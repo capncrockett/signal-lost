@@ -18,4 +18,4 @@
 
 ## Done ✅
 
-- [ ] *(Check once coverage + tests pass)*
+- [x] RadioTuner Component (80%+ test coverage achieved)
