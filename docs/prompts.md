@@ -51,7 +51,7 @@ These are modular, acceptance-test-driven development prompts. Implement each on
 
 ---
 
-### ❌ SaveManager
+### ✅ SaveManager
 
 > Create a save/load manager with localStorage.
 > - Tracks flags: `foundTower1`, `decodedMsg3`, etc.
