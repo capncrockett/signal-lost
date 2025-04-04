@@ -7,7 +7,7 @@ These are modular, acceptance-test-driven development prompts. Implement each on
 
 ---
 
-### ❌ RadioTuner Component
+### ✅ RadioTuner Component
 
 > Build a `RadioTuner` UI component for Phaser 3. Simulates analog tuning with:
 > - Frequency slider (visual + interactive)
