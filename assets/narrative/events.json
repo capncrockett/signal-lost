@@ -1,0 +1,275 @@
+[
+  {
+    "id": "tower_discovery",
+    "message": "You hear whispers in the static. The radio tower looms above you, its red light blinking in the fog.",
+    "choices": [
+      {
+        "text": "Investigate the tower",
+        "outcome": "trigger_tower_investigation"
+      },
+      {
+        "text": "Keep your distance",
+        "outcome": "trigger_tower_observe"
+      }
+    ],
+    "interference": 0.3
+  },
+  {
+    "id": "tower_investigation",
+    "message": "As you approach the tower, the static on your radio intensifies. You notice a small door at the base of the structure.",
+    "choices": [
+      {
+        "text": "Try to open the door",
+        "outcome": "trigger_tower_door"
+      },
+      {
+        "text": "Circle around the tower",
+        "outcome": "trigger_tower_circle"
+      },
+      {
+        "text": "Back away",
+        "outcome": "trigger_tower_observe"
+      }
+    ],
+    "interference": 0.5
+  },
+  {
+    "id": "tower_door",
+    "message": "The door is locked, but you notice a keypad next to it. There's a note with a series of numbers: 3-7-2-9.",
+    "choices": [
+      {
+        "text": "Enter the code",
+        "outcome": "trigger_tower_enter"
+      },
+      {
+        "text": "Look for another way in",
+        "outcome": "trigger_tower_circle"
+      },
+      {
+        "text": "Back away",
+        "outcome": "trigger_tower_observe"
+      }
+    ],
+    "interference": 0.2
+  },
+  {
+    "id": "tower_enter",
+    "message": "The door unlocks with a click. Inside, you find a small room with monitoring equipment. A logbook sits on a desk, its pages filled with strange observations.",
+    "choices": [
+      {
+        "text": "Read the logbook",
+        "outcome": "trigger_tower_logbook"
+      },
+      {
+        "text": "Examine the equipment",
+        "outcome": "trigger_tower_equipment"
+      },
+      {
+        "text": "Leave the tower",
+        "outcome": "trigger_tower_observe"
+      }
+    ],
+    "interference": 0.1
+  },
+  {
+    "id": "tower_logbook",
+    "message": "The logbook contains entries about signal anomalies. The last entry reads: 'They're coming through. The frequency is the key. 103.7 MHz.'",
+    "choices": [
+      {
+        "text": "Tune your radio to 103.7 MHz",
+        "outcome": "set_tuned_frequency=103.7"
+      },
+      {
+        "text": "Examine the equipment",
+        "outcome": "trigger_tower_equipment"
+      },
+      {
+        "text": "Leave the tower",
+        "outcome": "trigger_tower_observe"
+      }
+    ],
+    "interference": 0.1
+  },
+  {
+    "id": "tower_equipment",
+    "message": "The equipment consists of radio receivers, signal analyzers, and a map with several locations marked. One location is circled in red.",
+    "choices": [
+      {
+        "text": "Note the marked location",
+        "outcome": "set_knows_location=true"
+      },
+      {
+        "text": "Read the logbook",
+        "outcome": "trigger_tower_logbook"
+      },
+      {
+        "text": "Leave the tower",
+        "outcome": "trigger_tower_observe"
+      }
+    ],
+    "interference": 0.1
+  },
+  {
+    "id": "tower_circle",
+    "message": "As you circle the tower, you notice a maintenance ladder leading up to a platform. The ladder looks rusty but might hold your weight.",
+    "choices": [
+      {
+        "text": "Climb the ladder",
+        "outcome": "trigger_tower_climb"
+      },
+      {
+        "text": "Check the door again",
+        "outcome": "trigger_tower_door"
+      },
+      {
+        "text": "Back away",
+        "outcome": "trigger_tower_observe"
+      }
+    ],
+    "interference": 0.3
+  },
+  {
+    "id": "tower_climb",
+    "message": "You climb the ladder to a small platform. From here, you can see for miles. Your radio picks up a clearer signal at this height.",
+    "choices": [
+      {
+        "text": "Adjust your radio",
+        "outcome": "set_signal_boost=true"
+      },
+      {
+        "text": "Look for an entrance",
+        "outcome": "trigger_tower_platform_door"
+      },
+      {
+        "text": "Climb back down",
+        "outcome": "trigger_tower_circle"
+      }
+    ],
+    "interference": 0.2
+  },
+  {
+    "id": "tower_platform_door",
+    "message": "You find a small hatch on the platform. It's unlocked and leads into the tower.",
+    "choices": [
+      {
+        "text": "Enter the hatch",
+        "outcome": "trigger_tower_enter"
+      },
+      {
+        "text": "Adjust your radio first",
+        "outcome": "set_signal_boost=true"
+      },
+      {
+        "text": "Climb back down",
+        "outcome": "trigger_tower_circle"
+      }
+    ],
+    "interference": 0.2
+  },
+  {
+    "id": "tower_observe",
+    "message": "From a distance, the tower seems to pulse with an eerie rhythm. Your radio picks up fragments of voices, too distorted to understand.",
+    "choices": [
+      {
+        "text": "Approach the tower",
+        "outcome": "trigger_tower_investigation"
+      },
+      {
+        "text": "Tune your radio",
+        "outcome": "trigger_radio_tuning"
+      },
+      {
+        "text": "Leave the area",
+        "outcome": "trigger_leave_area"
+      }
+    ],
+    "interference": 0.4
+  },
+  {
+    "id": "radio_tuning",
+    "message": "You adjust your radio, trying to find a clear signal. As you turn the dial, the static ebbs and flows.",
+    "choices": [
+      {
+        "text": "Keep tuning",
+        "outcome": "trigger_radio_signal"
+      },
+      {
+        "text": "Approach the tower",
+        "outcome": "trigger_tower_investigation"
+      },
+      {
+        "text": "Leave the area",
+        "outcome": "trigger_leave_area"
+      }
+    ],
+    "interference": 0.6
+  },
+  {
+    "id": "radio_signal",
+    "message": "You find a frequency with less static. A voice comes through: '...coordinates... 37.7749° N, 122.4194° W... signal lost...'",
+    "choices": [
+      {
+        "text": "Note the coordinates",
+        "outcome": "set_knows_coordinates=true"
+      },
+      {
+        "text": "Approach the tower",
+        "outcome": "trigger_tower_investigation"
+      },
+      {
+        "text": "Leave the area",
+        "outcome": "trigger_leave_area"
+      }
+    ],
+    "interference": 0.3
+  },
+  {
+    "id": "leave_area",
+    "message": "You decide to leave the area. As you walk away, the static on your radio gradually fades, but a sense of unease remains.",
+    "choices": [
+      {
+        "text": "Return to the tower",
+        "outcome": "trigger_tower_observe"
+      },
+      {
+        "text": "Continue exploring elsewhere",
+        "outcome": "trigger_new_area"
+      }
+    ],
+    "interference": 0.2
+  },
+  {
+    "id": "new_area",
+    "message": "You find yourself in a clearing. In the distance, you see the ruins of an old building.",
+    "choices": [
+      {
+        "text": "Investigate the ruins",
+        "outcome": "trigger_ruins_discovery"
+      },
+      {
+        "text": "Return to the tower",
+        "outcome": "trigger_tower_observe"
+      }
+    ],
+    "interference": 0.1
+  },
+  {
+    "id": "ruins_discovery",
+    "message": "The ruins appear to be an old research facility. Most of the building has collapsed, but one section remains intact.",
+    "choices": [
+      {
+        "text": "Enter the intact section",
+        "outcome": "trigger_ruins_enter"
+      },
+      {
+        "text": "Search around the ruins",
+        "outcome": "trigger_ruins_search"
+      },
+      {
+        "text": "Leave the ruins",
+        "outcome": "trigger_new_area"
+      }
+    ],
+    "interference": 0.2
+  }
+]

@@ -61,7 +61,7 @@ These are modular, acceptance-test-driven development prompts. Implement each on
 
 ---
 
-### ❌ NarrativeEngine
+### ✅ NarrativeEngine
 
 > Load narrative events from JSON/YAML:
 > ```yaml
