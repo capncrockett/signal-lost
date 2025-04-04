@@ -11,22 +11,30 @@ export class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    // Load assets here
-    // Will add asset loading later
+    // Load assets
+    this.load.image('radio', 'assets/images/radio.png');
+    this.load.image('signalDetector', 'assets/images/signalDetector.png');
+    this.load.image('menuBackground', 'assets/images/menuBackground.png');
+    this.load.audio('static', 'assets/audio/static.mp3');
   }
 
   create() {
+    // Add background
+    const bg = this.add.image(400, 300, 'menuBackground');
+    bg.setDisplaySize(800, 600);
+
     // Initialize soundscape manager
-    this.soundscapeManager = new SoundscapeManager();
+    this.soundscapeManager = new SoundscapeManager(this);
 
     // Create the radio tuner component
     this.radioTuner = new RadioTuner(this, 400, 300);
     this.add.existing(this.radioTuner);
 
     // Listen for signal lock events
-    this.radioTuner.on('signalLock', (frequency: number) => {
-      console.log(`Signal locked at frequency: ${frequency}`);
-      // Handle signal lock event
+    this.radioTuner.on('signalLock', (data: any) => {
+      console.log(`Signal locked at frequency: ${data.frequency}`);
+      // Play a signal sound when locked
+      this.soundscapeManager.playSignalSound();
     });
 
     // Initialize audio on first interaction
@@ -47,6 +55,15 @@ export class MainScene extends Phaser.Scene {
     fieldButton.on('pointerdown', () => {
       this.scene.start('FieldScene');
     });
+
+    // Add instructions
+    const instructions = this.add.text(400, 400, 'Click and drag the radio tuner to find signals', {
+      fontSize: '18px',
+      color: '#ffffff',
+      backgroundColor: '#000000',
+      padding: { x: 10, y: 5 }
+    });
+    instructions.setOrigin(0.5, 0.5);
   }
 
   update(time: number, delta: number) {
@@ -55,7 +72,7 @@ export class MainScene extends Phaser.Scene {
     // Update soundscape based on radio tuner signal strength
     if (this.radioTuner && this.soundscapeManager) {
       const signalStrength = this.radioTuner.getSignalStrengthValue();
-      this.soundscapeManager.adjustLayers(signalStrength);
+      this.soundscapeManager.updateLayers(signalStrength);
     }
   }
 }
