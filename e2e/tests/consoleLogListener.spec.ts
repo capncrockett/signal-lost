@@ -36,15 +36,16 @@ test('Console log listener captures all game events', async ({ page }) => {
   await page.waitForSelector('#game', { timeout: 10000 });
 
   // Find the game container
-  const gameContainer = await page.locator('#game');
+  const gameContainer = page.locator('#game');
 
   // Verify game container exists
   await expect(gameContainer).toBeVisible();
 
   // Find the fallback canvas
-  const canvas = await page.locator('#fallback-canvas');
+  // Use the Phaser canvas instead of fallback canvas
+  const canvas = await page.locator('canvas').nth(1);
 
-  // Verify fallback canvas exists
+  // Verify canvas exists
   await expect(canvas).toBeVisible();
 
   // Click on the canvas to initialize audio
@@ -114,8 +115,8 @@ test('Console log listener captures performance metrics', async ({ page }) => {
   // Wait for the game to load
   await page.waitForTimeout(2000);
 
-  // Find the canvas
-  const canvas = await page.locator('canvas');
+  // Find the Phaser canvas (second canvas element)
+  const canvas = await page.locator('canvas').nth(1);
 
   // Click on the canvas to initialize the game
   await canvas.click();
@@ -173,8 +174,8 @@ test('Console log listener captures save/load operations', async ({ page }) => {
   // Wait for the game to load
   await page.waitForTimeout(2000);
 
-  // Find the canvas
-  const canvas = await page.locator('canvas');
+  // Find the Phaser canvas (second canvas element)
+  const canvas = await page.locator('canvas').nth(1);
 
   // Click on the canvas to initialize the game
   await canvas.click();
@@ -231,8 +232,8 @@ test('Console log listener captures error handling', async ({ page }) => {
   // Wait for the game to load
   await page.waitForTimeout(2000);
 
-  // Find the canvas
-  const canvas = await page.locator('canvas');
+  // Find the Phaser canvas (second canvas element)
+  const canvas = await page.locator('canvas').nth(1);
 
   // Click on the canvas to initialize the game
   await canvas.click();

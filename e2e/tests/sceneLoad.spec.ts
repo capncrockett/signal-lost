@@ -17,15 +17,15 @@ test('Game loads and scenes can be navigated', async ({ page }) => {
   await page.waitForSelector('#game', { timeout: 10000 });
 
   // Find the game container
-  const gameContainer = await page.locator('#game');
+  const gameContainer = page.locator('#game');
 
   // Verify game container exists
   await expect(gameContainer).toBeVisible();
 
-  // Find the fallback canvas
-  const canvas = await page.locator('#fallback-canvas');
+  // Find the Phaser canvas (second canvas element)
+  const canvas = page.locator('canvas').nth(1);
 
-  // Verify fallback canvas exists
+  // Verify canvas exists
   await expect(canvas).toBeVisible();
 
   // Wait for the game to load
@@ -73,8 +73,8 @@ test('Game handles window resize correctly', async ({ page }) => {
   // Wait for the game to load
   await page.waitForTimeout(2000);
 
-  // Find the canvas
-  const canvas = await page.locator('canvas');
+  // Find the Phaser canvas (second canvas element)
+  const canvas = page.locator('canvas').nth(1);
 
   // Get initial canvas size
   const initialBoundingBox = await canvas.boundingBox();
@@ -125,8 +125,8 @@ test('Game loads assets correctly', async ({ page }) => {
 
   expect(assetErrors).toHaveLength(0);
 
-  // Find the canvas
-  const canvas = await page.locator('canvas');
+  // Find the Phaser canvas (second canvas element)
+  const canvas = page.locator('canvas').nth(1);
 
   // Verify canvas exists
   await expect(canvas).toBeVisible();
@@ -145,8 +145,8 @@ test('Game initializes audio correctly', async ({ page }) => {
   // Wait for the game to load
   await page.waitForTimeout(2000);
 
-  // Find the canvas
-  const canvas = await page.locator('canvas');
+  // Find the Phaser canvas (second canvas element)
+  const canvas = page.locator('canvas').nth(1);
 
   // Click on the canvas to initialize audio (browser policy requires user interaction)
   await canvas.click();

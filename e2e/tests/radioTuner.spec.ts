@@ -17,15 +17,15 @@ test('RadioTuner component loads and emits signal lock event', async ({ page }) 
   await page.waitForSelector('#game', { timeout: 10000 });
 
   // Find the game container
-  const gameContainer = await page.locator('#game');
+  const gameContainer = page.locator('#game');
 
   // Verify game container exists
   await expect(gameContainer).toBeVisible();
 
-  // Find the fallback canvas
-  const canvas = await page.locator('#fallback-canvas');
+  // Find the Phaser canvas (second canvas element)
+  const canvas = page.locator('canvas').nth(1);
 
-  // Verify fallback canvas exists
+  // Verify canvas exists
   await expect(canvas).toBeVisible();
 
   // Click on the canvas where the radio tuner should be
