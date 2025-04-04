@@ -3,20 +3,22 @@ import { test, expect } from '@playwright/test';
 test('RadioTuner component loads and emits signal lock event', async ({ page }) => {
   // Navigate to the game
   await page.goto('http://localhost:5173/');
-  
+
   // Listen for console logs
   const logs: string[] = [];
   page.on('console', msg => {
     logs.push(msg.text());
   });
-  
+
   // Wait for the game to load
   await page.waitForTimeout(2000);
-  
-  // Find the radio tuner knob (this would need to be adjusted based on actual DOM structure)
-  // For Phaser canvas, we'll use coordinates instead
+
+  // Wait for the game to initialize and create the canvas
+  await page.waitForSelector('canvas', { timeout: 10000 });
+
+  // Find the canvas
   const canvas = await page.locator('canvas');
-  
+
   // Click on the canvas where the radio tuner should be
   // These coordinates would need to be adjusted based on actual layout
   await canvas.click({
@@ -25,10 +27,10 @@ test('RadioTuner component loads and emits signal lock event', async ({ page }) 
       y: 300  // Center Y
     }
   });
-  
+
   // Wait for potential signal lock event
   await page.waitForTimeout(1000);
-  
+
   // Check if the signal lock event was logged
   const signalLockLog = logs.find(log => log.includes('Signal locked at frequency'));
   expect(signalLockLog).toBeDefined();
