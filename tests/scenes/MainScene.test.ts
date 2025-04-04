@@ -4,7 +4,12 @@ jest.mock('phaser', () => {
     Scene: class Scene {
       constructor(config: any) {}
       add = {
-        existing: jest.fn()
+        existing: jest.fn(),
+        text: jest.fn().mockReturnValue({
+          setOrigin: jest.fn().mockReturnThis(),
+          setInteractive: jest.fn().mockReturnThis(),
+          on: jest.fn().mockReturnThis()
+        })
       };
       input = {
         once: jest.fn(),

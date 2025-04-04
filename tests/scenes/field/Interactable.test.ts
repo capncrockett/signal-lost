@@ -1,3 +1,32 @@
+// Mock Phaser before importing Interactable
+jest.mock('phaser', () => {
+  return {
+    GameObjects: {
+      Sprite: class Sprite {
+        constructor(scene: any, x: number, y: number, texture: string) {
+          this.scene = scene;
+          this.x = x;
+          this.y = y;
+          this.texture = texture;
+        }
+        scene: any;
+        x: number;
+        y: number;
+        texture: string;
+        visible: boolean = true;
+        alpha: number = 1;
+        setOrigin() { return this; }
+      }
+    },
+    Events: {
+      EventEmitter: class EventEmitter {
+        on() { return this; }
+        emit() { return this; }
+      }
+    }
+  };
+});
+
 import { Interactable } from '../../../src/scenes/field/Interactable';
 
 // Mock Phaser.Scene
@@ -25,11 +54,11 @@ const mockScene = {
 
 describe('Interactable', () => {
   let interactable: Interactable;
-  
+
   beforeEach(() => {
     // Reset mocks
     jest.clearAllMocks();
-    
+
     // Create an interactable at grid position (10, 8)
     interactable = new Interactable(
       mockScene as any,
@@ -40,7 +69,7 @@ describe('Interactable', () => {
       2
     );
   });
-  
+
   describe('constructor', () => {
     test('should initialize with the correct properties', () => {
       expect(interactable.getId()).toBe('tower1');
@@ -50,57 +79,57 @@ describe('Interactable', () => {
       expect(interactable.getTriggerDistance()).toBe(2);
       expect(interactable.isTriggered()).toBe(false);
     });
-    
+
     test('should initialize at the correct world position', () => {
       // For a 32px tile, the center of tile (10,8) should be at (336,272)
       expect(interactable.x).toBe(336);
       expect(interactable.y).toBe(272);
     });
-    
+
     test('should create a pulse effect', () => {
       expect(mockScene.tweens.add).toHaveBeenCalled();
       expect(mockScene.tweens.add.mock.calls[0][0].targets).toBe(interactable);
     });
   });
-  
+
   describe('trigger', () => {
     test('should set triggered to true', () => {
       interactable.trigger();
       expect(interactable.isTriggered()).toBe(true);
     });
-    
+
     test('should add visual effects', () => {
       interactable.trigger();
-      
+
       // Should add a tween
       expect(mockScene.tweens.add).toHaveBeenCalledTimes(2); // Once in constructor, once in trigger
       expect(mockScene.tweens.add.mock.calls[1][0].targets).toBe(interactable);
-      
+
       // Should add particles
       expect(mockScene.add.particles).toHaveBeenCalledWith('tower');
       expect(mockScene.add.particles().createEmitter).toHaveBeenCalled();
-      
+
       // Should set up a delayed call to destroy particles
       expect(mockScene.time.delayedCall).toHaveBeenCalled();
       expect(mockScene.add.particles().destroy).toHaveBeenCalled();
     });
-    
+
     test('should do nothing if already triggered', () => {
       // Trigger once
       interactable.trigger();
-      
+
       // Reset mocks
       jest.clearAllMocks();
-      
+
       // Trigger again
       interactable.trigger();
-      
+
       // Should not add effects again
       expect(mockScene.tweens.add).not.toHaveBeenCalled();
       expect(mockScene.add.particles).not.toHaveBeenCalled();
     });
   });
-  
+
   describe('getters', () => {
     test('should return the correct values', () => {
       expect(interactable.getId()).toBe('tower1');
