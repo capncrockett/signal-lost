@@ -8,8 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "jest",
-    "test:e2e": "playwright test",
-    "coverage": "jest --coverage"
+    "test:e2e": "playwright test --reporter=list",
+    "coverage": "jest --coverage --coverageReporters=text"
   },
   "keywords": [
     "game",
