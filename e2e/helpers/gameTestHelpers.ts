@@ -12,23 +12,23 @@ import { Page, expect } from '@playwright/test';
 export async function waitForGameLoad(page: Page) {
   // Wait for the game container to be visible
   await page.waitForSelector('#game', { timeout: 10000 });
-  
+
   // Find the game container
   const gameContainer = await page.locator('#game');
-  
+
   // Verify game container exists
   await expect(gameContainer).toBeVisible();
-  
+
   // Wait for canvas elements to be created
   await page.waitForTimeout(2000);
-  
+
   // Count canvas elements
   const canvasCount = await page.locator('canvas').count();
   console.log(`Canvas count: ${canvasCount}`);
-  
+
   // Verify at least one canvas exists
   expect(canvasCount).toBeGreaterThan(0);
-  
+
   return {
     gameContainer,
     canvasCount
@@ -45,18 +45,18 @@ export async function waitForGameLoad(page: Page) {
 export async function clickGamePosition(page: Page, x: number, y: number, options?: any) {
   // Find the game container
   const gameContainer = await page.locator('#game');
-  
+
   // Get the bounding box of the game container
   const box = await gameContainer.boundingBox();
-  
+
   if (!box) {
     throw new Error('Game container not found or not visible');
   }
-  
+
   // Calculate the absolute position
   const absoluteX = box.x + x;
   const absoluteY = box.y + y;
-  
+
   // Click at the calculated position
   await page.mouse.click(absoluteX, absoluteY, options);
 }
@@ -71,29 +71,29 @@ export async function clickGamePosition(page: Page, x: number, y: number, option
  * @param options Optional mouse options
  */
 export async function dragInGame(
-  page: Page, 
-  startX: number, 
-  startY: number, 
-  endX: number, 
+  page: Page,
+  startX: number,
+  startY: number,
+  endX: number,
   endY: number,
   options?: any
 ) {
   // Find the game container
   const gameContainer = await page.locator('#game');
-  
+
   // Get the bounding box of the game container
   const box = await gameContainer.boundingBox();
-  
+
   if (!box) {
     throw new Error('Game container not found or not visible');
   }
-  
+
   // Calculate the absolute positions
   const absoluteStartX = box.x + startX;
   const absoluteStartY = box.y + startY;
   const absoluteEndX = box.x + endX;
   const absoluteEndY = box.y + endY;
-  
+
   // Perform the drag operation
   await page.mouse.move(absoluteStartX, absoluteStartY);
   await page.mouse.down();
@@ -123,26 +123,26 @@ export async function captureConsoleLogs(page: Page, duration: number = 2000) {
   const logs: string[] = [];
   const errors: string[] = [];
   const warnings: string[] = [];
-  
+
   // Set up console log collection
   const consoleListener = (msg: any) => {
     const text = msg.text();
     logs.push(text);
-    
+
     // Categorize by type
     if (msg.type() === 'error') errors.push(text);
     if (msg.type() === 'warning') warnings.push(text);
   };
-  
+
   // Add the listener
   page.on('console', consoleListener);
-  
+
   // Wait for the specified duration
   await page.waitForTimeout(duration);
-  
+
   // Remove the listener to avoid duplicate logs
   page.removeListener('console', consoleListener);
-  
+
   return {
     logs,
     errors,
@@ -159,32 +159,41 @@ export async function captureConsoleLogs(page: Page, duration: number = 2000) {
 export async function testRadioTuner(page: Page) {
   // Wait for game to load
   await waitForGameLoad(page);
-  
+
   // Click to initialize audio
   await clickGamePosition(page, 400, 300);
-  
+
   // Wait for audio to initialize
   await page.waitForTimeout(1000);
-  
+
   // Drag the radio tuner knob
   await dragInGame(page, 400, 300, 450, 300);
-  
+
   // Wait for signal processing
   await page.waitForTimeout(1000);
-  
+
   // Drag to another position
   await dragInGame(page, 450, 300, 350, 300);
-  
+
   // Wait for signal processing
   await page.waitForTimeout(1000);
-  
+
   // Capture console logs to check for signal events
   const logResults = await captureConsoleLogs(page, 1000);
-  
+
   // Return test results
+  // Filter out audio loading errors
+  const nonAudioErrors = logResults.errors.filter(error =>
+    !error.includes('Unable to decode audio data') &&
+    !error.includes('Failed to process file') &&
+    !error.includes('Failed to load resource')
+  );
+
   return {
     signalEvents: logResults.logs.filter(log => log.includes('Signal')),
     audioInitialized: await verifyAudioContext(page),
-    logResults
+    logResults,
+    nonAudioErrors,
+    hasNonAudioErrors: nonAudioErrors.length > 0
   };
 }

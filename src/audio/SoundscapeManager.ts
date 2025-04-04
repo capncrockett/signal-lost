@@ -36,11 +36,11 @@ export class SoundscapeManager {
   };
 
   // Reference to the scene
-  private scene: Phaser.Scene;
+  private scene?: Phaser.Scene;
 
   constructor(scene?: Phaser.Scene) {
     // Audio context will be initialized on first user interaction
-    this.scene = scene || null;
+    this.scene = scene;
   }
 
   /**
@@ -232,9 +232,26 @@ export class SoundscapeManager {
    * Play a signal lock sound
    */
   public playSignalSound(): void {
-    if (!this.audioContext || !this.isInitialized) return;
+    if (!this.isInitialized) {
+      // Try to use Phaser's sound system if available
+      if (this.scene && this.scene.sound) {
+        try {
+          // Play a beep sound using Phaser's sound system
+          const beep = this.scene.sound.add('static', { volume: 0.3, loop: false });
+          beep.play();
+          return;
+        } catch (error) {
+          console.warn('Failed to play signal sound with Phaser:', error);
+        }
+      }
+
+      // If we can't use Phaser or Web Audio API, return
+      if (!this.audioContext) return;
+    }
 
     try {
+      if (!this.audioContext || !this.masterGain) return;
+
       // Create oscillator for signal sound
       const signalOsc = this.audioContext.createOscillator();
       signalOsc.type = 'sine';
@@ -246,7 +263,7 @@ export class SoundscapeManager {
 
       // Connect to master gain
       signalOsc.connect(signalGain);
-      signalGain.connect(this.masterGain!);
+      signalGain.connect(this.masterGain);
 
       // Schedule envelope
       const now = this.audioContext.currentTime;
