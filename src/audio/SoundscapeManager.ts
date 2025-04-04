@@ -1,3 +1,5 @@
+import { AudioManager } from './AudioManager';
+
 /**
  * SoundscapeManager
  *
@@ -38,9 +40,18 @@ export class SoundscapeManager {
   // Reference to the scene
   private scene?: Phaser.Scene;
 
+  // Reference to the audio manager
+  private audioManager: AudioManager;
+
+  // Volume change listener
+  private volumeChangeListener: ((volume: number) => void) | null = null;
+
   constructor(scene?: Phaser.Scene) {
     // Audio context will be initialized on first user interaction
     this.scene = scene;
+
+    // Get the audio manager
+    this.audioManager = AudioManager.getInstance();
   }
 
   /**
@@ -58,6 +69,16 @@ export class SoundscapeManager {
       this.masterGain = this.audioContext.createGain();
       this.masterGain.gain.value = 0.5; // Overall volume at 50% (reduced from 70%)
       this.masterGain.connect(this.audioContext.destination);
+
+      // Set up volume change listener
+      this.volumeChangeListener = (volume: number) => {
+        if (this.masterGain) {
+          this.masterGain.gain.value = volume * 0.5; // Apply volume scaling
+        }
+      };
+
+      // Add listener to audio manager
+      this.audioManager.addVolumeChangeListener(this.volumeChangeListener);
 
       // Set up static noise layer
       this.initializeStaticLayer();

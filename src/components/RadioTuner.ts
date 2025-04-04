@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { AudioManager } from '../audio/AudioManager';
 
 interface RadioTunerConfig {
   width?: number;
@@ -26,8 +27,11 @@ export class RadioTuner extends Phaser.GameObjects.Container {
   private isDragging: boolean = false;
   private audioContext: AudioContext | null = null;
   private staticGain: GainNode | null = null;
+  private masterGain: GainNode | null = null;
   private staticSource: AudioBufferSourceNode | null = null;
   private isAudioInitialized: boolean = false;
+  private audioManager: AudioManager;
+  private volumeChangeListener: ((volume: number) => void) | null = null;
 
   constructor(
     scene: Phaser.Scene,
@@ -49,6 +53,9 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       sliderColor: config.sliderColor || 0x666666,
       knobColor: config.knobColor || 0xcccccc
     };
+
+    // Get the audio manager
+    this.audioManager = AudioManager.getInstance();
 
     this.currentFrequency = (this.config.minFrequency + this.config.maxFrequency) / 2;
 
@@ -197,7 +204,7 @@ export class RadioTuner extends Phaser.GameObjects.Container {
     this.knob.x = minX + t * (maxX - minX);
   }
 
-  private masterGain: GainNode | null = null;
+  // Initialize audio system
 
   private initializeAudio(): void {
     if (this.isAudioInitialized) return;
@@ -218,6 +225,16 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       // We'll simulate static with white noise
       // In a real implementation, you would load an actual static sound
       this.createStaticNoise();
+
+      // Set up volume change listener
+      this.volumeChangeListener = (volume: number) => {
+        if (this.masterGain) {
+          this.masterGain.gain.value = volume * 0.5; // Apply volume scaling
+        }
+      };
+
+      // Add listener to audio manager
+      this.audioManager.addVolumeChangeListener(this.volumeChangeListener);
 
       this.isAudioInitialized = true;
     } catch (error) {
@@ -334,6 +351,12 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
     if (this.masterGain) {
       this.masterGain.disconnect();
+    }
+
+    // Remove volume change listener
+    if (this.volumeChangeListener) {
+      this.audioManager.removeVolumeChangeListener(this.volumeChangeListener);
+      this.volumeChangeListener = null;
     }
 
     if (this.audioContext && this.audioContext.state !== 'closed') {

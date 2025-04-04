@@ -1,10 +1,12 @@
 import Phaser from 'phaser';
 import { RadioTuner } from '../components/RadioTuner';
 import { SoundscapeManager } from '../audio/SoundscapeManager';
+import { VolumeControl } from '../components/VolumeControl';
 
 export class MainScene extends Phaser.Scene {
   private radioTuner!: RadioTuner;
   private soundscapeManager!: SoundscapeManager;
+  private volumeControl!: VolumeControl;
 
   constructor() {
     super({ key: 'MainScene' });
@@ -43,6 +45,14 @@ export class MainScene extends Phaser.Scene {
       console.log('Audio initialized');
     });
 
+    // Add volume control
+    this.volumeControl = new VolumeControl(this, 700, 50, {
+      width: 150,
+      height: 30,
+      initialVolume: 0.5
+    });
+    this.add.existing(this.volumeControl);
+
     // Add button to navigate to FieldScene
     const fieldButton = this.add.text(400, 500, 'Go to Field', {
       fontSize: '24px',
@@ -64,6 +74,15 @@ export class MainScene extends Phaser.Scene {
       padding: { x: 10, y: 5 }
     });
     instructions.setOrigin(0.5, 0.5);
+
+    // Add volume instructions
+    const volumeInstructions = this.add.text(700, 80, 'Adjust volume', {
+      fontSize: '14px',
+      color: '#ffffff',
+      backgroundColor: '#000000',
+      padding: { x: 5, y: 3 }
+    });
+    volumeInstructions.setOrigin(0.5, 0.5);
   }
 
   update(time: number, delta: number) {
