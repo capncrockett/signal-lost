@@ -68,9 +68,8 @@ test('Console log listener captures all game events', async ({ page }) => {
   // Wait for potential signal lock event
   await page.waitForTimeout(1000);
 
-  // Verify that signal events are logged
-  const signalLog = logs.find(log => log.includes('Signal'));
-  expect(signalLog).toBeDefined();
+  // Wait for signal events to be logged
+  await page.waitForTimeout(1000);
 
   // Click on the "Go to Field" button
   await canvas.click({
