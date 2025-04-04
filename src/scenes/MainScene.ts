@@ -32,8 +32,14 @@ export class MainScene extends Phaser.Scene {
     this.radioTuner = new RadioTuner(this, 400, 300);
     this.add.existing(this.radioTuner);
 
+    // Define the type for signal lock data
+    interface SignalLockData {
+      frequency: number;
+      signalStrength: number;
+    }
+
     // Listen for signal lock events
-    this.radioTuner.on('signalLock', (data: any) => {
+    this.radioTuner.on('signalLock', (data: SignalLockData) => {
       console.log(`Signal locked at frequency: ${data.frequency}`);
       // Play a signal sound when locked
       this.soundscapeManager.playSignalSound();

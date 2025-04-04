@@ -210,7 +210,16 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
     try {
       // Create audio context
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      // Use a type assertion to handle the webkitAudioContext
+      // This is a common pattern for cross-browser compatibility
+      const AudioContextClass =
+        window.AudioContext ||
+        (
+          window as unknown as {
+            webkitAudioContext: typeof AudioContext;
+          }
+        ).webkitAudioContext;
+      this.audioContext = new AudioContextClass();
 
       // Create master gain node (reduced to 50% volume)
       this.masterGain = this.audioContext.createGain();

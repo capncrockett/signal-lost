@@ -43,7 +43,8 @@ export class NarrativeEngine {
   private eventHistory: string[] = [];
 
   // Flag variables for conditions
-  private variables: Map<string, any> = new Map();
+  // Variables can be of different types (string, number, boolean, object)
+  private variables: Map<string, unknown> = new Map();
 
   /**
    * Create a new narrative engine
@@ -263,7 +264,7 @@ export class NarrativeEngine {
    * @param name Variable name
    * @param value Variable value
    */
-  setVariable(name: string, value: any): void {
+  setVariable(name: string, value: unknown): void {
     this.variables.set(name, value);
     SaveManager.setFlag(`var_${name}`, true);
 
@@ -278,7 +279,7 @@ export class NarrativeEngine {
    * @param name Variable name
    * @returns Variable value or undefined if not set
    */
-  getVariable(name: string): any {
+  getVariable(name: string): unknown {
     return this.variables.get(name);
   }
 
@@ -347,7 +348,7 @@ export class NarrativeEngine {
    * @param event Event name
    * @param listener Event listener
    */
-  on(event: string, listener: (...args: any[]) => void): void {
+  on(event: string, listener: (...args: unknown[]) => void): void {
     this.eventEmitter.on(event, listener);
   }
 
@@ -356,7 +357,7 @@ export class NarrativeEngine {
    * @param event Event name
    * @param listener Event listener
    */
-  off(event: string, listener: (...args: any[]) => void): void {
+  off(event: string, listener: (...args: unknown[]) => void): void {
     this.eventEmitter.off(event, listener);
   }
 }

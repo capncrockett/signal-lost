@@ -63,7 +63,15 @@ export class SoundscapeManager {
 
     try {
       // Create audio context
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      // Use a type assertion to handle the webkitAudioContext
+      const AudioContextClass =
+        window.AudioContext ||
+        (
+          window as unknown as {
+            webkitAudioContext: typeof AudioContext;
+          }
+        ).webkitAudioContext;
+      this.audioContext = new AudioContextClass();
 
       // Create master gain
       this.masterGain = this.audioContext.createGain();

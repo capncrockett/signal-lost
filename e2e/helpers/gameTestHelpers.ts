@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { ConsoleMessage, MouseClickOptions, Page, expect } from '@playwright/test';
 
 /**
  * Helper functions for testing games programmatically
@@ -42,7 +42,12 @@ export async function waitForGameLoad(page: Page) {
  * @param y Y coordinate
  * @param options Optional click options
  */
-export async function clickGamePosition(page: Page, x: number, y: number, options?: any) {
+export async function clickGamePosition(
+  page: Page,
+  x: number,
+  y: number,
+  options?: MouseClickOptions
+) {
   // Find the game container
   const gameContainer = await page.locator('#game');
 
@@ -76,7 +81,7 @@ export async function dragInGame(
   startY: number,
   endX: number,
   endY: number,
-  _options?: any
+  _options?: MouseClickOptions
 ) {
   // Find the game container
   const gameContainer = await page.locator('#game');
@@ -109,7 +114,10 @@ export async function dragInGame(
 export async function verifyAudioContext(page: Page): Promise<boolean> {
   return await page.evaluate(() => {
     // Check if any AudioContext exists in the page
-    return !!window.AudioContext || !!(window as any).webkitAudioContext;
+    return (
+      !!window.AudioContext ||
+      !!(window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    );
   });
 }
 
@@ -125,7 +133,7 @@ export async function captureConsoleLogs(page: Page, duration: number = 2000) {
   const warnings: string[] = [];
 
   // Set up console log collection
-  const consoleListener = (msg: any) => {
+  const consoleListener = (msg: ConsoleMessage) => {
     const text = msg.text();
     logs.push(text);
 

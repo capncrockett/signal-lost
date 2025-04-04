@@ -177,7 +177,18 @@ export class GridSystem {
 
         while (node.parent) {
           path.unshift({ x: node.x, y: node.y });
-          node = { ...node.parent, parent: null } as any;
+          // Define the type for the node
+          type GridNode = {
+            x: number;
+            y: number;
+            parent: GridNode | null;
+            f?: number;
+            g?: number;
+            h?: number;
+          };
+
+          // Create a new node without circular reference
+          node = { ...node.parent, parent: null } as GridNode;
         }
 
         return path;

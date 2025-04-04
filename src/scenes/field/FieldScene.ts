@@ -383,7 +383,7 @@ export class FieldScene extends Phaser.Scene {
    * @param fn Callback function
    * @param context Context for the callback
    */
-  on(event: string, fn: (...args: any[]) => void, context?: any): this {
+  on(event: string, fn: (...args: unknown[]) => void, context?: unknown): this {
     this.eventEmitter.on(event, fn, context);
     return this;
   }
@@ -394,7 +394,7 @@ export class FieldScene extends Phaser.Scene {
    * @param fn Callback function
    * @param context Context for the callback
    */
-  off(event: string, fn?: (...args: any[]) => void, context?: any): this {
+  off(event: string, fn?: (...args: unknown[]) => void, context?: unknown): this {
     this.eventEmitter.off(event, fn, context);
     return this;
   }
