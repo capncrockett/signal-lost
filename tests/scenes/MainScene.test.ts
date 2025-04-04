@@ -6,6 +6,10 @@ jest.mock('phaser', () => {
       add = {
         existing: jest.fn()
       };
+      input = {
+        once: jest.fn(),
+        on: jest.fn()
+      };
     },
     GameObjects: {
       Container: class Container {
@@ -19,9 +23,13 @@ jest.mock('phaser', () => {
 // Import the MainScene after mocking Phaser
 import { MainScene } from '../../src/scenes/MainScene';
 import { RadioTuner } from '../../src/components/RadioTuner';
+import { SoundscapeManager } from '../../src/audio/SoundscapeManager';
 
 // Mock the RadioTuner component
 jest.mock('../../src/components/RadioTuner');
+
+// Mock the SoundscapeManager
+jest.mock('../../src/audio/SoundscapeManager');
 
 describe('MainScene', () => {
   let mainScene: MainScene;
@@ -36,17 +44,24 @@ describe('MainScene', () => {
     expect(mainScene.constructor.name).toBe('MainScene');
   });
 
-  test('should create RadioTuner in create method', () => {
+  test('should create RadioTuner and SoundscapeManager in create method', () => {
     // Mock the RadioTuner constructor
     (RadioTuner as jest.Mock).mockImplementation(() => ({
       on: jest.fn().mockReturnThis()
     }));
 
+    // Mock the SoundscapeManager constructor
+    (SoundscapeManager as jest.Mock).mockImplementation(() => ({
+      initialize: jest.fn().mockReturnValue(true),
+      adjustLayers: jest.fn()
+    }));
+
     // Call the create method
     mainScene.create();
 
-    // Verify RadioTuner was created
+    // Verify RadioTuner and SoundscapeManager were created
     expect(RadioTuner).toHaveBeenCalled();
+    expect(SoundscapeManager).toHaveBeenCalled();
   });
 
   test('should handle signal lock events', () => {
@@ -79,11 +94,27 @@ describe('MainScene', () => {
     console.log = originalConsoleLog;
   });
 
-  test('should have update method', () => {
-    // Call the update method
+  test('should update soundscape in update method', () => {
+    // Mock the RadioTuner
+    const mockGetSignalStrength = jest.fn().mockReturnValue(0.5);
+    (RadioTuner as jest.Mock).mockImplementation(() => ({
+      on: jest.fn().mockReturnThis(),
+      getSignalStrengthValue: mockGetSignalStrength
+    }));
+
+    // Mock the SoundscapeManager
+    const mockAdjustLayers = jest.fn();
+    (SoundscapeManager as jest.Mock).mockImplementation(() => ({
+      initialize: jest.fn().mockReturnValue(true),
+      adjustLayers: mockAdjustLayers
+    }));
+
+    // Create the scene and call update
+    mainScene.create();
     mainScene.update(1000, 16);
 
-    // Just verify it doesn't throw an error
-    expect(true).toBe(true);
+    // Verify the soundscape was updated based on signal strength
+    expect(mockGetSignalStrength).toHaveBeenCalled();
+    expect(mockAdjustLayers).toHaveBeenCalledWith(0.5);
   });
 });

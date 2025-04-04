@@ -6,7 +6,7 @@
 ## Work In Progress
 
 - ✅ RadioTuner Component
-- ❌ SoundscapeManager
+- ✅ SoundscapeManager
 - ❌ Message Decoder
 - ❌ SaveManager
 - ❌ FieldScene Grid System
@@ -19,3 +19,4 @@
 ## Done ✅
 
 - [x] RadioTuner Component (80%+ test coverage achieved)
+- [x] SoundscapeManager (95%+ test coverage achieved)

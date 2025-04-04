@@ -18,7 +18,7 @@ These are modular, acceptance-test-driven development prompts. Implement each on
 
 ---
 
-### ❌ SoundscapeManager
+### ✅ SoundscapeManager
 
 > Create a `SoundscapeManager` using Web Audio API. Includes:
 > - Three ambient audio layers (static, drone, signal blip)
