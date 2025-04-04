@@ -3,14 +3,23 @@ import { test, expect } from '@playwright/test';
 test('Basic page load test with detailed diagnostics', async ({ page }) => {
   // Set up console log collection before navigation
   const logs: string[] = [];
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
   page.on('console', msg => {
-    logs.push(msg.text());
-    console.log(`Browser log: ${msg.text()}`);
+    const text = msg.text();
+    logs.push(text);
+    console.log(`Browser console [${msg.type()}]: ${text}`);
+
+    // Categorize by type
+    if (msg.type() === 'error') errors.push(text);
+    if (msg.type() === 'warning') warnings.push(text);
   });
 
   // Set up error collection
   page.on('pageerror', error => {
-    console.error(`Page error: ${error.message}`);
+    console.error(`Browser page error: ${error.message}`);
+    errors.push(error.message);
   });
 
   // Set up request/response monitoring
@@ -71,7 +80,19 @@ test('Basic page load test with detailed diagnostics', async ({ page }) => {
   console.log(`Canvas count after wait: ${newCanvasCount}`);
 
   // Log the collected console messages for debugging
-  console.log('Console logs:', logs);
+  console.log('Console logs count:', logs.length);
+  console.log('Console errors count:', errors.length);
+  console.log('Console warnings count:', warnings.length);
+
+  // If there are errors, log them in detail
+  if (errors.length > 0) {
+    console.error('Browser console errors:', errors);
+  }
+
+  // If there are warnings, log them in detail
+  if (warnings.length > 0) {
+    console.warn('Browser console warnings:', warnings);
+  }
 
   // Take a screenshot for debugging
   console.log('Taking screenshot...');

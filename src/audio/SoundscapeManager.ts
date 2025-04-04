@@ -56,7 +56,7 @@ export class SoundscapeManager {
 
       // Create master gain
       this.masterGain = this.audioContext.createGain();
-      this.masterGain.gain.value = 0.7; // Overall volume at 70%
+      this.masterGain.gain.value = 0.5; // Overall volume at 50% (reduced from 70%)
       this.masterGain.connect(this.audioContext.destination);
 
       // Set up static noise layer
@@ -84,7 +84,7 @@ export class SoundscapeManager {
 
     // Create gain node for static volume
     this.staticGain = this.audioContext.createGain();
-    this.staticGain.gain.value = 0.3; // Start at 30% volume
+    this.staticGain.gain.value = 0.225; // Start at 22.5% volume (reduced by 25%)
 
     // Create panner for static
     this.staticPanner = this.audioContext.createStereoPanner();
@@ -274,7 +274,7 @@ export class SoundscapeManager {
 
     // Adjust static volume (inverse relationship with signal strength)
     if (this.staticGain) {
-      this.staticGain.gain.value = 0.5 * (1 - strength);
+      this.staticGain.gain.value = 0.375 * (1 - strength); // Reduced by 25% from 0.5
     }
 
     // Adjust drone characteristics
