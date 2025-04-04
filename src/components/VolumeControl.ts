@@ -43,7 +43,7 @@ export class VolumeControl extends Phaser.GameObjects.Container {
 
     // Get the audio manager
     this.audioManager = AudioManager.getInstance();
-    
+
     // Set initial volume
     this.audioManager.setMasterVolume(this.config.initialVolume);
 
@@ -109,7 +109,7 @@ export class VolumeControl extends Phaser.GameObjects.Container {
       ),
       Phaser.Geom.Rectangle.Contains
     );
-    
+
     // Make the knob interactive and draggable
     this.knob.setInteractive(
       new Phaser.Geom.Circle(0, 0, this.config.height / 2 - 5),
@@ -136,16 +136,16 @@ export class VolumeControl extends Phaser.GameObjects.Container {
         const minX = -this.config.width / 2 + 10;
         const maxX = this.config.width / 2 - 10;
         const clampedX = Phaser.Math.Clamp(dragX, minX, maxX);
-        
+
         // Update knob position
         this.knob.x = clampedX;
-        
+
         // Calculate volume (0-1)
         const t = (clampedX - minX) / (maxX - minX);
-        
+
         // Update audio manager
         this.audioManager.setMasterVolume(t);
-        
+
         // Update display
         this.updateDisplay();
       }
@@ -163,16 +163,16 @@ export class VolumeControl extends Phaser.GameObjects.Container {
       const minX = -this.config.width / 2 + 10;
       const maxX = this.config.width / 2 - 10;
       const clampedX = Phaser.Math.Clamp(localX, minX, maxX);
-      
+
       // Update knob position
       this.knob.x = clampedX;
-      
+
       // Calculate volume (0-1)
       const t = (clampedX - minX) / (maxX - minX);
-      
+
       // Update audio manager
       this.audioManager.setMasterVolume(t);
-      
+
       // Update display
       this.updateDisplay();
     });
@@ -184,10 +184,13 @@ export class VolumeControl extends Phaser.GameObjects.Container {
   private updateDisplay(): void {
     // Get current volume
     const volume = this.audioManager.getMasterVolume();
-    
+
+    // Calculate effective volume (50% UI = 100% actual max volume)
+    const effectiveVolume = Math.min(1, volume * 2);
+
     // Update volume text
     this.volumeText.setText(`Volume: ${Math.round(volume * 100)}%`);
-    
+
     // Update knob position
     const minX = -this.config.width / 2 + 10;
     const maxX = this.config.width / 2 - 10;
@@ -201,7 +204,7 @@ export class VolumeControl extends Phaser.GameObjects.Container {
   public setVolume(volume: number): void {
     // Update audio manager
     this.audioManager.setMasterVolume(volume);
-    
+
     // Update display
     this.updateDisplay();
   }

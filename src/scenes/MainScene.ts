@@ -49,7 +49,7 @@ export class MainScene extends Phaser.Scene {
     this.volumeControl = new VolumeControl(this, 700, 50, {
       width: 150,
       height: 30,
-      initialVolume: 0.5
+      initialVolume: 0.1 // Start at 10% volume
     });
     this.add.existing(this.volumeControl);
 

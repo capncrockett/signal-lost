@@ -229,7 +229,9 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       // Set up volume change listener
       this.volumeChangeListener = (volume: number) => {
         if (this.masterGain) {
-          this.masterGain.gain.value = volume * 0.5; // Apply volume scaling
+          // Scale volume so that 50% in UI is maximum (0.25 gain)
+          // This makes the overall volume much lower
+          this.masterGain.gain.value = Math.min(0.25, volume * 0.5);
         }
       };
 

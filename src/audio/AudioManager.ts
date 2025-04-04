@@ -1,11 +1,11 @@
 /**
  * Global Audio Manager
- * 
+ *
  * Manages global audio settings and provides a central point for volume control
  */
 export class AudioManager {
   private static instance: AudioManager;
-  private masterVolume: number = 0.5; // Default to 50% volume
+  private masterVolume: number = 0.1; // Default to 10% volume
   private listeners: ((volume: number) => void)[] = [];
 
   private constructor() {
@@ -29,7 +29,7 @@ export class AudioManager {
   public setMasterVolume(volume: number): void {
     // Clamp volume between 0 and 1
     this.masterVolume = Math.max(0, Math.min(1, volume));
-    
+
     // Notify all listeners
     this.notifyListeners();
   }
@@ -48,7 +48,7 @@ export class AudioManager {
    */
   public addVolumeChangeListener(listener: (volume: number) => void): void {
     this.listeners.push(listener);
-    
+
     // Call the listener immediately with the current volume
     listener(this.masterVolume);
   }
