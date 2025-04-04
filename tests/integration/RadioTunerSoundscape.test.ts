@@ -6,9 +6,9 @@ jest.mock('../../src/audio/AudioManager', () => {
         setMasterVolume: jest.fn(),
         getMasterVolume: jest.fn().mockReturnValue(0.1),
         addVolumeChangeListener: jest.fn(),
-        removeVolumeChangeListener: jest.fn()
-      })
-    }
+        removeVolumeChangeListener: jest.fn(),
+      }),
+    },
   };
 });
 
@@ -20,12 +20,12 @@ jest.mock('../../src/audio/SoundscapeManager', () => {
         this.scene = scene;
       }
       scene: any;
-      updateLayers(signalStrength: number) {}
+      updateLayers(_signalStrength: number) {}
       playSignalSound() {}
-      setVolume(volume: number) {}
-      setPanning(pan: number) {}
+      setVolume(_volume: number) {}
+      setPanning(_pan: number) {}
       stop() {}
-    }
+    },
   };
 });
 
@@ -36,17 +36,25 @@ import { SoundscapeManager } from '../../src/audio/SoundscapeManager';
 jest.mock('../../src/components/RadioTuner', () => {
   return {
     RadioTuner: class MockRadioTuner {
-      constructor(scene: any, x: number, y: number, config = {}) {
+      constructor(scene: any, x: number, y: number, _config = {}) {
         // Store the scene for later use
         this.scene = scene;
       }
       scene: any;
-      on(event: string, callback: Function) { return this; }
-      emit(event: string, data: any) { return this; }
-      getSignalStrength() { return 0.5; }
-      getFrequency() { return 98.0; }
+      on(_event: string, _callback: (...args: any[]) => void) {
+        return this;
+      }
+      emit(_event: string, _data: any) {
+        return this;
+      }
+      getSignalStrength() {
+        return 0.5;
+      }
+      getFrequency() {
+        return 98.0;
+      }
       destroy() {}
-    }
+    },
   };
 });
 
@@ -58,20 +66,30 @@ jest.mock('phaser', () => {
   return {
     GameObjects: {
       Container: class Container {
-        constructor(scene: any, x: number, y: number) {}
-        add() { return this; }
-        setVisible() { return this; }
+        constructor(_scene: any, _x: number, _y: number) {}
+        add() {
+          return this;
+        }
+        setVisible() {
+          return this;
+        }
       },
       Graphics: class Graphics {
-        constructor(scene: any) {}
-        fillStyle() { return this; }
-        fillRect() { return this; }
+        constructor(_scene: any) {}
+        fillStyle() {
+          return this;
+        }
+        fillRect() {
+          return this;
+        }
       },
       Text: class Text {
-        constructor(scene: any, x: number, y: number, text: string) {}
-        setOrigin() { return this; }
-      }
-    }
+        constructor(_scene: any, _x: number, _y: number, _text: string) {}
+        setOrigin() {
+          return this;
+        }
+      },
+    },
   };
 });
 
@@ -83,7 +101,7 @@ const mockAudio = {
   setVolume: jest.fn(),
   setLoop: jest.fn(),
   setRate: jest.fn(),
-  isPlaying: jest.fn().mockReturnValue(false)
+  isPlaying: jest.fn().mockReturnValue(false),
 };
 
 // Mock Scene
@@ -96,18 +114,18 @@ const mockScene = {
       strokeRect: jest.fn().mockReturnThis(),
       lineBetween: jest.fn().mockReturnThis(),
       setInteractive: jest.fn().mockReturnThis(),
-      on: jest.fn().mockReturnThis()
+      on: jest.fn().mockReturnThis(),
     }),
     text: jest.fn().mockReturnValue({
-      setOrigin: jest.fn().mockReturnThis()
-    })
+      setOrigin: jest.fn().mockReturnThis(),
+    }),
   },
   sound: {
-    add: jest.fn().mockReturnValue(mockAudio)
+    add: jest.fn().mockReturnValue(mockAudio),
   },
   input: {
-    on: jest.fn()
-  }
+    on: jest.fn(),
+  },
 };
 
 describe('RadioTuner and SoundscapeManager Integration', () => {
@@ -151,7 +169,10 @@ describe('RadioTuner and SoundscapeManager Integration', () => {
     radioTuner.emit('signalLock', { frequency: 103.7, signalStrength: 0.9 });
 
     // Verify that the signal lock event was emitted
-    expect(radioTuner.emit).toHaveBeenCalledWith('signalLock', { frequency: 103.7, signalStrength: 0.9 });
+    expect(radioTuner.emit).toHaveBeenCalledWith('signalLock', {
+      frequency: 103.7,
+      signalStrength: 0.9,
+    });
 
     // Now simulate the SoundscapeManager responding to the signal lock
     soundscapeManager.playSignalSound();

@@ -1,4 +1,5 @@
 // Mock Phaser before importing NarrativeEngine
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 jest.mock('phaser', () => require('../mocks/PhaserMock').default);
 
 // Import after mocking
@@ -20,13 +21,13 @@ describe('NarrativeEngine', () => {
     choices: [
       {
         text: 'Option 1',
-        outcome: 'trigger_event_1'
+        outcome: 'trigger_event_1',
       },
       {
         text: 'Option 2',
-        outcome: 'set_variable=value'
-      }
-    ]
+        outcome: 'set_variable=value',
+      },
+    ],
   };
 
   const conditionalEvent: NarrativeEvent = {
@@ -36,9 +37,9 @@ describe('NarrativeEngine', () => {
     choices: [
       {
         text: 'Option 1',
-        outcome: 'trigger_event_1'
-      }
-    ]
+        outcome: 'trigger_event_1',
+      },
+    ],
   };
 
   const eventWithConditionalChoices: NarrativeEvent = {
@@ -47,14 +48,14 @@ describe('NarrativeEngine', () => {
     choices: [
       {
         text: 'Always available',
-        outcome: 'trigger_event_1'
+        outcome: 'trigger_event_1',
       },
       {
         text: 'Conditional option',
         outcome: 'trigger_event_2',
-        condition: 'test_flag'
-      }
-    ]
+        condition: 'test_flag',
+      },
+    ],
   };
 
   beforeEach(() => {
@@ -159,7 +160,7 @@ describe('NarrativeEngine', () => {
     test('should trigger an event by ID', () => {
       // Mock the emit method
       const mockEmit = jest.fn();
-      // @ts-ignore - Accessing private property for testing
+      // @ts-expect-error - Accessing private property for testing
       narrativeEngine.eventEmitter.emit = mockEmit;
 
       const result = narrativeEngine.triggerEvent('test_event');
@@ -206,7 +207,7 @@ describe('NarrativeEngine', () => {
       const eventWithInterference = {
         ...sampleEvent,
         id: 'event_with_interference',
-        interference: 0.5
+        interference: 0.5,
       };
       narrativeEngine.addEvent(eventWithInterference);
 
@@ -231,7 +232,7 @@ describe('NarrativeEngine', () => {
       narrativeEngine.addEvent({
         id: 'event_1',
         message: 'Event 1',
-        choices: []
+        choices: [],
       });
       narrativeEngine.addEvent(eventWithConditionalChoices);
 
@@ -245,7 +246,7 @@ describe('NarrativeEngine', () => {
 
       // Mock the emit method
       const mockEmit = jest.fn();
-      // @ts-ignore - Accessing private property for testing
+      // @ts-expect-error - Accessing private property for testing
       narrativeEngine.eventEmitter.emit = mockEmit;
 
       // Make a choice
@@ -256,7 +257,7 @@ describe('NarrativeEngine', () => {
       expect(mockEmit).toHaveBeenCalledWith('narrativeChoice', {
         eventId: 'test_event',
         choiceIndex: 0,
-        choice: sampleEvent.choices[0]
+        choice: sampleEvent.choices[0],
       });
     });
 
@@ -303,9 +304,9 @@ describe('NarrativeEngine', () => {
           {
             text: 'Conditional option',
             outcome: 'set_test_var=true',
-            condition: 'test_flag'
-          }
-        ]
+            condition: 'test_flag',
+          },
+        ],
       };
       narrativeEngine.addEvent(testEvent);
 
@@ -316,7 +317,7 @@ describe('NarrativeEngine', () => {
       narrativeEngine.triggerEvent('test_conditional_choice');
 
       // Make a choice
-      const result = narrativeEngine.makeChoice(0);
+      narrativeEngine.makeChoice(0);
 
       // Since we mocked SaveManager.getFlag to return true for 'test_flag',
       // the choice should be valid
@@ -354,7 +355,7 @@ describe('NarrativeEngine', () => {
       // Mock SaveManager.getFlag to return true for 'test_flag'
       (SaveManager.getFlag as jest.Mock).mockImplementation((flag) => flag === 'test_flag');
 
-      // @ts-ignore - Accessing private method for testing
+      // @ts-expect-error - Accessing private method for testing
       const result = narrativeEngine.evaluateCondition('test_flag');
 
       expect(result).toBe(true);
@@ -365,7 +366,7 @@ describe('NarrativeEngine', () => {
       // Mock SaveManager.getFlag to return true for 'test_flag'
       (SaveManager.getFlag as jest.Mock).mockImplementation((flag) => flag === 'test_flag');
 
-      // @ts-ignore - Accessing private method for testing
+      // @ts-expect-error - Accessing private method for testing
       const result = narrativeEngine.evaluateCondition('!test_flag');
 
       expect(result).toBe(false);
@@ -375,7 +376,7 @@ describe('NarrativeEngine', () => {
       // Set a variable
       narrativeEngine.setVariable('variable', 'value');
 
-      // @ts-ignore - Accessing private method for testing
+      // @ts-expect-error - Accessing private method for testing
       const result = narrativeEngine.evaluateCondition('variable=value');
 
       expect(result).toBe(true);
@@ -383,10 +384,10 @@ describe('NarrativeEngine', () => {
 
     test('should evaluate an event condition', () => {
       // Add an event to history
-      // @ts-ignore - Accessing private property for testing
+      // @ts-expect-error - Accessing private property for testing
       narrativeEngine.eventHistory = ['event_1'];
 
-      // @ts-ignore - Accessing private method for testing
+      // @ts-expect-error - Accessing private method for testing
       const result = narrativeEngine.evaluateCondition('event_event_1');
 
       expect(result).toBe(true);
@@ -413,7 +414,7 @@ describe('NarrativeEngine', () => {
   describe('hasTriggeredEvent', () => {
     test('should return true if the event has been triggered', () => {
       // Add an event to history
-      // @ts-ignore - Accessing private property for testing
+      // @ts-expect-error - Accessing private property for testing
       narrativeEngine.eventHistory = ['event_1'];
 
       expect(narrativeEngine.hasTriggeredEvent('event_1')).toBe(true);
@@ -445,9 +446,9 @@ describe('NarrativeEngine', () => {
       // Mock the on and off methods
       const mockOn = jest.fn();
       const mockOff = jest.fn();
-      // @ts-ignore - Accessing private property for testing
+      // @ts-expect-error - Accessing private property for testing
       narrativeEngine.eventEmitter.on = mockOn;
-      // @ts-ignore - Accessing private property for testing
+      // @ts-expect-error - Accessing private property for testing
       narrativeEngine.eventEmitter.off = mockOff;
 
       // Add a listener

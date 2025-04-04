@@ -15,16 +15,20 @@ jest.mock('phaser', () => {
         texture: string;
         visible: boolean = true;
         alpha: number = 1;
-        setOrigin() { return this; }
-        play() { return this; }
-      }
+        setOrigin() {
+          return this;
+        }
+        play() {
+          return this;
+        }
+      },
     },
     Input: {
       Keyboard: {
         KeyCodes: { ONE: 49 },
-        JustDown: jest.fn().mockReturnValue(false)
-      }
-    }
+        JustDown: jest.fn().mockReturnValue(false),
+      },
+    },
   };
 });
 
@@ -36,19 +40,19 @@ const mockScene = {
     graphics: jest.fn(),
     image: jest.fn(),
     sprite: jest.fn(),
-    text: jest.fn()
+    text: jest.fn(),
   },
   anims: {
     create: jest.fn(),
     exists: jest.fn().mockReturnValue(false),
-    generateFrameNumbers: jest.fn().mockReturnValue([])
+    generateFrameNumbers: jest.fn().mockReturnValue([]),
   },
   time: {
-    delayedCall: jest.fn()
+    delayedCall: jest.fn(),
   },
   tweens: {
-    add: jest.fn()
-  }
+    add: jest.fn(),
+  },
 };
 
 describe('Player', () => {
@@ -92,9 +96,9 @@ describe('Player', () => {
       player.moveTo(6, 7);
 
       // For a 32px tile, the center of tile (6,7) should be at (208,240)
-      // @ts-ignore - Accessing private property for testing
+      // @ts-expect-error - Accessing private property for testing
       expect(player.targetX).toBe(208);
-      // @ts-ignore - Accessing private property for testing
+      // @ts-expect-error - Accessing private property for testing
       expect(player.targetY).toBe(240);
     });
 
@@ -149,15 +153,15 @@ describe('Player', () => {
       player.moveTo(6, 5);
 
       // Set position very close to target
-      // @ts-ignore - Accessing private property for testing
+      // @ts-expect-error - Accessing private property for testing
       player.x = player.targetX! - 1;
-      // @ts-ignore - Accessing private property for testing
+      // @ts-expect-error - Accessing private property for testing
       player.y = player.targetY!;
 
       // Mock the play method
       player.play = jest.fn();
       // Mock the anims property
-      // @ts-ignore - Mocking for testing
+      // @ts-expect-error - Mocking for testing
       player.anims = { currentAnim: { key: 'player-walk-right' } };
 
       // Update with a large enough delta to reach the target
@@ -169,9 +173,9 @@ describe('Player', () => {
       expect(player.isMoving()).toBe(false);
 
       // Target should be cleared
-      // @ts-ignore - Accessing private property for testing
+      // @ts-expect-error - Accessing private property for testing
       expect(player.targetX).toBeNull();
-      // @ts-ignore - Accessing private property for testing
+      // @ts-expect-error - Accessing private property for testing
       expect(player.targetY).toBeNull();
 
       // Should play idle animation

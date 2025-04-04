@@ -23,12 +23,7 @@ export class VolumeControl extends Phaser.GameObjects.Container {
   private isDragging: boolean = false;
   private audioManager: AudioManager;
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    config: VolumeControlConfig = {}
-  ) {
+  constructor(scene: Phaser.Scene, x: number, y: number, config: VolumeControlConfig = {}) {
     super(scene, x, y);
 
     // Default configuration
@@ -38,7 +33,7 @@ export class VolumeControl extends Phaser.GameObjects.Container {
       backgroundColor: config.backgroundColor || 0x333333,
       sliderColor: config.sliderColor || 0x666666,
       knobColor: config.knobColor || 0xcccccc,
-      initialVolume: config.initialVolume !== undefined ? config.initialVolume : 0.5
+      initialVolume: config.initialVolume !== undefined ? config.initialVolume : 0.5,
     };
 
     // Get the audio manager
@@ -87,15 +82,10 @@ export class VolumeControl extends Phaser.GameObjects.Container {
     this.add(this.knob);
 
     // Create volume text
-    this.volumeText = this.scene.add.text(
-      0,
-      -this.config.height / 2 - 15,
-      'Volume: 50%',
-      {
-        fontSize: '14px',
-        color: '#ffffff'
-      }
-    );
+    this.volumeText = this.scene.add.text(0, -this.config.height / 2 - 15, 'Volume: 50%', {
+      fontSize: '14px',
+      color: '#ffffff',
+    });
     this.volumeText.setOrigin(0.5, 0.5);
     this.add(this.volumeText);
 
@@ -124,38 +114,51 @@ export class VolumeControl extends Phaser.GameObjects.Container {
     // Setup drag events
     this.scene.input.setDraggable(this.knob);
 
-    this.scene.input.on('dragstart', (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) => {
-      if (gameObject === this.knob) {
-        this.isDragging = true;
+    this.scene.input.on(
+      'dragstart',
+      (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) => {
+        if (gameObject === this.knob) {
+          this.isDragging = true;
+        }
       }
-    });
+    );
 
-    this.scene.input.on('drag', (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number) => {
-      if (gameObject === this.knob && this.isDragging) {
-        // Constrain to slider bounds
-        const minX = -this.config.width / 2 + 10;
-        const maxX = this.config.width / 2 - 10;
-        const clampedX = Phaser.Math.Clamp(dragX, minX, maxX);
+    this.scene.input.on(
+      'drag',
+      (
+        _pointer: Phaser.Input.Pointer,
+        gameObject: Phaser.GameObjects.GameObject,
+        dragX: number
+      ) => {
+        if (gameObject === this.knob && this.isDragging) {
+          // Constrain to slider bounds
+          const minX = -this.config.width / 2 + 10;
+          const maxX = this.config.width / 2 - 10;
+          const clampedX = Phaser.Math.Clamp(dragX, minX, maxX);
 
-        // Update knob position
-        this.knob.x = clampedX;
+          // Update knob position
+          this.knob.x = clampedX;
 
-        // Calculate volume (0-1)
-        const t = (clampedX - minX) / (maxX - minX);
+          // Calculate volume (0-1)
+          const t = (clampedX - minX) / (maxX - minX);
 
-        // Update audio manager
-        this.audioManager.setMasterVolume(t);
+          // Update audio manager
+          this.audioManager.setMasterVolume(t);
 
-        // Update display
-        this.updateDisplay();
+          // Update display
+          this.updateDisplay();
+        }
       }
-    });
+    );
 
-    this.scene.input.on('dragend', (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) => {
-      if (gameObject === this.knob) {
-        this.isDragging = false;
+    this.scene.input.on(
+      'dragend',
+      (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) => {
+        if (gameObject === this.knob) {
+          this.isDragging = false;
+        }
       }
-    });
+    );
 
     // Allow clicking on the slider to set volume directly
     this.background.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
@@ -186,7 +189,8 @@ export class VolumeControl extends Phaser.GameObjects.Container {
     const volume = this.audioManager.getMasterVolume();
 
     // Calculate effective volume (50% UI = 100% actual max volume)
-    const effectiveVolume = Math.min(1, volume * 2);
+    // const effectiveVolume = Math.min(1, volume * 2);
+    // Not currently used, but kept for future reference
 
     // Update volume text
     this.volumeText.setText(`Volume: ${Math.round(volume * 100)}%`);

@@ -14,11 +14,11 @@ const config: Phaser.Types.Core.GameConfig = {
     default: 'arcade',
     arcade: {
       gravity: { y: 0 },
-      debug: false
-    }
+      debug: false,
+    },
   },
   pixelArt: true,
-  canvasStyle: 'display: block; margin: 0 auto;' // Ensure canvas is visible
+  canvasStyle: 'display: block; margin: 0 auto;', // Ensure canvas is visible
 };
 
 // Add global error handler
@@ -44,13 +44,21 @@ window.addEventListener('load', () => {
     console.log('Window loaded, initializing Phaser game...');
     console.log('Window dimensions:', window.innerWidth, 'x', window.innerHeight);
     console.log('Game container exists:', !!document.getElementById('game'));
-    console.log('Game container dimensions:', document.getElementById('game')?.getBoundingClientRect());
+    console.log(
+      'Game container dimensions:',
+      document.getElementById('game')?.getBoundingClientRect()
+    );
     console.log('Fallback canvas exists:', !!document.getElementById('fallback-canvas'));
-    console.log('Fallback canvas dimensions:', document.getElementById('fallback-canvas')?.getBoundingClientRect());
+    console.log(
+      'Fallback canvas dimensions:',
+      document.getElementById('fallback-canvas')?.getBoundingClientRect()
+    );
     console.log('Phaser config:', JSON.stringify(config));
 
     // Create the game instance
-    const game = new Phaser.Game(config);
+    // Game instance is created but not stored in a variable
+    // as it's managed internally by Phaser
+    new Phaser.Game(config);
     console.log('Phaser game initialized');
 
     // Log when the canvas is created

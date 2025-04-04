@@ -6,20 +6,20 @@
 // Create a mock for Phaser
 const PhaserMock = {
   Game: class Game {
-    constructor(config: any) {}
+    constructor(_config: any) {}
   },
   Scene: class Scene {
-    constructor(config: any) {}
+    constructor(_config: any) {}
     add = {
       existing: jest.fn(),
       text: jest.fn().mockReturnValue({
         setOrigin: jest.fn().mockReturnThis(),
         setInteractive: jest.fn().mockReturnThis(),
-        on: jest.fn().mockReturnThis()
+        on: jest.fn().mockReturnThis(),
       }),
       image: jest.fn().mockReturnValue({
         setDisplaySize: jest.fn().mockReturnThis(),
-        setOrigin: jest.fn().mockReturnThis()
+        setOrigin: jest.fn().mockReturnThis(),
       }),
       graphics: jest.fn().mockReturnValue({
         fillStyle: jest.fn().mockReturnThis(),
@@ -31,19 +31,19 @@ const PhaserMock = {
         strokeRoundedRect: jest.fn().mockReturnThis(),
         strokeCircle: jest.fn().mockReturnThis(),
         setInteractive: jest.fn().mockReturnThis(),
-        on: jest.fn().mockReturnThis()
-      })
+        on: jest.fn().mockReturnThis(),
+      }),
     };
     input = {
       once: jest.fn(),
       on: jest.fn(),
-      setDraggable: jest.fn()
+      setDraggable: jest.fn(),
     };
     cameras = {
       main: {
         scrollX: 0,
-        scrollY: 0
-      }
+        scrollY: 0,
+      },
     };
     sound = {
       add: jest.fn().mockReturnValue({
@@ -51,9 +51,9 @@ const PhaserMock = {
         stop: jest.fn(),
         pause: jest.fn(),
         resume: jest.fn(),
-        setVolume: jest.fn()
-      })
-    }
+        setVolume: jest.fn(),
+      }),
+    };
   },
   GameObjects: {
     Container: class Container {
@@ -67,9 +67,15 @@ const PhaserMock = {
         this.y = y;
       }
 
-      add(child: any) { return this; }
-      on(event: string, fn: Function) { return this; }
-      emit(event: string, ...args: any[]) { return this; }
+      add(_child: any) {
+        return this;
+      }
+      on(_event: string, _fn: (...args: any[]) => void) {
+        return this;
+      }
+      emit(_event: string, ..._args: any[]) {
+        return this;
+      }
       destroy() {}
     },
     GameObject: class GameObject {},
@@ -82,46 +88,78 @@ const PhaserMock = {
         this.scene = scene;
       }
 
-      fillStyle() { return this; }
-      fillRect() { return this; }
-      fillRoundedRect() { return this; }
-      fillCircle() { return this; }
-      lineStyle() { return this; }
-      strokeRect() { return this; }
-      strokeRoundedRect() { return this; }
-      strokeCircle() { return this; }
-      setInteractive() { return this; }
-      on() { return this; }
+      fillStyle() {
+        return this;
+      }
+      fillRect() {
+        return this;
+      }
+      fillRoundedRect() {
+        return this;
+      }
+      fillCircle() {
+        return this;
+      }
+      lineStyle() {
+        return this;
+      }
+      strokeRect() {
+        return this;
+      }
+      strokeRoundedRect() {
+        return this;
+      }
+      strokeCircle() {
+        return this;
+      }
+      setInteractive() {
+        return this;
+      }
+      on() {
+        return this;
+      }
     },
     Text: class Text {
       scene: any;
       x: number = 0;
       y: number = 0;
 
-      constructor(scene: any, x: number, y: number, text: string, style: any) {
+      constructor(scene: any, x: number, y: number, _text: string, _style: any) {
         this.scene = scene;
         this.x = x;
         this.y = y;
       }
 
-      setOrigin() { return this; }
-      setInteractive() { return this; }
-      on() { return this; }
-      setText() { return this; }
-    }
+      setOrigin() {
+        return this;
+      }
+      setInteractive() {
+        return this;
+      }
+      on() {
+        return this;
+      }
+      setText() {
+        return this;
+      }
+    },
   },
   Math: {
-    Clamp: (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
+    Clamp: (value: number, min: number, max: number) => Math.min(Math.max(value, min), max),
   },
   Geom: {
     Circle: class Circle {
-      constructor(x: number, y: number, radius: number) {}
-      static Contains() { return true; }
+      constructor(_x: number, _y: number, _radius: number) {}
+      static Contains() {
+        return true;
+      }
     },
     Rectangle: class Rectangle {
-      constructor(x: number, y: number, width: number, height: number) {}
-      static Contains() { return true; }
-    }
+      constructor(_x: number, _y: number, _width: number, _height: number) {}
+      static Contains() {
+        return true;
+      }
+    },
   },
   Input: {
     Keyboard: {
@@ -131,19 +169,29 @@ const PhaserMock = {
         LEFT: 37,
         RIGHT: 39,
         SPACE: 32,
-        ENTER: 13
-      }
-    }
+        ENTER: 13,
+      },
+    },
   },
   Events: {
     EventEmitter: class EventEmitter {
-      on() { return this; }
-      once() { return this; }
-      off() { return this; }
-      emit() { return this; }
-      removeAllListeners() { return this; }
-    }
-  }
+      on() {
+        return this;
+      }
+      once() {
+        return this;
+      }
+      off() {
+        return this;
+      }
+      emit() {
+        return this;
+      }
+      removeAllListeners() {
+        return this;
+      }
+    },
+  },
 };
 
 export default PhaserMock;

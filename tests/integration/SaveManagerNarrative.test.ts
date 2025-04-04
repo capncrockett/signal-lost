@@ -1,4 +1,5 @@
 // Mock Phaser before importing NarrativeEngine
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 jest.mock('phaser', () => require('../mocks/PhaserMock').default);
 
 // Import after mocking
@@ -22,12 +23,12 @@ const localStorageMock = (() => {
     removeItem: jest.fn((key: string) => {
       delete store[key];
     }),
-    getAll: jest.fn(() => store)
+    getAll: jest.fn(() => store),
   };
 })();
 
 Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock
+  value: localStorageMock,
 });
 
 describe('SaveManager and NarrativeEngine Integration', () => {
@@ -40,13 +41,13 @@ describe('SaveManager and NarrativeEngine Integration', () => {
     choices: [
       {
         text: 'Option 1',
-        outcome: 'trigger_event_1'
+        outcome: 'trigger_event_1',
       },
       {
         text: 'Option 2',
-        outcome: 'set_variable=value'
-      }
-    ]
+        outcome: 'set_variable=value',
+      },
+    ],
   };
 
   const conditionalEvent: NarrativeEvent = {
@@ -56,15 +57,15 @@ describe('SaveManager and NarrativeEngine Integration', () => {
     choices: [
       {
         text: 'Option 1',
-        outcome: 'trigger_event_1'
-      }
-    ]
+        outcome: 'trigger_event_1',
+      },
+    ],
   };
 
   const event1: NarrativeEvent = {
     id: 'event_1',
     message: 'This is event 1',
-    choices: []
+    choices: [],
   };
 
   beforeEach(() => {

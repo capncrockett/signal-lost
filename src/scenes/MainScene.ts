@@ -49,7 +49,7 @@ export class MainScene extends Phaser.Scene {
     this.volumeControl = new VolumeControl(this, 700, 50, {
       width: 150,
       height: 30,
-      initialVolume: 0.1 // Start at 10% volume
+      initialVolume: 0.1, // Start at 10% volume
     });
     this.add.existing(this.volumeControl);
 
@@ -58,7 +58,7 @@ export class MainScene extends Phaser.Scene {
       fontSize: '24px',
       color: '#ffffff',
       backgroundColor: '#333333',
-      padding: { x: 10, y: 5 }
+      padding: { x: 10, y: 5 },
     });
     fieldButton.setOrigin(0.5, 0.5);
     fieldButton.setInteractive({ useHandCursor: true });
@@ -71,7 +71,7 @@ export class MainScene extends Phaser.Scene {
       fontSize: '18px',
       color: '#ffffff',
       backgroundColor: '#000000',
-      padding: { x: 10, y: 5 }
+      padding: { x: 10, y: 5 },
     });
     instructions.setOrigin(0.5, 0.5);
 
@@ -80,12 +80,12 @@ export class MainScene extends Phaser.Scene {
       fontSize: '14px',
       color: '#ffffff',
       backgroundColor: '#000000',
-      padding: { x: 5, y: 3 }
+      padding: { x: 5, y: 3 },
     });
     volumeInstructions.setOrigin(0.5, 0.5);
   }
 
-  update(time: number, delta: number) {
+  update(_time: number, _delta: number) {
     // Update game objects
 
     // Update soundscape based on radio tuner signal strength

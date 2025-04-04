@@ -13,30 +13,47 @@ jest.mock('phaser', () => {
         x: number;
         y: number;
         visible: boolean = true;
-        add() { return this; }
-        setVisible(visible: boolean) { this.visible = visible; return this; }
+        add() {
+          return this;
+        }
+        setVisible(visible: boolean) {
+          this.visible = visible;
+          return this;
+        }
       },
       Rectangle: class Rectangle {
-        setOrigin() { return this; }
+        setOrigin() {
+          return this;
+        }
       },
       Text: class Text {
-        setOrigin() { return this; }
-        setInteractive() { return this; }
-        on() { return this; }
-        setText() { return this; }
-        setColor() { return this; }
+        setOrigin() {
+          return this;
+        }
+        setInteractive() {
+          return this;
+        }
+        on() {
+          return this;
+        }
+        setText() {
+          return this;
+        }
+        setColor() {
+          return this;
+        }
         destroy() {}
         x: number = 0;
         y: number = 0;
         height: number = 100;
-      }
+      },
     },
     Input: {
       Keyboard: {
         KeyCodes: { ONE: 49 },
-        JustDown: jest.fn().mockReturnValue(false)
-      }
-    }
+        JustDown: jest.fn().mockReturnValue(false),
+      },
+    },
   };
 });
 
@@ -52,7 +69,7 @@ const mockScene = {
     rectangle: jest.fn().mockReturnValue({
       setOrigin: jest.fn().mockReturnThis(),
       setInteractive: jest.fn().mockReturnThis(),
-      on: jest.fn().mockReturnThis()
+      on: jest.fn().mockReturnThis(),
     }),
     text: jest.fn().mockReturnValue({
       setOrigin: jest.fn().mockReturnThis(),
@@ -63,14 +80,14 @@ const mockScene = {
       destroy: jest.fn(),
       x: 0,
       y: 0,
-      height: 100
-    })
+      height: 100,
+    }),
   },
   input: {
     keyboard: {
-      addKey: jest.fn().mockReturnValue({})
-    }
-  }
+      addKey: jest.fn().mockReturnValue({}),
+    },
+  },
 };
 
 describe('NarrativeRenderer', () => {
@@ -84,13 +101,13 @@ describe('NarrativeRenderer', () => {
     choices: [
       {
         text: 'Option 1',
-        outcome: 'trigger_event_1'
+        outcome: 'trigger_event_1',
       },
       {
         text: 'Option 2',
-        outcome: 'set_variable=value'
-      }
-    ]
+        outcome: 'set_variable=value',
+      },
+    ],
   };
 
   beforeEach(() => {
@@ -105,12 +122,7 @@ describe('NarrativeRenderer', () => {
     mockEngine.getCurrentEvent = jest.fn().mockReturnValue(null);
 
     // Create a NarrativeRenderer
-    narrativeRenderer = new NarrativeRenderer(
-      mockScene as any,
-      400,
-      300,
-      mockEngine
-    );
+    narrativeRenderer = new NarrativeRenderer(mockScene as any, 400, 300, mockEngine);
   });
 
   describe('constructor', () => {
@@ -133,7 +145,7 @@ describe('NarrativeRenderer', () => {
     test('should show an event', () => {
       // Mock the text object
       const mockText = mockScene.add.text();
-      // @ts-ignore - Accessing private property for testing
+      // @ts-expect-error - Accessing private property for testing
       narrativeRenderer.messageText = mockText;
 
       // Show an event
@@ -148,7 +160,7 @@ describe('NarrativeRenderer', () => {
     test('should create choice texts', () => {
       // Mock the text object
       const mockText = mockScene.add.text();
-      // @ts-ignore - Accessing private property for testing
+      // @ts-expect-error - Accessing private property for testing
       narrativeRenderer.messageText = mockText;
 
       // Show an event
@@ -159,7 +171,8 @@ describe('NarrativeRenderer', () => {
 
       // Check that the choices are interactive
       const choiceTextCalls = (mockScene.add.text as jest.Mock).mock.calls.slice(1);
-      for (const call of choiceTextCalls) {
+      // We don't need to use the call variable, just verify the number of calls
+      for (let i = 0; i < choiceTextCalls.length; i++) {
         const choiceText = mockScene.add.text();
         expect(choiceText.setInteractive).toHaveBeenCalled();
         expect(choiceText.on).toHaveBeenCalledWith('pointerover', expect.any(Function));

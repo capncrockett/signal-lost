@@ -15,15 +15,21 @@ jest.mock('phaser', () => {
         texture: string;
         visible: boolean = true;
         alpha: number = 1;
-        setOrigin() { return this; }
-      }
+        setOrigin() {
+          return this;
+        }
+      },
     },
     Events: {
       EventEmitter: class EventEmitter {
-        on() { return this; }
-        emit() { return this; }
-      }
-    }
+        on() {
+          return this;
+        }
+        emit() {
+          return this;
+        }
+      },
+    },
   };
 });
 
@@ -38,18 +44,18 @@ const mockScene = {
     text: jest.fn(),
     particles: jest.fn().mockReturnValue({
       createEmitter: jest.fn(),
-      destroy: jest.fn()
-    })
+      destroy: jest.fn(),
+    }),
   },
   time: {
-    delayedCall: jest.fn((delay: number, callback: Function) => {
+    delayedCall: jest.fn((delay: number, callback: () => void) => {
       // Call the callback immediately for testing
       callback();
-    })
+    }),
   },
   tweens: {
-    add: jest.fn()
-  }
+    add: jest.fn(),
+  },
 };
 
 describe('Interactable', () => {
@@ -60,14 +66,7 @@ describe('Interactable', () => {
     jest.clearAllMocks();
 
     // Create an interactable at grid position (10, 8)
-    interactable = new Interactable(
-      mockScene as any,
-      'tower1',
-      'tower',
-      10,
-      8,
-      2
-    );
+    interactable = new Interactable(mockScene as any, 'tower1', 'tower', 10, 8, 2);
   });
 
   describe('constructor', () => {

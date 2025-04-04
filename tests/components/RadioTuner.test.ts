@@ -13,9 +13,15 @@ jest.mock('phaser', () => {
           this.y = y;
         }
 
-        add(child: any) { return this; }
-        on(event: string, fn: Function) { return this; }
-        emit(event: string, ...args: any[]) { return this; }
+        add(_child: any) {
+          return this;
+        }
+        on(_event: string, _fn: (...args: any[]) => void) {
+          return this;
+        }
+        emit(_event: string, ..._args: any[]) {
+          return this;
+        }
         destroy() {}
       },
       GameObject: class GameObject {},
@@ -27,45 +33,65 @@ jest.mock('phaser', () => {
           this.scene = scene;
         }
 
-        fillStyle() { return this; }
-        fillRoundedRect() { return this; }
-        fillRect() { return this; }
-        fillCircle() { return this; }
-        setInteractive() { return this; }
-        on() { return this; }
+        fillStyle() {
+          return this;
+        }
+        fillRoundedRect() {
+          return this;
+        }
+        fillRect() {
+          return this;
+        }
+        fillCircle() {
+          return this;
+        }
+        setInteractive() {
+          return this;
+        }
+        on() {
+          return this;
+        }
       },
       Text: class Text {
         scene: any;
         x: number = 0;
         y: number = 0;
 
-        constructor(scene: any, x: number, y: number, text: string, style: any) {
+        constructor(scene: any, x: number, y: number, _text: string, _style: any) {
           this.scene = scene;
           this.x = x;
           this.y = y;
         }
 
-        setOrigin() { return this; }
-        setText() { return this; }
-      }
+        setOrigin() {
+          return this;
+        }
+        setText() {
+          return this;
+        }
+      },
     },
     Scene: class Scene {},
     Math: {
-      Clamp: (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
+      Clamp: (value: number, min: number, max: number) => Math.min(Math.max(value, min), max),
     },
     Geom: {
       Circle: class Circle {
-        constructor(x: number, y: number, radius: number) {}
-        static Contains() { return true; }
+        constructor(_x: number, _y: number, _radius: number) {}
+        static Contains() {
+          return true;
+        }
       },
       Rectangle: class Rectangle {
-        constructor(x: number, y: number, width: number, height: number) {}
-        static Contains() { return true; }
-      }
+        constructor(_x: number, _y: number, _width: number, _height: number) {}
+        static Contains() {
+          return true;
+        }
+      },
     },
     Input: {
-      Pointer: class Pointer {}
-    }
+      Pointer: class Pointer {},
+    },
   };
 });
 
@@ -82,23 +108,23 @@ const mockScene = {
       fillCircle: jest.fn().mockReturnThis(),
       setInteractive: jest.fn().mockReturnThis(),
       on: jest.fn(),
-      x: 0
+      x: 0,
     })),
     text: jest.fn(() => ({
       setOrigin: jest.fn().mockReturnThis(),
       setText: jest.fn(),
-      x: 0
-    }))
+      x: 0,
+    })),
   },
   input: {
     setDraggable: jest.fn(),
-    on: jest.fn()
+    on: jest.fn(),
   },
   cameras: {
     main: {
-      scrollX: 0
-    }
-  }
+      scrollX: 0,
+    },
+  },
 };
 
 describe('RadioTuner', () => {
@@ -116,7 +142,7 @@ describe('RadioTuner', () => {
       height: 120,
       backgroundColor: 0x444444,
       sliderColor: 0x777777,
-      knobColor: 0xdddddd
+      knobColor: 0xdddddd,
     });
   });
 
@@ -197,9 +223,11 @@ describe('RadioTuner', () => {
 
   test('should handle drag interactions', () => {
     // Mock the necessary methods and properties
-    const dragStartHandler = mockScene.input.on.mock.calls.find(call => call[0] === 'dragstart')[1];
-    const dragHandler = mockScene.input.on.mock.calls.find(call => call[0] === 'drag')[1];
-    const dragEndHandler = mockScene.input.on.mock.calls.find(call => call[0] === 'dragend')[1];
+    const dragStartHandler = mockScene.input.on.mock.calls.find(
+      (call) => call[0] === 'dragstart'
+    )[1];
+    const dragHandler = mockScene.input.on.mock.calls.find((call) => call[0] === 'drag')[1];
+    const dragEndHandler = mockScene.input.on.mock.calls.find((call) => call[0] === 'dragend')[1];
 
     // Create a mock knob and pointer
     const mockKnob = { x: 0 };
@@ -231,15 +259,15 @@ describe('RadioTuner', () => {
           sliderClickHandler.mockImplementation(handler);
         }
         return mockSlider;
-      })
+      }),
     };
 
     // Replace the slider in the RadioTuner
-    // @ts-ignore - Accessing private property for testing
+    // @ts-expect-error - Accessing private property for testing
     radioTuner.slider = mockSlider;
 
     // Simulate setupInteraction by calling the on method
-    mockSlider.on('pointerdown', (pointer: any) => {});
+    mockSlider.on('pointerdown', (_pointer: any) => {});
 
     // Simulate a click on the slider
     sliderClickHandler({ x: 450 });
@@ -254,7 +282,7 @@ describe('RadioTuner', () => {
     const mockGain = {
       connect: jest.fn(),
       gain: { value: 0 },
-      disconnect: jest.fn()
+      disconnect: jest.fn(),
     };
     const mockBufferSource = {
       connect: jest.fn(),
@@ -262,10 +290,10 @@ describe('RadioTuner', () => {
       stop: jest.fn(),
       disconnect: jest.fn(),
       buffer: null,
-      loop: false
+      loop: false,
     };
     const mockBuffer = {
-      getChannelData: jest.fn().mockReturnValue(new Float32Array(1000))
+      getChannelData: jest.fn().mockReturnValue(new Float32Array(1000)),
     };
     const mockCreateGain = jest.fn().mockReturnValue(mockGain);
     const mockCreateBufferSource = jest.fn().mockReturnValue(mockBufferSource);
@@ -278,33 +306,33 @@ describe('RadioTuner', () => {
       destination: {},
       sampleRate: 44100,
       state: 'running',
-      close: jest.fn()
+      close: jest.fn(),
     }));
 
     // Create a new RadioTuner to test audio initialization
     const newTuner = new RadioTuner(mockScene as any, 400, 300);
 
     // Simulate audio initialization
-    // @ts-ignore - Accessing private method for testing
+    // @ts-expect-error - Accessing private method for testing
     newTuner.initializeAudio();
 
     // Verify audio context was created
     expect(window.AudioContext).toHaveBeenCalled();
 
     // Test audio update
-    // @ts-ignore - Accessing private properties for testing
+    // @ts-expect-error - Accessing private properties for testing
     newTuner.staticGain = mockGain;
-    // @ts-ignore - Accessing private method for testing
+    // @ts-expect-error - Accessing private method for testing
     newTuner.updateAudio();
 
     // Test static noise creation
-    // @ts-ignore - Accessing private method for testing
+    // @ts-expect-error - Accessing private method for testing
     newTuner.createStaticNoise();
 
     // Test cleanup
-    // @ts-ignore - Accessing private properties for testing
+    // @ts-expect-error - Accessing private properties for testing
     newTuner.staticSource = mockBufferSource;
-    // @ts-ignore - Accessing private properties for testing
+    // @ts-expect-error - Accessing private properties for testing
     newTuner.staticGain = mockGain;
 
     newTuner.destroy();
@@ -333,7 +361,7 @@ describe('RadioTuner', () => {
     const newTuner = new RadioTuner(mockScene as any, 400, 300);
 
     // Simulate audio initialization
-    // @ts-ignore - Accessing private method for testing
+    // @ts-expect-error - Accessing private method for testing
     newTuner.initializeAudio();
 
     // Verify error was logged
@@ -349,7 +377,7 @@ describe('RadioTuner', () => {
     const setTextSpy = jest.fn();
 
     // Mock the frequency text
-    // @ts-ignore - Accessing private property for testing
+    // @ts-expect-error - Accessing private property for testing
     radioTuner.frequencyText = { setText: setTextSpy };
 
     // Set a new frequency
@@ -361,15 +389,15 @@ describe('RadioTuner', () => {
 
   test('should handle edge cases', () => {
     // Test with no audio context
-    // @ts-ignore - Accessing private property for testing
+    // @ts-expect-error - Accessing private property for testing
     radioTuner.audioContext = null;
-    // @ts-ignore - Accessing private method for testing
+    // @ts-expect-error - Accessing private method for testing
     radioTuner.createStaticNoise();
 
     // Test with no static gain
-    // @ts-ignore - Accessing private property for testing
+    // @ts-expect-error - Accessing private property for testing
     radioTuner.staticGain = null;
-    // @ts-ignore - Accessing private method for testing
+    // @ts-expect-error - Accessing private method for testing
     radioTuner.updateAudio();
 
     // Verify the component doesn't crash
