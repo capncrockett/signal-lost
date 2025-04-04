@@ -3,8 +3,8 @@ import {
   waitForGameLoad,
   clickGamePosition,
   dragInGame,
-  captureConsoleLogs,
-  testRadioTuner
+  // captureConsoleLogs, // Not used in this test
+  testRadioTuner,
 } from '../helpers/gameTestHelpers';
 
 test('Radio tuner interaction test', async ({ page }) => {
@@ -13,7 +13,7 @@ test('Radio tuner interaction test', async ({ page }) => {
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     const text = msg.text();
     logs.push(text);
     console.log(`Browser console [${msg.type()}]: ${text}`);
@@ -24,7 +24,7 @@ test('Radio tuner interaction test', async ({ page }) => {
   });
 
   // Set up error collection
-  page.on('pageerror', error => {
+  page.on('pageerror', (error) => {
     console.error(`Browser page error: ${error.message}`);
     errors.push(error.message);
   });
@@ -76,17 +76,18 @@ test('Radio tuner interaction test', async ({ page }) => {
   console.log('Console warnings count:', warnings.length);
 
   // Check for signal lock events
-  const signalEvents = logs.filter(log => log.includes('Signal locked'));
+  const signalEvents = logs.filter((log) => log.includes('Signal locked'));
   console.log('Signal lock events:', signalEvents.length);
 
   // Take a screenshot
   await page.screenshot({ path: 'radio-tuner-test.png' });
 
   // Check for errors (ignoring audio loading errors)
-  const nonAudioErrors = errors.filter(error =>
-    !error.includes('Unable to decode audio data') &&
-    !error.includes('Failed to process file') &&
-    !error.includes('Failed to load resource')
+  const nonAudioErrors = errors.filter(
+    (error) =>
+      !error.includes('Unable to decode audio data') &&
+      !error.includes('Failed to process file') &&
+      !error.includes('Failed to load resource')
   );
 
   // Verify no non-audio errors occurred
@@ -95,7 +96,7 @@ test('Radio tuner interaction test', async ({ page }) => {
 
 test('Comprehensive radio tuner test using helper', async ({ page }) => {
   // Set up console logging
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     console.log(`Browser console [${msg.type()}]: ${msg.text()}`);
   });
 
@@ -119,10 +120,11 @@ test('Comprehensive radio tuner test using helper', async ({ page }) => {
   expect(results.audioInitialized).toBe(true);
 
   // Check for non-audio errors
-  const nonAudioErrors = results.logResults.errors.filter(error =>
-    !error.includes('Unable to decode audio data') &&
-    !error.includes('Failed to process file') &&
-    !error.includes('Failed to load resource')
+  const nonAudioErrors = results.logResults.errors.filter(
+    (error) =>
+      !error.includes('Unable to decode audio data') &&
+      !error.includes('Failed to process file') &&
+      !error.includes('Failed to load resource')
   );
 
   // Verify no non-audio errors occurred

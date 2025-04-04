@@ -2,30 +2,34 @@
 jest.mock('phaser', () => {
   return {
     Scene: class Scene {
-      constructor(config: any) {}
+      constructor(_config: any) {}
       add = {
         existing: jest.fn(),
         text: jest.fn().mockReturnValue({
           setOrigin: jest.fn().mockReturnThis(),
           setInteractive: jest.fn().mockReturnThis(),
-          on: jest.fn().mockReturnThis()
+          on: jest.fn().mockReturnThis(),
         }),
         image: jest.fn().mockReturnValue({
           setDisplaySize: jest.fn().mockReturnThis(),
-          setOrigin: jest.fn().mockReturnThis()
-        })
+          setOrigin: jest.fn().mockReturnThis(),
+        }),
       };
       input = {
         once: jest.fn(),
-        on: jest.fn()
+        on: jest.fn(),
       };
     },
     GameObjects: {
       Container: class Container {
-        on() { return this; }
-        emit() { return this; }
-      }
-    }
+        on() {
+          return this;
+        }
+        emit() {
+          return this;
+        }
+      },
+    },
   };
 });
 
@@ -33,7 +37,8 @@ jest.mock('phaser', () => {
 import { MainScene } from '../../src/scenes/MainScene';
 import { RadioTuner } from '../../src/components/RadioTuner';
 import { SoundscapeManager } from '../../src/audio/SoundscapeManager';
-import { VolumeControl } from '../../src/components/VolumeControl';
+// VolumeControl is imported but not used directly in tests
+// import { VolumeControl } from '../../src/components/VolumeControl';
 
 // Mock the RadioTuner component
 jest.mock('../../src/components/RadioTuner');
@@ -45,8 +50,8 @@ jest.mock('../../src/audio/SoundscapeManager', () => {
       initialize: jest.fn(),
       updateLayers: jest.fn(),
       playSignalSound: jest.fn(),
-      dispose: jest.fn()
-    }))
+      dispose: jest.fn(),
+    })),
   };
 });
 
@@ -61,9 +66,9 @@ jest.mock('../../src/audio/AudioManager', () => {
         setMasterVolume: jest.fn(),
         getMasterVolume: jest.fn().mockReturnValue(0.1),
         addVolumeChangeListener: jest.fn(),
-        removeVolumeChangeListener: jest.fn()
-      })
-    }
+        removeVolumeChangeListener: jest.fn(),
+      }),
+    },
   };
 });
 
@@ -83,13 +88,13 @@ describe('MainScene', () => {
   test.skip('should create RadioTuner and SoundscapeManager in create method', () => {
     // Mock the RadioTuner constructor
     (RadioTuner as jest.Mock).mockImplementation(() => ({
-      on: jest.fn().mockReturnThis()
+      on: jest.fn().mockReturnThis(),
     }));
 
     // Mock the SoundscapeManager constructor
     (SoundscapeManager as jest.Mock).mockImplementation(() => ({
       initialize: jest.fn().mockReturnValue(true),
-      adjustLayers: jest.fn()
+      adjustLayers: jest.fn(),
     }));
 
     // Call the create method
@@ -113,7 +118,7 @@ describe('MainScene', () => {
           callback(96.3);
         }
         return mockRadioTuner;
-      })
+      }),
     };
     (RadioTuner as jest.Mock).mockImplementation(() => mockRadioTuner);
 
@@ -135,14 +140,14 @@ describe('MainScene', () => {
     const mockGetSignalStrength = jest.fn().mockReturnValue(0.5);
     (RadioTuner as jest.Mock).mockImplementation(() => ({
       on: jest.fn().mockReturnThis(),
-      getSignalStrengthValue: mockGetSignalStrength
+      getSignalStrengthValue: mockGetSignalStrength,
     }));
 
     // Mock the SoundscapeManager
     const mockAdjustLayers = jest.fn();
     (SoundscapeManager as jest.Mock).mockImplementation(() => ({
       initialize: jest.fn().mockReturnValue(true),
-      adjustLayers: mockAdjustLayers
+      adjustLayers: mockAdjustLayers,
     }));
 
     // Create the scene and call update

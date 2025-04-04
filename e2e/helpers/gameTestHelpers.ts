@@ -31,7 +31,7 @@ export async function waitForGameLoad(page: Page) {
 
   return {
     gameContainer,
-    canvasCount
+    canvasCount,
   };
 }
 
@@ -76,7 +76,7 @@ export async function dragInGame(
   startY: number,
   endX: number,
   endY: number,
-  options?: any
+  _options?: any
 ) {
   // Find the game container
   const gameContainer = await page.locator('#game');
@@ -148,7 +148,7 @@ export async function captureConsoleLogs(page: Page, duration: number = 2000) {
     errors,
     warnings,
     hasErrors: errors.length > 0,
-    hasWarnings: warnings.length > 0
+    hasWarnings: warnings.length > 0,
   };
 }
 
@@ -183,17 +183,18 @@ export async function testRadioTuner(page: Page) {
 
   // Return test results
   // Filter out audio loading errors
-  const nonAudioErrors = logResults.errors.filter(error =>
-    !error.includes('Unable to decode audio data') &&
-    !error.includes('Failed to process file') &&
-    !error.includes('Failed to load resource')
+  const nonAudioErrors = logResults.errors.filter(
+    (error) =>
+      !error.includes('Unable to decode audio data') &&
+      !error.includes('Failed to process file') &&
+      !error.includes('Failed to load resource')
   );
 
   return {
-    signalEvents: logResults.logs.filter(log => log.includes('Signal')),
+    signalEvents: logResults.logs.filter((log) => log.includes('Signal')),
     audioInitialized: await verifyAudioContext(page),
     logResults,
     nonAudioErrors,
-    hasNonAudioErrors: nonAudioErrors.length > 0
+    hasNonAudioErrors: nonAudioErrors.length > 0,
   };
 }

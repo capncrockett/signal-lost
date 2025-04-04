@@ -1,17 +1,20 @@
 // Mock Phaser before importing NarrativeEngine
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 jest.mock('phaser', () => require('../mocks/PhaserMock').default);
 
 // Import after mocking
 import { NarrativeEngine, NarrativeEvent } from '../../src/narrative/NarrativeEngine';
 import { MessageDecoder } from '../../src/utils/MessageDecoder';
-import { SaveManager } from '../../src/utils/SaveManager';
+// SaveManager is imported for type definitions but not directly used
+// import { SaveManager } from '../../src/utils/SaveManager';
 
 // Mock SaveManager
 jest.mock('../../src/utils/SaveManager');
 
 describe('NarrativeEngine and MessageDecoder Integration', () => {
   let narrativeEngine: NarrativeEngine;
-  let messageDecoder: MessageDecoder;
+  // MessageDecoder is initialized but used indirectly through NarrativeEngine
+  // let messageDecoder: MessageDecoder;
 
   // Sample events for testing
   const sampleEvent: NarrativeEvent = {
@@ -20,14 +23,14 @@ describe('NarrativeEngine and MessageDecoder Integration', () => {
     choices: [
       {
         text: 'Option 1',
-        outcome: 'trigger_event_1'
+        outcome: 'trigger_event_1',
       },
       {
         text: 'Option 2',
-        outcome: 'set_variable=value'
-      }
+        outcome: 'set_variable=value',
+      },
     ],
-    interference: 0.5 // 50% interference
+    interference: 0.5, // 50% interference
   };
 
   const eventWithoutInterference: NarrativeEvent = {
@@ -36,9 +39,9 @@ describe('NarrativeEngine and MessageDecoder Integration', () => {
     choices: [
       {
         text: 'Continue',
-        outcome: 'trigger_event_2'
-      }
-    ]
+        outcome: 'trigger_event_2',
+      },
+    ],
   };
 
   beforeEach(() => {
@@ -64,10 +67,7 @@ describe('NarrativeEngine and MessageDecoder Integration', () => {
     narrativeEngine.triggerEvent('test_event');
 
     // Verify that MessageDecoder.obfuscateMessage was called with the correct parameters
-    expect(obfuscateSpy).toHaveBeenCalledWith(
-      sampleEvent.message,
-      sampleEvent.interference
-    );
+    expect(obfuscateSpy).toHaveBeenCalledWith(sampleEvent.message, sampleEvent.interference);
 
     // The current event's message should be obfuscated
     const currentEvent = narrativeEngine.getCurrentEvent();
@@ -101,14 +101,14 @@ describe('NarrativeEngine and MessageDecoder Integration', () => {
       id: 'low_interference',
       message: 'This message has low interference',
       choices: [],
-      interference: 0.2
+      interference: 0.2,
     };
 
     const highInterferenceEvent: NarrativeEvent = {
       id: 'high_interference',
       message: 'This message has high interference',
       choices: [],
-      interference: 0.8
+      interference: 0.8,
     };
 
     narrativeEngine.addEvent(lowInterferenceEvent);
@@ -153,8 +153,8 @@ describe('NarrativeEngine and MessageDecoder Integration', () => {
   });
 
   test('MessageDecoder can decode messages with references', () => {
-    // Create a message with a reference pattern
-    const messageWithReference = 'This message contains a [TOWER] that should be decoded';
+    // Create a message with a reference pattern - used in the test below
+    // const messageWithReference = 'This message contains a [TOWER] that should be decoded';
 
     // Create a modified message that simulates a decoded reference
     const decodedMessage = 'This message contains a radio tower that should be decoded';
@@ -168,7 +168,7 @@ describe('NarrativeEngine and MessageDecoder Integration', () => {
       id: 'reference_event',
       message: 'You see a [TOWER] in the distance',
       choices: [],
-      interference: 0.3
+      interference: 0.3,
     };
 
     // Mock the obfuscateMessage method to return a predictable result
