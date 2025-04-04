@@ -124,20 +124,20 @@ export class RadioTuner extends Phaser.GameObjects.Container {
         const minX = -this.config.width / 2 + 20;
         const maxX = this.config.width / 2 - 20;
         const clampedX = Phaser.Math.Clamp(dragX, minX, maxX);
-        
+
         // Update knob position
         this.knob.x = clampedX;
-        
+
         // Calculate frequency based on position
         const t = (clampedX - minX) / (maxX - minX);
         this.currentFrequency = this.config.minFrequency + t * (this.config.maxFrequency - this.config.minFrequency);
-        
+
         // Update display
         this.updateDisplay();
-        
+
         // Update audio
         this.updateAudio();
-        
+
         // Check for signal lock
         this.checkSignalLock();
       }
@@ -165,21 +165,21 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       const minX = -this.config.width / 2 + 20;
       const maxX = this.config.width / 2 - 20;
       const clampedX = Phaser.Math.Clamp(localX, minX, maxX);
-      
+
       // Update knob position
       this.knob.x = clampedX;
-      
+
       // Calculate frequency
       const t = (clampedX - minX) / (maxX - minX);
       this.currentFrequency = this.config.minFrequency + t * (this.config.maxFrequency - this.config.minFrequency);
-      
+
       // Update display
       this.updateDisplay();
-      
+
       // Initialize and update audio
       this.initializeAudio();
       this.updateAudio();
-      
+
       // Check for signal lock
       this.checkSignalLock();
     });
@@ -188,30 +188,37 @@ export class RadioTuner extends Phaser.GameObjects.Container {
   private updateDisplay(): void {
     // Update frequency text
     this.frequencyText.setText(`${this.currentFrequency.toFixed(1)} MHz`);
-    
+
     // Update knob position based on frequency
-    const t = (this.currentFrequency - this.config.minFrequency) / 
+    const t = (this.currentFrequency - this.config.minFrequency) /
               (this.config.maxFrequency - this.config.minFrequency);
     const minX = -this.config.width / 2 + 20;
     const maxX = this.config.width / 2 - 20;
     this.knob.x = minX + t * (maxX - minX);
   }
 
+  private masterGain: GainNode | null = null;
+
   private initializeAudio(): void {
     if (this.isAudioInitialized) return;
-    
+
     try {
       // Create audio context
       this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      
+
+      // Create master gain node (reduced to 50% volume)
+      this.masterGain = this.audioContext.createGain();
+      this.masterGain.gain.value = 0.5; // 50% volume
+      this.masterGain.connect(this.audioContext.destination);
+
       // Create gain node for static volume
       this.staticGain = this.audioContext.createGain();
-      this.staticGain.connect(this.audioContext.destination);
-      
+      this.staticGain.connect(this.masterGain);
+
       // We'll simulate static with white noise
       // In a real implementation, you would load an actual static sound
       this.createStaticNoise();
-      
+
       this.isAudioInitialized = true;
     } catch (error) {
       console.error('Failed to initialize audio:', error);
@@ -220,53 +227,54 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
   private createStaticNoise(): void {
     if (!this.audioContext) return;
-    
+
     // Create buffer for white noise
     const bufferSize = 2 * this.audioContext.sampleRate;
     const noiseBuffer = this.audioContext.createBuffer(
-      1, 
-      bufferSize, 
+      1,
+      bufferSize,
       this.audioContext.sampleRate
     );
-    
+
     // Fill buffer with white noise
     const data = noiseBuffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
       data[i] = Math.random() * 2 - 1;
     }
-    
+
     // Create source node
     this.staticSource = this.audioContext.createBufferSource();
     this.staticSource.buffer = noiseBuffer;
     this.staticSource.loop = true;
-    
+
     // Connect to gain node
     this.staticSource.connect(this.staticGain!);
-    
+
     // Start playback
     this.staticSource.start();
   }
 
   private updateAudio(): void {
     if (!this.staticGain) return;
-    
+
     // Calculate signal strength based on proximity to valid frequencies
     const signalStrength = this.getSignalStrength();
-    
+
     // Adjust static volume based on signal strength
-    // 1.0 = full static (no signal), 0.0 = no static (perfect signal)
-    this.staticGain.gain.value = 1.0 - signalStrength;
+    // 0.75 = reduced static (no signal), 0.0 = no static (perfect signal)
+    // Reduced from 1.0 to 0.75 (25% reduction)
+    this.staticGain.gain.value = 0.75 * (1.0 - signalStrength);
   }
 
   private getSignalStrength(): number {
     // Calculate signal strength based on proximity to valid frequencies
     let closestDistance = Number.MAX_VALUE;
-    
+
     for (const frequency of this.config.signalFrequencies) {
       const distance = Math.abs(this.currentFrequency - frequency);
       closestDistance = Math.min(closestDistance, distance);
     }
-    
+
     // Normalize distance to signal strength
     // 1.0 = perfect signal, 0.0 = no signal
     const normalizedStrength = 1.0 - Math.min(closestDistance / this.config.signalTolerance, 1.0);
@@ -275,7 +283,7 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
   private checkSignalLock(): void {
     const signalStrength = this.getSignalStrength();
-    
+
     // If signal strength is above threshold, emit signal lock event
     if (signalStrength > 0.8) {
       this.emit('signalLock', this.currentFrequency);
@@ -319,11 +327,19 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       this.staticSource.stop();
       this.staticSource.disconnect();
     }
-    
+
     if (this.staticGain) {
       this.staticGain.disconnect();
     }
-    
+
+    if (this.masterGain) {
+      this.masterGain.disconnect();
+    }
+
+    if (this.audioContext && this.audioContext.state !== 'closed') {
+      this.audioContext.close();
+    }
+
     // Call parent destroy method
     super.destroy(fromScene);
   }
