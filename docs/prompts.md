@@ -40,7 +40,7 @@ These are modular, acceptance-test-driven development prompts. Implement each on
 
 ---
 
-### ❌ Exploration Grid
+### ✅ Exploration Grid
 
 > Implement a `FieldScene` with:
 > - Tilemap/grid-based movement

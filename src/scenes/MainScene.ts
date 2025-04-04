@@ -34,6 +34,19 @@ export class MainScene extends Phaser.Scene {
       this.soundscapeManager.initialize();
       console.log('Audio initialized');
     });
+
+    // Add button to navigate to FieldScene
+    const fieldButton = this.add.text(400, 500, 'Go to Field', {
+      fontSize: '24px',
+      color: '#ffffff',
+      backgroundColor: '#333333',
+      padding: { x: 10, y: 5 }
+    });
+    fieldButton.setOrigin(0.5, 0.5);
+    fieldButton.setInteractive({ useHandCursor: true });
+    fieldButton.on('pointerdown', () => {
+      this.scene.start('FieldScene');
+    });
   }
 
   update(time: number, delta: number) {
