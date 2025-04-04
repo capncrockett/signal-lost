@@ -1,3 +1,7 @@
+// Mock Phaser before importing NarrativeEngine
+jest.mock('phaser', () => require('../mocks/PhaserMock').default);
+
+// Import after mocking
 import { NarrativeEngine, NarrativeEvent } from '../../src/narrative/NarrativeEngine';
 import { SaveManager } from '../../src/utils/SaveManager';
 
