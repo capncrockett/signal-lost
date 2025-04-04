@@ -29,14 +29,14 @@ describe('SoundscapeManager', () => {
       gain: {
         value: 0,
         setValueAtTime: mockSetValueAtTime,
-        linearRampToValueAtTime: mockLinearRampToValueAtTime
-      }
+        linearRampToValueAtTime: mockLinearRampToValueAtTime,
+      },
     };
 
     const mockPannerNode = {
       connect: mockConnect,
       disconnect: mockDisconnect,
-      pan: { value: 0 }
+      pan: { value: 0 },
     };
 
     const mockOscillatorNode = {
@@ -45,7 +45,7 @@ describe('SoundscapeManager', () => {
       start: mockStart,
       stop: mockStop,
       frequency: { value: 0 },
-      type: 'sine'
+      type: 'sine',
     };
 
     const mockBufferSourceNode = {
@@ -54,11 +54,11 @@ describe('SoundscapeManager', () => {
       start: mockStart,
       stop: mockStop,
       buffer: null,
-      loop: false
+      loop: false,
     };
 
     const mockAudioBuffer = {
-      getChannelData: jest.fn().mockReturnValue(new Float32Array(1000))
+      getChannelData: jest.fn().mockReturnValue(new Float32Array(1000)),
     };
 
     // Mock AudioContext
@@ -72,7 +72,7 @@ describe('SoundscapeManager', () => {
       currentTime: 0,
       sampleRate: 44100,
       state: 'running',
-      close: mockClose
+      close: mockClose,
     }));
 
     // Mock setTimeout and clearTimeout
@@ -124,9 +124,9 @@ describe('SoundscapeManager', () => {
     soundscapeManager.initialize();
 
     // Update layers with different signal strengths
-    soundscapeManager.updateLayers(0);   // No signal
+    soundscapeManager.updateLayers(0); // No signal
     soundscapeManager.updateLayers(0.5); // Medium signal
-    soundscapeManager.updateLayers(1);   // Perfect signal
+    soundscapeManager.updateLayers(1); // Perfect signal
 
     // Verify adjustments were made
     // We can't check specific values easily due to the private properties,
@@ -139,9 +139,9 @@ describe('SoundscapeManager', () => {
     soundscapeManager.initialize();
 
     // Adjust panning with different positions
-    soundscapeManager.adjustPanning(-1);  // Far left
-    soundscapeManager.adjustPanning(0);   // Center
-    soundscapeManager.adjustPanning(1);   // Far right
+    soundscapeManager.adjustPanning(-1); // Far left
+    soundscapeManager.adjustPanning(0); // Center
+    soundscapeManager.adjustPanning(1); // Far right
 
     // Verify adjustments were made
     expect(true).toBe(true);
@@ -152,9 +152,9 @@ describe('SoundscapeManager', () => {
     soundscapeManager.initialize();
 
     // Set different volumes
-    soundscapeManager.setVolume(0);    // Silent
-    soundscapeManager.setVolume(0.5);  // Half volume
-    soundscapeManager.setVolume(1);    // Full volume
+    soundscapeManager.setVolume(0); // Silent
+    soundscapeManager.setVolume(0.5); // Half volume
+    soundscapeManager.setVolume(1); // Full volume
 
     // Verify volume was set
     expect(true).toBe(true);

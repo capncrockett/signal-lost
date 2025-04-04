@@ -6,7 +6,7 @@ test('Game loads and scenes can be navigated', async ({ page }) => {
 
   // Listen for console logs
   const logs: string[] = [];
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     logs.push(msg.text());
   });
 
@@ -36,8 +36,8 @@ test('Game loads and scenes can be navigated', async ({ page }) => {
   await canvas.click({
     position: {
       x: 400, // Button X position
-      y: 500  // Button Y position
-    }
+      y: 500, // Button Y position
+    },
   });
 
   // Wait for scene transition
@@ -101,13 +101,13 @@ test('Game loads assets correctly', async ({ page }) => {
 
   // Listen for console logs
   const logs: string[] = [];
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     logs.push(msg.text());
   });
 
   // Listen for console errors
   const errors: string[] = [];
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     if (msg.type() === 'error') {
       errors.push(msg.text());
     }
@@ -117,10 +117,9 @@ test('Game loads assets correctly', async ({ page }) => {
   await page.waitForTimeout(2000);
 
   // Verify that there are no asset loading errors
-  const assetErrors = errors.filter(error =>
-    error.includes('Failed to load') ||
-    error.includes('Error loading') ||
-    error.includes('404')
+  const assetErrors = errors.filter(
+    (error) =>
+      error.includes('Failed to load') || error.includes('Error loading') || error.includes('404')
   );
 
   expect(assetErrors).toHaveLength(0);
@@ -138,7 +137,7 @@ test('Game initializes audio correctly', async ({ page }) => {
 
   // Listen for console logs
   const logs: string[] = [];
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     logs.push(msg.text());
   });
 

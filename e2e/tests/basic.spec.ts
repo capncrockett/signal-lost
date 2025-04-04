@@ -6,7 +6,7 @@ test('Basic page load test with detailed diagnostics', async ({ page }) => {
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     const text = msg.text();
     logs.push(text);
     console.log(`Browser console [${msg.type()}]: ${text}`);
@@ -17,17 +17,17 @@ test('Basic page load test with detailed diagnostics', async ({ page }) => {
   });
 
   // Set up error collection
-  page.on('pageerror', error => {
+  page.on('pageerror', (error) => {
     console.error(`Browser page error: ${error.message}`);
     errors.push(error.message);
   });
 
   // Set up request/response monitoring
-  page.on('request', request => {
+  page.on('request', (request) => {
     console.log(`Request: ${request.method()} ${request.url()}`);
   });
 
-  page.on('response', response => {
+  page.on('response', (response) => {
     console.log(`Response: ${response.status()} ${response.url()}`);
   });
 
@@ -107,7 +107,7 @@ test('Basic page load test with detailed diagnostics', async ({ page }) => {
       canvasElements: document.querySelectorAll('canvas').length,
       windowInnerWidth: window.innerWidth,
       windowInnerHeight: window.innerHeight,
-      documentReady: document.readyState
+      documentReady: document.readyState,
     };
   });
   console.log('Page JavaScript evaluation result:', gameInfo);

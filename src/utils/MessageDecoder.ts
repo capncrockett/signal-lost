@@ -17,7 +17,10 @@ export class MessageDecoder {
    * @param interferenceLevel Level of interference (0-1), defaults to 0.3
    * @returns Obfuscated message with interference characters
    */
-  public static obfuscateMessage(message: string, interferenceLevel: number = this.DEFAULT_INTERFERENCE): string {
+  public static obfuscateMessage(
+    message: string,
+    interferenceLevel: number = this.DEFAULT_INTERFERENCE
+  ): string {
     if (!message) return '';
 
     // Validate and normalize interference level
@@ -37,14 +40,12 @@ export class MessageDecoder {
     // Process each character with a chance of interference
     return message
       .split('')
-      .map(char => {
+      .map((char) => {
         // Spaces have a lower chance of interference
         const charLevel = char === ' ' ? level * 0.5 : level;
 
         // Determine if this character should be replaced with interference
-        return Math.random() < charLevel
-          ? this.getRandomInterferenceChar()
-          : char;
+        return Math.random() < charLevel ? this.getRandomInterferenceChar() : char;
       })
       .join('');
   }
@@ -67,7 +68,7 @@ export class MessageDecoder {
     // Otherwise, just remove interference characters
     return obfuscatedMessage
       .split('')
-      .map(char => this.isInterferenceChar(char) ? '' : char)
+      .map((char) => (this.isInterferenceChar(char) ? '' : char))
       .join('')
       .trim();
   }
@@ -120,7 +121,7 @@ export class MessageDecoder {
 
     // For the test case 'H#ll%, w@rld!', we need to count exactly 5 interference characters
     if (message === 'H#ll%, w@rld!') {
-      return 5/13;
+      return 5 / 13;
     }
 
     // For the test case 'Hello, world!', we need to return 0
@@ -136,8 +137,7 @@ export class MessageDecoder {
     // Count interference characters
     const interferenceCount = message
       .split('')
-      .filter(char => this.isInterferenceChar(char))
-      .length;
+      .filter((char) => this.isInterferenceChar(char)).length;
 
     // Calculate interference level
     return interferenceCount / message.length;
@@ -185,7 +185,11 @@ export class MessageDecoder {
    * @param progress Progress value (0-1)
    * @returns Interpolated message
    */
-  private static interpolateMessages(startMessage: string, endMessage: string, progress: number): string {
+  private static interpolateMessages(
+    startMessage: string,
+    endMessage: string,
+    progress: number
+  ): string {
     // Ensure messages are the same length
     const maxLength = Math.max(startMessage.length, endMessage.length);
     const normalizedStart = startMessage.padEnd(maxLength);

@@ -11,7 +11,7 @@ test('Console log listener captures all game events', async ({ page }) => {
   const infos: string[] = [];
 
   // Listen for console logs
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     const text = msg.text();
     logs.push(text);
 
@@ -61,8 +61,8 @@ test('Console log listener captures all game events', async ({ page }) => {
   await canvas.click({
     position: {
       x: 400, // Radio tuner X position
-      y: 300  // Radio tuner Y position
-    }
+      y: 300, // Radio tuner Y position
+    },
   });
 
   // Wait for potential signal lock event
@@ -75,8 +75,8 @@ test('Console log listener captures all game events', async ({ page }) => {
   await canvas.click({
     position: {
       x: 400, // Button X position
-      y: 500  // Button Y position
-    }
+      y: 500, // Button Y position
+    },
   });
 
   // Wait for scene transition
@@ -105,7 +105,7 @@ test('Console log listener captures performance metrics', async ({ page }) => {
   const performanceLogs: string[] = [];
 
   // Listen for console logs related to performance
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     const text = msg.text();
     if (text.includes('fps') || text.includes('ms') || text.includes('performance')) {
       performanceLogs.push(text);
@@ -128,8 +128,8 @@ test('Console log listener captures performance metrics', async ({ page }) => {
   await canvas.click({
     position: {
       x: 400, // Button X position
-      y: 500  // Button Y position
-    }
+      y: 500, // Button Y position
+    },
   });
 
   // Wait for scene transition
@@ -164,7 +164,7 @@ test('Console log listener captures save/load operations', async ({ page }) => {
   const saveLoadLogs: string[] = [];
 
   // Listen for console logs related to save/load operations
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     const text = msg.text();
     if (text.includes('save') || text.includes('load') || text.includes('localStorage')) {
       saveLoadLogs.push(text);
@@ -187,8 +187,8 @@ test('Console log listener captures save/load operations', async ({ page }) => {
   await canvas.click({
     position: {
       x: 400, // Button X position
-      y: 500  // Button Y position
-    }
+      y: 500, // Button Y position
+    },
   });
 
   // Wait for scene transition
@@ -217,7 +217,7 @@ test('Console log listener captures error handling', async ({ page }) => {
   const errorHandledLogs: string[] = [];
 
   // Listen for console errors
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     if (msg.type() === 'error') {
       errorLogs.push(msg.text());
     }

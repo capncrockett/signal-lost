@@ -4,6 +4,6 @@ export const mockAudioManager = {
     setMasterVolume: jest.fn(),
     getMasterVolume: jest.fn().mockReturnValue(0.1),
     addVolumeChangeListener: jest.fn(),
-    removeVolumeChangeListener: jest.fn()
-  })
+    removeVolumeChangeListener: jest.fn(),
+  }),
 };

@@ -159,14 +159,11 @@ export class NarrativeEngine {
 
     // Apply interference to message if specified
     if (typeof event.interference === 'number') {
-      processedEvent.message = MessageDecoder.obfuscateMessage(
-        event.message,
-        event.interference
-      );
+      processedEvent.message = MessageDecoder.obfuscateMessage(event.message, event.interference);
     }
 
     // Filter choices based on conditions
-    processedEvent.choices = event.choices.filter(choice => {
+    processedEvent.choices = event.choices.filter((choice) => {
       return !choice.condition || this.evaluateCondition(choice.condition);
     });
 
@@ -207,7 +204,7 @@ export class NarrativeEngine {
     this.eventEmitter.emit('narrativeChoice', {
       eventId: this.currentEvent.id,
       choiceIndex,
-      choice
+      choice,
     });
 
     // Trigger outcome if specified

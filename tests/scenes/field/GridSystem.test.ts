@@ -6,13 +6,13 @@ const mockScene = {
     graphics: jest.fn(),
     image: jest.fn(),
     sprite: jest.fn(),
-    text: jest.fn()
+    text: jest.fn(),
   },
   input: {
     keyboard: {
-      createCursorKeys: jest.fn()
-    }
-  }
+      createCursorKeys: jest.fn(),
+    },
+  },
 };
 
 describe('GridSystem', () => {

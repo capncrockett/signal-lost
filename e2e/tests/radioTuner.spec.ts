@@ -6,7 +6,7 @@ test('RadioTuner component loads and emits signal lock event', async ({ page }) 
 
   // Listen for console logs
   const logs: string[] = [];
-  page.on('console', msg => {
+  page.on('console', (msg) => {
     logs.push(msg.text());
   });
 
@@ -33,8 +33,8 @@ test('RadioTuner component loads and emits signal lock event', async ({ page }) 
   await canvas.click({
     position: {
       x: 400, // Center X
-      y: 300  // Center Y
-    }
+      y: 300, // Center Y
+    },
   });
 
   // Wait for potential signal lock event

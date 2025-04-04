@@ -34,7 +34,7 @@ export class SoundscapeManager {
   private config = {
     droneFrequency: 55, // Base frequency in Hz
     blipInterval: 2000, // Time between blips in ms
-    blipDuration: 200,  // Duration of each blip in ms
+    blipDuration: 200, // Duration of each blip in ms
   };
 
   // Reference to the scene
@@ -179,11 +179,7 @@ export class SoundscapeManager {
 
     // Create buffer for white noise
     const bufferSize = 2 * this.audioContext.sampleRate;
-    const noiseBuffer = this.audioContext.createBuffer(
-      1,
-      bufferSize,
-      this.audioContext.sampleRate
-    );
+    const noiseBuffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
 
     // Fill buffer with white noise
     const data = noiseBuffer.getChannelData(0);
@@ -211,10 +207,7 @@ export class SoundscapeManager {
 
     const scheduleNextBlip = () => {
       this.createBlip();
-      this.blipSchedulerId = window.setTimeout(
-        scheduleNextBlip,
-        this.config.blipInterval
-      );
+      this.blipSchedulerId = window.setTimeout(scheduleNextBlip, this.config.blipInterval);
     };
 
     // Start scheduling
@@ -320,10 +313,10 @@ export class SoundscapeManager {
     // Adjust drone characteristics
     if (this.droneSource && this.droneGain) {
       // Increase drone volume with signal strength
-      this.droneGain.gain.value = 0.1 + (0.3 * strength);
+      this.droneGain.gain.value = 0.1 + 0.3 * strength;
 
       // Adjust drone frequency based on signal strength
-      this.droneSource.frequency.value = this.config.droneFrequency + (strength * 20);
+      this.droneSource.frequency.value = this.config.droneFrequency + strength * 20;
     }
 
     // Adjust blip volume and rate
@@ -332,7 +325,7 @@ export class SoundscapeManager {
       this.blipGain.gain.value = strength * 0.4;
 
       // Adjust blip interval (faster with stronger signal)
-      this.config.blipInterval = 2000 - (strength * 1500);
+      this.config.blipInterval = 2000 - strength * 1500;
     }
 
     // Adjust panning based on signal strength
