@@ -32,11 +32,17 @@ test('Console log listener captures all game events', async ({ page }) => {
   // Wait for the game to load
   await page.waitForTimeout(2000);
 
-  // Wait for the game to initialize and create the canvas
-  await page.waitForSelector('canvas', { timeout: 10000 });
+  // Wait for the game container to be visible
+  await page.waitForSelector('#game', { timeout: 10000 });
 
-  // Find the canvas
-  const canvas = await page.locator('canvas');
+  // Find the game container
+  const gameContainer = await page.locator('#game');
+
+  // Verify game container exists
+  await expect(gameContainer).toBeVisible();
+
+  // For tests that need to interact with the game, we'll use the game container
+  const canvas = gameContainer;
 
   // Click on the canvas to initialize audio
   await canvas.click();

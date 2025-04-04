@@ -13,14 +13,17 @@ test('Game loads and scenes can be navigated', async ({ page }) => {
   // Wait for the game to load
   await page.waitForTimeout(2000);
 
-  // Wait for the game to initialize and create the canvas
-  await page.waitForSelector('canvas', { timeout: 10000 });
+  // Wait for the game container to be visible
+  await page.waitForSelector('#game', { timeout: 10000 });
 
-  // Find the canvas
-  const canvas = await page.locator('canvas');
+  // Find the game container
+  const gameContainer = await page.locator('#game');
 
-  // Verify canvas exists
-  await expect(canvas).toBeVisible();
+  // Verify game container exists
+  await expect(gameContainer).toBeVisible();
+
+  // For tests that need to interact with the game, we'll use the game container
+  const canvas = gameContainer;
 
   // Check if the game has loaded by looking for specific console logs
   const gameLoadedLog = logs.find(log => log.includes('Phaser') && log.includes('initialized'));

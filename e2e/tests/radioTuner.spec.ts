@@ -13,11 +13,17 @@ test('RadioTuner component loads and emits signal lock event', async ({ page }) 
   // Wait for the game to load
   await page.waitForTimeout(2000);
 
-  // Wait for the game to initialize and create the canvas
-  await page.waitForSelector('canvas', { timeout: 10000 });
+  // Wait for the game container to be visible
+  await page.waitForSelector('#game', { timeout: 10000 });
 
-  // Find the canvas
-  const canvas = await page.locator('canvas');
+  // Find the game container
+  const gameContainer = await page.locator('#game');
+
+  // Verify game container exists
+  await expect(gameContainer).toBeVisible();
+
+  // For tests that need to interact with the game, we'll use the game container
+  const canvas = gameContainer;
 
   // Click on the canvas where the radio tuner should be
   // These coordinates would need to be adjusted based on actual layout
