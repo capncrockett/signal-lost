@@ -276,7 +276,9 @@ describe('RadioTuner', () => {
       createBufferSource: mockCreateBufferSource,
       createBuffer: mockCreateBuffer,
       destination: {},
-      sampleRate: 44100
+      sampleRate: 44100,
+      state: 'running',
+      close: jest.fn()
     }));
 
     // Create a new RadioTuner to test audio initialization

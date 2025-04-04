@@ -1,3 +1,17 @@
+// Mock the AudioManager class
+jest.mock('../../src/audio/AudioManager', () => {
+  return {
+    AudioManager: {
+      getInstance: jest.fn().mockReturnValue({
+        setMasterVolume: jest.fn(),
+        getMasterVolume: jest.fn().mockReturnValue(0.1),
+        addVolumeChangeListener: jest.fn(),
+        removeVolumeChangeListener: jest.fn()
+      })
+    }
+  };
+});
+
 // Mock the SoundscapeManager class
 jest.mock('../../src/audio/SoundscapeManager', () => {
   return {
