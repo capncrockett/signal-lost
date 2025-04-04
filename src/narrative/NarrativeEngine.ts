@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import Phaser from 'phaser';
 import { SaveManager } from '../utils/SaveManager';
 import { MessageDecoder } from '../utils/MessageDecoder';
 
@@ -31,7 +31,7 @@ export interface NarrativeEvent {
  */
 export class NarrativeEngine {
   // Event emitter for narrative events
-  private eventEmitter: EventEmitter;
+  private eventEmitter: Phaser.Events.EventEmitter;
 
   // Map of narrative events by ID
   private events: Map<string, NarrativeEvent>;
@@ -49,7 +49,7 @@ export class NarrativeEngine {
    * Create a new narrative engine
    */
   constructor() {
-    this.eventEmitter = new EventEmitter();
+    this.eventEmitter = new Phaser.Events.EventEmitter();
     this.events = new Map();
 
     // Initialize SaveManager
