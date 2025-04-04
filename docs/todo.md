@@ -7,7 +7,7 @@
 
 - ✅ RadioTuner Component
 - ✅ SoundscapeManager
-- ❌ Message Decoder
+- ✅ Message Decoder
 - ❌ SaveManager
 - ❌ FieldScene Grid System
 - ❌ Narrative Engine
@@ -20,3 +20,4 @@
 
 - [x] RadioTuner Component (80%+ test coverage achieved)
 - [x] SoundscapeManager (95%+ test coverage achieved)
+- [x] Message Decoder (94%+ test coverage achieved)

@@ -29,7 +29,7 @@ These are modular, acceptance-test-driven development prompts. Implement each on
 
 ---
 
-### ❌ Message Decoder
+### ✅ Message Decoder
 
 > Write a utility to obfuscate and decode messages.
 > - `obfuscateMessage(msg: string): string`
