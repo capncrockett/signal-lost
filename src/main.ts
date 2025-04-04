@@ -21,25 +21,73 @@ const config: Phaser.Types.Core.GameConfig = {
   canvasStyle: 'display: block; margin: 0 auto;' // Ensure canvas is visible
 };
 
+// Add global error handler
+window.addEventListener('error', (event) => {
+  console.error('Global error:', event.message, event.filename, event.lineno, event.error);
+});
+
+// Add unhandled promise rejection handler
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('Unhandled promise rejection:', event.reason);
+});
+
+// Log DOM ready state
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM content loaded');
+  console.log('Game container exists:', !!document.getElementById('game'));
+  console.log('Fallback canvas exists:', !!document.getElementById('fallback-canvas'));
+});
+
 // Initialize the game
 window.addEventListener('load', () => {
-  console.log('Window loaded, initializing Phaser game...');
-  const game = new Phaser.Game(config);
-  console.log('Phaser game initialized');
+  try {
+    console.log('Window loaded, initializing Phaser game...');
+    console.log('Window dimensions:', window.innerWidth, 'x', window.innerHeight);
+    console.log('Game container exists:', !!document.getElementById('game'));
+    console.log('Game container dimensions:', document.getElementById('game')?.getBoundingClientRect());
+    console.log('Fallback canvas exists:', !!document.getElementById('fallback-canvas'));
+    console.log('Fallback canvas dimensions:', document.getElementById('fallback-canvas')?.getBoundingClientRect());
+    console.log('Phaser config:', JSON.stringify(config));
 
-  // Log when the canvas is created
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.addedNodes.length) {
-        mutation.addedNodes.forEach((node) => {
-          if (node.nodeName === 'CANVAS') {
-            console.log('Canvas element created');
-          }
-        });
-      }
+    // Create the game instance
+    const game = new Phaser.Game(config);
+    console.log('Phaser game initialized');
+
+    // Log when the canvas is created
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length) {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeName === 'CANVAS') {
+              console.log('Canvas element created:', node);
+              console.log('Canvas dimensions:', (node as HTMLElement).getBoundingClientRect());
+            }
+          });
+        }
+      });
     });
-  });
 
-  // Start observing the document body for changes
-  observer.observe(document.body, { childList: true, subtree: true });
+    // Start observing the document body for changes
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Also observe the game container
+    const gameContainer = document.getElementById('game');
+    if (gameContainer) {
+      observer.observe(gameContainer, { childList: true, subtree: true });
+    }
+
+    // Log all canvas elements after a delay
+    setTimeout(() => {
+      const canvasElements = document.querySelectorAll('canvas');
+      console.log('Canvas elements after delay:', canvasElements.length);
+      canvasElements.forEach((canvas, index) => {
+        console.log(`Canvas ${index}:`, canvas);
+        console.log(`Canvas ${index} dimensions:`, canvas.getBoundingClientRect());
+        console.log(`Canvas ${index} visibility:`, window.getComputedStyle(canvas).visibility);
+        console.log(`Canvas ${index} display:`, window.getComputedStyle(canvas).display);
+      });
+    }, 2000);
+  } catch (error) {
+    console.error('Error initializing game:', error);
+  }
 });

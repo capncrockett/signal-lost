@@ -12,8 +12,12 @@ export default defineConfig({
     trace: 'on-first-retry',
     headless: false,
     launchOptions: {
-      slowMo: 100 // Slow down execution by 100ms
-    }
+      slowMo: 100, // Slow down execution by 100ms
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    },
+    viewport: { width: 1024, height: 768 }, // Set viewport size to ensure game is visible
+    actionTimeout: 15000, // Increase action timeout
+    navigationTimeout: 15000 // Increase navigation timeout
   },
   projects: [
     {
