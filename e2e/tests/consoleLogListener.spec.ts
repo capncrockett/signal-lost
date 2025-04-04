@@ -41,8 +41,11 @@ test('Console log listener captures all game events', async ({ page }) => {
   // Verify game container exists
   await expect(gameContainer).toBeVisible();
 
-  // For tests that need to interact with the game, we'll use the game container
-  const canvas = gameContainer;
+  // Find the fallback canvas
+  const canvas = await page.locator('#fallback-canvas');
+
+  // Verify fallback canvas exists
+  await expect(canvas).toBeVisible();
 
   // Click on the canvas to initialize audio
   await canvas.click();

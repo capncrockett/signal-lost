@@ -22,8 +22,11 @@ test('Game loads and scenes can be navigated', async ({ page }) => {
   // Verify game container exists
   await expect(gameContainer).toBeVisible();
 
-  // For tests that need to interact with the game, we'll use the game container
-  const canvas = gameContainer;
+  // Find the fallback canvas
+  const canvas = await page.locator('#fallback-canvas');
+
+  // Verify fallback canvas exists
+  await expect(canvas).toBeVisible();
 
   // Check if the game has loaded by looking for specific console logs
   const gameLoadedLog = logs.find(log => log.includes('Phaser') && log.includes('initialized'));

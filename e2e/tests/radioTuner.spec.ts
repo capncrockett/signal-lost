@@ -22,8 +22,11 @@ test('RadioTuner component loads and emits signal lock event', async ({ page }) 
   // Verify game container exists
   await expect(gameContainer).toBeVisible();
 
-  // For tests that need to interact with the game, we'll use the game container
-  const canvas = gameContainer;
+  // Find the fallback canvas
+  const canvas = await page.locator('#fallback-canvas');
+
+  // Verify fallback canvas exists
+  await expect(canvas).toBeVisible();
 
   // Click on the canvas where the radio tuner should be
   // These coordinates would need to be adjusted based on actual layout
