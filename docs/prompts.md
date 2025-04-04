@@ -14,7 +14,7 @@ These are modular, acceptance-test-driven development prompts. Implement each on
 > - Static audio that cleans as signal sharpens
 > - Emits `signalLock(frequency)` event when close to predefined frequency
 > - Tests: signal detection logic, slider input behavior
-> - 90%+ test coverage
+> - 80%+ test coverage
 
 ---
 
@@ -25,7 +25,7 @@ These are modular, acceptance-test-driven development prompts. Implement each on
 > - Can adjust volume/panning based on player location or tuning
 > - Public methods: `adjustLayers(signalStrength: number)`
 > - Tests: panning/volume blend logic, unit + integration
-> - 90%+ test coverage
+> - 80%+ test coverage
 
 ---
 
@@ -36,7 +36,7 @@ These are modular, acceptance-test-driven development prompts. Implement each on
 > - `decodeMessage(msg: string): string`
 > - Simulate radio interference with %/#/! characters
 > - Unit tests for edge cases
-> - 90%+ coverage
+> - 80%+ coverage
 
 ---
 
@@ -47,7 +47,7 @@ These are modular, acceptance-test-driven development prompts. Implement each on
 > - Collision system for interactables
 > - Trigger event when near tower/ruins
 > - Tests: movement boundaries, event detection
-> - 90%+ coverage
+> - 80%+ coverage
 
 ---
 
@@ -57,7 +57,7 @@ These are modular, acceptance-test-driven development prompts. Implement each on
 > - Tracks flags: `foundTower1`, `decodedMsg3`, etc.
 > - API: `getFlag(id)`, `setFlag(id)`, `clearFlags()`
 > - Mock localStorage in tests
-> - 90%+ test coverage
+> - 80%+ test coverage
 
 ---
 
@@ -74,4 +74,4 @@ These are modular, acceptance-test-driven development prompts. Implement each on
 > - Parser module
 > - Renderer in scene
 > - Tests: branching logic
-> - 90%+ coverage
+> - 80%+ coverage

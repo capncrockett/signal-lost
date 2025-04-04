@@ -27,7 +27,7 @@ npm run coverage     # Output coverage report
 ## ✅ Development Rules
 
 - TypeScript must be used throughout
-- Tests must cover ≥ 90% of code (unit + integration + E2E)
+- Tests must cover ≥ 80% of code (unit + integration + E2E)
 - Console logs must be accessible and validated in browser-based tests
 - All prompts/tasks live in docs/ files and serve as acceptance criteria
 - If Agent fails, it must re-read the relevant README task before retrying

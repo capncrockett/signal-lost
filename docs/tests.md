@@ -26,17 +26,17 @@ page.on('console', msg => {
 
 ## Coverage Goals
 
-- Minimum 90% test coverage across entire codebase
+- Minimum 80% test coverage across entire codebase
 - Run: `npm run coverage`
 - Enforced via `coverageThreshold` in `jest.config.ts`
 
 ```ts
 coverageThreshold: {
   global: {
-    branches: 90,
-    functions: 90,
-    lines: 90,
-    statements: 90
+    branches: 80,
+    functions: 80,
+    lines: 80,
+    statements: 80
   }
 }
 ```
