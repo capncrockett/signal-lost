@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import Phaser from 'phaser';
 import { SaveManager } from '../utils/SaveManager';
 import { MessageDecoder } from '../utils/MessageDecoder';
 
@@ -31,7 +31,7 @@ export interface NarrativeEvent {
  */
 export class NarrativeEngine {
   // Event emitter for narrative events
-  private eventEmitter: EventEmitter;
+  private eventEmitter: Phaser.Events.EventEmitter;
 
   // Map of narrative events by ID
   private events: Map<string, NarrativeEvent>;
@@ -43,13 +43,14 @@ export class NarrativeEngine {
   private eventHistory: string[] = [];
 
   // Flag variables for conditions
-  private variables: Map<string, any> = new Map();
+  // Variables can be of different types (string, number, boolean, object)
+  private variables: Map<string, unknown> = new Map();
 
   /**
    * Create a new narrative engine
    */
   constructor() {
-    this.eventEmitter = new EventEmitter();
+    this.eventEmitter = new Phaser.Events.EventEmitter();
     this.events = new Map();
 
     // Initialize SaveManager
@@ -159,14 +160,11 @@ export class NarrativeEngine {
 
     // Apply interference to message if specified
     if (typeof event.interference === 'number') {
-      processedEvent.message = MessageDecoder.obfuscateMessage(
-        event.message,
-        event.interference
-      );
+      processedEvent.message = MessageDecoder.obfuscateMessage(event.message, event.interference);
     }
 
     // Filter choices based on conditions
-    processedEvent.choices = event.choices.filter(choice => {
+    processedEvent.choices = event.choices.filter((choice) => {
       return !choice.condition || this.evaluateCondition(choice.condition);
     });
 
@@ -207,7 +205,7 @@ export class NarrativeEngine {
     this.eventEmitter.emit('narrativeChoice', {
       eventId: this.currentEvent.id,
       choiceIndex,
-      choice
+      choice,
     });
 
     // Trigger outcome if specified
@@ -266,7 +264,7 @@ export class NarrativeEngine {
    * @param name Variable name
    * @param value Variable value
    */
-  setVariable(name: string, value: any): void {
+  setVariable(name: string, value: unknown): void {
     this.variables.set(name, value);
     SaveManager.setFlag(`var_${name}`, true);
 
@@ -281,7 +279,7 @@ export class NarrativeEngine {
    * @param name Variable name
    * @returns Variable value or undefined if not set
    */
-  getVariable(name: string): any {
+  getVariable(name: string): unknown {
     return this.variables.get(name);
   }
 
@@ -350,7 +348,7 @@ export class NarrativeEngine {
    * @param event Event name
    * @param listener Event listener
    */
-  on(event: string, listener: (...args: any[]) => void): void {
+  on(event: string, listener: (...args: unknown[]) => void): void {
     this.eventEmitter.on(event, listener);
   }
 
@@ -359,7 +357,7 @@ export class NarrativeEngine {
    * @param event Event name
    * @param listener Event listener
    */
-  off(event: string, listener: (...args: any[]) => void): void {
+  off(event: string, listener: (...args: unknown[]) => void): void {
     this.eventEmitter.off(event, listener);
   }
 }

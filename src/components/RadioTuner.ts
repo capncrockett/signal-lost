@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { AudioManager } from '../audio/AudioManager';
 
 interface RadioTunerConfig {
   width?: number;
@@ -26,15 +27,13 @@ export class RadioTuner extends Phaser.GameObjects.Container {
   private isDragging: boolean = false;
   private audioContext: AudioContext | null = null;
   private staticGain: GainNode | null = null;
+  private masterGain: GainNode | null = null;
   private staticSource: AudioBufferSourceNode | null = null;
   private isAudioInitialized: boolean = false;
+  private audioManager: AudioManager;
+  private volumeChangeListener: ((volume: number) => void) | null = null;
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    config: RadioTunerConfig = {}
-  ) {
+  constructor(scene: Phaser.Scene, x: number, y: number, config: RadioTunerConfig = {}) {
     super(scene, x, y);
 
     // Default configuration
@@ -47,8 +46,11 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       signalTolerance: config.signalTolerance || 0.3,
       backgroundColor: config.backgroundColor || 0x333333,
       sliderColor: config.sliderColor || 0x666666,
-      knobColor: config.knobColor || 0xcccccc
+      knobColor: config.knobColor || 0xcccccc,
     };
+
+    // Get the audio manager
+    this.audioManager = AudioManager.getInstance();
 
     this.currentFrequency = (this.config.minFrequency + this.config.maxFrequency) / 2;
 
@@ -73,12 +75,7 @@ export class RadioTuner extends Phaser.GameObjects.Container {
     // Create slider track
     this.slider = this.scene.add.graphics();
     this.slider.fillStyle(this.config.sliderColor, 1);
-    this.slider.fillRect(
-      -this.config.width / 2 + 20,
-      -5,
-      this.config.width - 40,
-      10
-    );
+    this.slider.fillRect(-this.config.width / 2 + 20, -5, this.config.width - 40, 10);
     this.add(this.slider);
 
     // Create knob
@@ -94,7 +91,7 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       `${this.currentFrequency.toFixed(1)} MHz`,
       {
         fontSize: '18px',
-        color: '#ffffff'
+        color: '#ffffff',
       }
     );
     this.frequencyText.setOrigin(0.5, 0.5);
@@ -103,60 +100,67 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
   private setupInteraction(): void {
     // Make knob interactive
-    this.knob.setInteractive(
-      new Phaser.Geom.Circle(0, 0, 15),
-      Phaser.Geom.Circle.Contains
-    );
+    this.knob.setInteractive(new Phaser.Geom.Circle(0, 0, 15), Phaser.Geom.Circle.Contains);
 
     // Setup drag events
     this.scene.input.setDraggable(this.knob);
 
-    this.scene.input.on('dragstart', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) => {
-      if (gameObject === this.knob) {
-        this.isDragging = true;
-        this.initializeAudio();
+    this.scene.input.on(
+      'dragstart',
+      (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) => {
+        if (gameObject === this.knob) {
+          this.isDragging = true;
+          this.initializeAudio();
+        }
       }
-    });
+    );
 
-    this.scene.input.on('drag', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number) => {
-      if (gameObject === this.knob && this.isDragging) {
-        // Constrain to slider bounds
-        const minX = -this.config.width / 2 + 20;
-        const maxX = this.config.width / 2 - 20;
-        const clampedX = Phaser.Math.Clamp(dragX, minX, maxX);
-        
-        // Update knob position
-        this.knob.x = clampedX;
-        
-        // Calculate frequency based on position
-        const t = (clampedX - minX) / (maxX - minX);
-        this.currentFrequency = this.config.minFrequency + t * (this.config.maxFrequency - this.config.minFrequency);
-        
-        // Update display
-        this.updateDisplay();
-        
-        // Update audio
-        this.updateAudio();
-        
-        // Check for signal lock
-        this.checkSignalLock();
-      }
-    });
+    this.scene.input.on(
+      'drag',
+      (
+        _pointer: Phaser.Input.Pointer,
+        gameObject: Phaser.GameObjects.GameObject,
+        dragX: number,
+        _dragY: number
+      ) => {
+        if (gameObject === this.knob && this.isDragging) {
+          // Constrain to slider bounds
+          const minX = -this.config.width / 2 + 20;
+          const maxX = this.config.width / 2 - 20;
+          const clampedX = Phaser.Math.Clamp(dragX, minX, maxX);
 
-    this.scene.input.on('dragend', (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) => {
-      if (gameObject === this.knob) {
-        this.isDragging = false;
+          // Update knob position
+          this.knob.x = clampedX;
+
+          // Calculate frequency based on position
+          const t = (clampedX - minX) / (maxX - minX);
+          this.currentFrequency =
+            this.config.minFrequency + t * (this.config.maxFrequency - this.config.minFrequency);
+
+          // Update display
+          this.updateDisplay();
+
+          // Update audio
+          this.updateAudio();
+
+          // Check for signal lock
+          this.checkSignalLock();
+        }
       }
-    });
+    );
+
+    this.scene.input.on(
+      'dragend',
+      (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) => {
+        if (gameObject === this.knob) {
+          this.isDragging = false;
+        }
+      }
+    );
 
     // Click on slider to jump
     this.slider.setInteractive(
-      new Phaser.Geom.Rectangle(
-        -this.config.width / 2 + 20,
-        -5,
-        this.config.width - 40,
-        10
-      ),
+      new Phaser.Geom.Rectangle(-this.config.width / 2 + 20, -5, this.config.width - 40, 10),
       Phaser.Geom.Rectangle.Contains
     );
 
@@ -165,21 +169,22 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       const minX = -this.config.width / 2 + 20;
       const maxX = this.config.width / 2 - 20;
       const clampedX = Phaser.Math.Clamp(localX, minX, maxX);
-      
+
       // Update knob position
       this.knob.x = clampedX;
-      
+
       // Calculate frequency
       const t = (clampedX - minX) / (maxX - minX);
-      this.currentFrequency = this.config.minFrequency + t * (this.config.maxFrequency - this.config.minFrequency);
-      
+      this.currentFrequency =
+        this.config.minFrequency + t * (this.config.maxFrequency - this.config.minFrequency);
+
       // Update display
       this.updateDisplay();
-      
+
       // Initialize and update audio
       this.initializeAudio();
       this.updateAudio();
-      
+
       // Check for signal lock
       this.checkSignalLock();
     });
@@ -188,30 +193,59 @@ export class RadioTuner extends Phaser.GameObjects.Container {
   private updateDisplay(): void {
     // Update frequency text
     this.frequencyText.setText(`${this.currentFrequency.toFixed(1)} MHz`);
-    
+
     // Update knob position based on frequency
-    const t = (this.currentFrequency - this.config.minFrequency) / 
-              (this.config.maxFrequency - this.config.minFrequency);
+    const t =
+      (this.currentFrequency - this.config.minFrequency) /
+      (this.config.maxFrequency - this.config.minFrequency);
     const minX = -this.config.width / 2 + 20;
     const maxX = this.config.width / 2 - 20;
     this.knob.x = minX + t * (maxX - minX);
   }
 
+  // Initialize audio system
+
   private initializeAudio(): void {
     if (this.isAudioInitialized) return;
-    
+
     try {
       // Create audio context
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      
+      // Use a type assertion to handle the webkitAudioContext
+      // This is a common pattern for cross-browser compatibility
+      const AudioContextClass =
+        window.AudioContext ||
+        (
+          window as unknown as {
+            webkitAudioContext: typeof AudioContext;
+          }
+        ).webkitAudioContext;
+      this.audioContext = new AudioContextClass();
+
+      // Create master gain node (reduced to 50% volume)
+      this.masterGain = this.audioContext.createGain();
+      this.masterGain.gain.value = 0.5; // 50% volume
+      this.masterGain.connect(this.audioContext.destination);
+
       // Create gain node for static volume
       this.staticGain = this.audioContext.createGain();
-      this.staticGain.connect(this.audioContext.destination);
-      
+      this.staticGain.connect(this.masterGain);
+
       // We'll simulate static with white noise
       // In a real implementation, you would load an actual static sound
       this.createStaticNoise();
-      
+
+      // Set up volume change listener
+      this.volumeChangeListener = (volume: number) => {
+        if (this.masterGain) {
+          // Scale volume so that 50% in UI is maximum (0.25 gain)
+          // This makes the overall volume much lower
+          this.masterGain.gain.value = Math.min(0.25, volume * 0.5);
+        }
+      };
+
+      // Add listener to audio manager
+      this.audioManager.addVolumeChangeListener(this.volumeChangeListener);
+
       this.isAudioInitialized = true;
     } catch (error) {
       console.error('Failed to initialize audio:', error);
@@ -220,53 +254,50 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
   private createStaticNoise(): void {
     if (!this.audioContext) return;
-    
+
     // Create buffer for white noise
     const bufferSize = 2 * this.audioContext.sampleRate;
-    const noiseBuffer = this.audioContext.createBuffer(
-      1, 
-      bufferSize, 
-      this.audioContext.sampleRate
-    );
-    
+    const noiseBuffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+
     // Fill buffer with white noise
     const data = noiseBuffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
       data[i] = Math.random() * 2 - 1;
     }
-    
+
     // Create source node
     this.staticSource = this.audioContext.createBufferSource();
     this.staticSource.buffer = noiseBuffer;
     this.staticSource.loop = true;
-    
+
     // Connect to gain node
     this.staticSource.connect(this.staticGain!);
-    
+
     // Start playback
     this.staticSource.start();
   }
 
   private updateAudio(): void {
     if (!this.staticGain) return;
-    
+
     // Calculate signal strength based on proximity to valid frequencies
     const signalStrength = this.getSignalStrength();
-    
+
     // Adjust static volume based on signal strength
-    // 1.0 = full static (no signal), 0.0 = no static (perfect signal)
-    this.staticGain.gain.value = 1.0 - signalStrength;
+    // 0.75 = reduced static (no signal), 0.0 = no static (perfect signal)
+    // Reduced from 1.0 to 0.75 (25% reduction)
+    this.staticGain.gain.value = 0.75 * (1.0 - signalStrength);
   }
 
   private getSignalStrength(): number {
     // Calculate signal strength based on proximity to valid frequencies
     let closestDistance = Number.MAX_VALUE;
-    
+
     for (const frequency of this.config.signalFrequencies) {
       const distance = Math.abs(this.currentFrequency - frequency);
       closestDistance = Math.min(closestDistance, distance);
     }
-    
+
     // Normalize distance to signal strength
     // 1.0 = perfect signal, 0.0 = no signal
     const normalizedStrength = 1.0 - Math.min(closestDistance / this.config.signalTolerance, 1.0);
@@ -275,7 +306,7 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
   private checkSignalLock(): void {
     const signalStrength = this.getSignalStrength();
-    
+
     // If signal strength is above threshold, emit signal lock event
     if (signalStrength > 0.8) {
       this.emit('signalLock', this.currentFrequency);
@@ -319,11 +350,25 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       this.staticSource.stop();
       this.staticSource.disconnect();
     }
-    
+
     if (this.staticGain) {
       this.staticGain.disconnect();
     }
-    
+
+    if (this.masterGain) {
+      this.masterGain.disconnect();
+    }
+
+    // Remove volume change listener
+    if (this.volumeChangeListener) {
+      this.audioManager.removeVolumeChangeListener(this.volumeChangeListener);
+      this.volumeChangeListener = null;
+    }
+
+    if (this.audioContext && this.audioContext.state !== 'closed') {
+      this.audioContext.close();
+    }
+
     // Call parent destroy method
     super.destroy(fromScene);
   }

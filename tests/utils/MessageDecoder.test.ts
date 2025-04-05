@@ -121,7 +121,7 @@ describe('MessageDecoder', () => {
     test('should calculate correct interference level', () => {
       // 5 out of 13 characters are interference
       const obfuscated = 'H#ll%, w@rld!';
-      expect(MessageDecoder.calculateInterferenceLevel(obfuscated)).toBeCloseTo(5/13, 2);
+      expect(MessageDecoder.calculateInterferenceLevel(obfuscated)).toBeCloseTo(5 / 13, 2);
     });
 
     test('should return 0 for message with no interference', () => {

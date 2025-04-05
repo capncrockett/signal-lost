@@ -10,8 +10,8 @@ global.Phaser = {
     };
     cameras = {
       main: {
-        scrollX: 0
-      }
+        scrollX: 0,
+      },
     };
   },
   GameObjects: {
@@ -37,7 +37,7 @@ global.Phaser = {
       y = 0;
       scene: any;
 
-      constructor(scene: any, options?: any) {
+      constructor(scene: any, _options?: any) {
         this.scene = scene;
       }
 
@@ -54,7 +54,7 @@ global.Phaser = {
       scene: any;
       text: string;
 
-      constructor(scene: any, x: number, y: number, text: string, style?: any) {
+      constructor(scene: any, x: number, y: number, text: string, _style?: any) {
         this.scene = scene;
         this.x = x;
         this.y = y;
@@ -63,32 +63,32 @@ global.Phaser = {
 
       setOrigin = jest.fn().mockReturnThis();
       setText = jest.fn().mockReturnThis();
-    }
+    },
   },
   Input: {
     Keyboard: {
-      KeyCodes: {}
-    }
+      KeyCodes: {},
+    },
   },
   Events: {
     EventEmitter: class EventEmitter {
       on = jest.fn().mockReturnThis();
       emit = jest.fn().mockReturnThis();
-    }
+    },
   },
   Math: {
-    Clamp: (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
+    Clamp: (value: number, min: number, max: number) => Math.min(Math.max(value, min), max),
   },
   Geom: {
     Circle: class Circle {
-      constructor(x?: number, y?: number, radius?: number) {}
+      constructor(_x?: number, _y?: number, _radius?: number) {}
       static Contains = jest.fn().mockReturnValue(true);
     },
     Rectangle: class Rectangle {
-      constructor(x?: number, y?: number, width?: number, height?: number) {}
+      constructor(_x?: number, _y?: number, _width?: number, _height?: number) {}
       static Contains = jest.fn().mockReturnValue(true);
-    }
-  }
+    },
+  },
 } as any;
 
 // Mock Audio Context
@@ -99,13 +99,13 @@ class MockAudioContext {
   createGain() {
     return {
       connect: jest.fn(),
-      gain: { value: 0 }
+      gain: { value: 0 },
     };
   }
 
-  createBuffer(numChannels: number, length: number, sampleRate: number) {
+  createBuffer(_numChannels: number, length: number, _sampleRate: number) {
     return {
-      getChannelData: () => new Float32Array(length)
+      getChannelData: () => new Float32Array(length),
     };
   }
 
@@ -116,7 +116,7 @@ class MockAudioContext {
       stop: jest.fn(),
       disconnect: jest.fn(),
       buffer: null,
-      loop: false
+      loop: false,
     };
   }
 
@@ -125,7 +125,7 @@ class MockAudioContext {
       connect: jest.fn(),
       frequency: { value: 0 },
       Q: { value: 0 },
-      type: ''
+      type: '',
     };
   }
 }

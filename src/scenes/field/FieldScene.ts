@@ -49,7 +49,7 @@ export class FieldScene extends Phaser.Scene {
     // Load player sprite
     this.load.spritesheet('player', 'assets/images/player.png', {
       frameWidth: 32,
-      frameHeight: 32
+      frameHeight: 32,
     });
 
     // Load interactable sprites
@@ -132,7 +132,7 @@ export class FieldScene extends Phaser.Scene {
     const interactableData = [
       { id: 'tower1', type: 'tower', x: 10, y: 8, triggerDistance: 2 },
       { id: 'tower2', type: 'tower', x: 20, y: 15, triggerDistance: 2 },
-      { id: 'ruins1', type: 'ruins', x: 15, y: 12, triggerDistance: 1 }
+      { id: 'ruins1', type: 'ruins', x: 15, y: 12, triggerDistance: 1 },
     ];
 
     // Create interactable objects
@@ -267,7 +267,11 @@ export class FieldScene extends Phaser.Scene {
         interactable.trigger();
 
         // Emit event
-        this.eventEmitter.emit('interactableTriggered', interactable.getId(), interactable.getType());
+        this.eventEmitter.emit(
+          'interactableTriggered',
+          interactable.getId(),
+          interactable.getType()
+        );
 
         // Save to game state
         SaveManager.setFlag(`found${interactable.getId()}`, true);
@@ -303,7 +307,11 @@ export class FieldScene extends Phaser.Scene {
     // Interact with the nearest interactable
     if (nearestInteractable) {
       // Emit interaction event
-      this.eventEmitter.emit('interactableInteracted', nearestInteractable.getId(), nearestInteractable.getType());
+      this.eventEmitter.emit(
+        'interactableInteracted',
+        nearestInteractable.getId(),
+        nearestInteractable.getType()
+      );
     }
   }
 
@@ -375,7 +383,7 @@ export class FieldScene extends Phaser.Scene {
    * @param fn Callback function
    * @param context Context for the callback
    */
-  on(event: string, fn: Function, context?: any): this {
+  on(event: string, fn: (...args: unknown[]) => void, context?: unknown): this {
     this.eventEmitter.on(event, fn, context);
     return this;
   }
@@ -386,7 +394,7 @@ export class FieldScene extends Phaser.Scene {
    * @param fn Callback function
    * @param context Context for the callback
    */
-  off(event: string, fn?: Function, context?: any): this {
+  off(event: string, fn?: (...args: unknown[]) => void, context?: unknown): this {
     this.eventEmitter.off(event, fn, context);
     return this;
   }
