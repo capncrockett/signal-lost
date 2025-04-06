@@ -55,7 +55,7 @@ jest.mock('phaser', () => {
         setInteractive() {
           return this;
         }
-        on = jest.fn().mockImplementation(function (_event, _callback) {
+        on = jest.fn().mockImplementation((_event, _callback) => {
           return this;
         });
       },
@@ -75,7 +75,7 @@ jest.mock('phaser', () => {
         setOrigin() {
           return this;
         }
-        setText = jest.fn().mockImplementation(function (text: string) {
+        setText = jest.fn().mockImplementation((text: string) => {
           this.text = text;
           return this;
         });
@@ -315,10 +315,12 @@ describe('VolumeControl', () => {
     const listener2 = jest.fn();
 
     // Add listeners to AudioManager
-    mockAudioManager.addVolumeChangeListener.mockImplementation((listener) => {
-      // Simulate immediate call with current volume
-      listener(0.8);
-    });
+    mockAudioManager.addVolumeChangeListener.mockImplementation(
+      (listener: (volume: number) => void) => {
+        // Simulate immediate call with current volume
+        listener(0.8);
+      }
+    );
 
     // Create VolumeControl
     volumeControl = new VolumeControl(mockScene as any, 100, 100);
