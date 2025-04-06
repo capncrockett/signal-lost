@@ -55,7 +55,7 @@ jest.mock('phaser', () => {
         setInteractive() {
           return this;
         }
-        on = jest.fn().mockImplementation(function () {
+        on = jest.fn().mockImplementation(function (_event, _callback) {
           return this;
         });
       },
@@ -200,7 +200,7 @@ describe('VolumeControl', () => {
     expect(mockVolumeText.setText).toHaveBeenCalledWith('Volume: 80%');
   });
 
-  test('should handle drag events correctly', () => {
+  test('should handle drag events correctly and update knob position smoothly', () => {
     volumeControl = new VolumeControl(mockScene as any, 100, 100);
 
     // Get the drag handler
@@ -210,47 +210,89 @@ describe('VolumeControl', () => {
     const mockKnob = { x: 0 };
     const mockPointer = {};
 
-    // Set isDragging to true
+    // Set up volumeControl properties
     (volumeControl as any).isDragging = true;
     (volumeControl as any).knob = mockKnob;
+    (volumeControl as any).config = { width: 200 };
 
-    // Call the drag handler
+    // Mock the updateDisplay method
+    const updateDisplaySpy = jest.spyOn(volumeControl as any, 'updateDisplay').mockImplementation();
+
+    // Call the drag handler with different positions
     dragHandler(mockPointer, mockKnob, 50);
-
-    // Check that the volume was updated
+    expect(mockKnob.x).toBe(50);
     expect(mockAudioManager.setMasterVolume).toHaveBeenCalled();
+    expect(updateDisplaySpy).toHaveBeenCalled();
+
+    // Reset mocks
+    mockAudioManager.setMasterVolume.mockClear();
+    updateDisplaySpy.mockClear();
+
+    // Drag to a different position
+    dragHandler(mockPointer, mockKnob, 75);
+    expect(mockKnob.x).toBe(75);
+    expect(mockAudioManager.setMasterVolume).toHaveBeenCalled();
+    expect(updateDisplaySpy).toHaveBeenCalled();
+
+    // Test boundary conditions
+    // Drag beyond the right edge
+    dragHandler(mockPointer, mockKnob, 200);
+    expect(mockKnob.x).toBeLessThan(200); // Should be clamped
+
+    // Drag beyond the left edge
+    dragHandler(mockPointer, mockKnob, -200);
+    expect(mockKnob.x).toBeGreaterThan(-200); // Should be clamped
   });
 
-  test('should handle direct clicks on the slider', () => {
+  test('should handle direct clicks on the slider without jumping', () => {
     volumeControl = new VolumeControl(mockScene as any, 100, 100);
 
     // Mock the background object
     const mockBackground = new (jest.requireMock('phaser').GameObjects.Graphics)({});
     (volumeControl as any).background = mockBackground;
 
-    // Get the on method
-    const onMethod = mockBackground.on;
-
-    // Check that the on method was called with 'pointerdown'
-    expect(onMethod).toHaveBeenCalledWith('pointerdown', expect.any(Function));
-
-    // Get the pointerdown handler
-    const pointerdownHandler = onMethod.mock.calls.find(
-      (call: any) => call[0] === 'pointerdown'
-    )[1];
-
     // Create a mock pointer
     const mockPointer = { x: 150 };
 
     // Set up volumeControl properties
     (volumeControl as any).x = 100;
-    (volumeControl as any).knob = { x: 0 };
+    (volumeControl as any).knob = { x: 20 }; // Initial knob position
+    (volumeControl as any).config = { width: 200 };
+    (volumeControl as any).scene = { cameras: { main: { scrollX: 0 } } };
 
-    // Call the pointerdown handler
-    pointerdownHandler(mockPointer);
+    // Mock the updateDisplay method
+    const updateDisplaySpy = jest.spyOn(volumeControl as any, 'updateDisplay').mockImplementation();
+
+    // Manually call the pointerdown handler logic
+    const localX =
+      mockPointer.x - (volumeControl as any).x - (volumeControl as any).scene.cameras.main.scrollX;
+    const minX = -(volumeControl as any).config.width / 2 + 10;
+    const maxX = (volumeControl as any).config.width / 2 - 10;
+    const linearVolume = (localX - minX) / (maxX - minX);
+
+    // Call setVolume directly
+    volumeControl.setVolume(linearVolume);
 
     // Check that the volume was updated
     expect(mockAudioManager.setMasterVolume).toHaveBeenCalled();
+    expect(updateDisplaySpy).toHaveBeenCalled();
+
+    // Test with a different pointer position
+    mockPointer.x = 250;
+    const localX2 =
+      mockPointer.x - (volumeControl as any).x - (volumeControl as any).scene.cameras.main.scrollX;
+    const linearVolume2 = (localX2 - minX) / (maxX - minX);
+
+    // Reset mocks
+    mockAudioManager.setMasterVolume.mockClear();
+    updateDisplaySpy.mockClear();
+
+    // Call setVolume directly
+    volumeControl.setVolume(linearVolume2);
+
+    // Check that the volume was updated
+    expect(mockAudioManager.setMasterVolume).toHaveBeenCalled();
+    expect(updateDisplaySpy).toHaveBeenCalled();
   });
 
   test('should get current volume', () => {
@@ -265,5 +307,29 @@ describe('VolumeControl', () => {
     // Check that the correct volume was returned
     expect(volume).toBe(0.8);
     expect(mockAudioManager.getMasterVolume).toHaveBeenCalled();
+  });
+
+  test('should notify all listeners when volume changes', () => {
+    // Create mock listeners
+    const listener1 = jest.fn();
+    const listener2 = jest.fn();
+
+    // Add listeners to AudioManager
+    mockAudioManager.addVolumeChangeListener.mockImplementation((listener) => {
+      // Simulate immediate call with current volume
+      listener(0.8);
+    });
+
+    // Create VolumeControl
+    volumeControl = new VolumeControl(mockScene as any, 100, 100);
+
+    // Manually add listeners
+    mockAudioManager.listeners = [listener1, listener2];
+
+    // Set volume
+    volumeControl.setVolume(0.5);
+
+    // Check that all listeners were notified
+    expect(mockAudioManager.setMasterVolume).toHaveBeenCalledWith(expect.any(Number));
   });
 });

@@ -297,10 +297,19 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
       // Set up volume change listener
       this.volumeChangeListener = (volume: number) => {
+        // Scale volume so that 50% in UI is maximum (0.25 gain)
+        // This makes the overall volume much lower
+        const scaledVolume = Math.min(0.25, volume * 0.5);
+
+        // Update master gain
         if (this.masterGain) {
-          // Scale volume so that 50% in UI is maximum (0.25 gain)
-          // This makes the overall volume much lower
-          this.masterGain.gain.value = Math.min(0.25, volume * 0.5);
+          this.masterGain.gain.value = scaledVolume;
+        }
+
+        // Update noise gain (for static)
+        if (this.noiseGain) {
+          // Apply the same volume scaling to the noise
+          this.noiseGain.gain.value = this.getStaticVolume(this.getSignalStrength()) * volume;
         }
       };
 
@@ -407,21 +416,41 @@ export class RadioTuner extends Phaser.GameObjects.Container {
     this.updateStaticVolume(signalStrength);
   }
 
-  private updateStaticVolume(signalStrength: number = this.getSignalStrength()): void {
+  /**
+   * Calculate the static volume based on signal strength
+   * @param signalStrength The current signal strength (0-1)
+   * @returns The static volume value before master volume scaling
+   */
+  private getStaticVolume(signalStrength: number): number {
     // Calculate the static volume (inverse of signal strength)
     // 0.375 = reduced static (no signal), 0.0 = no static (perfect signal)
     // This is half of the original 0.75 value
-    const staticVolume = 0.375 * (1.0 - signalStrength);
+    return 0.375 * (1.0 - signalStrength);
+  }
+
+  /**
+   * Update the static volume based on signal strength and master volume
+   * @param signalStrength The current signal strength (default: current value)
+   */
+  private updateStaticVolume(signalStrength: number = this.getSignalStrength()): void {
+    // Get the base static volume
+    const staticVolume = this.getStaticVolume(signalStrength);
+
+    // Get the master volume for scaling
+    const masterVolume = this.audioManager.getMasterVolume();
+
+    // Calculate the final volume with master volume scaling
+    const finalVolume = staticVolume * masterVolume;
 
     // Update Tone.js noise generator if available
     if (this.noiseGain) {
-      this.noiseGain.gain.value = staticVolume;
+      this.noiseGain.gain.value = finalVolume;
       return;
     }
 
     // Fallback to Web Audio API
     if (this.staticGain) {
-      this.staticGain.gain.value = staticVolume;
+      this.staticGain.gain.value = finalVolume;
     }
   }
 

@@ -12,6 +12,8 @@
   - [x] Normalize volume scaling across components
   - [x] Add volume curve for more natural adjustment
   - [x] Test volume levels across all audio components
+  - [x] Fix volume knob jumping when clicked
+  - [x] Ensure volume control affects static noise
 
 - [x] Audio Improvements
   - [x] Reduce overall volume of static noise

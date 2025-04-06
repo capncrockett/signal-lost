@@ -170,9 +170,6 @@ export class VolumeControl extends Phaser.GameObjects.Container {
       const maxX = this.config.width / 2 - 10;
       const clampedX = Phaser.Math.Clamp(localX, minX, maxX);
 
-      // Update knob position
-      this.knob.x = clampedX;
-
       // Calculate linear volume (0-1)
       const linearVolume = (clampedX - minX) / (maxX - minX);
 
@@ -182,8 +179,13 @@ export class VolumeControl extends Phaser.GameObjects.Container {
       // Update audio manager
       this.audioManager.setMasterVolume(curvedVolume);
 
-      // Update display
+      // Update display - this will also update the knob position
+      // based on the actual volume, preventing jumps
       this.updateDisplay();
+
+      // Start dragging the knob from this position
+      this.isDragging = true;
+      this.scene.input.setDraggable(this.knob, true);
     });
   }
 

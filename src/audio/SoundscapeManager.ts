@@ -377,6 +377,18 @@ export class SoundscapeManager {
   }
 
   /**
+   * Calculate the static volume based on signal strength
+   * @param signalStrength The current signal strength (0-1)
+   * @returns The static volume value before master volume scaling
+   */
+  private getStaticVolume(signalStrength: number): number {
+    // Calculate the static volume (inverse of signal strength)
+    // 0.1875 = reduced static (no signal), 0.0 = no static (perfect signal)
+    // This is half of the original 0.375 value
+    return 0.1875 * (1 - signalStrength);
+  }
+
+  /**
    * Update audio layers based on signal strength
    * @param signalStrength Value between 0 (no signal) and 1 (perfect signal)
    */
@@ -386,17 +398,20 @@ export class SoundscapeManager {
     // Clamp signal strength between 0 and 1
     const strength = Math.max(0, Math.min(1, signalStrength));
 
-    // Adjust static volume (inverse relationship with signal strength)
-    // Use half the original volume (0.1875 instead of 0.375)
-    const staticVolume = 0.1875 * (1 - strength);
+    // Get the base static volume based on signal strength
+    const baseStaticVolume = this.getStaticVolume(strength);
+
+    // Apply master volume scaling
+    const masterVolume = this.audioManager.getMasterVolume();
+    const finalStaticVolume = baseStaticVolume * masterVolume;
 
     // Use Tone.js noise generator if available
     if (this.noiseGain) {
-      this.noiseGain.gain.value = staticVolume;
+      this.noiseGain.gain.value = finalStaticVolume;
     }
     // Fallback to Web Audio API
     else if (this.staticGain) {
-      this.staticGain.gain.value = staticVolume;
+      this.staticGain.gain.value = finalStaticVolume;
     }
 
     // Adjust drone characteristics
