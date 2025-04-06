@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { AudioManager } from '../audio/AudioManager';
+import * as Tone from 'tone';
 
 interface RadioTunerConfig {
   width?: number;
@@ -32,6 +33,10 @@ export class RadioTuner extends Phaser.GameObjects.Container {
   private isAudioInitialized: boolean = false;
   private audioManager: AudioManager;
   private volumeChangeListener: ((volume: number) => void) | null = null;
+
+  // Tone.js specific properties
+  private noiseGenerator: any = null;
+  private noiseGain: any = null;
 
   constructor(scene: Phaser.Scene, x: number, y: number, config: RadioTunerConfig = {}) {
     super(scene, x, y);
@@ -256,40 +261,87 @@ export class RadioTuner extends Phaser.GameObjects.Container {
   }
 
   private createStaticNoise(): void {
+    try {
+      // Use Tone.js Noise generator for better quality and performance
+      const noise = new Tone.Noise('white').start();
+
+      // Create a gain node to control the volume
+      const gainNode = new Tone.Gain(0.5).toDestination();
+
+      // Connect the noise to the gain node
+      noise.connect(gainNode);
+
+      // Store references for later use
+      this.noiseGenerator = noise;
+      this.noiseGain = gainNode;
+
+      console.log('Static noise generator initialized with Tone.js');
+    } catch (error) {
+      console.error('Failed to create static noise with Tone.js:', error);
+
+      // Fallback to Web Audio API if Tone.js fails
+      this.createStaticNoiseFallback();
+    }
+  }
+
+  private createStaticNoiseFallback(): void {
     if (!this.audioContext) return;
 
-    // Create buffer for white noise
-    const bufferSize = 2 * this.audioContext.sampleRate;
-    const noiseBuffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+    try {
+      // Create buffer for white noise
+      const bufferSize = 2 * this.audioContext.sampleRate;
+      const noiseBuffer = this.audioContext.createBuffer(
+        1,
+        bufferSize,
+        this.audioContext.sampleRate
+      );
 
-    // Fill buffer with white noise
-    const data = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = Math.random() * 2 - 1;
+      // Fill buffer with white noise
+      const data = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+
+      // Create source node
+      this.staticSource = this.audioContext.createBufferSource();
+      this.staticSource.buffer = noiseBuffer;
+      this.staticSource.loop = true;
+
+      // Connect to gain node
+      this.staticSource.connect(this.staticGain!);
+
+      // Start playback
+      this.staticSource.start();
+
+      console.log('Static noise generator initialized with Web Audio API (fallback)');
+    } catch (error) {
+      console.error('Failed to create static noise with fallback method:', error);
     }
-
-    // Create source node
-    this.staticSource = this.audioContext.createBufferSource();
-    this.staticSource.buffer = noiseBuffer;
-    this.staticSource.loop = true;
-
-    // Connect to gain node
-    this.staticSource.connect(this.staticGain!);
-
-    // Start playback
-    this.staticSource.start();
   }
 
   private updateAudio(): void {
-    if (!this.staticGain) return;
-
     // Calculate signal strength based on proximity to valid frequencies
     const signalStrength = this.getSignalStrength();
 
-    // Adjust static volume based on signal strength
+    // Update static volume based on signal strength
+    this.updateStaticVolume(signalStrength);
+  }
+
+  private updateStaticVolume(signalStrength: number = this.getSignalStrength()): void {
+    // Calculate the static volume (inverse of signal strength)
     // 0.75 = reduced static (no signal), 0.0 = no static (perfect signal)
-    // Reduced from 1.0 to 0.75 (25% reduction)
-    this.staticGain.gain.value = 0.75 * (1.0 - signalStrength);
+    const staticVolume = 0.75 * (1.0 - signalStrength);
+
+    // Update Tone.js noise generator if available
+    if (this.noiseGain) {
+      this.noiseGain.gain.value = staticVolume;
+      return;
+    }
+
+    // Fallback to Web Audio API
+    if (this.staticGain) {
+      this.staticGain.gain.value = staticVolume;
+    }
   }
 
   private getSignalStrength(): number {
@@ -357,18 +409,53 @@ export class RadioTuner extends Phaser.GameObjects.Container {
    * Clean up resources when component is destroyed
    */
   public destroy(fromScene?: boolean): void {
-    // Stop and clean up audio
+    // Clean up Tone.js resources
+    if (this.noiseGenerator) {
+      try {
+        this.noiseGenerator.stop();
+        this.noiseGenerator.dispose();
+        this.noiseGenerator = null;
+      } catch (error) {
+        console.error('Error disposing Tone.js noise generator:', error);
+      }
+    }
+
+    if (this.noiseGain) {
+      try {
+        this.noiseGain.dispose();
+        this.noiseGain = null;
+      } catch (error) {
+        console.error('Error disposing Tone.js gain node:', error);
+      }
+    }
+
+    // Clean up Web Audio API resources (fallback)
     if (this.staticSource) {
-      this.staticSource.stop();
-      this.staticSource.disconnect();
+      try {
+        this.staticSource.stop();
+        this.staticSource.disconnect();
+        this.staticSource = null;
+      } catch (error) {
+        console.error('Error cleaning up static source:', error);
+      }
     }
 
     if (this.staticGain) {
-      this.staticGain.disconnect();
+      try {
+        this.staticGain.disconnect();
+        this.staticGain = null;
+      } catch (error) {
+        console.error('Error cleaning up static gain:', error);
+      }
     }
 
     if (this.masterGain) {
-      this.masterGain.disconnect();
+      try {
+        this.masterGain.disconnect();
+        this.masterGain = null;
+      } catch (error) {
+        console.error('Error cleaning up master gain:', error);
+      }
     }
 
     // Remove volume change listener
@@ -377,8 +464,14 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       this.volumeChangeListener = null;
     }
 
+    // Close audio context
     if (this.audioContext && this.audioContext.state !== 'closed') {
-      this.audioContext.close();
+      try {
+        this.audioContext.close();
+        this.audioContext = null;
+      } catch (error) {
+        console.error('Error closing audio context:', error);
+      }
     }
 
     // Call parent destroy method

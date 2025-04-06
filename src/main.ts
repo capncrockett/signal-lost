@@ -18,11 +18,24 @@ const config: Phaser.Types.Core.GameConfig = {
     },
   },
   pixelArt: true,
-  canvasStyle: 'display: block; margin: 0 auto; width: 100%; max-width: 800px; height: auto;', // Ensure canvas is visible and responsive
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: 800,
+    height: 600,
+    min: {
+      width: 400,
+      height: 300,
+    },
+    max: {
+      width: 1600,
+      height: 1200,
+    },
   },
+  dom: {
+    createContainer: true,
+  },
+  // Remove canvasStyle as it's now handled by the scale manager
 };
 
 // Add global error handler
