@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { RadioTuner } from '../components/RadioTuner';
 import { SoundscapeManager } from '../audio/SoundscapeManager';
 import { VolumeControl } from '../components/VolumeControl';
+import { TestOverlay } from '../utils/TestOverlay';
 
 export class MainScene extends Phaser.Scene {
   private radioTuner!: RadioTuner;
@@ -37,6 +38,9 @@ export class MainScene extends Phaser.Scene {
       sliderColor: 0x888888, // Lighter slider for better visibility
     });
     this.add.existing(this.radioTuner);
+
+    // Add test overlay for the radio tuner
+    TestOverlay.createOverlay(this, this.radioTuner, 'radio-tuner');
 
     // Add a text label above the radio
     const radioLabel = this.add.text(400, 150, 'RADIO TUNER', {
@@ -75,6 +79,9 @@ export class MainScene extends Phaser.Scene {
     });
     this.add.existing(this.volumeControl);
 
+    // Add test overlay for the volume control
+    TestOverlay.createOverlay(this, this.volumeControl, 'volume-control');
+
     // Add button to navigate to FieldScene
     const fieldButton = this.add.text(400, 500, 'Go to Field', {
       fontSize: '32px',
@@ -107,28 +114,13 @@ export class MainScene extends Phaser.Scene {
       this.scene.start('FieldScene');
     });
 
-    // Add a DOM button as a fallback for E2E tests
-    const domButton = document.createElement('button');
-    domButton.innerText = 'GO TO FIELD';
-    domButton.style.position = 'absolute';
-    domButton.style.bottom = '50px';
-    domButton.style.left = '50%';
-    domButton.style.transform = 'translateX(-50%)';
-    domButton.style.padding = '15px 30px';
-    domButton.style.fontSize = '28px';
-    domButton.style.fontWeight = 'bold';
-    domButton.style.backgroundColor = '#ff5500';
-    domButton.style.color = '#fff';
-    domButton.style.border = '3px solid #fff';
-    domButton.style.borderRadius = '10px';
-    domButton.style.cursor = 'pointer';
-    domButton.style.zIndex = '1000';
-    domButton.style.boxShadow = '0 0 10px #fff, 0 0 20px #fff';
-    domButton.onclick = () => {
-      console.log('DOM Go to Field button clicked');
+    // Add test overlay for E2E testing
+    TestOverlay.createOverlay(this, fieldButton, 'go-to-field-button', () => {
+      console.log('Go to Field button clicked via test overlay');
       this.scene.start('FieldScene');
-    };
-    document.getElementById('game')?.appendChild(domButton);
+    });
+
+    // Note: DOM button removed to avoid duplication with the Phaser Text button
 
     // Add instructions
     const instructions = this.add.text(400, 400, 'Click and drag the radio tuner to find signals', {
