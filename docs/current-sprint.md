@@ -13,6 +13,15 @@
   - [x] Add volume curve for more natural adjustment
   - [x] Test volume levels across all audio components
 
+- [x] Audio Improvements
+  - [x] Reduce overall volume of static noise
+    - [x] Cut static volume in half across all components
+    - [x] Normalized volume scaling for better user experience
+  - [x] Use pink noise instead of white noise for gentler sound
+    - [x] Implemented in both SoundscapeManager and RadioTuner
+    - [x] Added fallback implementation using Voss algorithm
+    - [x] Created NoiseGenerator utility for consistent noise generation
+
 - [ ] Viewport & Scaling
   - [ ] Fix Phaser scale configuration
   - [ ] Test responsive behavior

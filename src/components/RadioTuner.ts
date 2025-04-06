@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { AudioManager } from '../audio/AudioManager';
 import * as Tone from 'tone';
+import { createNoise } from '../audio/NoiseGenerator';
+import { NoiseType } from '../audio/NoiseType';
 
 interface RadioTunerConfig {
   width?: number;
@@ -35,8 +37,8 @@ export class RadioTuner extends Phaser.GameObjects.Container {
   private volumeChangeListener: ((volume: number) => void) | null = null;
 
   // Tone.js specific properties
-  private noiseGenerator: any = null;
-  private noiseGain: any = null;
+  private noiseGenerator: Tone.Noise | null = null;
+  private noiseGain: Tone.Gain<'gain'> | null = null;
 
   constructor(scene: Phaser.Scene, x: number, y: number, config: RadioTunerConfig = {}) {
     super(scene, x, y);
@@ -316,44 +318,67 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
   private createStaticNoise(): void {
     try {
-      // Use Tone.js Noise generator for better quality and performance
-      const noise = new Tone.Noise('white').start();
+      // Use our NoiseGenerator utility to create pink noise with reduced volume
+      const result = createNoise(NoiseType.Pink, 0.25); // Half of the original 0.5
 
-      // Create a gain node to control the volume
-      const gainNode = new Tone.Gain(0.5).toDestination();
+      if (result) {
+        // Store references for later use
+        this.noiseGenerator = result.noise;
+        this.noiseGain = result.gain;
 
-      // Connect the noise to the gain node
-      noise.connect(gainNode);
-
-      // Store references for later use
-      this.noiseGenerator = noise;
-      this.noiseGain = gainNode;
-
-      console.log('Static noise generator initialized with Tone.js');
+        console.log('Pink noise generator initialized with Tone.js');
+        return;
+      }
     } catch (error) {
-      console.error('Failed to create static noise with Tone.js:', error);
-
-      // Fallback to Web Audio API if Tone.js fails
-      this.createStaticNoiseFallback();
+      console.error('Failed to create pink noise with Tone.js:', error);
     }
+
+    // Fallback to Web Audio API if Tone.js fails
+    this.createStaticNoiseFallback();
   }
 
   private createStaticNoiseFallback(): void {
     if (!this.audioContext) return;
 
     try {
-      // Create buffer for white noise
+      // Create buffer for pink noise
       const bufferSize = 2 * this.audioContext.sampleRate;
       const noiseBuffer = this.audioContext.createBuffer(
         1,
         bufferSize,
         this.audioContext.sampleRate
       );
-
-      // Fill buffer with white noise
       const data = noiseBuffer.getChannelData(0);
+
+      // Generate pink noise using the Voss algorithm
+      let b0 = 0,
+        b1 = 0,
+        b2 = 0,
+        b3 = 0,
+        b4 = 0,
+        b5 = 0;
+      const b6 = 0;
+
       for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
+        // White noise
+        const white = Math.random() * 2 - 1;
+
+        // Pink noise calculation
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.969 * b2 + white * 0.153852;
+        b3 = 0.8665 * b3 + white * 0.3104856;
+        b4 = 0.55 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.016898;
+
+        // Combine components
+        data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+
+        // Normalize to [-1, 1]
+        data[i] *= 0.11; // Adjust amplitude
+
+        // Clamp to prevent clipping
+        data[i] = Math.max(-1, Math.min(1, data[i]));
       }
 
       // Create source node
@@ -361,15 +386,16 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       this.staticSource.buffer = noiseBuffer;
       this.staticSource.loop = true;
 
-      // Connect to gain node
+      // Connect to gain node with reduced volume (half of original)
+      this.staticGain!.gain.value = 0.25; // Half of the original 0.5
       this.staticSource.connect(this.staticGain!);
 
       // Start playback
       this.staticSource.start();
 
-      console.log('Static noise generator initialized with Web Audio API (fallback)');
+      console.log('Pink noise generator initialized with Web Audio API (fallback)');
     } catch (error) {
-      console.error('Failed to create static noise with fallback method:', error);
+      console.error('Failed to create pink noise with fallback method:', error);
     }
   }
 
@@ -383,8 +409,9 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
   private updateStaticVolume(signalStrength: number = this.getSignalStrength()): void {
     // Calculate the static volume (inverse of signal strength)
-    // 0.75 = reduced static (no signal), 0.0 = no static (perfect signal)
-    const staticVolume = 0.75 * (1.0 - signalStrength);
+    // 0.375 = reduced static (no signal), 0.0 = no static (perfect signal)
+    // This is half of the original 0.75 value
+    const staticVolume = 0.375 * (1.0 - signalStrength);
 
     // Update Tone.js noise generator if available
     if (this.noiseGain) {
