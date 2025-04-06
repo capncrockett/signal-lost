@@ -84,6 +84,12 @@ export class FieldScene extends Phaser.Scene {
       // Create interactables
       this.createInteractables();
 
+      // Set up resize handler
+      this.scale.on('resize', this.handleResize, this);
+
+      // Initial resize to set correct positions
+      this.handleResize(this.scale.width, this.scale.height);
+
       // Set up input
       this.setupInput();
 
@@ -525,5 +531,41 @@ export class FieldScene extends Phaser.Scene {
    */
   getInteractables(): Interactable[] {
     return [...this.interactables];
+  }
+
+  /**
+   * Handle resize events
+   * @param width New width of the scene
+   * @param height New height of the scene
+   */
+  private handleResize(width: number, height: number): void {
+    // Adjust camera bounds if needed
+    if (this.cameras.main && this.gridSystem) {
+      // Get the map dimensions in pixels
+      const mapWidth = this.gridSystem.getMapWidth() * this.gridSystem.getTileSize();
+      const mapHeight = this.gridSystem.getMapHeight() * this.gridSystem.getTileSize();
+
+      // Set camera bounds to ensure the map is fully visible
+      this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
+
+      // Adjust zoom level to ensure the map fits well on screen
+      const zoomX = width / mapWidth;
+      const zoomY = height / mapHeight;
+      const zoom = Math.min(zoomX, zoomY) * 0.9; // 90% to leave some margin
+
+      // Don't zoom out too far or in too close
+      const clampedZoom = Phaser.Math.Clamp(zoom, 0.5, 2);
+      this.cameras.main.setZoom(clampedZoom);
+
+      // Make sure the camera is still following the player
+      if (this.player) {
+        this.cameras.main.startFollow(this.player.getSprite());
+      }
+    }
+
+    // Adjust UI elements if needed
+    if (this.narrativeRenderer) {
+      this.narrativeRenderer.onResize(width, height);
+    }
   }
 }

@@ -145,9 +145,13 @@ export class TestOverlay {
     // Get the canvas bounds
     const canvasBounds = canvas.getBoundingClientRect();
 
+    // Get the game's current dimensions
+    const gameWidth = scene.scale.width;
+    const gameHeight = scene.scale.height;
+
     // Calculate the scale factor between the game world and the canvas
-    const scaleX = (canvasBounds.width / scene.sys.game.config.width) as number;
-    const scaleY = (canvasBounds.height / scene.sys.game.config.height) as number;
+    const scaleX = canvasBounds.width / gameWidth;
+    const scaleY = canvasBounds.height / gameHeight;
 
     // Apply camera scroll offset
     const cameraX = scene.cameras.main.scrollX;

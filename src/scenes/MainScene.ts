@@ -25,6 +25,13 @@ export class MainScene extends Phaser.Scene {
     // Add background
     const bg = this.add.image(400, 300, 'menuBackground');
     bg.setDisplaySize(800, 600);
+    bg.setName('menuBackground'); // Add name for resize handler
+
+    // Set up resize handler
+    this.scale.on('resize', this.handleResize, this);
+
+    // Initial resize to set correct positions
+    this.handleResize(this.scale.width, this.scale.height);
 
     // Initialize soundscape manager
     this.soundscapeManager = new SoundscapeManager(this);
@@ -93,6 +100,7 @@ export class MainScene extends Phaser.Scene {
     });
     fieldButton.setOrigin(0.5, 0.5);
     fieldButton.setInteractive({ useHandCursor: true });
+    fieldButton.setName('fieldButton'); // Add name for resize handler
 
     // Add a glow effect to make it more visible
     fieldButton.preFX?.addGlow(0x00ffff, 0, 0, false, 0.1, 16);
@@ -130,6 +138,7 @@ export class MainScene extends Phaser.Scene {
       padding: { x: 10, y: 5 },
     });
     instructions.setOrigin(0.5, 0.5);
+    instructions.setName('instructions'); // Add name for resize handler
 
     // Add volume instructions
     const volumeInstructions = this.add.text(700, 80, 'Adjust volume', {
@@ -139,6 +148,7 @@ export class MainScene extends Phaser.Scene {
       padding: { x: 5, y: 3 },
     });
     volumeInstructions.setOrigin(0.5, 0.5);
+    volumeInstructions.setName('volumeInstructions'); // Add name for resize handler
   }
 
   update(_time: number, _delta: number) {
@@ -148,6 +158,54 @@ export class MainScene extends Phaser.Scene {
     if (this.radioTuner && this.soundscapeManager) {
       const signalStrength = this.radioTuner.getSignalStrengthValue();
       this.soundscapeManager.updateLayers(signalStrength);
+    }
+  }
+
+  /**
+   * Handle resize events
+   * @param width New width of the scene
+   * @param height New height of the scene
+   */
+  private handleResize(width: number, height: number): void {
+    // Resize and reposition background
+    const bg = this.children.getByName('menuBackground') as Phaser.GameObjects.Image;
+    if (bg) {
+      bg.setPosition(width / 2, height / 2);
+      bg.setDisplaySize(width, height);
+    }
+
+    // Reposition volume control
+    if (this.volumeControl) {
+      this.volumeControl.onResize(width, height);
+    }
+
+    // Reposition radio tuner
+    if (this.radioTuner) {
+      this.radioTuner.x = width / 2;
+      this.radioTuner.y = height / 2;
+    }
+
+    // Reposition field button
+    const fieldButton = this.children.getByName('fieldButton') as Phaser.GameObjects.Text;
+    if (fieldButton) {
+      fieldButton.x = width / 2;
+      fieldButton.y = height - 100;
+    }
+
+    // Reposition instructions
+    const instructions = this.children.getByName('instructions') as Phaser.GameObjects.Text;
+    if (instructions) {
+      instructions.x = width / 2;
+      instructions.y = height / 2 + 100;
+    }
+
+    // Reposition volume instructions
+    const volumeInstructions = this.children.getByName(
+      'volumeInstructions'
+    ) as Phaser.GameObjects.Text;
+    if (volumeInstructions) {
+      volumeInstructions.x = width / 2;
+      volumeInstructions.y = height / 2 + 130;
     }
   }
 }

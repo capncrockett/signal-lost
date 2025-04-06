@@ -222,6 +222,21 @@ export class VolumeControl extends Phaser.GameObjects.Container {
   }
 
   /**
+   * Handle scene resize events to maintain proper positioning
+   * @param width New width of the scene
+   * @param height New height of the scene
+   */
+  public onResize(width: number, _height: number): void {
+    // Adjust position based on new dimensions
+    // Keep the volume control in the top-right corner
+    this.x = width - this.config.width / 2 - 20;
+    this.y = 50; // Fixed distance from top
+
+    // Update display
+    this.updateDisplay();
+  }
+
+  /**
    * Set the volume directly
    * @param volume Value between 0 (silent) and 1 (full volume)
    */

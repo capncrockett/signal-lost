@@ -9,14 +9,20 @@
 ## During Development
 1. Write tests first
 2. Implement feature
-3. Run full test suite: `npm run test`
-4. Run e2e tests: `npm run test:e2e`
-5. Fix lint issues: `npm run lint:fix`
+3. **Run linter first**: `npm run lint` or `npx eslint . --ext .ts --fix`
+   - Linting is your first layer of testing
+   - Fix all TypeScript errors and warnings before proceeding
+   - Never ignore TypeScript errors (e.g., uninitialized properties)
+4. Run full test suite: `npm run test`
+5. Run e2e tests: `npm run test:e2e`
 6. Format code: `npm run format`
 
 ## Pre-commit Checklist
 ```bash
-npm run lint        # Check for lint issues
+# ALWAYS run linter first - this is your first layer of testing
+npm run lint        # Check for lint issues (or npx eslint . --ext .ts --fix)
+
+# Then proceed with other checks
 npm run format     # Format all files
 npm test          # Run unit tests
 npm run test:e2e  # Run e2e tests
