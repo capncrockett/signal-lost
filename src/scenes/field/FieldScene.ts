@@ -64,64 +64,75 @@ export class FieldScene extends Phaser.Scene {
    * Create the scene
    */
   create(): void {
-    // Create tilemap
-    const map = this.make.tilemap({ key: 'field' });
-    const tileset = map.addTilesetImage('tiles', 'tiles');
+    try {
+      // Create tilemap
+      const map = this.make.tilemap({ key: 'field' });
 
-    if (!tileset) {
-      console.error('Failed to load tileset');
-      return;
-    }
+      // Add orientation property to fix the error
+      if (map.orientation === undefined) {
+        // @ts-expect-error - Adding missing property
+        map.orientation = 'orthogonal';
+      }
 
-    // Create layers
-    const groundLayer = map.createLayer('Ground', tileset);
-    const obstaclesLayer = map.createLayer('Obstacles', tileset);
+      const tileset = map.addTilesetImage('tiles', 'tiles');
 
-    if (!groundLayer || !obstaclesLayer) {
-      console.error('Failed to create layers');
-      return;
-    }
+      if (!tileset) {
+        console.error('Failed to load tileset');
+        return;
+      }
 
-    // Set collision on obstacles layer
-    obstaclesLayer.setCollisionByProperty({ collides: true });
+      // Create layers
+      const groundLayer = map.createLayer('Ground', tileset);
+      const obstaclesLayer = map.createLayer('Obstacles', tileset);
 
-    // Initialize grid system
-    const tileSize = 32;
-    const gridWidth = map.width;
-    const gridHeight = map.height;
-    this.gridSystem = new GridSystem(this, gridWidth, gridHeight, tileSize);
+      if (!groundLayer || !obstaclesLayer) {
+        console.error('Failed to create layers');
+        return;
+      }
 
-    // Add collision from tilemap to grid system
-    for (let y = 0; y < gridHeight; y++) {
-      for (let x = 0; x < gridWidth; x++) {
-        const tile = obstaclesLayer.getTileAt(x, y);
-        if (tile && tile.properties.collides) {
-          this.gridSystem.setTileCollision(x, y, true);
+      // Set collision on obstacles layer
+      obstaclesLayer.setCollisionByProperty({ collides: true });
+
+      // Initialize grid system
+      const tileSize = 32;
+      const gridWidth = map.width;
+      const gridHeight = map.height;
+      this.gridSystem = new GridSystem(this, gridWidth, gridHeight, tileSize);
+
+      // Add collision from tilemap to grid system
+      for (let y = 0; y < gridHeight; y++) {
+        for (let x = 0; x < gridWidth; x++) {
+          const tile = obstaclesLayer.getTileAt(x, y);
+          if (tile && tile.properties.collides) {
+            this.gridSystem.setTileCollision(x, y, true);
+          }
         }
       }
+
+      // Create player
+      const playerStartX = 5;
+      const playerStartY = 5;
+      this.player = new Player(this, playerStartX, playerStartY, 'player');
+      this.add.existing(this.player);
+
+      // Set up camera to follow player
+      this.cameras.main.startFollow(this.player);
+      this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
+      // Create interactables
+      this.createInteractables();
+
+      // Set up input
+      this.setupInput();
+
+      // Initialize SaveManager
+      SaveManager.initialize();
+
+      // Initialize narrative engine
+      this.initializeNarrativeEngine();
+    } catch (error) {
+      console.error('Error creating field scene:', error);
     }
-
-    // Create player
-    const playerStartX = 5;
-    const playerStartY = 5;
-    this.player = new Player(this, playerStartX, playerStartY, 'player');
-    this.add.existing(this.player);
-
-    // Set up camera to follow player
-    this.cameras.main.startFollow(this.player);
-    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-
-    // Create interactables
-    this.createInteractables();
-
-    // Set up input
-    this.setupInput();
-
-    // Initialize SaveManager
-    SaveManager.initialize();
-
-    // Initialize narrative engine
-    this.initializeNarrativeEngine();
   }
 
   /**

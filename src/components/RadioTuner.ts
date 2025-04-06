@@ -231,7 +231,7 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       this.staticGain.connect(this.masterGain);
 
       // We'll simulate static with white noise
-      // In a real implementation, you would load an actual static sound
+      // Generate white noise programmatically instead of loading an MP3 file
       this.createStaticNoise();
 
       // Set up volume change listener
@@ -247,6 +247,9 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       this.audioManager.addVolumeChangeListener(this.volumeChangeListener);
 
       this.isAudioInitialized = true;
+
+      // Emit an event that audio is initialized (for testing)
+      this.emit('audioInitialized');
     } catch (error) {
       console.error('Failed to initialize audio:', error);
     }
@@ -309,7 +312,16 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
     // If signal strength is above threshold, emit signal lock event
     if (signalStrength > 0.8) {
-      this.emit('signalLock', this.currentFrequency);
+      // Emit signal lock event with frequency and signal strength
+      this.emit('signalLock', {
+        frequency: this.currentFrequency,
+        signalStrength: signalStrength,
+      });
+
+      // Log the signal lock for testing purposes
+      console.log(
+        `Signal locked at frequency: ${this.currentFrequency.toFixed(1)} MHz with strength ${signalStrength.toFixed(2)}`
+      );
     }
   }
 
