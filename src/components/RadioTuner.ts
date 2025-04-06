@@ -65,8 +65,20 @@ export class RadioTuner extends Phaser.GameObjects.Container {
   }
 
   private createVisuals(): void {
-    // Create background
+    // Create background with border
     this.background = this.scene.add.graphics();
+
+    // Add a border
+    this.background.lineStyle(4, 0xffffff, 1); // White border
+    this.background.strokeRoundedRect(
+      -this.config.width / 2,
+      -this.config.height / 2,
+      this.config.width,
+      this.config.height,
+      10
+    );
+
+    // Fill background
     this.background.fillStyle(this.config.backgroundColor, 1);
     this.background.fillRoundedRect(
       -this.config.width / 2,
@@ -77,26 +89,68 @@ export class RadioTuner extends Phaser.GameObjects.Container {
     );
     this.add(this.background);
 
-    // Create slider track
+    // Create slider track with better visibility
     this.slider = this.scene.add.graphics();
+
+    // Add a border to the slider
+    this.slider.lineStyle(2, 0xffffff, 1);
+    this.slider.strokeRect(-this.config.width / 2 + 20, -8, this.config.width - 40, 16);
+
+    // Fill slider
     this.slider.fillStyle(this.config.sliderColor, 1);
-    this.slider.fillRect(-this.config.width / 2 + 20, -5, this.config.width - 40, 10);
+    this.slider.fillRect(-this.config.width / 2 + 20, -8, this.config.width - 40, 16);
     this.add(this.slider);
 
-    // Create knob
+    // Create knob with better visibility
     this.knob = this.scene.add.graphics();
+
+    // Add a border to the knob
+    this.knob.lineStyle(3, 0xffffff, 1);
+    this.knob.strokeCircle(0, 0, 20);
+
+    // Fill knob
     this.knob.fillStyle(this.config.knobColor, 1);
-    this.knob.fillCircle(0, 0, 15);
+    this.knob.fillCircle(0, 0, 20);
     this.add(this.knob);
 
-    // Create frequency text
+    // Add frequency markers
+    const markerGraphics = this.scene.add.graphics();
+    markerGraphics.fillStyle(0xffffff, 1);
+
+    // Add frequency labels
+    for (
+      let freq = Math.ceil(this.config.minFrequency);
+      freq <= this.config.maxFrequency;
+      freq += 2
+    ) {
+      const t =
+        (freq - this.config.minFrequency) / (this.config.maxFrequency - this.config.minFrequency);
+      const x = -this.config.width / 2 + 20 + t * (this.config.width - 40);
+
+      // Draw marker
+      markerGraphics.fillRect(x - 1, -15, 2, 10);
+
+      // Add label
+      const label = this.scene.add.text(x, -30, `${freq}`, {
+        fontSize: '12px',
+        color: '#ffffff',
+      });
+      label.setOrigin(0.5, 0.5);
+      this.add(label);
+    }
+    this.add(markerGraphics);
+
+    // Create frequency text with better visibility
     this.frequencyText = this.scene.add.text(
       0,
-      this.config.height / 2 - 30,
+      this.config.height / 2 - 40,
       `${this.currentFrequency.toFixed(1)} MHz`,
       {
-        fontSize: '18px',
+        fontSize: '24px',
+        fontStyle: 'bold',
         color: '#ffffff',
+        backgroundColor: '#000000',
+        padding: { x: 10, y: 5 },
       }
     );
     this.frequencyText.setOrigin(0.5, 0.5);

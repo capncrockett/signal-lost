@@ -28,9 +28,25 @@ export class MainScene extends Phaser.Scene {
     // Initialize soundscape manager
     this.soundscapeManager = new SoundscapeManager(this);
 
-    // Create the radio tuner component
-    this.radioTuner = new RadioTuner(this, 400, 300);
+    // Create the radio tuner component with larger size
+    this.radioTuner = new RadioTuner(this, 400, 300, {
+      width: 500, // Increase width
+      height: 200, // Increase height
+      backgroundColor: 0x444444, // Darker background for better visibility
+      knobColor: 0xffff00, // Yellow knob for better visibility
+      sliderColor: 0x888888, // Lighter slider for better visibility
+    });
     this.add.existing(this.radioTuner);
+
+    // Add a text label above the radio
+    const radioLabel = this.add.text(400, 150, 'RADIO TUNER', {
+      fontSize: '32px',
+      fontStyle: 'bold',
+      color: '#ffffff',
+      backgroundColor: '#000000',
+      padding: { x: 10, y: 5 },
+    });
+    radioLabel.setOrigin(0.5, 0.5);
 
     // Define the type for signal lock data
     interface SignalLockData {
@@ -93,19 +109,21 @@ export class MainScene extends Phaser.Scene {
 
     // Add a DOM button as a fallback for E2E tests
     const domButton = document.createElement('button');
-    domButton.innerText = 'Go to Field';
+    domButton.innerText = 'GO TO FIELD';
     domButton.style.position = 'absolute';
-    domButton.style.bottom = '100px';
+    domButton.style.bottom = '50px';
     domButton.style.left = '50%';
     domButton.style.transform = 'translateX(-50%)';
-    domButton.style.padding = '10px 20px';
-    domButton.style.fontSize = '24px';
-    domButton.style.backgroundColor = '#333';
+    domButton.style.padding = '15px 30px';
+    domButton.style.fontSize = '28px';
+    domButton.style.fontWeight = 'bold';
+    domButton.style.backgroundColor = '#ff5500';
     domButton.style.color = '#fff';
-    domButton.style.border = '2px solid #fff';
-    domButton.style.borderRadius = '5px';
+    domButton.style.border = '3px solid #fff';
+    domButton.style.borderRadius = '10px';
     domButton.style.cursor = 'pointer';
     domButton.style.zIndex = '1000';
+    domButton.style.boxShadow = '0 0 10px #fff, 0 0 20px #fff';
     domButton.onclick = () => {
       console.log('DOM Go to Field button clicked');
       this.scene.start('FieldScene');
