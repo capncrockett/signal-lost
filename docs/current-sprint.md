@@ -7,11 +7,11 @@
   - ✅ Update e2e tests to target correct button
   - ✅ Added TestOverlay utility for better E2E testing with data-testid attributes
 
-- [ ] Fix Volume Control
-  - [ ] Set initial volume to 80% in VolumeControl constructor
-  - [ ] Normalize volume scaling across components
-  - [ ] Add volume curve for more natural adjustment
-  - [ ] Test volume levels across all audio components
+- [x] Fix Volume Control
+  - [x] Set initial volume to 80% in VolumeControl constructor
+  - [x] Normalize volume scaling across components
+  - [x] Add volume curve for more natural adjustment
+  - [x] Test volume levels across all audio components
 
 - [ ] Viewport & Scaling
   - [ ] Fix Phaser scale configuration

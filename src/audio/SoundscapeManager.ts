@@ -75,15 +75,27 @@ export class SoundscapeManager {
 
       // Create master gain
       this.masterGain = this.audioContext.createGain();
-      this.masterGain.gain.value = 0.5; // Overall volume at 50% (reduced from 70%)
+      this.masterGain.gain.value = 0.5; // Base volume at 50%
       this.masterGain.connect(this.audioContext.destination);
 
       // Set up volume change listener
       this.volumeChangeListener = (volume: number) => {
         if (this.masterGain) {
-          // Scale volume so that 50% in UI is maximum (0.25 gain)
-          // This makes the overall volume much lower
-          this.masterGain.gain.value = Math.min(0.25, volume * 0.5);
+          // Apply a normalized volume scale
+          // Map the 0-1 range to a more appropriate gain range for Web Audio API
+          // Max gain of 0.5 prevents distortion while still allowing good volume range
+          const normalizedGain = volume * 0.5;
+
+          // Set the gain value with a small time constant for smooth transitions
+          if (this.audioContext) {
+            this.masterGain.gain.setTargetAtTime(
+              normalizedGain,
+              this.audioContext.currentTime,
+              0.01
+            );
+          } else {
+            this.masterGain.gain.value = normalizedGain;
+          }
         }
       };
 

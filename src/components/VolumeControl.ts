@@ -33,7 +33,7 @@ export class VolumeControl extends Phaser.GameObjects.Container {
       backgroundColor: config.backgroundColor || 0x333333,
       sliderColor: config.sliderColor || 0x666666,
       knobColor: config.knobColor || 0xcccccc,
-      initialVolume: config.initialVolume !== undefined ? config.initialVolume : 0.5,
+      initialVolume: config.initialVolume !== undefined ? config.initialVolume : 0.8, // Default to 80% volume
     };
 
     // Get the audio manager
@@ -139,11 +139,14 @@ export class VolumeControl extends Phaser.GameObjects.Container {
           // Update knob position
           this.knob.x = clampedX;
 
-          // Calculate volume (0-1)
-          const t = (clampedX - minX) / (maxX - minX);
+          // Calculate linear volume (0-1)
+          const linearVolume = (clampedX - minX) / (maxX - minX);
+
+          // Apply volume curve for more natural adjustment
+          const curvedVolume = this.applyVolumeCurve(linearVolume);
 
           // Update audio manager
-          this.audioManager.setMasterVolume(t);
+          this.audioManager.setMasterVolume(curvedVolume);
 
           // Update display
           this.updateDisplay();
@@ -170,11 +173,14 @@ export class VolumeControl extends Phaser.GameObjects.Container {
       // Update knob position
       this.knob.x = clampedX;
 
-      // Calculate volume (0-1)
-      const t = (clampedX - minX) / (maxX - minX);
+      // Calculate linear volume (0-1)
+      const linearVolume = (clampedX - minX) / (maxX - minX);
+
+      // Apply volume curve for more natural adjustment
+      const curvedVolume = this.applyVolumeCurve(linearVolume);
 
       // Update audio manager
-      this.audioManager.setMasterVolume(t);
+      this.audioManager.setMasterVolume(curvedVolume);
 
       // Update display
       this.updateDisplay();
@@ -202,12 +208,27 @@ export class VolumeControl extends Phaser.GameObjects.Container {
   }
 
   /**
+   * Apply a volume curve to make volume adjustment feel more natural
+   * Uses a cubic curve that gives better control at lower volumes
+   * @param linearVolume Linear volume value between 0 and 1
+   * @returns Curved volume value between 0 and 1
+   */
+  private applyVolumeCurve(linearVolume: number): number {
+    // Use a cubic curve (x^3) for more natural volume control
+    // This gives finer control at lower volumes where human hearing is more sensitive
+    return Phaser.Math.Easing.Cubic.Out(linearVolume);
+  }
+
+  /**
    * Set the volume directly
    * @param volume Value between 0 (silent) and 1 (full volume)
    */
   public setVolume(volume: number): void {
+    // Apply volume curve for more natural adjustment
+    const curvedVolume = this.applyVolumeCurve(volume);
+
     // Update audio manager
-    this.audioManager.setMasterVolume(volume);
+    this.audioManager.setMasterVolume(curvedVolume);
 
     // Update display
     this.updateDisplay();
