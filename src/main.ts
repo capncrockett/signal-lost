@@ -19,24 +19,16 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   pixelArt: true,
   scale: {
-    mode: Phaser.Scale.RESIZE, // Use RESIZE instead of FIT for better responsiveness
+    mode: Phaser.Scale.FIT, // FIT ensures the entire game is visible and maintains aspect ratio
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: '100%',
-    height: '100%',
-    min: {
-      width: 320,
-      height: 240,
-    },
-    max: {
-      width: 1600,
-      height: 1200,
-    },
-    expandParent: true,
+    parent: 'game',
+    width: 800,
+    height: 600,
   },
   dom: {
     createContainer: true,
   },
-  canvasStyle: 'display: block; width: 100%; height: 100%; object-fit: contain;',
+  canvasStyle: 'display: block;',
   autoRound: true, // Round pixel positions to avoid blurring
 };
 

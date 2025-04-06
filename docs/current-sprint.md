@@ -1,34 +1,35 @@
 # Current Sprint Tasks
 
 ## Critical Issues
-- [x] Remove duplicate "Go to Field" button
+- ✅ Remove duplicate "Go to Field" button
   - ✅ Remove DOM button from MainScene
   - ✅ Keep only the Phaser Text button
   - ✅ Update e2e tests to target correct button
   - ✅ Added TestOverlay utility for better E2E testing with data-testid attributes
 
-- [x] Fix Volume Control
-  - [x] Set initial volume to 80% in VolumeControl constructor
-  - [x] Normalize volume scaling across components
-  - [x] Add volume curve for more natural adjustment
-  - [x] Test volume levels across all audio components
-  - [x] Fix volume knob jumping when clicked
-  - [x] Ensure volume control affects static noise
+- ✅ Fix Volume Control
+  - ✅ Set initial volume to 80% in VolumeControl constructor
+  - ✅ Normalize volume scaling across components
+  - ✅ Add volume curve for more natural adjustment
+  - ✅ Test volume levels across all audio components
+  - ✅ Fix volume knob jumping when clicked
+  - ✅ Ensure volume control affects static noise
 
-- [x] Audio Improvements
-  - [x] Reduce overall volume of static noise
-    - [x] Cut static volume in half across all components
-    - [x] Normalized volume scaling for better user experience
-  - [x] Use pink noise instead of white noise for gentler sound
-    - [x] Implemented in both SoundscapeManager and RadioTuner
-    - [x] Added fallback implementation using Voss algorithm
-    - [x] Created NoiseGenerator utility for consistent noise generation
+- ✅ Audio Improvements
+  - ✅ Reduce overall volume of static noise
+    - ✅ Cut static volume in half across all components
+    - ✅ Normalized volume scaling for better user experience
+  - ✅ Use pink noise instead of white noise for gentler sound
+    - ✅ Implemented in both SoundscapeManager and RadioTuner
+    - ✅ Added fallback implementation using Voss algorithm
+    - ✅ Created NoiseGenerator utility for consistent noise generation
 
-- [x] Viewport & Scaling
-  - [x] Fix Phaser scale configuration
-  - [x] Test responsive behavior
-  - [x] Add viewport meta tags
-  - [x] Verify mobile compatibility
+- ✅ Viewport & Scaling
+  - ✅ Fix Phaser scale configuration (using FIT mode)
+  - ✅ Test responsive behavior
+  - ✅ Add viewport meta tags
+  - ✅ Verify mobile compatibility
+  - ✅ Add rendering tests with screenshots
 
 - [ ] Improve E2E Tests
   - [ ] Add actual gameplay flow testing

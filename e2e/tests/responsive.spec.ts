@@ -31,9 +31,9 @@ test.describe('Responsive behavior', () => {
     );
 
     // Verify canvas size is appropriate for the viewport
-    // Note: With RESIZE mode, the canvas might not always be smaller
-    expect(smallerBoundingBox?.width).toBeLessThanOrEqual(1024);
-    expect(smallerBoundingBox?.height).toBeLessThanOrEqual(768);
+    // With FIT mode, the canvas should maintain aspect ratio
+    expect(smallerBoundingBox?.width).toBeLessThanOrEqual(800);
+    expect(smallerBoundingBox?.height).toBeLessThanOrEqual(600);
 
     // Verify aspect ratio is maintained (approximately)
     const initialRatio = initialBoundingBox!.width / initialBoundingBox!.height;

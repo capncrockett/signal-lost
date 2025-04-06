@@ -171,7 +171,11 @@ export class MainScene extends Phaser.Scene {
     const bg = this.children.getByName('menuBackground') as Phaser.GameObjects.Image;
     if (bg) {
       bg.setPosition(width / 2, height / 2);
-      bg.setDisplaySize(width, height);
+      // Use setScale instead of setDisplaySize to maintain aspect ratio
+      const scaleX = width / 800;
+      const scaleY = height / 600;
+      const scale = Math.max(scaleX, scaleY);
+      bg.setScale(scale);
     }
 
     // Reposition volume control
