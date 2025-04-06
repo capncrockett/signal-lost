@@ -17,7 +17,7 @@ export class MainScene extends Phaser.Scene {
     this.load.image('radio', 'assets/images/radio.png');
     this.load.image('signalDetector', 'assets/images/signalDetector.png');
     this.load.image('menuBackground', 'assets/images/menuBackground.png');
-    this.load.audio('static', 'assets/audio/static.mp3');
+    // Static noise is generated programmatically, no need to load an audio file
   }
 
   create() {

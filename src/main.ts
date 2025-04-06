@@ -13,12 +13,16 @@ const config: Phaser.Types.Core.GameConfig = {
   physics: {
     default: 'arcade',
     arcade: {
-      gravity: { y: 0 },
+      gravity: { x: 0, y: 0 },
       debug: false,
     },
   },
   pixelArt: true,
-  canvasStyle: 'display: block; margin: 0 auto;', // Ensure canvas is visible
+  canvasStyle: 'display: block; margin: 0 auto; width: 100%; max-width: 800px; height: auto;', // Ensure canvas is visible and responsive
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
 };
 
 // Add global error handler
