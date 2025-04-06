@@ -61,16 +61,56 @@ export class MainScene extends Phaser.Scene {
 
     // Add button to navigate to FieldScene
     const fieldButton = this.add.text(400, 500, 'Go to Field', {
-      fontSize: '24px',
+      fontSize: '32px',
+      fontStyle: 'bold',
       color: '#ffffff',
       backgroundColor: '#333333',
-      padding: { x: 10, y: 5 },
+      padding: { x: 20, y: 10 },
+      shadow: { offsetX: 2, offsetY: 2, color: '#000000', blur: 2, stroke: true, fill: true },
     });
     fieldButton.setOrigin(0.5, 0.5);
     fieldButton.setInteractive({ useHandCursor: true });
+
+    // Add a glow effect to make it more visible
+    fieldButton.preFX?.addGlow(0x00ffff, 0, 0, false, 0.1, 16);
+
+    // Make the button pulse to draw attention
+    this.tweens.add({
+      targets: fieldButton,
+      scaleX: 1.1,
+      scaleY: 1.1,
+      duration: 1000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+
+    // Add click handler
     fieldButton.on('pointerdown', () => {
+      console.log('Go to Field button clicked');
       this.scene.start('FieldScene');
     });
+
+    // Add a DOM button as a fallback for E2E tests
+    const domButton = document.createElement('button');
+    domButton.innerText = 'Go to Field';
+    domButton.style.position = 'absolute';
+    domButton.style.bottom = '100px';
+    domButton.style.left = '50%';
+    domButton.style.transform = 'translateX(-50%)';
+    domButton.style.padding = '10px 20px';
+    domButton.style.fontSize = '24px';
+    domButton.style.backgroundColor = '#333';
+    domButton.style.color = '#fff';
+    domButton.style.border = '2px solid #fff';
+    domButton.style.borderRadius = '5px';
+    domButton.style.cursor = 'pointer';
+    domButton.style.zIndex = '1000';
+    domButton.onclick = () => {
+      console.log('DOM Go to Field button clicked');
+      this.scene.start('FieldScene');
+    };
+    document.getElementById('game')?.appendChild(domButton);
 
     // Add instructions
     const instructions = this.add.text(400, 400, 'Click and drag the radio tuner to find signals', {

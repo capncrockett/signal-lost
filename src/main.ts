@@ -19,23 +19,15 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   pixelArt: true,
   scale: {
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 800,
-    height: 600,
-    min: {
-      width: 400,
-      height: 300,
-    },
-    max: {
-      width: 1600,
-      height: 1200,
-    },
+    mode: Phaser.Scale.RESIZE, // Use RESIZE instead of FIT to fill the container
+    parent: 'game',
+    width: '100%',
+    height: '100%',
   },
   dom: {
     createContainer: true,
   },
-  // Remove canvasStyle as it's now handled by the scale manager
+  canvasStyle: 'display: block; width: 100%; height: 100%;',
 };
 
 // Add global error handler
