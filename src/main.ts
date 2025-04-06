@@ -13,12 +13,21 @@ const config: Phaser.Types.Core.GameConfig = {
   physics: {
     default: 'arcade',
     arcade: {
-      gravity: { y: 0 },
+      gravity: { x: 0, y: 0 },
       debug: false,
     },
   },
   pixelArt: true,
-  canvasStyle: 'display: block; margin: 0 auto;', // Ensure canvas is visible
+  scale: {
+    mode: Phaser.Scale.RESIZE, // Use RESIZE instead of FIT to fill the container
+    parent: 'game',
+    width: '100%',
+    height: '100%',
+  },
+  dom: {
+    createContainer: true,
+  },
+  canvasStyle: 'display: block; width: 100%; height: 100%;',
 };
 
 // Add global error handler

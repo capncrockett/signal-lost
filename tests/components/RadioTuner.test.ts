@@ -198,7 +198,10 @@ describe('RadioTuner', () => {
     radioTuner.setFrequency(91.5);
 
     // Check if emit was called with correct parameters
-    expect(emitSpy).toHaveBeenCalledWith('signalLock', 91.5);
+    expect(emitSpy).toHaveBeenCalled();
+    expect(emitSpy.mock.calls[0][0]).toBe('signalLock');
+    expect(emitSpy.mock.calls[0][1].frequency).toBe(91.5);
+    expect(emitSpy.mock.calls[0][1].signalStrength).toBeGreaterThan(0.8);
 
     // Reset spy
     emitSpy.mockReset();

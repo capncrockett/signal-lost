@@ -131,6 +131,9 @@ export async function captureConsoleLogs(page: Page, duration: number = 2000) {
   const logs: string[] = [];
   const errors: string[] = [];
   const warnings: string[] = [];
+  const audioErrors: string[] = [];
+  const networkErrors: string[] = [];
+  const uncaughtErrors: string[] = [];
 
   // Set up console log collection
   const consoleListener = (msg: ConsoleMessage) => {
@@ -138,25 +141,57 @@ export async function captureConsoleLogs(page: Page, duration: number = 2000) {
     logs.push(text);
 
     // Categorize by type
-    if (msg.type() === 'error') errors.push(text);
+    if (msg.type() === 'error') {
+      errors.push(text);
+
+      // Further categorize errors
+      if (text.includes('audio') || text.includes('decode')) {
+        audioErrors.push(text);
+      }
+      if (text.includes('network') || text.includes('fetch') || text.includes('load')) {
+        networkErrors.push(text);
+      }
+      if (text.includes('Uncaught') || text.includes('unhandled')) {
+        uncaughtErrors.push(text);
+      }
+    }
     if (msg.type() === 'warning') warnings.push(text);
+
+    // Log all errors to the test output for better visibility
+    if (msg.type() === 'error') {
+      console.error(`Browser console error: ${text}`);
+    }
   };
 
   // Add the listener
   page.on('console', consoleListener);
 
+  // Also listen for page errors
+  page.on('pageerror', (error) => {
+    const text = error.message;
+    errors.push(text);
+    uncaughtErrors.push(text);
+    console.error(`Page error: ${text}`);
+  });
+
   // Wait for the specified duration
   await page.waitForTimeout(duration);
 
-  // Remove the listener to avoid duplicate logs
+  // Remove the listeners to avoid duplicate logs
   page.removeListener('console', consoleListener);
 
   return {
     logs,
     errors,
     warnings,
+    audioErrors,
+    networkErrors,
+    uncaughtErrors,
     hasErrors: errors.length > 0,
     hasWarnings: warnings.length > 0,
+    hasAudioErrors: audioErrors.length > 0,
+    hasNetworkErrors: networkErrors.length > 0,
+    hasUncaughtErrors: uncaughtErrors.length > 0,
   };
 }
 

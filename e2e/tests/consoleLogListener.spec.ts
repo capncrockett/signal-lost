@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { captureConsoleLogs } from '../helpers/gameTestHelpers';
 
 test('Console log listener captures all game events', async ({ page }) => {
   // Navigate to the game
@@ -212,25 +213,8 @@ test('Console log listener captures error handling', async ({ page }) => {
   // Navigate to the game
   await page.goto('http://localhost:5173/');
 
-  // Create arrays to store error logs
-  const errorLogs: string[] = [];
-  const errorHandledLogs: string[] = [];
-
-  // Listen for console errors
-  page.on('console', (msg) => {
-    if (msg.type() === 'error') {
-      errorLogs.push(msg.text());
-    }
-
-    // Check for logs that indicate error handling
-    const text = msg.text();
-    if (text.includes('caught') || text.includes('handled') || text.includes('recovered')) {
-      errorHandledLogs.push(text);
-    }
-  });
-
-  // Wait for the game to load
-  await page.waitForTimeout(2000);
+  // Capture console logs for 3 seconds
+  const logData = await captureConsoleLogs(page, 3000);
 
   // Find the Phaser canvas (second canvas element)
   const canvas = await page.locator('canvas').nth(1);
@@ -241,9 +225,41 @@ test('Console log listener captures error handling', async ({ page }) => {
   // Wait for game to run
   await page.waitForTimeout(1000);
 
-  // Note: This test is primarily for demonstration purposes
-  // In a real project, you would trigger specific error conditions
-  // and verify that they are handled correctly
-  console.log(`Captured ${errorLogs.length} error logs`);
-  console.log(`Captured ${errorHandledLogs.length} error handled logs`);
+  // Log the captured errors
+  console.log(`Captured ${logData.errors.length} error logs`);
+  console.log(`Captured ${logData.audioErrors.length} audio error logs`);
+  console.log(`Captured ${logData.networkErrors.length} network error logs`);
+  console.log(`Captured ${logData.uncaughtErrors.length} uncaught error logs`);
+
+  // Display the errors for debugging
+  if (logData.errors.length > 0) {
+    console.log('Errors:');
+    logData.errors.forEach((error, index) => {
+      console.log(`${index + 1}. ${error}`);
+    });
+  }
+
+  // We expect no audio errors after our fix
+  expect(logData.audioErrors.length).toBe(0);
+});
+
+test('Game handles audio properly', async ({ page }) => {
+  // Navigate to the game
+  await page.goto('http://localhost:5173/');
+
+  // Capture console logs
+  const logData = await captureConsoleLogs(page, 3000);
+
+  // Check for audio initialization messages
+  const audioInitLogs = logData.logs.filter(
+    (log) => log.includes('audio') || log.includes('Audio') || log.includes('sound')
+  );
+
+  console.log('Audio initialization logs:');
+  audioInitLogs.forEach((log, index) => {
+    console.log(`${index + 1}. ${log}`);
+  });
+
+  // We expect no audio errors after our fix
+  expect(logData.audioErrors.length).toBe(0);
 });

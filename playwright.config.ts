@@ -15,7 +15,7 @@ export default defineConfig({
       slowMo: 100, // Slow down execution by 100ms
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     },
-    viewport: { width: 1024, height: 768 }, // Set viewport size to ensure game is visible
+    viewport: { width: 1280, height: 800 }, // Set viewport size to ensure game is fully visible
     actionTimeout: 15000, // Increase action timeout
     navigationTimeout: 15000, // Increase navigation timeout
   },
