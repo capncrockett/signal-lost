@@ -5,6 +5,7 @@ import { Interactable } from './Interactable';
 import { SaveManager } from '../../utils/SaveManager';
 import { NarrativeEngine } from '../../narrative/NarrativeEngine';
 import { NarrativeRenderer } from '../../narrative/NarrativeRenderer';
+import { interactableData } from './InteractableConfig';
 
 /**
  * FieldScene
@@ -65,59 +66,20 @@ export class FieldScene extends Phaser.Scene {
    */
   create(): void {
     try {
-      // Create tilemap
-      const map = this.make.tilemap({ key: 'field' });
+      // Create tilemap and layers
+      const mapData = this.createTilemap();
+      if (!mapData) return;
 
-      // Add orientation property to fix the error
-      if (map.orientation === undefined) {
-        // @ts-expect-error - Adding missing property
-        map.orientation = 'orthogonal';
-      }
+      const { map, obstaclesLayer } = mapData;
 
-      const tileset = map.addTilesetImage('tiles', 'tiles');
-
-      if (!tileset) {
-        console.error('Failed to load tileset');
-        return;
-      }
-
-      // Create layers
-      const groundLayer = map.createLayer('Ground', tileset);
-      const obstaclesLayer = map.createLayer('Obstacles', tileset);
-
-      if (!groundLayer || !obstaclesLayer) {
-        console.error('Failed to create layers');
-        return;
-      }
-
-      // Set collision on obstacles layer
-      obstaclesLayer.setCollisionByProperty({ collides: true });
-
-      // Initialize grid system
-      const tileSize = 32;
-      const gridWidth = map.width;
-      const gridHeight = map.height;
-      this.gridSystem = new GridSystem(this, gridWidth, gridHeight, tileSize);
-
-      // Add collision from tilemap to grid system
-      for (let y = 0; y < gridHeight; y++) {
-        for (let x = 0; x < gridWidth; x++) {
-          const tile = obstaclesLayer.getTileAt(x, y);
-          if (tile && tile.properties.collides) {
-            this.gridSystem.setTileCollision(x, y, true);
-          }
-        }
-      }
+      // Initialize grid system and set up collisions
+      this.setupGridSystem(map, obstaclesLayer);
 
       // Create player
-      const playerStartX = 5;
-      const playerStartY = 5;
-      this.player = new Player(this, playerStartX, playerStartY, 'player');
-      this.add.existing(this.player);
+      this.createPlayer();
 
       // Set up camera to follow player
-      this.cameras.main.startFollow(this.player);
-      this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+      this.setupCamera(map);
 
       // Create interactables
       this.createInteractables();
@@ -136,17 +98,95 @@ export class FieldScene extends Phaser.Scene {
   }
 
   /**
+   * Create tilemap and layers
+   * @returns Map data including the tilemap and layers, or null if creation failed
+   */
+  private createTilemap(): {
+    map: Phaser.Tilemaps.Tilemap;
+    groundLayer: Phaser.Tilemaps.TilemapLayer;
+    obstaclesLayer: Phaser.Tilemaps.TilemapLayer;
+  } | null {
+    // Create tilemap
+    const map = this.make.tilemap({ key: 'field' });
+
+    // Add orientation property to fix the error
+    if (map.orientation === undefined) {
+      // @ts-expect-error - Adding missing property
+      map.orientation = 'orthogonal';
+    }
+
+    const tileset = map.addTilesetImage('tiles', 'tiles');
+
+    if (!tileset) {
+      console.error('Failed to load tileset');
+      return null;
+    }
+
+    // Create layers
+    const groundLayer = map.createLayer('Ground', tileset);
+    const obstaclesLayer = map.createLayer('Obstacles', tileset);
+
+    if (!groundLayer || !obstaclesLayer) {
+      console.error('Failed to create layers');
+      return null;
+    }
+
+    // Set collision on obstacles layer
+    obstaclesLayer.setCollisionByProperty({ collides: true });
+
+    return { map, groundLayer, obstaclesLayer };
+  }
+
+  /**
+   * Set up grid system and collisions
+   * @param map The tilemap
+   * @param obstaclesLayer The obstacles layer
+   */
+  private setupGridSystem(
+    map: Phaser.Tilemaps.Tilemap,
+    obstaclesLayer: Phaser.Tilemaps.TilemapLayer
+  ): void {
+    // Initialize grid system
+    const tileSize = 32;
+    const gridWidth = map.width;
+    const gridHeight = map.height;
+    this.gridSystem = new GridSystem(this, gridWidth, gridHeight, tileSize);
+
+    // Add collision from tilemap to grid system
+    for (let y = 0; y < gridHeight; y++) {
+      for (let x = 0; x < gridWidth; x++) {
+        const tile = obstaclesLayer.getTileAt(x, y);
+        if (tile && tile.properties.collides) {
+          this.gridSystem.setTileCollision(x, y, true);
+        }
+      }
+    }
+  }
+
+  /**
+   * Create player character
+   */
+  private createPlayer(): void {
+    const playerStartX = 5;
+    const playerStartY = 5;
+    this.player = new Player(this, playerStartX, playerStartY, 'player');
+    this.add.existing(this.player);
+  }
+
+  /**
+   * Set up camera to follow player
+   * @param map The tilemap
+   */
+  private setupCamera(map: Phaser.Tilemaps.Tilemap): void {
+    this.cameras.main.startFollow(this.player);
+    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+  }
+
+  /**
    * Create interactable objects in the scene
    */
   private createInteractables(): void {
-    // Define interactable objects
-    const interactableData = [
-      { id: 'tower1', type: 'tower', x: 10, y: 8, triggerDistance: 2 },
-      { id: 'tower2', type: 'tower', x: 20, y: 15, triggerDistance: 2 },
-      { id: 'ruins1', type: 'ruins', x: 15, y: 12, triggerDistance: 1 },
-    ];
-
-    // Create interactable objects
+    // Create interactable objects from configuration
     for (const data of interactableData) {
       // Skip if already discovered
       if (SaveManager.getFlag(`found${data.id}`)) {
@@ -154,22 +194,40 @@ export class FieldScene extends Phaser.Scene {
       }
 
       // Create interactable
-      const interactable = new Interactable(
-        this,
-        data.id,
-        data.type,
-        data.x,
-        data.y,
-        data.triggerDistance
-      );
+      const interactable = this.createInteractable(data);
 
-      // Add to scene
-      this.add.existing(interactable);
-
-      // Add to collections
+      // Add to interactables array and map
       this.interactables.push(interactable);
       this.interactableMap.set(data.id, interactable);
     }
+  }
+
+  /**
+   * Create a single interactable object
+   * @param data The interactable configuration
+   * @returns The created interactable
+   */
+  private createInteractable(data: {
+    id: string;
+    type: string;
+    x: number;
+    y: number;
+    triggerDistance: number;
+  }): Interactable {
+    // Create interactable
+    const interactable = new Interactable(
+      this,
+      data.id,
+      data.type,
+      data.x,
+      data.y,
+      data.triggerDistance
+    );
+
+    // Add to scene
+    this.add.existing(interactable);
+
+    return interactable;
   }
 
   /**
@@ -185,36 +243,42 @@ export class FieldScene extends Phaser.Scene {
     }
 
     // Handle key down events
-    this.input.keyboard?.on('keydown', (event: KeyboardEvent) => {
-      // Skip if player is already moving
-      if (this.player.isMoving()) {
-        return;
-      }
+    this.input.keyboard?.on('keydown', this.handleKeyDown.bind(this));
+  }
 
-      // Handle movement
-      switch (event.code) {
-        case 'ArrowUp':
-        case 'KeyW':
-          this.movePlayer(0, -1);
-          break;
-        case 'ArrowDown':
-        case 'KeyS':
-          this.movePlayer(0, 1);
-          break;
-        case 'ArrowLeft':
-        case 'KeyA':
-          this.movePlayer(-1, 0);
-          break;
-        case 'ArrowRight':
-        case 'KeyD':
-          this.movePlayer(1, 0);
-          break;
-        case 'Space':
-        case 'KeyE':
-          this.interact();
-          break;
-      }
-    });
+  /**
+   * Handle keyboard input
+   * @param event The keyboard event
+   */
+  private handleKeyDown(event: KeyboardEvent): void {
+    // Skip if player is already moving
+    if (this.player.isMoving()) {
+      return;
+    }
+
+    // Handle movement
+    switch (event.code) {
+      case 'ArrowUp':
+      case 'KeyW':
+        this.movePlayer(0, -1);
+        break;
+      case 'ArrowDown':
+      case 'KeyS':
+        this.movePlayer(0, 1);
+        break;
+      case 'ArrowLeft':
+      case 'KeyA':
+        this.movePlayer(-1, 0);
+        break;
+      case 'ArrowRight':
+      case 'KeyD':
+        this.movePlayer(1, 0);
+        break;
+      case 'Space':
+      case 'KeyE':
+        this.interact();
+        break;
+    }
   }
 
   /**
@@ -330,6 +394,20 @@ export class FieldScene extends Phaser.Scene {
    * Initialize the narrative engine
    */
   private initializeNarrativeEngine(): void {
+    // Create and initialize narrative engine
+    this.createNarrativeEngine();
+
+    // Create narrative renderer
+    this.createNarrativeRenderer();
+
+    // Set up event listeners
+    this.setupNarrativeEventListeners();
+  }
+
+  /**
+   * Create and initialize the narrative engine
+   */
+  private createNarrativeEngine(): void {
     // Create narrative engine
     this.narrativeEngine = new NarrativeEngine();
 
@@ -338,7 +416,12 @@ export class FieldScene extends Phaser.Scene {
     if (eventsData) {
       this.narrativeEngine.loadEvents(JSON.stringify(eventsData));
     }
+  }
 
+  /**
+   * Create the narrative renderer
+   */
+  private createNarrativeRenderer(): void {
     // Create narrative renderer
     this.narrativeRenderer = new NarrativeRenderer(
       this,
@@ -347,8 +430,13 @@ export class FieldScene extends Phaser.Scene {
       this.narrativeEngine
     );
     this.add.existing(this.narrativeRenderer);
+  }
 
-    // Set up event listeners
+  /**
+   * Set up narrative event listeners
+   */
+  private setupNarrativeEventListeners(): void {
+    // Listen for narrative events
     this.narrativeEngine.on('narrativeEvent', (event) => {
       console.log(`Narrative event triggered: ${event.id}`);
     });

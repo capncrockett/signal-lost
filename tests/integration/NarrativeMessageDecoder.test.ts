@@ -13,8 +13,8 @@ jest.mock('../../src/utils/SaveManager');
 
 describe('NarrativeEngine and MessageDecoder Integration', () => {
   let narrativeEngine: NarrativeEngine;
-  // MessageDecoder is initialized but used indirectly through NarrativeEngine
-  // let messageDecoder: MessageDecoder;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let messageDecoder: MessageDecoder;
 
   // Sample events for testing
   const sampleEvent: NarrativeEvent = {
