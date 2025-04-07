@@ -6,6 +6,10 @@ import { SaveManager } from '../../utils/SaveManager';
 import { NarrativeEngine } from '../../narrative/NarrativeEngine';
 import { NarrativeRenderer } from '../../narrative/NarrativeRenderer';
 import { interactableData } from './InteractableConfig';
+import { Inventory } from '../../inventory/Inventory';
+import { InventoryUI } from '../../inventory/InventoryUI';
+import { itemsData } from '../../inventory/ItemsConfig';
+import { Item } from '../../inventory/Item';
 
 /**
  * FieldScene
@@ -33,6 +37,12 @@ export class FieldScene extends Phaser.Scene {
 
   // Narrative renderer
   private narrativeRenderer!: NarrativeRenderer;
+
+  // Inventory
+  private inventory!: Inventory;
+
+  // Inventory UI
+  private inventoryUI!: InventoryUI;
 
   constructor() {
     super({ key: 'FieldScene' });
@@ -131,6 +141,9 @@ export class FieldScene extends Phaser.Scene {
 
       // Initialize narrative engine
       this.initializeNarrativeEngine();
+
+      // Initialize inventory system
+      this.initializeInventorySystem();
     } catch (error) {
       console.error('Error creating field scene:', error);
     }
@@ -348,6 +361,9 @@ export class FieldScene extends Phaser.Scene {
       case 'KeyE':
         this.interact();
         break;
+      case 'KeyI':
+        this.toggleInventory();
+        break;
     }
   }
 
@@ -425,6 +441,15 @@ export class FieldScene extends Phaser.Scene {
   }
 
   /**
+   * Toggle the inventory UI
+   */
+  private toggleInventory(): void {
+    if (this.inventoryUI) {
+      this.inventoryUI.toggle();
+    }
+  }
+
+  /**
    * Interact with the nearest interactable
    */
   private interact(): void {
@@ -458,6 +483,129 @@ export class FieldScene extends Phaser.Scene {
         nearestInteractable.getType()
       );
     }
+  }
+
+  /**
+   * Initialize the inventory system
+   */
+  private initializeInventorySystem(): void {
+    // Create inventory
+    this.inventory = new Inventory(20);
+
+    // Load item definitions
+    this.inventory.loadItemDefinitions(itemsData);
+
+    // Load saved inventory
+    this.inventory.loadInventory();
+
+    // Create inventory UI
+    this.inventoryUI = new InventoryUI(this, this.inventory, {
+      x: this.cameras.main.width / 2,
+      y: this.cameras.main.height / 2,
+    });
+    this.add.existing(this.inventoryUI);
+
+    // Add starting items if this is a new game
+    this.addStartingItems();
+  }
+
+  /**
+   * Add starting items to the inventory
+   */
+  private addStartingItems(): void {
+    // Check if this is the first time loading the scene
+    if (!SaveManager.getFlag('field_scene_visited')) {
+      // Add radio to inventory
+      const radioItem = itemsData.find(item => item.id === 'radio');
+      if (radioItem) {
+        this.inventory.addItem(new Item(radioItem));
+      }
+
+      // Add journal to inventory
+      const journalItem = itemsData.find(item => item.id === 'journal');
+      if (journalItem) {
+        this.inventory.addItem(new Item(journalItem));
+      }
+
+      // Mark scene as visited
+      SaveManager.setFlag('field_scene_visited', true);
+    }
+  }
+
+  /**
+   * Set up inventory event listeners
+   */
+  private setupInventoryEventListeners(): void {
+    // Listen for item use events
+    this.inventory.on('itemUsed', (item: Item) => {
+      console.log(`Item used: ${item.getName()}`);
+
+      // Handle item effects
+      const effects = item.getEffects();
+      const action = effects.action as string | undefined;
+
+      if (action) {
+        switch (action) {
+          case 'open_radio':
+            // Return to main scene to use radio
+            this.scene.start('MainScene');
+            break;
+
+          case 'open_map':
+            // Show map overlay
+            console.log('Opening map...');
+            // TODO: Implement map overlay
+            break;
+
+          case 'read_note':
+            // Show note content
+            const content = effects.content as string | undefined;
+            if (content) {
+              // Trigger a narrative event to display the note content
+              this.narrativeEngine.addEvent({
+                id: `note_${Date.now()}`,
+                message: content,
+                choices: [
+                  {
+                    text: 'Close',
+                    outcome: '',
+                  },
+                ],
+              });
+              this.narrativeEngine.triggerEvent(`note_${Date.now()}`);
+            }
+            break;
+
+          default:
+            console.log(`Unknown action: ${action}`);
+            break;
+        }
+      }
+    });
+
+    // Listen for interactable events that give items
+    this.eventEmitter.on('interactableTriggered', (id: string, type: string) => {
+      // Check if this interactable gives an item
+      if (type === 'item') {
+        // Find the corresponding item in the item definitions
+        const itemData = itemsData.find(item => item.id === id);
+        if (itemData) {
+          // Add the item to the inventory
+          const item = new Item(itemData);
+          const added = this.inventory.addItem(item);
+
+          if (added) {
+            console.log(`Added item to inventory: ${item.getName()}`);
+
+            // Mark the item as collected
+            SaveManager.setFlag(`collected_${id}`, true);
+          } else {
+            console.log('Inventory is full!');
+            // TODO: Show inventory full message
+          }
+        }
+      }
+    });
   }
 
   /**

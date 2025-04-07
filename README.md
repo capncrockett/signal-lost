@@ -34,6 +34,53 @@ npm run check-all          # Run all checks (lint, type-check, tests, E2E tests)
 - TypeScript must be used throughout
 - Tests must cover ≥ 80% of code (unit + integration + E2E)
 
+## 🎮 Gameplay Instructions
+
+### Main Controls
+
+- **Radio Tuning**: Use the mouse to tune the radio frequency
+- **Interact**: Press `E` or `Space` to interact with objects
+- **Movement**: Use `W`, `A`, `S`, `D` or arrow keys to move in the field
+- **Inventory**: Press `I` to open/close the inventory
+
+### Game Mechanics
+
+#### Radio Signals
+
+The game revolves around discovering and interpreting radio signals. Different frequencies contain different types of signals:
+
+- **Location Signals**: Reveal coordinates on the map
+- **Message Signals**: Provide story elements and clues
+- **Item Signals**: Allow you to discover special items
+
+Tune the radio carefully to find the clearest signal. The signal strength indicator shows how close you are to a valid frequency.
+
+#### Field Exploration
+
+Explore the field to discover locations mentioned in radio signals. You'll find:
+
+- **Radio Towers**: Communication hubs with valuable information
+- **Ruins**: Abandoned research facilities with clues about what happened
+- **Bunkers**: Secure locations with supplies and equipment
+
+#### Inventory System
+
+Collect and use items to progress through the game:
+
+- **Tools**: Items like the radio and map that help you navigate
+- **Documents**: Notes and journals that provide story context
+- **Keys**: Used to unlock doors and access new areas
+- **Radio Parts**: Enhance your radio's capabilities
+- **Consumables**: One-time use items like batteries and medkits
+
+### Story Progression
+
+The game's narrative unfolds as you discover signals and explore locations. Pay attention to:
+
+- The sequence of frequencies mentioned in various locations
+- The mysterious "Signal Protocol" referenced in documents
+- The events that led to the current state of the world
+
 ## 🔄 CI/CD Workflow
 
 This project uses GitHub Actions for continuous integration and deployment. The workflow is defined in `.github/workflows/agent-workflow.yml` and includes:
