@@ -10,11 +10,15 @@
     "postinstall": "npx playwright install",
     "test": "jest",
     "test:e2e": "playwright test --reporter=list",
+    "test:e2e:ci": "cross-env CI=true playwright test",
+    "test:e2e:report": "playwright test",
+    "test:e2e:show-report": "playwright show-report",
     "coverage": "jest --coverage --coverageReporters=text",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
-    "prepare": "husky"
+    "prepare": "husky",
+    "check-all": "npm run lint && npm run test && npm run test:e2e:ci"
   },
   "keywords": [
     "game",
@@ -29,6 +33,7 @@
     "@types/node": "^20.8.2",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",

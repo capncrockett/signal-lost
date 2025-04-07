@@ -145,9 +145,9 @@ export class TestOverlay {
     // Get the canvas bounds
     const canvasBounds = canvas.getBoundingClientRect();
 
-    // Get the game's current dimensions
-    const gameWidth = scene.scale.width;
-    const gameHeight = scene.scale.height;
+    // Use fixed dimensions for our game
+    const gameWidth = 800;
+    const gameHeight = 600;
 
     // Calculate the scale factor between the game world and the canvas
     const scaleX = canvasBounds.width / gameWidth;

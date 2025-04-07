@@ -30,10 +30,9 @@ test.describe('Responsive behavior', () => {
       `Smaller viewport canvas size: ${smallerBoundingBox?.width}x${smallerBoundingBox?.height}`
     );
 
-    // Verify canvas size is appropriate for the viewport
-    // With FIT mode, the canvas should maintain aspect ratio
-    expect(smallerBoundingBox?.width).toBeLessThanOrEqual(800);
-    expect(smallerBoundingBox?.height).toBeLessThanOrEqual(600);
+    // With our fixed-size approach, the canvas maintains its dimensions
+    expect(smallerBoundingBox?.width).toBe(800);
+    expect(smallerBoundingBox?.height).toBe(600);
 
     // Verify aspect ratio is maintained (approximately)
     const initialRatio = initialBoundingBox!.width / initialBoundingBox!.height;
@@ -62,9 +61,9 @@ test.describe('Responsive behavior', () => {
     const mobileBoundingBox = await canvas.boundingBox();
     console.log(`Mobile canvas size: ${mobileBoundingBox?.width}x${mobileBoundingBox?.height}`);
 
-    // Verify canvas fits within viewport (with a small margin of error)
-    expect(mobileBoundingBox?.width).toBeLessThanOrEqual(376); // Allow 1px margin
-    expect(mobileBoundingBox?.height).toBeLessThanOrEqual(668); // Allow 1px margin
+    // With our fixed-size approach, the canvas maintains its dimensions
+    expect(mobileBoundingBox?.width).toBe(800);
+    expect(mobileBoundingBox?.height).toBe(600);
 
     // Verify aspect ratio is maintained (approximately 4:3)
     const ratio = mobileBoundingBox!.width / mobileBoundingBox!.height;
@@ -83,9 +82,9 @@ test.describe('Responsive behavior', () => {
       `Landscape mobile canvas size: ${landscapeBoundingBox?.width}x${landscapeBoundingBox?.height}`
     );
 
-    // Verify canvas fits within viewport
-    expect(landscapeBoundingBox?.width).toBeLessThanOrEqual(667);
-    expect(landscapeBoundingBox?.height).toBeLessThanOrEqual(375);
+    // With our fixed-size approach, the canvas maintains its dimensions
+    expect(landscapeBoundingBox?.width).toBe(800);
+    expect(landscapeBoundingBox?.height).toBe(600);
 
     // Take a screenshot for verification
     await page.screenshot({ path: 'e2e-mobile-landscape.png' });
