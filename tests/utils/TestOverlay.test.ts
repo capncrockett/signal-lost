@@ -28,21 +28,40 @@ jest.mock('phaser', () => {
 
 describe('TestOverlay', () => {
   // Mock DOM elements
-  let mockDiv: HTMLDivElement;
-  let mockCanvas: HTMLCanvasElement;
-  let mockParent: HTMLDivElement;
+  let mockDiv: any;
+  let mockCanvas: any;
+  let mockParent: any;
   let mockGameObject: any;
   let mockScene: any;
 
   beforeEach(() => {
     // Set up mocks
     mockDiv = {
-      style: {},
+      style: {
+        position: '',
+        top: '',
+        left: '',
+        width: '',
+        height: '',
+        backgroundColor: '',
+        color: '',
+        padding: '',
+        border: '',
+        borderRadius: '',
+        fontFamily: '',
+        fontSize: '',
+        display: '',
+        alignItems: '',
+        justifyContent: '',
+        cursor: '',
+        zIndex: '',
+        // Add any other CSS properties you need
+      } as CSSStyleDeclaration,
       setAttribute: jest.fn().mockImplementation((name, value) => {
-        (mockDiv as any)[name] = value;
+        mockDiv[name] = value;
       }),
       getAttribute: jest.fn().mockImplementation((name) => {
-        return (mockDiv as any)[name] || null;
+        return mockDiv[name] || null;
       }),
       addEventListener: jest.fn(),
       dispatchEvent: jest.fn(),
@@ -135,7 +154,7 @@ describe('TestOverlay', () => {
 
     // Get the click handler function that was passed to addEventListener
     const clickHandlerFn = mockDiv.addEventListener.mock.calls.find(
-      (call) => call[0] === 'click'
+      (call: any[]) => call[0] === 'click'
     )[1];
 
     // Call the handler directly
