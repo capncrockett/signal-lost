@@ -50,7 +50,7 @@
     "wait-on": "^8.0.3"
   },
   "dependencies": {
-    "phaser": "^3.60.0",
+    "phaser": "3.60.0",
     "tone": "^15.0.4"
   },
   "lint-staged": {
