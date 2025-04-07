@@ -237,6 +237,7 @@ We're tracking the number of TypeScript errors to measure our progress:
 | 2023-07-11 | 98           | 35         | 63         | Fixed TestOverlay.test.ts errors    |
 | 2023-07-12 | 82           | 28         | 54         | Fixed signal data type errors        |
 | 2023-07-13 | 54           | 0          | 54         | Fixed all core file errors           |
+| 2023-07-14 | 42           | 0          | 42         | Fixed E2E test file errors          |
 
 ### Priority Files
 
