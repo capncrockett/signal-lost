@@ -1,15 +1,14 @@
 # Sprint 2: Cleanup and Maintenance
 
 ## Goals
-This sprint focuses on cleaning up the codebase, improving test infrastructure, and addressing technical debt to ensure a more maintainable and stable codebase moving forward.
+This sprint focuses on cleaning up the codebase, improving test infrastructure, and addressing critical TypeScript errors to ensure a more maintainable and stable codebase moving forward.
 
-## Revised Priorities
+## Current Sprint Priorities
 
 1. Fix critical TypeScript errors in core game files
 2. Ensure all tests pass consistently
 3. Clean up unused code and imports
 4. Address remaining TypeScript errors in test files
-5. Refactor duplicated code (if time permits)
 
 ## Code Cleanup
 
@@ -20,11 +19,6 @@ This sprint focuses on cleaning up the codebase, improving test infrastructure, 
   - ✅ Create proper interfaces for event data types
   - ⬜ Fix remaining TypeScript errors in core files
   - ⬜ Fix TypeScript errors in test files
-
-- ⬜ Refactor duplicated code (Moved to future sprint)
-  - ⬜ Identify and consolidate duplicate logic across components
-  - ⬜ Create shared utilities for common operations
-  - ⬜ Standardize patterns for similar functionality
 
 - ⬜ Remove unused code
   - ⬜ Delete dead code paths
@@ -57,47 +51,20 @@ This sprint focuses on cleaning up the codebase, improving test infrastructure, 
   - ✅ Optimize build configuration
   - ✅ Ensure consistent builds across environments
 
-- [ ] Improve development workflow
-  - [ ] Streamline local development setup
-  - [ ] Enhance debugging capabilities
-  - [ ] Optimize hot reloading
+- ⬜ Improve development workflow
+  - ✅ Update workflow documentation to emphasize TypeScript checking
+  - ✅ Add TypeScript error management guidelines
+  - ⬜ Streamline local development setup
+  - ⬜ Enhance debugging capabilities
 
-- [ ] Update dependencies
-  - [ ] Audit and update outdated packages
-  - [ ] Address security vulnerabilities
-  - [ ] Ensure compatibility between dependencies
+## Deferred to Future Sprint
 
-## Documentation
+The following items have been moved to a future sprint to focus on critical functionality first:
 
-- [ ] Update technical documentation
-  - [ ] Document architecture decisions
-  - [ ] Create component documentation
-  - [ ] Update API documentation
+- Refactor duplicated code
+- Performance optimization
+- Comprehensive documentation updates
+- Accessibility improvements
+- Dependency updates (unless critical security issues)
 
-- [ ] Improve code comments
-  - [ ] Add JSDoc comments to public interfaces
-  - [ ] Document complex algorithms
-  - [ ] Explain non-obvious design decisions
-
-## Performance Optimization
-
-- [ ] Identify performance bottlenecks
-  - [ ] Run performance benchmarks
-  - [ ] Profile critical paths
-  - [ ] Identify memory leaks
-
-- [ ] Optimize rendering
-  - [ ] Reduce unnecessary re-renders
-  - [ ] Optimize asset loading
-  - [ ] Improve animation performance
-
-## Accessibility
-
-- [ ] Improve keyboard navigation
-  - [ ] Ensure all interactive elements are keyboard accessible
-  - [ ] Add keyboard shortcuts for common actions
-
-- [ ] Enhance screen reader support
-  - [ ] Add ARIA attributes
-  - [ ] Ensure proper focus management
-  - [ ] Test with screen readers
+See [sprint-3.md](sprint-3.md) for details on these deferred tasks.
