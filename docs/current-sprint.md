@@ -32,9 +32,11 @@
   - ✅ Add rendering tests with screenshots
   - ✅ Fix TypeScript errors in test files
 
-- [ ] Improve E2E Tests
+- ✅ Improve E2E Tests
+  - ✅ Add comprehensive rendering tests for different resolutions
+  - ✅ Test audio initialization
+  - ✅ Capture screenshots for visual verification
   - [ ] Add actual gameplay flow testing
-  - [ ] Test audio initialization
   - [ ] Verify signal detection
   - [ ] Add field exploration tests
   - [ ] Test save/load functionality
