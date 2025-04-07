@@ -51,7 +51,7 @@ test('Complete gameplay flow from tuning radio to field exploration', async ({ p
 
   // Try multiple times to get a signal lock
   let signalLocked = false;
-  let signalEvents91_5 = [];
+  let signalEvents91_5: string[] = [];
   let attempts = 0;
   const maxAttempts = 3;
 

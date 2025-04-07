@@ -81,7 +81,9 @@ test('Field exploration and interaction with objects', async ({ page }) => {
       { x: 450, y: 450 },
     ];
 
-    for (const [index, pos] of positions.entries()) {
+    // Use a traditional for loop instead of entries() to avoid TypeScript error
+    for (let index = 0; index < positions.length; index++) {
+      const pos = positions[index];
       if (buttonClicked) break;
 
       try {

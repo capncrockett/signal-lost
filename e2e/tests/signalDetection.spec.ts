@@ -39,7 +39,7 @@ test('Signal detection at different frequencies', async ({ page }) => {
 
     // Try multiple times to get a signal lock
     let signalLocked = false;
-    let signalEvents = [];
+    let signalEvents: string[] = [];
     let attempts = 0;
     const maxAttempts = 3;
 

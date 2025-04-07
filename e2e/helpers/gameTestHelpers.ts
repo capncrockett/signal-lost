@@ -13,6 +13,10 @@ interface MouseClickOptions {
   position?: { x: number; y: number };
   timeout?: number;
   trial?: boolean;
+  // Custom options for our tests
+  fallbackToCenter?: boolean;
+  takeScreenshot?: boolean;
+  screenshotName?: string;
 }
 
 // Ensure the screenshots directory exists

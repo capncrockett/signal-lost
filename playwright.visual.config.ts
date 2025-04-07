@@ -42,7 +42,8 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         // Store snapshots in browser-specific directories
-        snapshotPathTemplate: '{testDir}/{testFileDir}/{testFileName}-{arg}{ext}',
+        // Use a custom property instead of snapshotPathTemplate
+        _snapshotPath: '{testDir}/{testFileDir}/{testFileName}-{arg}{ext}',
       },
     },
   ],

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import {
   takeScreenshot,
   takeElementScreenshot,
@@ -80,7 +80,7 @@ test.describe('Game Rendering', () => {
 });
 
 // Helper function to test a specific resolution
-async function testResolution(page, resolution) {
+async function testResolution(page: Page, resolution: { name: string; width: number; height: number }) {
   console.log(`Testing resolution: ${resolution.name} (${resolution.width}x${resolution.height})`);
 
   // Set viewport to the resolution
@@ -133,7 +133,8 @@ async function testResolution(page, resolution) {
       console.log(`Radio tuner is NOT visible at ${resolution.name} resolution`);
     }
   } catch (error) {
-    console.error(`Error at resolution ${resolution.name}: ${error.message}`);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Error at resolution ${resolution.name}: ${errorMessage}`);
     // Take a screenshot of the page anyway
     await takeScreenshot(page, `${resolution.name}-error`, true);
     throw error; // Re-throw to fail the test
