@@ -5,6 +5,7 @@ export default defineConfig({
   server: {
     host: true,
   },
+  publicDir: 'public',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
