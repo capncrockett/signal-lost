@@ -97,13 +97,17 @@ export class VolumeControl extends Phaser.GameObjects.Container {
         this.config.width,
         this.config.height
       ),
-      Phaser.Geom.Rectangle.Contains
+      (hitArea: Phaser.Geom.Rectangle, x: number, y: number) => {
+        return Phaser.Geom.Rectangle.Contains(hitArea, x, y);
+      }
     );
 
     // Make the knob interactive and draggable
     this.knob.setInteractive(
       new Phaser.Geom.Circle(0, 0, this.config.height / 2 - 5),
-      Phaser.Geom.Circle.Contains
+      (hitArea: Phaser.Geom.Circle, x: number, y: number) => {
+        return Phaser.Geom.Circle.Contains(hitArea, x, y);
+      }
     );
   }
 

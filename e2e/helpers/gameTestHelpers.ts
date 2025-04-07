@@ -60,7 +60,10 @@ export async function takeElementScreenshot(element: any, name: string): Promise
  * @param options Optional configuration
  * @returns Object containing game elements
  */
-export async function waitForGameLoad(page: Page, options: { timeout?: number; waitForCanvas?: boolean } = {}) {
+export async function waitForGameLoad(
+  page: Page,
+  options: { timeout?: number; waitForCanvas?: boolean } = {}
+) {
   const timeout = options.timeout || 15000;
   const waitForCanvas = options.waitForCanvas !== false; // Default to true
 
@@ -102,14 +105,14 @@ export async function waitForGameLoad(page: Page, options: { timeout?: number; w
     return {
       gameContainer,
       canvasCount,
-      hasCanvas: canvasCount > 0
+      hasCanvas: canvasCount > 0,
     };
   }
 
   return {
     gameContainer,
     canvasCount: 0,
-    hasCanvas: false
+    hasCanvas: false,
   };
 }
 
@@ -363,18 +366,23 @@ export async function captureConsoleLogs(page: Page, duration: number = 2000) {
  * @param page Playwright page
  * @param options Optional configuration
  */
-export async function testRadioTuner(page: Page, options: {
-  takeScreenshots?: boolean;
-  waitTimeout?: number;
-  retryCount?: number;
-  signalFrequencies?: number[];
-} = {}) {
+export async function testRadioTuner(
+  page: Page,
+  options: {
+    takeScreenshots?: boolean;
+    waitTimeout?: number;
+    retryCount?: number;
+    signalFrequencies?: number[];
+  } = {}
+) {
   const takeScreenshots = options.takeScreenshots !== false; // Default to true
   const waitTimeout = options.waitTimeout || 2000;
   const retryCount = options.retryCount || 3;
   const signalFrequencies = options.signalFrequencies || [91.5, 96.3, 103.7]; // Default signal frequencies
 
-  console.log(`Testing radio tuner (screenshots: ${takeScreenshots}, waitTimeout: ${waitTimeout}ms, retries: ${retryCount})`);
+  console.log(
+    `Testing radio tuner (screenshots: ${takeScreenshots}, waitTimeout: ${waitTimeout}ms, retries: ${retryCount})`
+  );
 
   // Wait for game to load with extended timeout
   const gameLoadResult = await waitForGameLoad(page, { timeout: 20000 });
@@ -420,7 +428,7 @@ export async function testRadioTuner(page: Page, options: {
       steps: 20, // More steps for smoother movement
       fallbackToCenter: true,
       takeScreenshot: takeScreenshots,
-      screenshotName: `frequency-${frequency}`
+      screenshotName: `frequency-${frequency}`,
     });
 
     // Wait for signal processing
@@ -432,17 +440,17 @@ export async function testRadioTuner(page: Page, options: {
     signalTestResults.push({
       frequency,
       dragSuccess,
-      signalEvents: frequencyLogs.logs.filter(log =>
-        log.includes('Signal') && log.includes(frequency.toString())
+      signalEvents: frequencyLogs.logs.filter(
+        (log) => log.includes('Signal') && log.includes(frequency.toString())
       ),
-      logs: frequencyLogs
+      logs: frequencyLogs,
     });
   }
 
   // Final drag to a neutral position
   await dragInGame(page, 400, 300, 350, 300, {
     takeScreenshot: takeScreenshots,
-    screenshotName: 'final-position'
+    screenshotName: 'final-position',
   });
 
   // Wait for signal processing

@@ -210,7 +210,7 @@ export class Interactable extends Phaser.GameObjects.Sprite {
       duration: 1000,
       yoyo: true,
       repeat: -1,
-      ease: 'Sine.easeInOut'
+      ease: 'Sine.easeInOut',
     });
   }
 }

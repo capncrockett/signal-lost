@@ -36,7 +36,9 @@ export class MainScene extends Phaser.Scene {
     });
 
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
-      console.error(`MainScene error loading asset: ${file.key} from ${file.url}`);
+      // Ensure url is a string
+      const url = typeof file.url === 'string' ? file.url : String(file.url);
+      console.error(`MainScene error loading asset: ${file.key} from ${url}`);
     });
 
     // Static noise is generated programmatically, no need to load an audio file
@@ -69,7 +71,11 @@ export class MainScene extends Phaser.Scene {
     }
 
     // Set up resize handler
-    this.scale.on('resize', this.handleResize, this);
+    this.scale.on(
+      'resize',
+      (width: number, height: number) => this.handleResize(width, height),
+      this
+    );
 
     // Initial resize to set correct positions
     this.handleResize(this.scale.width, this.scale.height);
@@ -87,7 +93,7 @@ export class MainScene extends Phaser.Scene {
         sliderColor: 0x888888, // Lighter slider for better visibility
         // Add asset keys for both path formats
         radioImageKey: 'radio',
-        radioImageKeyAlt: 'radio_alt'
+        radioImageKeyAlt: 'radio_alt',
       });
       this.add.existing(this.radioTuner);
       console.log('RadioTuner created successfully');
@@ -98,12 +104,14 @@ export class MainScene extends Phaser.Scene {
       fallbackRadio.setName('fallbackRadio');
 
       // Add text to indicate the fallback
-      this.add.text(400, 300, 'RADIO TUNER (FALLBACK)', {
-        fontSize: '24px',
-        fontStyle: 'bold',
-        color: '#ffffff',
-        align: 'center'
-      }).setOrigin(0.5, 0.5);
+      this.add
+        .text(400, 300, 'RADIO TUNER (FALLBACK)', {
+          fontSize: '24px',
+          fontStyle: 'bold',
+          color: '#ffffff',
+          align: 'center',
+        })
+        .setOrigin(0.5, 0.5);
     }
 
     // Add test overlay for the radio tuner
@@ -119,18 +127,32 @@ export class MainScene extends Phaser.Scene {
     });
     radioLabel.setOrigin(0.5, 0.5);
 
+    // Define types for signal data
+    interface LocationSignalData {
+      locationId: string;
+      coordinates: { x: number; y: number };
+    }
+
+    interface MessageSignalData {
+      message: string;
+    }
+
+    type SignalData = LocationSignalData | MessageSignalData;
+
     // Define the type for signal lock data
     interface SignalLockData {
       frequency: number;
       signalStrength: number;
       signalId: string;
-      signalType: string;
-      signalData: any;
+      signalType: 'location' | 'message';
+      signalData: SignalData;
     }
 
     // Listen for signal lock events
     this.radioTuner.on('signalLock', (data: SignalLockData) => {
-      console.log(`Signal locked at frequency: ${data.frequency}, ID: ${data.signalId}, Type: ${data.signalType}`);
+      console.log(
+        `Signal locked at frequency: ${data.frequency}, ID: ${data.signalId}, Type: ${data.signalType}`
+      );
 
       // Play a signal sound when locked
       this.soundscapeManager.playSignalSound();
@@ -232,7 +254,7 @@ export class MainScene extends Phaser.Scene {
    * Handle signal lock events
    * @param data Signal lock data
    */
-  private handleSignalLock(data: { frequency: number; signalStrength: number; signalId: string; signalType: string; signalData: any }): void {
+  private handleSignalLock(data: SignalLockData): void {
     // Create a visual effect to indicate signal lock
     this.createSignalLockEffect();
 
@@ -283,7 +305,7 @@ export class MainScene extends Phaser.Scene {
       ease: 'Power2',
       onComplete: () => {
         flash.destroy();
-      }
+      },
     });
   }
 
@@ -291,20 +313,22 @@ export class MainScene extends Phaser.Scene {
    * Display signal information
    * @param data Signal lock data
    */
-  private displaySignalInfo(data: { frequency: number; signalStrength: number; signalId: string; signalType: string; signalData: any }): void {
+  private displaySignalInfo(data: SignalLockData): void {
     // Create a text object to display signal information
-    const infoText = this.add.text(400, 200,
+    const infoText = this.add.text(
+      400,
+      200,
       `Signal Detected!\n` +
-      `Frequency: ${data.frequency.toFixed(1)} MHz\n` +
-      `Signal Strength: ${(data.signalStrength * 100).toFixed(0)}%\n` +
-      `Type: ${data.signalType.toUpperCase()}`,
+        `Frequency: ${data.frequency.toFixed(1)} MHz\n` +
+        `Signal Strength: ${(data.signalStrength * 100).toFixed(0)}%\n` +
+        `Type: ${data.signalType.toUpperCase()}`,
       {
         fontSize: '24px',
         fontStyle: 'bold',
         color: '#ffffff',
         backgroundColor: '#000000',
         padding: { x: 20, y: 10 },
-        align: 'center'
+        align: 'center',
       }
     );
     infoText.setOrigin(0.5, 0.5);
@@ -322,7 +346,7 @@ export class MainScene extends Phaser.Scene {
         ease: 'Power2',
         onComplete: () => {
           infoText.destroy();
-        }
+        },
       });
     });
   }
@@ -331,26 +355,40 @@ export class MainScene extends Phaser.Scene {
    * Handle location signal
    * @param data Location data
    */
-  private handleLocationSignal(data: { locationId: string; coordinates: { x: number; y: number } }): void {
-    console.log(`Location signal detected: ${data.locationId} at coordinates (${data.coordinates.x}, ${data.coordinates.y})`);
+  private handleLocationSignal(data: LocationSignalData): void {
+    console.log(
+      `Location signal detected: ${data.locationId} at coordinates (${data.coordinates.x}, ${data.coordinates.y})`
+    );
 
     // Create a marker on the map
-    const marker = this.add.text(400, 400,
-      `Location Marked on Map:\n` +
-      `Coordinates: (${data.coordinates.x}, ${data.coordinates.y})`,
+    const marker = this.add.text(
+      400,
+      400,
+      `Location Marked on Map:\n` + `Coordinates: (${data.coordinates.x}, ${data.coordinates.y})`,
       {
         fontSize: '20px',
         color: '#ffff00',
         backgroundColor: '#333333',
         padding: { x: 15, y: 8 },
-        align: 'center'
+        align: 'center',
       }
     );
     marker.setOrigin(0.5, 0.5);
     marker.setDepth(101);
 
+    // Define interface for SaveManager
+    interface SaveManagerInterface {
+      setFlag: (key: string, value: boolean) => void;
+      setData: (key: string, value: unknown) => void;
+    }
+
+    // Define interface for window with SaveManager property
+    interface WindowWithSaveManager {
+      SaveManager: SaveManagerInterface;
+    }
+
     // Save the location to the game state
-    const SaveManager = (window as any).SaveManager;
+    const SaveManager = (window as unknown as WindowWithSaveManager).SaveManager;
     if (SaveManager) {
       SaveManager.setFlag(`discovered_${data.locationId}`, true);
       SaveManager.setData(`location_${data.locationId}`, data.coordinates);
@@ -365,7 +403,7 @@ export class MainScene extends Phaser.Scene {
         ease: 'Power2',
         onComplete: () => {
           marker.destroy();
-        }
+        },
       });
     });
   }
@@ -374,21 +412,17 @@ export class MainScene extends Phaser.Scene {
    * Handle message signal
    * @param data Message data
    */
-  private handleMessageSignal(data: { message: string }): void {
+  private handleMessageSignal(data: MessageSignalData): void {
     console.log(`Message signal detected: ${data.message}`);
 
     // Create a text object to display the message
-    const messageText = this.add.text(400, 400,
-      `Incoming Message:\n` +
-      `"${data.message}"`,
-      {
-        fontSize: '20px',
-        color: '#00ff00',
-        backgroundColor: '#333333',
-        padding: { x: 15, y: 8 },
-        align: 'center'
-      }
-    );
+    const messageText = this.add.text(400, 400, `Incoming Message:\n` + `"${data.message}"`, {
+      fontSize: '20px',
+      color: '#00ff00',
+      backgroundColor: '#333333',
+      padding: { x: 15, y: 8 },
+      align: 'center',
+    });
     messageText.setOrigin(0.5, 0.5);
     messageText.setDepth(101);
 
@@ -407,7 +441,7 @@ export class MainScene extends Phaser.Scene {
           typewriterEvent.destroy();
         }
       },
-      repeat: originalText.length - 1
+      repeat: originalText.length - 1,
     });
 
     // Fade out after a few seconds
@@ -419,7 +453,7 @@ export class MainScene extends Phaser.Scene {
         ease: 'Power2',
         onComplete: () => {
           messageText.destroy();
-        }
+        },
       });
     });
   }
@@ -433,22 +467,17 @@ export class MainScene extends Phaser.Scene {
 
     // Load narrative events
     fetch('/assets/narrative/events.json')
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         this.narrativeEngine.loadEvents(JSON.stringify(data));
         console.log('Narrative events loaded');
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Failed to load narrative events:', error);
       });
 
     // Create narrative renderer
-    this.narrativeRenderer = new NarrativeRenderer(
-      this,
-      400,
-      300,
-      this.narrativeEngine
-    );
+    this.narrativeRenderer = new NarrativeRenderer(this, 400, 300, this.narrativeEngine);
     this.add.existing(this.narrativeRenderer);
     this.narrativeRenderer.setVisible(false);
     this.narrativeRenderer.setDepth(200);

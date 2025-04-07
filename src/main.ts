@@ -21,7 +21,7 @@ class LoadingScene extends Phaser.Scene {
     const loadingText = this.add.text(width / 2, height / 2 - 50, 'Loading...', {
       fontFamily: 'Arial',
       fontSize: '20px',
-      color: '#ffffff'
+      color: '#ffffff',
     });
     loadingText.setOrigin(0.5, 0.5);
 
@@ -29,7 +29,7 @@ class LoadingScene extends Phaser.Scene {
     const assetText = this.add.text(width / 2, height / 2 + 50, '', {
       fontFamily: 'Arial',
       fontSize: '18px',
-      color: '#ffffff'
+      color: '#ffffff',
     });
     assetText.setOrigin(0.5, 0.5);
 
@@ -49,9 +49,10 @@ class LoadingScene extends Phaser.Scene {
     });
 
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
-      console.error(`Error loading asset: ${file.key} from ${file.url}`);
+      // Ensure url is a string
+      const url = typeof file.url === 'string' ? file.url : String(file.url);
+      console.error(`Error loading asset: ${file.key} from ${url}`);
       // Try alternative path
-      const url = String(file.url); // Ensure url is a string
       if (url.startsWith('/')) {
         const newUrl = url.substring(1); // Remove leading slash
         console.log(`Retrying with alternative path: ${newUrl}`);
@@ -95,21 +96,21 @@ const config: Phaser.Types.Core.GameConfig = {
     min: 10,
     target: 60,
     forceSetTimeOut: true,
-    deltaHistory: 10
+    deltaHistory: 10,
   },
   render: {
     pixelArt: true,
     antialias: false,
-    antialiasGL: false
+    antialiasGL: false,
   },
   // Add physics configuration
   physics: {
     default: 'arcade',
     arcade: {
       gravity: { y: 0 },
-      debug: false
-    }
-  }
+      debug: false,
+    },
+  },
 };
 
 // Add global error handler
@@ -138,8 +139,13 @@ window.addEventListener('load', () => {
     const game = new Phaser.Game(config);
     console.log('Phaser game initialized');
 
+    // Define interface for window with game property
+    interface WindowWithGame {
+      game: Phaser.Game;
+    }
+
     // Add the game instance to window for debugging
-    (window as any).game = game;
+    (window as unknown as WindowWithGame).game = game;
   } catch (error) {
     console.error('Error initializing game:', error);
   }

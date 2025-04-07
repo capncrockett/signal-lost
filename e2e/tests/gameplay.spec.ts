@@ -2,10 +2,9 @@ import { test, expect } from '@playwright/test';
 import {
   takeScreenshot,
   waitForGameLoad,
-  clickGamePosition,
   dragInGame,
   captureConsoleLogs,
-  testRadioTuner
+  testRadioTuner,
 } from '../helpers/gameTestHelpers';
 
 test('Complete gameplay flow from tuning radio to field exploration', async ({ page }) => {
@@ -39,12 +38,12 @@ test('Complete gameplay flow from tuning radio to field exploration', async ({ p
   const radioTest = await testRadioTuner(page, {
     takeScreenshots: true,
     waitTimeout: 2000,
-    retryCount: 3
+    retryCount: 3,
   });
   console.log('Radio tuner test results:', {
     clickSuccess: radioTest.clickSuccess,
     signalEventsCount: radioTest.signalEvents.length,
-    audioInitialized: radioTest.audioInitialized
+    audioInitialized: radioTest.audioInitialized,
   });
 
   // Simulate dragging the radio tuner knob to specific frequencies
@@ -54,39 +53,45 @@ test('Complete gameplay flow from tuning radio to field exploration', async ({ p
   await dragInGame(page, 400, 300, 350, 300, {
     steps: 20,
     takeScreenshot: true,
-    screenshotName: 'frequency-91.5'
+    screenshotName: 'frequency-91.5',
   });
   await page.waitForTimeout(2000);
 
   // Capture console logs to check for signal events
   const logs91_5 = await captureConsoleLogs(page, 1000);
-  const signalEvents91_5 = logs91_5.logs.filter(log => log.includes('Signal') && log.includes('91.5'));
+  const signalEvents91_5 = logs91_5.logs.filter(
+    (log) => log.includes('Signal') && log.includes('91.5')
+  );
   console.log(`Signal events at 91.5 MHz: ${signalEvents91_5.length}`);
 
   // Test frequency 96.3 MHz
   await dragInGame(page, 350, 300, 400, 300, {
     steps: 20,
     takeScreenshot: true,
-    screenshotName: 'frequency-96.3'
+    screenshotName: 'frequency-96.3',
   });
   await page.waitForTimeout(2000);
 
   // Capture console logs to check for signal events
   const logs96_3 = await captureConsoleLogs(page, 1000);
-  const signalEvents96_3 = logs96_3.logs.filter(log => log.includes('Signal') && log.includes('96.3'));
+  const signalEvents96_3 = logs96_3.logs.filter(
+    (log) => log.includes('Signal') && log.includes('96.3')
+  );
   console.log(`Signal events at 96.3 MHz: ${signalEvents96_3.length}`);
 
   // Test frequency 103.7 MHz
   await dragInGame(page, 400, 300, 450, 300, {
     steps: 20,
     takeScreenshot: true,
-    screenshotName: 'frequency-103.7'
+    screenshotName: 'frequency-103.7',
   });
   await page.waitForTimeout(2000);
 
   // Capture console logs to check for signal events
   const logs103_7 = await captureConsoleLogs(page, 1000);
-  const signalEvents103_7 = logs103_7.logs.filter(log => log.includes('Signal') && log.includes('103.7'));
+  const signalEvents103_7 = logs103_7.logs.filter(
+    (log) => log.includes('Signal') && log.includes('103.7')
+  );
   console.log(`Signal events at 103.7 MHz: ${signalEvents103_7.length}`);
 
   // Take a screenshot after all tuning tests
@@ -97,7 +102,7 @@ test('Complete gameplay flow from tuning radio to field exploration', async ({ p
 
   // Simulate a button position in the top part of the container
   const buttonX = gameContainerBounds.x + gameContainerBounds.width * 0.5;
-  const buttonY = gameContainerBounds.y + 100;  // Approximately where a button might be
+  const buttonY = gameContainerBounds.y + 100; // Approximately where a button might be
 
   console.log(`Simulated button position: ${buttonX}, ${buttonY}`);
 
@@ -106,7 +111,7 @@ test('Complete gameplay flow from tuning radio to field exploration', async ({ p
     x: buttonX - 50,
     y: buttonY - 20,
     width: 100,
-    height: 40
+    height: 40,
   };
 
   // Click in the center of the button using mouse actions for more reliability

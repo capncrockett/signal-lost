@@ -200,9 +200,14 @@ export class SaveManager {
       this.flagCache = {};
 
       // Copy only boolean values
-      for (const [key, value] of Object.entries(importedState)) {
-        if (typeof value === 'boolean') {
-          this.flagCache[key] = value;
+      // Ensure importedState is an object before using Object.entries
+      if (importedState && typeof importedState === 'object') {
+        // Cast to Record<string, unknown> to ensure type safety
+        const safeImportedState: Record<string, unknown> = importedState as Record<string, unknown>;
+        for (const [key, value] of Object.entries(safeImportedState)) {
+          if (typeof value === 'boolean') {
+            this.flagCache[key] = value;
+          }
         }
       }
 

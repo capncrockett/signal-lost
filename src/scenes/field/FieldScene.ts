@@ -77,10 +77,11 @@ export class FieldScene extends Phaser.Scene {
     });
 
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
-      console.error(`FieldScene error loading asset: ${file.key} from ${file.url}`);
+      // Ensure url is a string
+      const url = typeof file.url === 'string' ? file.url : String(file.url);
+      console.error(`FieldScene error loading asset: ${file.key} from ${url}`);
       // If this is not an alternative asset, try loading with the alternative path
       if (!file.key.endsWith('_alt')) {
-        const url = String(file.url);
         if (url.startsWith('/')) {
           const newUrl = url.substring(1);
           console.log(`FieldScene retrying with alternative path: ${newUrl}`);
@@ -113,7 +114,11 @@ export class FieldScene extends Phaser.Scene {
       this.createInteractables();
 
       // Set up resize handler
-      this.scale.on('resize', this.handleResize, this);
+      this.scale.on(
+        'resize',
+        (width: number, height: number) => this.handleResize(width, height),
+        this
+      );
 
       // Initial resize to set correct positions
       this.handleResize(this.scale.width, this.scale.height);
@@ -612,8 +617,18 @@ export class FieldScene extends Phaser.Scene {
     // Add visual indicators for discovered locations
     for (const locationId of discoveredLocations) {
       const locationData = SaveManager.getData(`location_${locationId}`);
-      if (locationData && locationData.x !== undefined && locationData.y !== undefined) {
-        this.addLocationMarker(locationId, locationData.x, locationData.y);
+      if (
+        locationData &&
+        typeof locationData === 'object' &&
+        'x' in locationData &&
+        'y' in locationData &&
+        typeof locationData.x === 'number' &&
+        typeof locationData.y === 'number'
+      ) {
+        // Convert to numbers to ensure type safety
+        const x = Number(locationData.x);
+        const y = Number(locationData.y);
+        this.addLocationMarker(locationId, x, y);
       }
     }
   }
@@ -642,7 +657,7 @@ export class FieldScene extends Phaser.Scene {
       duration: 1000,
       yoyo: true,
       repeat: -1,
-      ease: 'Sine.easeInOut'
+      ease: 'Sine.easeInOut',
     });
 
     // Add a label
@@ -650,7 +665,7 @@ export class FieldScene extends Phaser.Scene {
       fontSize: '14px',
       color: '#ffffff',
       backgroundColor: '#000000',
-      padding: { x: 5, y: 3 }
+      padding: { x: 5, y: 3 },
     });
     label.setOrigin(0.5, 0.5);
     label.setDepth(11);
@@ -677,12 +692,15 @@ export class FieldScene extends Phaser.Scene {
       const zoom = Math.min(zoomX, zoomY) * 0.9; // 90% to leave some margin
 
       // Don't zoom out too far or in too close
-      const clampedZoom = Phaser.Math.Clamp(zoom, 0.5, 2);
+      const clampedZoom = Phaser.Math.Clamp(Number(zoom), 0.5, 2);
       this.cameras.main.setZoom(clampedZoom);
 
       // Make sure the camera is still following the player
       if (this.player) {
-        this.cameras.main.startFollow(this.player.getSprite());
+        const playerSprite = this.player.getSprite();
+        if (playerSprite && playerSprite instanceof Phaser.GameObjects.GameObject) {
+          this.cameras.main.startFollow(playerSprite);
+        }
       }
     }
 

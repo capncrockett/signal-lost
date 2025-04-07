@@ -88,7 +88,7 @@ test('Console log listener captures all game events', async ({ page }) => {
 
   // Simulate a button position
   const buttonX = containerBox.x + containerBox.width * 0.5;
-  const buttonY = containerBox.y + 100;  // Approximately where a button might be
+  const buttonY = containerBox.y + 100; // Approximately where a button might be
 
   // Click at the simulated button position
   const centerX = buttonX;

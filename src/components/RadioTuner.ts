@@ -4,6 +4,25 @@ import * as Tone from 'tone';
 import { createNoise } from '../audio/NoiseGenerator';
 import { NoiseType } from '../audio/NoiseType';
 
+// Define types for signal data
+interface RadioLocationSignalData {
+  locationId: string;
+  coordinates: { x: number; y: number };
+}
+
+interface RadioMessageSignalData {
+  message: string;
+}
+
+type RadioSignalData = RadioLocationSignalData | RadioMessageSignalData;
+
+interface RadioSignalInfo {
+  id: string;
+  frequency: number;
+  type: 'location' | 'message';
+  data: RadioSignalData;
+}
+
 interface RadioTunerConfig {
   width?: number;
   height?: number;
@@ -165,7 +184,12 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
   private setupInteraction(): void {
     // Make knob interactive
-    this.knob.setInteractive(new Phaser.Geom.Circle(0, 0, 15), Phaser.Geom.Circle.Contains);
+    this.knob.setInteractive(
+      new Phaser.Geom.Circle(0, 0, 15),
+      (hitArea: Phaser.Geom.Circle, x: number, y: number) => {
+        return Phaser.Geom.Circle.Contains(hitArea, x, y);
+      }
+    );
 
     // Setup drag events
     this.scene.input.setDraggable(this.knob);
@@ -226,7 +250,9 @@ export class RadioTuner extends Phaser.GameObjects.Container {
     // Click on slider to jump
     this.slider.setInteractive(
       new Phaser.Geom.Rectangle(-this.config.width / 2 + 20, -5, this.config.width - 40, 10),
-      Phaser.Geom.Rectangle.Contains
+      (hitArea: Phaser.Geom.Rectangle, x: number, y: number) => {
+        return Phaser.Geom.Rectangle.Contains(hitArea, x, y);
+      }
     );
 
     this.slider.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
@@ -487,13 +513,13 @@ export class RadioTuner extends Phaser.GameObjects.Container {
         signalStrength: signalStrength,
         signalId: lockedSignal?.id || 'unknown',
         signalType: lockedSignal?.type || 'unknown',
-        signalData: lockedSignal?.data || null
+        signalData: lockedSignal?.data || null,
       });
 
       // Log the signal lock for testing purposes
       console.log(
         `Signal locked at frequency: ${this.currentFrequency.toFixed(1)} MHz with strength ${signalStrength.toFixed(2)}, ` +
-        `signal ID: ${lockedSignal?.id || 'unknown'}, type: ${lockedSignal?.type || 'unknown'}`
+          `signal ID: ${lockedSignal?.id || 'unknown'}, type: ${lockedSignal?.type || 'unknown'}`
       );
     }
   }
@@ -502,12 +528,27 @@ export class RadioTuner extends Phaser.GameObjects.Container {
    * Find which predefined signal was locked onto
    * @returns The signal data or undefined if no match
    */
-  private findLockedSignal(): { id: string; frequency: number; type: string; data: any } | undefined {
+  private findLockedSignal(): RadioSignalInfo | undefined {
     // Define signal data with IDs, types, and additional data
     const signals = [
-      { id: 'signal1', frequency: 91.5, type: 'location', data: { locationId: 'tower1', coordinates: { x: 10, y: 8 } } },
-      { id: 'signal2', frequency: 96.3, type: 'message', data: { message: 'Help us... coordinates... 15, 12...' } },
-      { id: 'signal3', frequency: 103.7, type: 'location', data: { locationId: 'ruins1', coordinates: { x: 15, y: 12 } } },
+      {
+        id: 'signal1',
+        frequency: 91.5,
+        type: 'location',
+        data: { locationId: 'tower1', coordinates: { x: 10, y: 8 } },
+      },
+      {
+        id: 'signal2',
+        frequency: 96.3,
+        type: 'message',
+        data: { message: 'Help us... coordinates... 15, 12...' },
+      },
+      {
+        id: 'signal3',
+        frequency: 103.7,
+        type: 'location',
+        data: { locationId: 'ruins1', coordinates: { x: 15, y: 12 } },
+      },
     ];
 
     // Find the closest signal

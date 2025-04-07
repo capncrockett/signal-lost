@@ -4,7 +4,7 @@ import {
   takeElementScreenshot,
   waitForGameLoad,
   clickGamePosition,
-  captureConsoleLogs
+  captureConsoleLogs,
 } from '../helpers/gameTestHelpers';
 
 // Increase the test timeout
@@ -27,13 +27,11 @@ test.describe('Game Rendering', () => {
     // Click on the game to initialize audio (important for full rendering)
     await clickGamePosition(page, 400, 300, {
       fallbackToCenter: true,
-      takeScreenshot: true
+      takeScreenshot: true,
     });
     await page.waitForTimeout(2000);
 
     // Find the Phaser canvas (any canvas element)
-    // First, check if there's a visible canvas
-    const visibleCanvas = page.locator('canvas:visible');
     const canvasCount = await page.locator('canvas').count();
     console.log(`Total canvas elements: ${canvasCount}`);
 
@@ -101,7 +99,7 @@ async function testResolution(page, resolution) {
   await clickGamePosition(page, resolution.width / 2, resolution.height / 2, {
     fallbackToCenter: true,
     takeScreenshot: true,
-    screenshotName: `${resolution.name}-click`
+    screenshotName: `${resolution.name}-click`,
   });
   await page.waitForTimeout(2000);
 
@@ -110,7 +108,7 @@ async function testResolution(page, resolution) {
   console.log(`Console logs at ${resolution.name} resolution:`, {
     errors: logs.errors.length,
     warnings: logs.warnings.length,
-    networkErrors: logs.networkErrors.length
+    networkErrors: logs.networkErrors.length,
   });
 
   // Find the game container

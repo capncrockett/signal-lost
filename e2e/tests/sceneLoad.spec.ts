@@ -45,9 +45,9 @@ test('Game loads and scenes can be navigated', async ({ page }) => {
   // Simulate a button position in the top part of the container
   const buttonBounds = {
     x: containerBounds.x + containerBounds.width * 0.5,
-    y: containerBounds.y + 100,  // Approximately where a button might be
+    y: containerBounds.y + 100, // Approximately where a button might be
     width: 100,
-    height: 40
+    height: 40,
   };
 
   // Click in the center of the button using mouse actions for more reliability
