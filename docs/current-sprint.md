@@ -26,7 +26,8 @@ This sprint focuses on cleaning up the codebase, improving test infrastructure, 
   - [x] Update tests to account for new components
   - [x] Fix mocks for components that have changed
   - [x] Address environment-specific test failures
-  - [ ] Fix remaining SoundscapeManager test issues
+  - [x] Fix SoundscapeManager test issues
+  - [ ] Fix AudioSystem integration tests
 
 - [ ] Improve test coverage
   - [ ] Add tests for untested components

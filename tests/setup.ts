@@ -95,11 +95,19 @@ global.Phaser = {
 class MockAudioContext {
   destination = {};
   sampleRate = 44100;
+  currentTime = 0;
+  state = 'running';
 
   createGain() {
     return {
       connect: jest.fn(),
-      gain: { value: 0 },
+      disconnect: jest.fn(),
+      gain: {
+        value: 0,
+        setTargetAtTime: jest.fn(),
+        linearRampToValueAtTime: jest.fn(),
+        exponentialRampToValueAtTime: jest.fn(),
+      },
     };
   }
 
@@ -123,10 +131,62 @@ class MockAudioContext {
   createBiquadFilter() {
     return {
       connect: jest.fn(),
-      frequency: { value: 0 },
+      disconnect: jest.fn(),
+      frequency: {
+        value: 0,
+        setTargetAtTime: jest.fn(),
+      },
       Q: { value: 0 },
       type: '',
     };
+  }
+
+  createOscillator() {
+    return {
+      frequency: {
+        value: 0,
+        setTargetAtTime: jest.fn(),
+      },
+      type: 'sine',
+      connect: jest.fn(),
+      disconnect: jest.fn(),
+      start: jest.fn(),
+      stop: jest.fn(),
+    };
+  }
+
+  createStereoPanner() {
+    return {
+      pan: {
+        value: 0,
+        setTargetAtTime: jest.fn(),
+      },
+      connect: jest.fn(),
+      disconnect: jest.fn(),
+    };
+  }
+
+  createAnalyser() {
+    return {
+      fftSize: 2048,
+      frequencyBinCount: 1024,
+      getByteFrequencyData: jest.fn(),
+      getByteTimeDomainData: jest.fn(),
+      connect: jest.fn(),
+      disconnect: jest.fn(),
+    };
+  }
+
+  resume() {
+    return Promise.resolve();
+  }
+
+  suspend() {
+    return Promise.resolve();
+  }
+
+  close() {
+    return Promise.resolve();
   }
 }
 
