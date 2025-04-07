@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { takeScreenshot } from '../helpers/gameTestHelpers';
 
 test('Complete gameplay flow from tuning radio to field exploration', async ({ page }) => {
   // Navigate to the game
@@ -8,7 +9,7 @@ test('Complete gameplay flow from tuning radio to field exploration', async ({ p
   await page.waitForTimeout(2000);
 
   // Take a screenshot of the initial state
-  await page.screenshot({ path: 'e2e-initial-state.png', fullPage: true });
+  await takeScreenshot(page, 'e2e-initial-state', true);
 
   // Find the Phaser canvas (second canvas element)
   const canvas = await page.locator('canvas').nth(1);
@@ -50,7 +51,7 @@ test('Complete gameplay flow from tuning radio to field exploration', async ({ p
   await page.waitForTimeout(2000);
 
   // Take a screenshot after tuning
-  await page.screenshot({ path: 'e2e-tuned-radio.png', fullPage: true });
+  await takeScreenshot(page, 'e2e-tuned-radio', true);
 
   // Find and click the "Go to Field" button using its test ID
   console.log('Looking for the Go to Field button by test ID');
@@ -76,7 +77,7 @@ test('Complete gameplay flow from tuning radio to field exploration', async ({ p
   await page.waitForTimeout(2000);
 
   // Take a screenshot of the field scene
-  await page.screenshot({ path: 'e2e-field-scene.png', fullPage: true });
+  await takeScreenshot(page, 'e2e-field-scene', true);
 
   // Test movement in the field
   // Press arrow keys to move
@@ -86,12 +87,12 @@ test('Complete gameplay flow from tuning radio to field exploration', async ({ p
   await page.waitForTimeout(500);
 
   // Take a screenshot after movement
-  await page.screenshot({ path: 'e2e-after-movement.png', fullPage: true });
+  await takeScreenshot(page, 'e2e-after-movement', true);
 
   // Test interaction with an object
   await page.keyboard.press('Space');
   await page.waitForTimeout(1000);
 
   // Take a final screenshot
-  await page.screenshot({ path: 'e2e-after-interaction.png', fullPage: true });
+  await takeScreenshot(page, 'e2e-after-interaction', true);
 });

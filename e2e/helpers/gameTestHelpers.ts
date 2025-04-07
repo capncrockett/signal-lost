@@ -1,4 +1,6 @@
 import { ConsoleMessage, Page, expect } from '@playwright/test';
+import * as path from 'path';
+import * as fs from 'fs';
 
 // Define our own MouseClickOptions interface
 interface MouseClickOptions {
@@ -13,9 +15,44 @@ interface MouseClickOptions {
   trial?: boolean;
 }
 
+// Ensure the screenshots directory exists
+const screenshotsDir = path.join(process.cwd(), 'e2e-screenshots');
+if (!fs.existsSync(screenshotsDir)) {
+  fs.mkdirSync(screenshotsDir, { recursive: true });
+}
+
 /**
  * Helper functions for testing games programmatically
  */
+
+/**
+ * Take a screenshot and save it to the e2e-screenshots directory
+ * @param page Playwright page
+ * @param name Name of the screenshot (without extension)
+ * @param fullPage Whether to take a screenshot of the full page
+ * @returns Path to the saved screenshot
+ */
+export async function takeScreenshot(
+  page: Page,
+  name: string,
+  fullPage: boolean = false
+): Promise<string> {
+  const screenshotPath = path.join(screenshotsDir, `${name}.png`);
+  await page.screenshot({ path: screenshotPath, fullPage });
+  return screenshotPath;
+}
+
+/**
+ * Take a screenshot of a specific element
+ * @param element Playwright locator for the element
+ * @param name Name of the screenshot (without extension)
+ * @returns Path to the saved screenshot
+ */
+export async function takeElementScreenshot(element: any, name: string): Promise<string> {
+  const screenshotPath = path.join(screenshotsDir, `${name}.png`);
+  await element.screenshot({ path: screenshotPath });
+  return screenshotPath;
+}
 
 /**
  * Wait for the game to load and verify basic elements

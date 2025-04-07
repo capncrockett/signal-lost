@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { takeScreenshot } from '../helpers/gameTestHelpers';
 
 test.describe('Responsive behavior', () => {
   test('Game scales correctly on desktop', async ({ page }) => {
@@ -40,7 +41,7 @@ test.describe('Responsive behavior', () => {
     expect(Math.abs(initialRatio - newRatio)).toBeLessThan(0.1);
 
     // Take a screenshot for verification
-    await page.screenshot({ path: 'e2e-desktop-resize.png' });
+    await takeScreenshot(page, 'e2e-desktop-resize');
   });
 
   test('Game scales correctly on mobile', async ({ page }) => {
@@ -70,7 +71,7 @@ test.describe('Responsive behavior', () => {
     expect(Math.abs(ratio - 4 / 3)).toBeLessThan(0.1);
 
     // Take a screenshot for verification
-    await page.screenshot({ path: 'e2e-mobile-size.png' });
+    await takeScreenshot(page, 'e2e-mobile-size');
 
     // Test landscape orientation
     await page.setViewportSize({ width: 667, height: 375 }); // iPhone SE landscape
@@ -87,7 +88,7 @@ test.describe('Responsive behavior', () => {
     expect(landscapeBoundingBox?.height).toBe(600);
 
     // Take a screenshot for verification
-    await page.screenshot({ path: 'e2e-mobile-landscape.png' });
+    await takeScreenshot(page, 'e2e-mobile-landscape');
   });
 
   test('UI elements remain accessible at different screen sizes', async ({ page }) => {
@@ -118,6 +119,6 @@ test.describe('Responsive behavior', () => {
     await expect(fieldButton).toBeVisible();
 
     // Take a screenshot for verification
-    await page.screenshot({ path: 'e2e-small-viewport-ui.png' });
+    await takeScreenshot(page, 'e2e-small-viewport-ui');
   });
 });

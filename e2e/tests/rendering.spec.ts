@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { takeScreenshot, takeElementScreenshot } from '../helpers/gameTestHelpers';
 
 // Increase the test timeout
 test.setTimeout(120000);
@@ -28,11 +29,11 @@ test.describe('Game Rendering', () => {
     console.log(`Canvas size: ${initialBoundingBox?.width}x${initialBoundingBox?.height}`);
 
     // Take a screenshot of just the canvas
-    await canvas.screenshot({ path: 'e2e-screenshots/canvas-only.png' });
+    await takeElementScreenshot(canvas, 'canvas-only');
 
     // Take a screenshot of the game container
     const gameContainer = page.locator('#game');
-    await gameContainer.screenshot({ path: 'e2e-screenshots/game-container.png' });
+    await takeElementScreenshot(gameContainer, 'game-container');
   });
 
   // Test full HD resolution
@@ -90,7 +91,7 @@ async function testResolution(page, resolution) {
     await expect(canvas).toBeVisible({ timeout: 5000 });
 
     // Take a screenshot of the canvas
-    await canvas.screenshot({ path: `e2e-screenshots/${resolution.name}-canvas.png` });
+    await takeElementScreenshot(canvas, `${resolution.name}-canvas`);
 
     // Get canvas size
     const boundingBox = await canvas.boundingBox();
@@ -98,7 +99,7 @@ async function testResolution(page, resolution) {
 
     // Take a screenshot of the game container
     const gameContainer = page.locator('#game');
-    await gameContainer.screenshot({ path: `e2e-screenshots/${resolution.name}-container.png` });
+    await takeElementScreenshot(gameContainer, `${resolution.name}-container`);
 
     // Verify the radio tuner is visible
     const radioTuner = page.locator('[data-testid="radio-tuner"]');
@@ -110,7 +111,7 @@ async function testResolution(page, resolution) {
   } catch (error) {
     console.error(`Error at resolution ${resolution.name}: ${error.message}`);
     // Take a screenshot of the page anyway
-    await page.screenshot({ path: `e2e-screenshots/${resolution.name}-error.png` });
+    await takeScreenshot(page, `${resolution.name}-error`, true);
     throw error; // Re-throw to fail the test
   }
 }
