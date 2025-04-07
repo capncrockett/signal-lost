@@ -19,8 +19,7 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   pixelArt: true,
   scale: {
-    mode: Phaser.Scale.FIT, // FIT ensures the entire game is visible and maintains aspect ratio
-    autoCenter: Phaser.Scale.CENTER_BOTH,
+    mode: Phaser.Scale.NONE, // Use NONE and handle scaling manually for better control
     parent: 'game',
     width: 800,
     height: 600,
