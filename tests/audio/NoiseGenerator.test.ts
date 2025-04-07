@@ -19,6 +19,8 @@ jest.mock('tone', () => {
 // Import after mocking
 import { createNoise } from '../../src/audio/NoiseGenerator';
 import * as Tone from 'tone';
+import { MockToneNoise, NoiseResult } from '../types/audio';
+import { createMockGainNode } from '../mocks/audioMocks';
 
 describe('NoiseGenerator', () => {
   beforeEach(() => {
@@ -26,7 +28,8 @@ describe('NoiseGenerator', () => {
   });
 
   test('should create pink noise by default', () => {
-    const { noise: noiseGen, gain } = createNoise();
+    const result = createNoise() as unknown as NoiseResult;
+    const { noise: noiseGen, gain } = result;
 
     // Check that Tone.Noise was called with 'pink'
     expect(Tone.Noise).toHaveBeenCalledWith('pink');
@@ -42,7 +45,8 @@ describe('NoiseGenerator', () => {
   });
 
   test('should create noise with specified type and volume', () => {
-    const { gain } = createNoise(NoiseType.White, 0.5);
+    const result = createNoise(NoiseType.White, 0.5) as unknown as NoiseResult;
+    const { gain } = result;
 
     // Check that Tone.Noise was called with 'white'
     expect(Tone.Noise).toHaveBeenCalledWith('white');
@@ -53,7 +57,7 @@ describe('NoiseGenerator', () => {
 
   test('should handle errors gracefully', () => {
     // Mock Tone.Noise to throw an error
-    (Tone.Noise as jest.Mock).mockImplementationOnce(() => {
+    (Tone.Noise as unknown as jest.Mock).mockImplementationOnce(() => {
       throw new Error('Test error');
     });
 

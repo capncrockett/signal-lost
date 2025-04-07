@@ -2,6 +2,7 @@ import { AudioManager } from './AudioManager';
 import { createNoise } from './NoiseGenerator';
 import { NoiseType } from './NoiseType';
 import * as Tone from 'tone';
+import * as Phaser from 'phaser';
 
 /**
  * SoundscapeManager
