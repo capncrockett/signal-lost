@@ -183,7 +183,7 @@ describe('SaveLoadMenu', () => {
     SaveLoadMenu.prototype.setVisible = jest.fn();
 
     // Create new instance to trigger loadSaveSlots
-    const menu = new SaveLoadMenu(mockScene as any, 400, 300);
+    new SaveLoadMenu(mockScene as any, 400, 300);
 
     // Restore original setVisible method
     SaveLoadMenu.prototype.setVisible = originalSetVisible;

@@ -244,7 +244,7 @@ describe('PerformanceDisplay', () => {
     };
 
     // Create new display with custom config
-    const customDisplay = new PerformanceDisplay(mockScene as any, 200, 200, customConfig);
+    new PerformanceDisplay(mockScene as any, 200, 200, customConfig);
 
     // Verify custom config was used
     expect(mockScene.add.rectangle).toHaveBeenCalledWith(

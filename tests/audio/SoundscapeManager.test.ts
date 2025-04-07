@@ -107,7 +107,7 @@ describe('SoundscapeManager', () => {
   test('should initialize correctly', () => {
     // Mock the AudioManager's addVolumeChangeListener to avoid the setTargetAtTime issue
     const mockAudioManager = AudioManager.getInstance();
-    (mockAudioManager.addVolumeChangeListener as jest.Mock).mockImplementation((callback) => {
+    (mockAudioManager.addVolumeChangeListener as jest.Mock).mockImplementation((_callback) => {
       // Store the callback but don't call it
     });
 

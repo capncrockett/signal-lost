@@ -230,7 +230,7 @@ class MockElement {
 }
 
 class MockDocument extends MockElement {
-  createElement(tagName: string): MockElement {
+  createElement(_tagName: string): MockElement {
     return new MockElement();
   }
 
