@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 import { AudioManager } from '../audio/AudioManager';
 import * as Tone from 'tone';
 import { createNoise } from '../audio/NoiseGenerator';

@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 
 // Define types for game objects to avoid 'any' warnings
 type PhaserGameObject = Phaser.GameObjects.GameObject;
@@ -49,7 +49,7 @@ export class TestOverlay {
     overlay.style.pointerEvents = 'all';
     overlay.style.userSelect = 'none';
     overlay.style.touchAction = 'none';
-    overlay.style.webkitTapHighlightColor = 'transparent';
+    (overlay.style as any).webkitTapHighlightColor = 'transparent';
 
     // Add a small indicator in development mode to show the test overlay
     if (process.env.NODE_ENV !== 'production') {
@@ -139,13 +139,13 @@ export class TestOverlay {
       bounds = (gameObject as WithBounds).getBounds();
     } else if ('width' in gameObject && 'height' in gameObject) {
       // For objects with width and height properties
-      const obj = gameObject as WithDimensions;
+      const obj = gameObject as unknown as WithDimensions;
       const x = obj.x - obj.width * (obj.originX || 0);
       const y = obj.y - obj.height * (obj.originY || 0);
       bounds = new Phaser.Geom.Rectangle(x, y, obj.width, obj.height);
     } else {
       // Fallback for other objects - create a small clickable area
-      const obj = gameObject as WithPosition;
+      const obj = gameObject as unknown as WithPosition;
       const x = obj.x || 0;
       const y = obj.y || 0;
       bounds = new Phaser.Geom.Rectangle(x - 25, y - 25, 50, 50);

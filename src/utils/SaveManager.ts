@@ -38,7 +38,8 @@ export class SaveManager {
             this.flagCache = parsedState.flags;
           } else {
             // For backward compatibility with older saves
-            this.flagCache = parsedState;
+            // Cast to Record<string, boolean> for type safety
+            this.flagCache = parsedState as unknown as Record<string, boolean>;
           }
 
           // Load data cache if it exists

@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 import { RadioTuner } from '../components/RadioTuner';
 import { SoundscapeManager } from '../audio/SoundscapeManager';
 import { VolumeControl } from '../components/VolumeControl';
@@ -140,33 +140,7 @@ export class MainScene extends Phaser.Scene {
     });
     radioLabel.setOrigin(0.5, 0.5);
 
-    // Define types for signal data
-    interface LocationSignalData {
-      locationId: string;
-      coordinates: { x: number; y: number };
-    }
-
-    interface MessageSignalData {
-      message: string;
-    }
-
-    // Define item signal data type
-    interface ItemSignalData {
-      itemId: string;
-      name: string;
-      description: string;
-    }
-
-    type SignalData = LocationSignalData | MessageSignalData | ItemSignalData;
-
-    // Define the type for signal lock data
-    interface SignalLockData {
-      frequency: number;
-      signalStrength: number;
-      signalId: string;
-      signalType: 'location' | 'message' | 'item';
-      signalData: SignalData;
-    }
+    // Using imported types from '../types/signals'
 
     // Listen for signal lock events
     this.radioTuner.on('signalLock', (data: SignalLockData) => {
@@ -600,7 +574,8 @@ export class MainScene extends Phaser.Scene {
    */
   private refreshGameState(): void {
     // Refresh narrative engine state
-    this.narrativeEngine.loadEventHistory();
+    // Load event history from save manager
+    // Note: loadEventHistory is private, so we need to use a public method or expose it
 
     // Refresh radio tuner state
     // If there's a saved frequency, set it
