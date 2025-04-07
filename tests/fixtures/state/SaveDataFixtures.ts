@@ -1,4 +1,4 @@
-import { SaveDataFixture, FixtureCollection } from '../types';
+import { FixtureCollection } from '../types';
 
 /**
  * Save data fixtures

@@ -1,4 +1,4 @@
-import { FieldSceneFixture, FixtureCollection } from '../types';
+import { FixtureCollection } from '../types';
 
 /**
  * Field scene fixtures

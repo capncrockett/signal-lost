@@ -1,5 +1,4 @@
 import { PerformanceTests, PerformanceTestResult } from './PerformanceTests';
-import { BenchmarkResult } from '../../src/utils/PerformanceBenchmark';
 import * as fs from 'fs';
 import * as path from 'path';
 

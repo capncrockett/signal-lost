@@ -475,11 +475,12 @@ export class InventoryUI extends Phaser.GameObjects.Container {
    */
   destroy(fromScene?: boolean): void {
     // Remove event listeners
-    this.inventory.off('itemAdded', this.refreshItems, this);
-    this.inventory.off('itemRemoved', this.refreshItems, this);
-    this.inventory.off('itemUpdated', this.refreshItems, this);
-    this.inventory.off('inventoryLoaded', this.refreshItems, this);
-    this.inventory.off('inventoryCleared', this.refreshItems, this);
+    const refreshItems = (): void => this.refreshItems();
+    this.inventory.off('itemAdded', refreshItems, this);
+    this.inventory.off('itemRemoved', refreshItems, this);
+    this.inventory.off('itemUpdated', refreshItems, this);
+    this.inventory.off('inventoryLoaded', refreshItems, this);
+    this.inventory.off('inventoryCleared', refreshItems, this);
 
     super.destroy(fromScene);
   }

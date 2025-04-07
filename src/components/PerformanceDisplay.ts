@@ -69,7 +69,7 @@ export class PerformanceDisplay extends Phaser.GameObjects.Container {
     // Set update interval
     this.scene.time.addEvent({
       delay: this.config.updateInterval,
-      callback: this.updateDisplay,
+      callback: () => this.updateDisplay(),
       callbackScope: this,
       loop: true,
     });

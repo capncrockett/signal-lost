@@ -1,4 +1,4 @@
-import { GameStateFixture, FixtureCollection } from '../types';
+import { FixtureCollection } from '../types';
 
 /**
  * Game state fixtures

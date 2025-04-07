@@ -558,7 +558,7 @@ export class FieldScene extends Phaser.Scene {
             // TODO: Implement map overlay
             break;
 
-          case 'read_note':
+          case 'read_note': {
             // Show note content
             const content = effects.content as string | undefined;
             if (content) {
@@ -576,6 +576,7 @@ export class FieldScene extends Phaser.Scene {
               this.narrativeEngine.triggerEvent(`note_${Date.now()}`);
             }
             break;
+          }
 
           default:
             console.log(`Unknown action: ${action}`);

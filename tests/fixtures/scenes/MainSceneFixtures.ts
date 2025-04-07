@@ -1,4 +1,4 @@
-import { MainSceneFixture, FixtureCollection } from '../types';
+import { FixtureCollection } from '../types';
 
 /**
  * Main scene fixtures

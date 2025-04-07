@@ -67,8 +67,8 @@ test('Save and load game functionality', async ({ page }) => {
     console.log('Save Game button found');
 
     // Check for other buttons
-    const loadGameButton = page.locator('text=Load Game').first();
-    const deleteButton = page.locator('text=Delete Save').first();
+    // const loadGameButton = page.locator('text=Load Game').first();
+    // const deleteButton = page.locator('text=Delete Save').first();
 
     // Click the Save Game button
     console.log('Creating a save...');

@@ -36,7 +36,7 @@
   },
   "overrides": [
     {
-      "files": ["**/*.test.ts", "**/tests/**/*.ts", "**/e2e/**/*.ts", "**/mocks/**/*.ts"],
+      "files": ["**/*.test.ts", "**/*.spec.ts", "**/tests/**/*.ts", "**/e2e/**/*.ts", "**/mocks/**/*.ts", "**/fixtures/**/*.ts", "**/performance/**/*.ts"],
       "rules": {
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-unsafe-assignment": "off",

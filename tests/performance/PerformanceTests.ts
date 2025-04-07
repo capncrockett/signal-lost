@@ -82,7 +82,7 @@ export class PerformanceTests {
    * @param game Phaser game instance
    * @returns Test results
    */
-  public async runRenderTests(game: Phaser.Game): Promise<BenchmarkResult[]> {
+  public runRenderTests(game: Phaser.Game): BenchmarkResult[] {
     const results: BenchmarkResult[] = [];
 
     // Test basic rendering
@@ -115,7 +115,7 @@ export class PerformanceTests {
    * @param game Phaser game instance
    * @returns Test results
    */
-  public async runUpdateTests(game: Phaser.Game): Promise<BenchmarkResult[]> {
+  public runUpdateTests(game: Phaser.Game): BenchmarkResult[] {
     const results: BenchmarkResult[] = [];
 
     // Test basic update
@@ -203,7 +203,7 @@ export class PerformanceTests {
         return new Promise<void>((resolve) => {
           const currentScene = game.scene.scenes[0].scene.key;
           const nextScene = currentScene === 'MainScene' ? 'FieldScene' : 'MainScene';
-          
+
           game.scene.scenes[0].scene.start(nextScene);
           game.scene.scenes[0].scene.once('start', () => {
             resolve();

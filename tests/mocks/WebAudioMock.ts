@@ -88,22 +88,22 @@ export class AudioParam {
     this.value = defaultValue;
   }
 
-  public setValueAtTime(value: number, startTime: number): AudioParam {
+  public setValueAtTime(value: number, _startTime: number): AudioParam {
     this.value = value;
     return this;
   }
 
-  public linearRampToValueAtTime(value: number, endTime: number): AudioParam {
+  public linearRampToValueAtTime(value: number, _endTime: number): AudioParam {
     this.value = value;
     return this;
   }
 
-  public exponentialRampToValueAtTime(value: number, endTime: number): AudioParam {
+  public exponentialRampToValueAtTime(value: number, _endTime: number): AudioParam {
     this.value = value;
     return this;
   }
 
-  public setTargetAtTime(target: number, startTime: number, timeConstant: number): AudioParam {
+  public setTargetAtTime(target: number, _startTime: number, _timeConstant: number): AudioParam {
     this.value = target;
     return this;
   }
@@ -131,11 +131,11 @@ export class OscillatorNode extends AudioNode {
     this.detune = new AudioParam(0);
   }
 
-  public start(when?: number): void {
+  public start(_when?: number): void {
     // No-op in mock
   }
 
-  public stop(when?: number): void {
+  public stop(_when?: number): void {
     // No-op in mock
   }
 }
@@ -204,11 +204,11 @@ export class AudioBufferSourceNode extends AudioNode {
     this.playbackRate = new AudioParam(1);
   }
 
-  public start(when?: number, offset?: number, duration?: number): void {
+  public start(_when?: number, _offset?: number, _duration?: number): void {
     // No-op in mock
   }
 
-  public stop(when?: number): void {
+  public stop(_when?: number): void {
     // No-op in mock
   }
 }

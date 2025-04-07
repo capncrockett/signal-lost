@@ -23,27 +23,27 @@ export interface VisualComparisonOptions {
    * Maximum allowed difference in pixels
    */
   maxDiffPixels?: number;
-  
+
   /**
    * Threshold for the entire image (0-1)
    */
   threshold?: number;
-  
+
   /**
    * Whether to save diff images
    */
   saveDiffImage?: boolean;
-  
+
   /**
    * Whether to update snapshots
    */
   updateSnapshots?: boolean;
-  
+
   /**
    * Mask color for ignoring areas (RGBA)
    */
   maskColor?: { r: number; g: number; b: number; a: number };
-  
+
   /**
    * Areas to mask (ignore) during comparison
    */
@@ -62,14 +62,14 @@ export async function takeElementSnapshot(
 ): Promise<string> {
   // Ensure element is visible
   await expect(element).toBeVisible();
-  
+
   // Take screenshot
   const buffer = await element.screenshot();
-  
+
   // Save screenshot
   const screenshotPath = path.join(snapshotsDir, `${name}.png`);
   fs.writeFileSync(screenshotPath, buffer);
-  
+
   return screenshotPath;
 }
 
@@ -85,7 +85,7 @@ export async function takeGameSnapshot(
 ): Promise<string> {
   // Find the game canvas
   const canvas = page.locator('canvas').first();
-  
+
   // Take screenshot
   return takeElementSnapshot(canvas, name);
 }
@@ -97,16 +97,16 @@ export async function takeGameSnapshot(
  * @param options Comparison options
  * @returns Comparison result
  */
-export async function compareSnapshots(
+export function compareSnapshots(
   actualPath: string,
   expectedName: string,
   options: VisualComparisonOptions = {}
-): Promise<{
+): {
   match: boolean;
   diffPixels: number;
   diffPercentage: number;
   diffPath?: string;
-}> {
+} {
   // Default options
   const {
     maxDiffPixels = 100,
@@ -116,30 +116,30 @@ export async function compareSnapshots(
     maskColor = { r: 255, g: 0, b: 255, a: 255 }, // Magenta
     maskAreas = [],
   } = options;
-  
+
   // Path to expected snapshot
   const expectedPath = path.join(snapshotsDir, `${expectedName}.png`);
-  
+
   // If expected snapshot doesn't exist or we're updating snapshots, use actual as expected
   if (!fs.existsSync(expectedPath) || updateSnapshots) {
     fs.copyFileSync(actualPath, expectedPath);
     return { match: true, diffPixels: 0, diffPercentage: 0 };
   }
-  
+
   // Read images
   const actualImg = PNG.sync.read(fs.readFileSync(actualPath));
   const expectedImg = PNG.sync.read(fs.readFileSync(expectedPath));
-  
+
   // Create diff image
   const { width, height } = actualImg;
   const diffImg = new PNG({ width, height });
-  
+
   // Apply masks if any
   if (maskAreas.length > 0) {
     // Create copies to avoid modifying originals
     const actualCopy = PNG.sync.read(fs.readFileSync(actualPath));
     const expectedCopy = PNG.sync.read(fs.readFileSync(expectedPath));
-    
+
     // Apply mask to both images
     maskAreas.forEach(area => {
       for (let y = area.y; y < area.y + area.height; y++) {
@@ -150,7 +150,7 @@ export async function compareSnapshots(
             actualCopy.data[idx + 1] = maskColor.g;
             actualCopy.data[idx + 2] = maskColor.b;
             actualCopy.data[idx + 3] = maskColor.a;
-            
+
             expectedCopy.data[idx] = maskColor.r;
             expectedCopy.data[idx + 1] = maskColor.g;
             expectedCopy.data[idx + 2] = maskColor.b;
@@ -159,7 +159,7 @@ export async function compareSnapshots(
         }
       }
     });
-    
+
     // Compare masked images
     const diffPixels = pixelmatch(
       actualCopy.data,
@@ -169,18 +169,18 @@ export async function compareSnapshots(
       height,
       { threshold }
     );
-    
+
     // Calculate diff percentage
     const totalPixels = width * height;
     const diffPercentage = (diffPixels / totalPixels) * 100;
-    
+
     // Save diff image if needed
     let diffPath: string | undefined;
     if (saveDiffImage) {
       diffPath = path.join(diffDir, `${expectedName}-diff.png`);
       fs.writeFileSync(diffPath, PNG.sync.write(diffImg));
     }
-    
+
     return {
       match: diffPixels <= maxDiffPixels,
       diffPixels,
@@ -188,7 +188,7 @@ export async function compareSnapshots(
       diffPath,
     };
   }
-  
+
   // Compare images without masking
   const diffPixels = pixelmatch(
     actualImg.data,
@@ -198,18 +198,18 @@ export async function compareSnapshots(
     height,
     { threshold }
   );
-  
+
   // Calculate diff percentage
   const totalPixels = width * height;
   const diffPercentage = (diffPixels / totalPixels) * 100;
-  
+
   // Save diff image if needed
   let diffPath: string | undefined;
   if (saveDiffImage) {
     diffPath = path.join(diffDir, `${expectedName}-diff.png`);
     fs.writeFileSync(diffPath, PNG.sync.write(diffImg));
   }
-  
+
   return {
     match: diffPixels <= maxDiffPixels,
     diffPixels,
@@ -232,10 +232,10 @@ export async function expectComponentToMatchSnapshot(
 ): Promise<void> {
   // Take snapshot
   const actualPath = await takeElementSnapshot(element, `${name}-actual`);
-  
+
   // Compare with reference
   const result = await compareSnapshots(actualPath, name, options);
-  
+
   // Log comparison result
   console.log(`Visual comparison for ${name}:`, {
     match: result.match,
@@ -243,9 +243,9 @@ export async function expectComponentToMatchSnapshot(
     diffPercentage: result.diffPercentage.toFixed(2) + '%',
     diffPath: result.diffPath,
   });
-  
+
   // Assert match
-  expect(result.match, 
+  expect(result.match,
     `Visual comparison failed for ${name}: ${result.diffPixels} different pixels (${result.diffPercentage.toFixed(2)}%)`
   ).toBeTruthy();
 }
@@ -264,7 +264,7 @@ export async function expectGameToMatchSnapshot(
 ): Promise<void> {
   // Find the game canvas
   const canvas = page.locator('canvas').first();
-  
+
   // Compare with reference
   await expectComponentToMatchSnapshot(canvas, name, options);
 }
@@ -280,7 +280,7 @@ export async function waitForAnimationsToComplete(
 ): Promise<void> {
   // Wait for a short time to allow animations to start
   await page.waitForTimeout(100);
-  
+
   // Wait for animations to complete
   await page.waitForFunction(
     () => {
@@ -309,29 +309,29 @@ export async function waitForGameToStabilize(
     checkInterval = 500,
     maxConsecutiveMatches = 3,
   } = options;
-  
+
   // Find the game canvas
   const canvas = page.locator('canvas').first();
-  
+
   // Take initial screenshot
   let lastScreenshot = await canvas.screenshot();
   let consecutiveMatches = 0;
   const startTime = Date.now();
-  
+
   // Check for stability
   while (Date.now() - startTime < timeout) {
     // Wait for a short time
     await page.waitForTimeout(checkInterval);
-    
+
     // Take new screenshot
     const newScreenshot = await canvas.screenshot();
-    
+
     // Compare screenshots
     const img1 = PNG.sync.read(lastScreenshot);
     const img2 = PNG.sync.read(newScreenshot);
     const { width, height } = img1;
     const diff = new PNG({ width, height });
-    
+
     const diffPixels = pixelmatch(
       img1.data,
       img2.data,
@@ -340,11 +340,11 @@ export async function waitForGameToStabilize(
       height,
       { threshold: 0.1 }
     );
-    
+
     // If no difference, increment consecutive matches
     if (diffPixels === 0) {
       consecutiveMatches++;
-      
+
       // If enough consecutive matches, consider stable
       if (consecutiveMatches >= maxConsecutiveMatches) {
         console.log(`Game stabilized after ${Date.now() - startTime}ms`);
@@ -353,12 +353,12 @@ export async function waitForGameToStabilize(
     } else {
       // Reset consecutive matches
       consecutiveMatches = 0;
-      
+
       // Update last screenshot
       lastScreenshot = newScreenshot;
     }
   }
-  
+
   // If we get here, we timed out
   console.log(`Game did not stabilize after ${timeout}ms`);
 }
