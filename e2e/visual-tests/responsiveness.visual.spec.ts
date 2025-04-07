@@ -1,8 +1,5 @@
-import { test, expect } from '@playwright/test';
-import {
-  waitForGameLoad,
-  clickGamePosition,
-} from '../helpers/gameTestHelpers';
+import { test } from '@playwright/test';
+import { waitForGameLoad, clickGamePosition } from '../helpers/gameTestHelpers';
 import {
   expectGameToMatchSnapshot,
   waitForGameToStabilize,
@@ -23,7 +20,7 @@ test.describe('Responsiveness Visual Tests', () => {
     test(`Game renders correctly at ${size.name} resolution`, async ({ page }) => {
       // Set viewport size
       await page.setViewportSize({ width: size.width, height: size.height });
-      
+
       // Navigate to the game
       await page.goto('http://localhost:5173/', { waitUntil: 'networkidle' });
 

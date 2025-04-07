@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { PerformanceTestRunner } from './PerformanceTestRunner';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -12,7 +11,7 @@ test('Run performance benchmarks', async ({ page }) => {
 
   // Wait for the game to load
   await page.waitForSelector('canvas', { state: 'visible', timeout: 10000 });
-  
+
   // Inject performance test code
   await page.addScriptTag({
     path: path.resolve(__dirname, '../../dist/performance-test-bundle.js'),
@@ -136,11 +135,11 @@ test('Measure FPS stability', async ({ page }) => {
     const max = Math.max(...values);
     const sorted = [...values].sort((a, b) => a - b);
     const median = sorted[Math.floor(sorted.length / 2)];
-    
+
     // Calculate standard deviation
     const variance = values.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / values.length;
     const stdDev = Math.sqrt(variance);
-    
+
     return {
       values,
       avg,

@@ -1,5 +1,13 @@
 import { ItemFixture, FixtureCollection } from '../types';
-import { ItemType } from '../../src/inventory/Item';
+
+// Define ItemType enum locally to avoid circular dependencies
+enum ItemType {
+  TOOL = 'tool',
+  COMPONENT = 'component',
+  CONSUMABLE = 'consumable',
+  KEY = 'key',
+  DOCUMENT = 'document',
+}
 
 /**
  * Item fixtures

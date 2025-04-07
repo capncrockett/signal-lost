@@ -1,9 +1,5 @@
 import { test, expect } from '@playwright/test';
-import {
-  waitForGameLoad,
-  clickGamePosition,
-  captureConsoleLogs,
-} from '../helpers/gameTestHelpers';
+import { waitForGameLoad, clickGamePosition } from '../helpers/gameTestHelpers';
 import {
   expectComponentToMatchSnapshot,
   expectGameToMatchSnapshot,

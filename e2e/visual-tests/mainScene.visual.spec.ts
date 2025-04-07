@@ -1,9 +1,5 @@
 import { test, expect } from '@playwright/test';
-import {
-  waitForGameLoad,
-  clickGamePosition,
-  captureConsoleLogs,
-} from '../helpers/gameTestHelpers';
+import { waitForGameLoad, clickGamePosition } from '../helpers/gameTestHelpers';
 import {
   expectComponentToMatchSnapshot,
   expectGameToMatchSnapshot,
@@ -97,7 +93,7 @@ test.describe('Main Scene Visual Tests', () => {
     // Find and click the Save/Load button
     console.log('Opening save/load menu...');
     const saveLoadButton = page.locator('text=Save/Load');
-    
+
     try {
       await expect(saveLoadButton).toBeVisible({ timeout: 5000 });
       await saveLoadButton.click();
@@ -105,7 +101,7 @@ test.describe('Main Scene Visual Tests', () => {
       console.log('Save/Load button not found, trying to click at its position...');
       await clickGamePosition(page, 700, 120);
     }
-    
+
     await page.waitForTimeout(1000);
     await waitForAnimationsToComplete(page);
     await waitForGameToStabilize(page);
@@ -135,7 +131,7 @@ test.describe('Main Scene Visual Tests', () => {
     } else {
       await clickGamePosition(page, 680, 130);
     }
-    
+
     await page.waitForTimeout(1000);
     await waitForAnimationsToComplete(page);
     await waitForGameToStabilize(page);
