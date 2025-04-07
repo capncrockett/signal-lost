@@ -3,17 +3,25 @@
 ## Goals
 This sprint focuses on cleaning up the codebase, improving test infrastructure, and addressing technical debt to ensure a more maintainable and stable codebase moving forward.
 
+## Revised Priorities
+
+1. Fix critical TypeScript errors in core game files
+2. Ensure all tests pass consistently
+3. Clean up unused code and imports
+4. Address remaining TypeScript errors in test files
+5. Refactor duplicated code (if time permits)
+
 ## Code Cleanup
 
-- ✅ Fix TypeScript errors and warnings
+- ⬜ Fix TypeScript errors and warnings
   - ✅ Fix ESLint errors in core components
   - ✅ Add type declarations for external libraries
   - ✅ Create proper interfaces for signal data types
   - ✅ Create proper interfaces for event data types
-  - ✅ Fix type safety issues in core components
-  - ✅ Ensure proper typing for all public interfaces
+  - ⬜ Fix remaining TypeScript errors in core files
+  - ⬜ Fix TypeScript errors in test files
 
-- ⬜ Refactor duplicated code
+- ⬜ Refactor duplicated code (Moved to future sprint)
   - ⬜ Identify and consolidate duplicate logic across components
   - ⬜ Create shared utilities for common operations
   - ⬜ Standardize patterns for similar functionality
