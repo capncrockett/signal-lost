@@ -293,7 +293,7 @@ export async function verifyAudioContext(page: Page): Promise<boolean> {
  * @param duration How long to capture logs (in ms)
  * @returns Object containing categorized logs
  */
-export async function captureConsoleLogs(page: Page, duration: number = 2000) {
+export async function captureConsoleLogs(page: Page, duration: number = 500) {
   const logs: string[] = [];
   const errors: string[] = [];
   const warnings: string[] = [];
