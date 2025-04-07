@@ -13,10 +13,10 @@ This sprint focuses on cleaning up the codebase, improving test infrastructure, 
   - ✅ Fix type safety issues in core components
   - ✅ Ensure proper typing for all public interfaces
 
-- [ ] Refactor duplicated code
-  - [ ] Identify and consolidate duplicate logic across components
-  - [ ] Create shared utilities for common operations
-  - [ ] Standardize patterns for similar functionality
+- ⬜ Refactor duplicated code
+  - ⬜ Identify and consolidate duplicate logic across components
+  - ⬜ Create shared utilities for common operations
+  - ⬜ Standardize patterns for similar functionality
 
 - [ ] Remove unused code
   - [ ] Delete dead code paths
