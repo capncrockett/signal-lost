@@ -1,36 +1,83 @@
 import Phaser from 'phaser';
+import { MainScene } from './scenes/MainScene';
+import { FieldScene } from './scenes/field/FieldScene';
 
-// Simple test scene
-class TestScene extends Phaser.Scene {
+// Debug scene to test asset loading
+class LoadingScene extends Phaser.Scene {
   constructor() {
-    super({ key: 'TestScene' });
+    super({ key: 'LoadingScene' });
   }
 
   preload() {
-    // Load assets
-    this.load.image('radio', 'assets/images/radio.png');
-    this.load.image('background', 'assets/images/menuBackground.png');
+    // Set up loading bar
+    const progressBar = this.add.graphics();
+    const progressBox = this.add.graphics();
+    progressBox.fillStyle(0x222222, 0.8);
+    progressBox.fillRect(240, 270, 320, 50);
+
+    // Loading text
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+    const loadingText = this.add.text(width / 2, height / 2 - 50, 'Loading...', {
+      fontFamily: 'Arial',
+      fontSize: '20px',
+      color: '#ffffff'
+    });
+    loadingText.setOrigin(0.5, 0.5);
+
+    // Asset text
+    const assetText = this.add.text(width / 2, height / 2 + 50, '', {
+      fontFamily: 'Arial',
+      fontSize: '18px',
+      color: '#ffffff'
+    });
+    assetText.setOrigin(0.5, 0.5);
+
+    // Log asset loading
+    this.load.on('progress', (value: number) => {
+      progressBar.clear();
+      progressBar.fillStyle(0xffffff, 1);
+      progressBar.fillRect(250, 280, 300 * value, 30);
+    });
+
+    this.load.on('fileprogress', (file: Phaser.Loader.File) => {
+      assetText.setText(`Loading asset: ${file.key}`);
+    });
+
+    this.load.on('filecomplete', (key: string, type: string) => {
+      console.log(`Asset loaded: ${key} (${type})`);
+    });
+
+    this.load.on('loaderror', (file: Phaser.Loader.File) => {
+      console.error(`Error loading asset: ${file.key} from ${file.url}`);
+      // Try alternative path
+      const url = String(file.url); // Ensure url is a string
+      if (url.startsWith('/')) {
+        const newUrl = url.substring(1); // Remove leading slash
+        console.log(`Retrying with alternative path: ${newUrl}`);
+        this.load.image(`${file.key}_alt`, newUrl);
+      }
+    });
+
+    this.load.on('complete', () => {
+      progressBar.destroy();
+      progressBox.destroy();
+      loadingText.destroy();
+      assetText.destroy();
+      this.scene.start('MainScene');
+    });
+
+    // Load essential assets
+    // Try multiple path formats to handle different environments
+    this.load.image('radio', '/assets/images/radio.png');
+    this.load.image('radio_alt', 'assets/images/radio.png'); // Alternative path
+
+    this.load.image('background', '/assets/images/menuBackground.png');
+    this.load.image('background_alt', 'assets/images/menuBackground.png'); // Alternative path
   }
 
   create() {
-    console.log('TestScene created');
-
-    // Add background
-    const bg = this.add.image(400, 300, 'background');
-    bg.setDisplaySize(800, 600);
-
-    // Add radio
-    const radio = this.add.image(400, 300, 'radio');
-    radio.setScale(0.5);
-
-    // Add text
-    this.add
-      .text(400, 100, 'Signal Lost', {
-        fontFamily: 'Arial',
-        fontSize: '32px',
-        color: '#ffffff',
-      })
-      .setOrigin(0.5);
+    console.log('LoadingScene completed');
   }
 }
 
@@ -41,7 +88,28 @@ const config: Phaser.Types.Core.GameConfig = {
   height: 600,
   backgroundColor: '#000000',
   parent: 'game',
-  scene: [TestScene],
+  scene: [LoadingScene, MainScene, FieldScene],
+  // Add debug flags
+  banner: true,
+  fps: {
+    min: 10,
+    target: 60,
+    forceSetTimeOut: true,
+    deltaHistory: 10
+  },
+  render: {
+    pixelArt: true,
+    antialias: false,
+    antialiasGL: false
+  },
+  // Add physics configuration
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 0 },
+      debug: false
+    }
+  }
 };
 
 // Add global error handler
@@ -55,9 +123,23 @@ window.addEventListener('load', () => {
     console.log('Window loaded, initializing Phaser game...');
     console.log('Game container exists:', !!document.getElementById('game'));
 
+    // Create a fallback canvas for testing
+    const gameContainer = document.getElementById('game');
+    if (gameContainer) {
+      const fallbackCanvas = document.createElement('canvas');
+      fallbackCanvas.id = 'fallback-canvas';
+      fallbackCanvas.width = 800;
+      fallbackCanvas.height = 600;
+      fallbackCanvas.style.display = 'none'; // Hide it by default
+      gameContainer.appendChild(fallbackCanvas);
+    }
+
     // Create the game instance
-    new Phaser.Game(config);
+    const game = new Phaser.Game(config);
     console.log('Phaser game initialized');
+
+    // Add the game instance to window for debugging
+    (window as any).game = game;
   } catch (error) {
     console.error('Error initializing game:', error);
   }

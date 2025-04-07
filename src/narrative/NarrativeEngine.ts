@@ -272,6 +272,17 @@ export class NarrativeEngine {
     if (typeof value === 'boolean') {
       SaveManager.setFlag(`var_${name}_value`, value);
     }
+
+    // Handle special variables
+    if (name === 'discovered_tower1' && value === 'true') {
+      SaveManager.setFlag('discovered_tower1', true);
+      SaveManager.setData('location_tower1', { x: 10, y: 8 });
+      this.eventEmitter.emit('locationDiscovered', { id: 'tower1', x: 10, y: 8 });
+    } else if (name === 'discovered_ruins1' && value === 'true') {
+      SaveManager.setFlag('discovered_ruins1', true);
+      SaveManager.setData('location_ruins1', { x: 15, y: 12 });
+      this.eventEmitter.emit('locationDiscovered', { id: 'ruins1', x: 15, y: 12 });
+    }
   }
 
   /**

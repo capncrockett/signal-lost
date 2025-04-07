@@ -1,5 +1,80 @@
 [
   {
+    "id": "signal1_discovery",
+    "message": "You've tuned into the emergency broadcast frequency. Through the static, you hear coordinates being repeated: '...survivors at coordinates 10, 8... medical supplies available... approach with caution...'",
+    "choices": [
+      {
+        "text": "Mark the coordinates",
+        "outcome": "set_discovered_tower1=true"
+      },
+      {
+        "text": "Keep listening",
+        "outcome": "trigger_signal1_more"
+      }
+    ],
+    "interference": 0.2
+  },
+  {
+    "id": "signal1_more",
+    "message": "The message continues: '...repeat, survivors at tower coordinates 10, 8... we have limited medical supplies... radio frequency 91.5 MHz for contact...'",
+    "choices": [
+      {
+        "text": "Mark the coordinates",
+        "outcome": "set_discovered_tower1=true"
+      },
+      {
+        "text": "Note the frequency",
+        "outcome": "set_knows_frequency=91.5"
+      }
+    ],
+    "interference": 0.3
+  },
+  {
+    "id": "signal2_discovery",
+    "message": "You've picked up a distress call. A desperate voice speaks through heavy static: 'Help us... we're trapped... coordinates 15, 12... running out of supplies... if anyone can hear this...'",
+    "choices": [
+      {
+        "text": "Mark the coordinates",
+        "outcome": "set_discovered_ruins1=true"
+      },
+      {
+        "text": "Try to respond",
+        "outcome": "trigger_signal2_response"
+      }
+    ],
+    "interference": 0.4
+  },
+  {
+    "id": "signal2_response",
+    "message": "You try to respond to the distress call, but your equipment isn't powerful enough to transmit. You'll need to find these survivors in person if you want to help them.",
+    "choices": [
+      {
+        "text": "Mark the coordinates",
+        "outcome": "set_discovered_ruins1=true"
+      },
+      {
+        "text": "Continue searching for signals",
+        "outcome": "trigger_radio_tuning"
+      }
+    ],
+    "interference": 0.3
+  },
+  {
+    "id": "signal3_discovery",
+    "message": "You've tuned into what seems to be an automated message. A robotic voice announces: 'Attention all personnel. The facility at coordinates 15, 12 has been compromised. Evacuation protocol is in effect. Proceed to the nearest shelter immediately.'",
+    "choices": [
+      {
+        "text": "Mark the coordinates",
+        "outcome": "set_discovered_ruins1=true"
+      },
+      {
+        "text": "Continue searching for signals",
+        "outcome": "trigger_radio_tuning"
+      }
+    ],
+    "interference": 0.1
+  },
+  {
     "id": "tower_discovery",
     "message": "You hear whispers in the static. The radio tower looms above you, its red light blinking in the fog.",
     "choices": [

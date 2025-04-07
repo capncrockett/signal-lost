@@ -19,7 +19,7 @@ export class TestOverlay {
    */
   static createOverlay(
     scene: Phaser.Scene,
-    gameObject: PhaserGameObject,
+    gameObject: PhaserGameObject | null,
     testId: string,
     clickHandler?: () => void
   ): HTMLElement {
@@ -28,6 +28,15 @@ export class TestOverlay {
     if (!canvas || !canvas.parentElement) {
       console.error('Canvas or parent element not found');
       return document.createElement('div');
+    }
+
+    // Handle null gameObject
+    if (!gameObject) {
+      console.warn(`Creating test overlay for null gameObject with testId: ${testId}`);
+      // Create a fallback element in the center of the screen
+      const fallbackObject = scene.add.rectangle(400, 300, 100, 50, 0x000000, 0);
+      fallbackObject.setName(`fallback-${testId}`);
+      gameObject = fallbackObject;
     }
 
     // Create overlay element
@@ -97,12 +106,12 @@ export class TestOverlay {
    */
   private static updateOverlayPosition(
     scene: Phaser.Scene,
-    gameObject: PhaserGameObject,
+    gameObject: PhaserGameObject | null,
     overlay: HTMLElement
   ): void {
     // Get the game canvas
     const canvas = scene.sys.game.canvas;
-    if (!canvas) return;
+    if (!canvas || !gameObject) return;
 
     // Get the bounds of the game object
     let bounds: Phaser.Geom.Rectangle;

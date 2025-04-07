@@ -43,22 +43,50 @@ export class FieldScene extends Phaser.Scene {
    * Preload assets for the scene
    */
   preload(): void {
-    // Load tilemap
-    this.load.image('tiles', 'assets/images/tiles.png');
-    this.load.tilemapTiledJSON('field', 'assets/maps/field.json');
+    // Load tilemap with multiple path formats
+    this.load.image('tiles', '/assets/images/tiles.png');
+    this.load.tilemapTiledJSON('field', '/assets/maps/field.json');
+
+    // Alternative paths without leading slash
+    this.load.image('tiles_alt', 'assets/images/tiles.png');
+    this.load.tilemapTiledJSON('field_alt', 'assets/maps/field.json');
 
     // Load player sprite
-    this.load.spritesheet('player', 'assets/images/player.png', {
+    this.load.spritesheet('player', '/assets/images/player.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet('player_alt', 'assets/images/player.png', {
       frameWidth: 32,
       frameHeight: 32,
     });
 
     // Load interactable sprites
-    this.load.image('tower', 'assets/images/tower.png');
-    this.load.image('ruins', 'assets/images/ruins.png');
+    this.load.image('tower', '/assets/images/tower.png');
+    this.load.image('ruins', '/assets/images/ruins.png');
+    this.load.image('tower_alt', 'assets/images/tower.png');
+    this.load.image('ruins_alt', 'assets/images/ruins.png');
 
     // Load narrative events
-    this.load.json('narrative_events', 'assets/narrative/events.json');
+    this.load.json('narrative_events', '/assets/narrative/events.json');
+    this.load.json('narrative_events_alt', 'assets/narrative/events.json');
+
+    // Log asset loading events
+    this.load.on('filecomplete', (key: string, type: string) => {
+      console.log(`FieldScene asset loaded: ${key} (${type})`);
+    });
+
+    this.load.on('loaderror', (file: Phaser.Loader.File) => {
+      console.error(`FieldScene error loading asset: ${file.key} from ${file.url}`);
+      // If this is not an alternative asset, try loading with the alternative path
+      if (!file.key.endsWith('_alt')) {
+        const url = String(file.url);
+        if (url.startsWith('/')) {
+          const newUrl = url.substring(1);
+          console.log(`FieldScene retrying with alternative path: ${newUrl}`);
+        }
+      }
+    });
   }
 
   /**
@@ -112,35 +140,58 @@ export class FieldScene extends Phaser.Scene {
     groundLayer: Phaser.Tilemaps.TilemapLayer;
     obstaclesLayer: Phaser.Tilemaps.TilemapLayer;
   } | null {
-    // Create tilemap
-    const map = this.make.tilemap({ key: 'field' });
+    try {
+      // Try to create tilemap with primary key
+      let map = this.make.tilemap({ key: 'field' });
 
-    // Add orientation property to fix the error
-    if (map.orientation === undefined) {
-      // @ts-expect-error - Adding missing property
-      map.orientation = 'orthogonal';
-    }
+      // If that fails, try the alternative key
+      if (!map) {
+        console.log('Trying alternative tilemap key');
+        map = this.make.tilemap({ key: 'field_alt' });
+      }
 
-    const tileset = map.addTilesetImage('tiles', 'tiles');
+      if (!map) {
+        console.error('Failed to create tilemap with both keys');
+        return null;
+      }
 
-    if (!tileset) {
-      console.error('Failed to load tileset');
+      // Add orientation property to fix the error
+      if (map.orientation === undefined) {
+        // @ts-expect-error - Adding missing property
+        map.orientation = 'orthogonal';
+      }
+
+      // Try primary tileset key first
+      let tileset = map.addTilesetImage('tiles', 'tiles');
+
+      // If that fails, try the alternative key
+      if (!tileset) {
+        console.log('Trying alternative tileset key');
+        tileset = map.addTilesetImage('tiles', 'tiles_alt');
+      }
+
+      if (!tileset) {
+        console.error('Failed to load tileset with both keys');
+        return null;
+      }
+
+      // Create layers
+      const groundLayer = map.createLayer('Ground', tileset);
+      const obstaclesLayer = map.createLayer('Obstacles', tileset);
+
+      if (!groundLayer || !obstaclesLayer) {
+        console.error('Failed to create layers');
+        return null;
+      }
+
+      // Set collision on obstacles layer
+      obstaclesLayer.setCollisionByProperty({ collides: true });
+
+      return { map, groundLayer, obstaclesLayer };
+    } catch (error) {
+      console.error('Error creating tilemap:', error);
       return null;
     }
-
-    // Create layers
-    const groundLayer = map.createLayer('Ground', tileset);
-    const obstaclesLayer = map.createLayer('Obstacles', tileset);
-
-    if (!groundLayer || !obstaclesLayer) {
-      console.error('Failed to create layers');
-      return null;
-    }
-
-    // Set collision on obstacles layer
-    obstaclesLayer.setCollisionByProperty({ collides: true });
-
-    return { map, groundLayer, obstaclesLayer };
   }
 
   /**
@@ -194,18 +245,26 @@ export class FieldScene extends Phaser.Scene {
   private createInteractables(): void {
     // Create interactable objects from configuration
     for (const data of interactableData) {
-      // Skip if already discovered
-      if (SaveManager.getFlag(`found${data.id}`)) {
+      // Skip if already discovered and collected
+      if (SaveManager.getFlag(`collected${data.id}`)) {
         continue;
       }
 
       // Create interactable
       const interactable = this.createInteractable(data);
 
+      // If the location was discovered via radio signal, mark it as found
+      if (SaveManager.getFlag(`discovered_${data.id}`)) {
+        interactable.setDiscovered(true);
+      }
+
       // Add to interactables array and map
       this.interactables.push(interactable);
       this.interactableMap.set(data.id, interactable);
     }
+
+    // Check for signal-discovered locations
+    this.checkSignalDiscoveredLocations();
   }
 
   /**
@@ -531,6 +590,70 @@ export class FieldScene extends Phaser.Scene {
    */
   getInteractables(): Interactable[] {
     return [...this.interactables];
+  }
+
+  /**
+   * Check for locations discovered via radio signals
+   */
+  private checkSignalDiscoveredLocations(): void {
+    // Get all discovered locations from SaveManager
+    const discoveredLocations: string[] = [];
+
+    // Check for tower1 location
+    if (SaveManager.getFlag('discovered_tower1')) {
+      discoveredLocations.push('tower1');
+    }
+
+    // Check for ruins1 location
+    if (SaveManager.getFlag('discovered_ruins1')) {
+      discoveredLocations.push('ruins1');
+    }
+
+    // Add visual indicators for discovered locations
+    for (const locationId of discoveredLocations) {
+      const locationData = SaveManager.getData(`location_${locationId}`);
+      if (locationData && locationData.x !== undefined && locationData.y !== undefined) {
+        this.addLocationMarker(locationId, locationData.x, locationData.y);
+      }
+    }
+  }
+
+  /**
+   * Add a visual marker for a discovered location
+   * @param locationId The location ID
+   * @param gridX The grid X coordinate
+   * @param gridY The grid Y coordinate
+   */
+  private addLocationMarker(locationId: string, gridX: number, gridY: number): void {
+    // Convert grid coordinates to pixel coordinates
+    const pixelX = gridX * this.gridSystem.getTileSize() + this.gridSystem.getTileSize() / 2;
+    const pixelY = gridY * this.gridSystem.getTileSize() + this.gridSystem.getTileSize() / 2;
+
+    // Create a marker sprite
+    const marker = this.add.circle(pixelX, pixelY, 16, 0xffff00, 0.8);
+    marker.setDepth(10);
+
+    // Add a pulsing effect
+    this.tweens.add({
+      targets: marker,
+      scaleX: 1.5,
+      scaleY: 1.5,
+      alpha: 0.4,
+      duration: 1000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+
+    // Add a label
+    const label = this.add.text(pixelX, pixelY - 30, locationId.toUpperCase(), {
+      fontSize: '14px',
+      color: '#ffffff',
+      backgroundColor: '#000000',
+      padding: { x: 5, y: 3 }
+    });
+    label.setOrigin(0.5, 0.5);
+    label.setDepth(11);
   }
 
   /**

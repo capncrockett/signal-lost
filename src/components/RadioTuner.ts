@@ -14,6 +14,8 @@ interface RadioTunerConfig {
   backgroundColor?: number;
   sliderColor?: number;
   knobColor?: number;
+  radioImageKey?: string;
+  radioImageKeyAlt?: string;
 }
 
 /**
@@ -54,6 +56,8 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       backgroundColor: config.backgroundColor || 0x333333,
       sliderColor: config.sliderColor || 0x666666,
       knobColor: config.knobColor || 0xcccccc,
+      radioImageKey: config.radioImageKey || 'radio',
+      radioImageKeyAlt: config.radioImageKeyAlt || 'radio_alt',
     };
 
     // Get the audio manager
@@ -474,17 +478,51 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
     // If signal strength is above threshold, emit signal lock event
     if (signalStrength > 0.8) {
-      // Emit signal lock event with frequency and signal strength
+      // Find which signal was locked onto
+      const lockedSignal = this.findLockedSignal();
+
+      // Emit signal lock event with frequency, signal strength, and signal ID
       this.emit('signalLock', {
         frequency: this.currentFrequency,
         signalStrength: signalStrength,
+        signalId: lockedSignal?.id || 'unknown',
+        signalType: lockedSignal?.type || 'unknown',
+        signalData: lockedSignal?.data || null
       });
 
       // Log the signal lock for testing purposes
       console.log(
-        `Signal locked at frequency: ${this.currentFrequency.toFixed(1)} MHz with strength ${signalStrength.toFixed(2)}`
+        `Signal locked at frequency: ${this.currentFrequency.toFixed(1)} MHz with strength ${signalStrength.toFixed(2)}, ` +
+        `signal ID: ${lockedSignal?.id || 'unknown'}, type: ${lockedSignal?.type || 'unknown'}`
       );
     }
+  }
+
+  /**
+   * Find which predefined signal was locked onto
+   * @returns The signal data or undefined if no match
+   */
+  private findLockedSignal(): { id: string; frequency: number; type: string; data: any } | undefined {
+    // Define signal data with IDs, types, and additional data
+    const signals = [
+      { id: 'signal1', frequency: 91.5, type: 'location', data: { locationId: 'tower1', coordinates: { x: 10, y: 8 } } },
+      { id: 'signal2', frequency: 96.3, type: 'message', data: { message: 'Help us... coordinates... 15, 12...' } },
+      { id: 'signal3', frequency: 103.7, type: 'location', data: { locationId: 'ruins1', coordinates: { x: 15, y: 12 } } },
+    ];
+
+    // Find the closest signal
+    let closestSignal;
+    let closestDistance = Number.MAX_VALUE;
+
+    for (const signal of signals) {
+      const distance = Math.abs(this.currentFrequency - signal.frequency);
+      if (distance < closestDistance && distance < this.config.signalTolerance) {
+        closestDistance = distance;
+        closestSignal = signal;
+      }
+    }
+
+    return closestSignal;
   }
 
   /**

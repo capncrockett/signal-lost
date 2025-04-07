@@ -3,29 +3,70 @@ import { RadioTuner } from '../components/RadioTuner';
 import { SoundscapeManager } from '../audio/SoundscapeManager';
 import { VolumeControl } from '../components/VolumeControl';
 import { TestOverlay } from '../utils/TestOverlay';
+import { NarrativeEngine } from '../narrative/NarrativeEngine';
+import { NarrativeRenderer } from '../narrative/NarrativeRenderer';
+import { SaveManager } from '../utils/SaveManager';
 
 export class MainScene extends Phaser.Scene {
   private radioTuner!: RadioTuner;
   private soundscapeManager!: SoundscapeManager;
   private volumeControl!: VolumeControl;
+  private narrativeEngine!: NarrativeEngine;
+  private narrativeRenderer!: NarrativeRenderer;
 
   constructor() {
     super({ key: 'MainScene' });
   }
 
   preload() {
-    // Load assets
-    this.load.image('radio', 'assets/images/radio.png');
-    this.load.image('signalDetector', 'assets/images/signalDetector.png');
-    this.load.image('menuBackground', 'assets/images/menuBackground.png');
+    // Load assets with multiple path formats to handle different environments
+    // Try with leading slash first
+    this.load.image('radio', '/assets/images/radio.png');
+    this.load.image('signalDetector', '/assets/images/signalDetector.png');
+    this.load.image('menuBackground', '/assets/images/menuBackground.png');
+
+    // Alternative paths without leading slash as fallback
+    this.load.image('radio_alt', 'assets/images/radio.png');
+    this.load.image('signalDetector_alt', 'assets/images/signalDetector.png');
+    this.load.image('menuBackground_alt', 'assets/images/menuBackground.png');
+
+    // Log asset loading events
+    this.load.on('filecomplete', (key: string, type: string) => {
+      console.log(`MainScene asset loaded: ${key} (${type})`);
+    });
+
+    this.load.on('loaderror', (file: Phaser.Loader.File) => {
+      console.error(`MainScene error loading asset: ${file.key} from ${file.url}`);
+    });
+
     // Static noise is generated programmatically, no need to load an audio file
   }
 
   create() {
-    // Add background
-    const bg = this.add.image(400, 300, 'menuBackground');
-    bg.setDisplaySize(800, 600);
-    bg.setName('menuBackground'); // Add name for resize handler
+    // Initialize SaveManager
+    SaveManager.initialize();
+
+    // Initialize narrative engine
+    this.initializeNarrativeEngine();
+
+    // Add background - try both asset keys
+    let bg;
+    try {
+      bg = this.add.image(400, 300, 'menuBackground');
+    } catch (error) {
+      console.log('Trying alternative background key');
+      bg = this.add.image(400, 300, 'menuBackground_alt');
+    }
+
+    if (bg) {
+      bg.setDisplaySize(800, 600);
+      bg.setName('menuBackground'); // Add name for resize handler
+    } else {
+      console.error('Failed to load background with both keys');
+      // Create a fallback background
+      bg = this.add.rectangle(400, 300, 800, 600, 0x000000);
+      bg.setName('menuBackground');
+    }
 
     // Set up resize handler
     this.scale.on('resize', this.handleResize, this);
@@ -37,14 +78,33 @@ export class MainScene extends Phaser.Scene {
     this.soundscapeManager = new SoundscapeManager(this);
 
     // Create the radio tuner component with larger size
-    this.radioTuner = new RadioTuner(this, 400, 300, {
-      width: 500, // Increase width
-      height: 200, // Increase height
-      backgroundColor: 0x444444, // Darker background for better visibility
-      knobColor: 0xffff00, // Yellow knob for better visibility
-      sliderColor: 0x888888, // Lighter slider for better visibility
-    });
-    this.add.existing(this.radioTuner);
+    try {
+      this.radioTuner = new RadioTuner(this, 400, 300, {
+        width: 500, // Increase width
+        height: 200, // Increase height
+        backgroundColor: 0x444444, // Darker background for better visibility
+        knobColor: 0xffff00, // Yellow knob for better visibility
+        sliderColor: 0x888888, // Lighter slider for better visibility
+        // Add asset keys for both path formats
+        radioImageKey: 'radio',
+        radioImageKeyAlt: 'radio_alt'
+      });
+      this.add.existing(this.radioTuner);
+      console.log('RadioTuner created successfully');
+    } catch (error) {
+      console.error('Failed to create RadioTuner:', error);
+      // Create a fallback radio tuner display
+      const fallbackRadio = this.add.rectangle(400, 300, 500, 200, 0x444444);
+      fallbackRadio.setName('fallbackRadio');
+
+      // Add text to indicate the fallback
+      this.add.text(400, 300, 'RADIO TUNER (FALLBACK)', {
+        fontSize: '24px',
+        fontStyle: 'bold',
+        color: '#ffffff',
+        align: 'center'
+      }).setOrigin(0.5, 0.5);
+    }
 
     // Add test overlay for the radio tuner
     TestOverlay.createOverlay(this, this.radioTuner, 'radio-tuner');
@@ -63,13 +123,20 @@ export class MainScene extends Phaser.Scene {
     interface SignalLockData {
       frequency: number;
       signalStrength: number;
+      signalId: string;
+      signalType: string;
+      signalData: any;
     }
 
     // Listen for signal lock events
     this.radioTuner.on('signalLock', (data: SignalLockData) => {
-      console.log(`Signal locked at frequency: ${data.frequency}`);
+      console.log(`Signal locked at frequency: ${data.frequency}, ID: ${data.signalId}, Type: ${data.signalType}`);
+
       // Play a signal sound when locked
       this.soundscapeManager.playSignalSound();
+
+      // Handle different signal types
+      this.handleSignalLock(data);
     });
 
     // Initialize audio on first interaction
@@ -162,6 +229,251 @@ export class MainScene extends Phaser.Scene {
   }
 
   /**
+   * Handle signal lock events
+   * @param data Signal lock data
+   */
+  private handleSignalLock(data: { frequency: number; signalStrength: number; signalId: string; signalType: string; signalData: any }): void {
+    // Create a visual effect to indicate signal lock
+    this.createSignalLockEffect();
+
+    // Display signal information
+    this.displaySignalInfo(data);
+
+    // Handle different signal types
+    switch (data.signalType) {
+      case 'location':
+        this.handleLocationSignal(data.signalData);
+        break;
+      case 'message':
+        this.handleMessageSignal(data.signalData);
+        break;
+      default:
+        console.log(`Unknown signal type: ${data.signalType}`);
+        break;
+    }
+
+    // Trigger narrative events based on signal ID
+    switch (data.signalId) {
+      case 'signal1':
+        this.narrativeEngine.triggerEvent('signal1_discovery');
+        break;
+      case 'signal2':
+        this.narrativeEngine.triggerEvent('signal2_discovery');
+        break;
+      case 'signal3':
+        this.narrativeEngine.triggerEvent('signal3_discovery');
+        break;
+    }
+  }
+
+  /**
+   * Create a visual effect to indicate signal lock
+   */
+  private createSignalLockEffect(): void {
+    // Create a flash effect
+    const flash = this.add.rectangle(400, 300, 800, 600, 0xffffff);
+    flash.setAlpha(0.8);
+    flash.setDepth(100);
+
+    // Fade out the flash
+    this.tweens.add({
+      targets: flash,
+      alpha: 0,
+      duration: 500,
+      ease: 'Power2',
+      onComplete: () => {
+        flash.destroy();
+      }
+    });
+  }
+
+  /**
+   * Display signal information
+   * @param data Signal lock data
+   */
+  private displaySignalInfo(data: { frequency: number; signalStrength: number; signalId: string; signalType: string; signalData: any }): void {
+    // Create a text object to display signal information
+    const infoText = this.add.text(400, 200,
+      `Signal Detected!\n` +
+      `Frequency: ${data.frequency.toFixed(1)} MHz\n` +
+      `Signal Strength: ${(data.signalStrength * 100).toFixed(0)}%\n` +
+      `Type: ${data.signalType.toUpperCase()}`,
+      {
+        fontSize: '24px',
+        fontStyle: 'bold',
+        color: '#ffffff',
+        backgroundColor: '#000000',
+        padding: { x: 20, y: 10 },
+        align: 'center'
+      }
+    );
+    infoText.setOrigin(0.5, 0.5);
+    infoText.setDepth(101);
+
+    // Add a glow effect
+    infoText.preFX?.addGlow(0x00ffff, 0, 0, false, 0.1, 16);
+
+    // Fade out after a few seconds
+    this.time.delayedCall(5000, () => {
+      this.tweens.add({
+        targets: infoText,
+        alpha: 0,
+        duration: 1000,
+        ease: 'Power2',
+        onComplete: () => {
+          infoText.destroy();
+        }
+      });
+    });
+  }
+
+  /**
+   * Handle location signal
+   * @param data Location data
+   */
+  private handleLocationSignal(data: { locationId: string; coordinates: { x: number; y: number } }): void {
+    console.log(`Location signal detected: ${data.locationId} at coordinates (${data.coordinates.x}, ${data.coordinates.y})`);
+
+    // Create a marker on the map
+    const marker = this.add.text(400, 400,
+      `Location Marked on Map:\n` +
+      `Coordinates: (${data.coordinates.x}, ${data.coordinates.y})`,
+      {
+        fontSize: '20px',
+        color: '#ffff00',
+        backgroundColor: '#333333',
+        padding: { x: 15, y: 8 },
+        align: 'center'
+      }
+    );
+    marker.setOrigin(0.5, 0.5);
+    marker.setDepth(101);
+
+    // Save the location to the game state
+    const SaveManager = (window as any).SaveManager;
+    if (SaveManager) {
+      SaveManager.setFlag(`discovered_${data.locationId}`, true);
+      SaveManager.setData(`location_${data.locationId}`, data.coordinates);
+    }
+
+    // Fade out after a few seconds
+    this.time.delayedCall(8000, () => {
+      this.tweens.add({
+        targets: marker,
+        alpha: 0,
+        duration: 1000,
+        ease: 'Power2',
+        onComplete: () => {
+          marker.destroy();
+        }
+      });
+    });
+  }
+
+  /**
+   * Handle message signal
+   * @param data Message data
+   */
+  private handleMessageSignal(data: { message: string }): void {
+    console.log(`Message signal detected: ${data.message}`);
+
+    // Create a text object to display the message
+    const messageText = this.add.text(400, 400,
+      `Incoming Message:\n` +
+      `"${data.message}"`,
+      {
+        fontSize: '20px',
+        color: '#00ff00',
+        backgroundColor: '#333333',
+        padding: { x: 15, y: 8 },
+        align: 'center'
+      }
+    );
+    messageText.setOrigin(0.5, 0.5);
+    messageText.setDepth(101);
+
+    // Add a typewriter effect
+    const originalText = messageText.text;
+    messageText.setText('');
+
+    let currentChar = 0;
+    const typewriterEvent = this.time.addEvent({
+      delay: 50,
+      callback: () => {
+        messageText.text += originalText[currentChar];
+        currentChar++;
+
+        if (currentChar === originalText.length) {
+          typewriterEvent.destroy();
+        }
+      },
+      repeat: originalText.length - 1
+    });
+
+    // Fade out after a few seconds
+    this.time.delayedCall(10000, () => {
+      this.tweens.add({
+        targets: messageText,
+        alpha: 0,
+        duration: 1000,
+        ease: 'Power2',
+        onComplete: () => {
+          messageText.destroy();
+        }
+      });
+    });
+  }
+
+  /**
+   * Initialize the narrative engine
+   */
+  private initializeNarrativeEngine(): void {
+    // Create narrative engine
+    this.narrativeEngine = new NarrativeEngine();
+
+    // Load narrative events
+    fetch('/assets/narrative/events.json')
+      .then(response => response.json())
+      .then(data => {
+        this.narrativeEngine.loadEvents(JSON.stringify(data));
+        console.log('Narrative events loaded');
+      })
+      .catch(error => {
+        console.error('Failed to load narrative events:', error);
+      });
+
+    // Create narrative renderer
+    this.narrativeRenderer = new NarrativeRenderer(
+      this,
+      400,
+      300,
+      this.narrativeEngine
+    );
+    this.add.existing(this.narrativeRenderer);
+    this.narrativeRenderer.setVisible(false);
+    this.narrativeRenderer.setDepth(200);
+
+    // Listen for narrative events
+    this.narrativeEngine.on('narrativeEvent', (event) => {
+      console.log(`Narrative event triggered: ${event.id}`);
+      this.narrativeRenderer.setVisible(true);
+    });
+
+    // Listen for narrative choices
+    this.narrativeEngine.on('narrativeChoice', (data) => {
+      console.log(`Choice made: ${data.choice.text}`);
+      this.narrativeRenderer.setVisible(false);
+    });
+
+    // Listen for location discoveries
+    this.narrativeEngine.on('locationDiscovered', (data) => {
+      console.log(`Location discovered: ${data.id} at (${data.x}, ${data.y})`);
+      SaveManager.setFlag(`discovered_${data.id}`, true);
+      SaveManager.setData(`location_${data.id}`, { x: data.x, y: data.y });
+    });
+  }
+
+  /**
    * Handle resize events
    * @param width New width of the scene
    * @param height New height of the scene
@@ -210,6 +522,12 @@ export class MainScene extends Phaser.Scene {
     if (volumeInstructions) {
       volumeInstructions.x = width / 2;
       volumeInstructions.y = height / 2 + 130;
+    }
+
+    // Reposition narrative renderer
+    if (this.narrativeRenderer) {
+      this.narrativeRenderer.x = width / 2;
+      this.narrativeRenderer.y = height / 2;
     }
   }
 }
