@@ -1,7 +1,7 @@
 {
   "extends": "../.eslintrc.json",
   "parserOptions": {
-    "project": "./e2e/tsconfig.json"
+    "project": "./config/tsconfig.json"
   },
   "rules": {
     "@typescript-eslint/no-explicit-any": "warn",
@@ -14,7 +14,7 @@
     "@typescript-eslint/no-floating-promises": "off",
     "@typescript-eslint/await-thenable": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/no-unnecessary-type-assertion": "off",
+    "@typescript-eslint/unbound-method": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "no-console": "off"
   }
