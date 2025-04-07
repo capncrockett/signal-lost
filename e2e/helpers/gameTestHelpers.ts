@@ -378,7 +378,7 @@ export async function testRadioTuner(
   const takeScreenshots = options.takeScreenshots !== false; // Default to true
   const waitTimeout = options.waitTimeout || 2000;
   const retryCount = options.retryCount || 3;
-  const signalFrequencies = options.signalFrequencies || [91.5, 96.3, 103.7]; // Default signal frequencies
+  const signalFrequencies = options.signalFrequencies || [91.5, 94.2, 96.3, 99.8, 103.7, 105.1]; // Default signal frequencies
 
   console.log(
     `Testing radio tuner (screenshots: ${takeScreenshots}, waitTimeout: ${waitTimeout}ms, retries: ${retryCount})`

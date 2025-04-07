@@ -75,6 +75,96 @@
     "interference": 0.1
   },
   {
+    "id": "signal4_discovery",
+    "message": "Through the static, you hear a faint military transmission: 'Bunker Alpha secure... coordinates 5, 20... supplies intact... awaiting further orders...'",
+    "choices": [
+      {
+        "text": "Mark the coordinates",
+        "outcome": "set_discovered_bunker1=true"
+      },
+      {
+        "text": "Try to respond",
+        "outcome": "trigger_signal4_response"
+      }
+    ],
+    "interference": 0.3
+  },
+  {
+    "id": "signal4_response",
+    "message": "You attempt to respond to the military transmission, but receive only silence in return. The transmission appears to be a recording on a loop.",
+    "choices": [
+      {
+        "text": "Mark the coordinates",
+        "outcome": "set_discovered_bunker1=true"
+      },
+      {
+        "text": "Continue searching for signals",
+        "outcome": "trigger_radio_tuning"
+      }
+    ],
+    "interference": 0.2
+  },
+  {
+    "id": "signal5_discovery",
+    "message": "You've intercepted what sounds like a security protocol: 'Security breach in sector 7... emergency override code 7-3-9-2... repeat, override code 7-3-9-2...'",
+    "choices": [
+      {
+        "text": "Note the code",
+        "outcome": "set_knows_security_code=true"
+      },
+      {
+        "text": "Try to trace the signal",
+        "outcome": "trigger_signal5_trace"
+      }
+    ],
+    "interference": 0.4
+  },
+  {
+    "id": "signal5_trace",
+    "message": "You attempt to trace the signal, but it's too weak. However, you notice that it seems to be coming from the direction of the ruins at coordinates 15, 12.",
+    "choices": [
+      {
+        "text": "Mark the ruins",
+        "outcome": "set_discovered_ruins1=true"
+      },
+      {
+        "text": "Note the security code",
+        "outcome": "set_knows_security_code=true"
+      }
+    ],
+    "interference": 0.3
+  },
+  {
+    "id": "signal6_discovery",
+    "message": "You've discovered a strange frequency that seems to be emitting a series of tones and pulses. As you listen, your radio begins to glow faintly, and you notice the reception improving.",
+    "choices": [
+      {
+        "text": "Analyze the signal",
+        "outcome": "trigger_signal6_analyze"
+      },
+      {
+        "text": "Record the frequency",
+        "outcome": "set_knows_special_frequency=true"
+      }
+    ],
+    "interference": 0.1
+  },
+  {
+    "id": "signal6_analyze",
+    "message": "As you analyze the signal, you realize it's actually a firmware update for your radio. Your device automatically downloads it, and you notice an immediate improvement in signal clarity and range.",
+    "choices": [
+      {
+        "text": "Test the enhanced radio",
+        "outcome": "set_has_radio_enhancer=true"
+      },
+      {
+        "text": "Continue searching for signals",
+        "outcome": "trigger_radio_tuning"
+      }
+    ],
+    "interference": 0.0
+  },
+  {
     "id": "tower_discovery",
     "message": "You hear whispers in the static. The radio tower looms above you, its red light blinking in the fog.",
     "choices": [

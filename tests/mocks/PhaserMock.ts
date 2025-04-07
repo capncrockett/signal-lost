@@ -172,6 +172,33 @@ const PhaserMock = {
         ENTER: 13,
       },
     },
+    Container: class Container {
+      scene: any;
+      x: number = 0;
+      y: number = 0;
+
+      constructor(scene: any, x: number, y: number) {
+        this.scene = scene;
+        this.x = x;
+        this.y = y;
+      }
+
+      add() {
+        return this;
+      }
+      removeAll() {
+        return this;
+      }
+      setVisible() {
+        return this;
+      }
+      emit() {
+        return this;
+      }
+      destroy() {
+        return this;
+      }
+    },
   },
   Events: {
     EventEmitter: class EventEmitter {

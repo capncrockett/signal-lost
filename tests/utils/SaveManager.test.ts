@@ -409,13 +409,13 @@ describe('SaveManager', () => {
 
       const result = SaveManager.exportState();
 
-      expect(JSON.parse(result)).toEqual({ flag1: true, flag2: false });
+      expect(JSON.parse(result)).toEqual({ flags: { flag1: true, flag2: false }, data: {} });
     });
 
     test('should export empty object when no flags', () => {
       const result = SaveManager.exportState();
 
-      expect(JSON.parse(result)).toEqual({});
+      expect(JSON.parse(result)).toEqual({ flags: {}, data: {} });
     });
   });
 });

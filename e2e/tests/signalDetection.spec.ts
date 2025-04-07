@@ -31,7 +31,7 @@ test('Signal detection at different frequencies', async ({ page }) => {
   await page.waitForTimeout(1000);
 
   // Define the frequencies to test
-  const frequencies = [91.5, 96.3, 103.7];
+  const frequencies = [91.5, 94.2, 96.3, 99.8, 103.7, 105.1];
 
   // Test each frequency
   for (const frequency of frequencies) {
@@ -147,6 +147,43 @@ test('Signal detection at different frequencies', async ({ page }) => {
       const coordinatesVisible = await page.locator('text=Coordinates: (15, 12)').isVisible();
       console.log(`Coordinates visible at ${frequency} MHz: ${coordinatesVisible}`);
       expect(coordinatesVisible).toBe(true);
+    } else if (frequency === 94.2) {
+      // This should be a location signal (bunker1)
+      expect(signalEvents[0]).toContain('signal4');
+      expect(signalEvents[0]).toContain('location');
+
+      // Check for location marker
+      const locationMarkerVisible = await page.locator('text=Location Marked on Map').isVisible();
+      console.log(`Location marker visible at ${frequency} MHz: ${locationMarkerVisible}`);
+      expect(locationMarkerVisible).toBe(true);
+
+      // Check for coordinates in the marker
+      const coordinatesVisible = await page.locator('text=Coordinates: (5, 20)').isVisible();
+      console.log(`Coordinates visible at ${frequency} MHz: ${coordinatesVisible}`);
+      expect(coordinatesVisible).toBe(true);
+    } else if (frequency === 99.8) {
+      // This should be a message signal
+      expect(signalEvents[0]).toContain('signal5');
+      expect(signalEvents[0]).toContain('message');
+
+      // Check for message text
+      const messageVisible = await page.locator('text=Incoming Message').isVisible();
+      console.log(`Message visible at ${frequency} MHz: ${messageVisible}`);
+      expect(messageVisible).toBe(true);
+    } else if (frequency === 105.1) {
+      // This should be an item signal
+      expect(signalEvents[0]).toContain('signal6');
+      expect(signalEvents[0]).toContain('item');
+
+      // Check for item discovery text
+      const itemVisible = await page.locator('text=Item Discovered').isVisible();
+      console.log(`Item discovery visible at ${frequency} MHz: ${itemVisible}`);
+      expect(itemVisible).toBe(true);
+
+      // Check for item name
+      const itemNameVisible = await page.locator('text=Signal Enhancer').isVisible();
+      console.log(`Item name visible at ${frequency} MHz: ${itemNameVisible}`);
+      expect(itemNameVisible).toBe(true);
     }
 
     // Wait a bit before testing the next frequency

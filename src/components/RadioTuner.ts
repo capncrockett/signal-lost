@@ -14,12 +14,18 @@ interface RadioMessageSignalData {
   message: string;
 }
 
-type RadioSignalData = RadioLocationSignalData | RadioMessageSignalData;
+interface RadioItemSignalData {
+  itemId: string;
+  name: string;
+  description: string;
+}
+
+type RadioSignalData = RadioLocationSignalData | RadioMessageSignalData | RadioItemSignalData;
 
 interface RadioSignalInfo {
   id: string;
   frequency: number;
-  type: 'location' | 'message';
+  type: 'location' | 'message' | 'item';
   data: RadioSignalData;
 }
 
@@ -70,7 +76,7 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       height: config.height || 100,
       minFrequency: config.minFrequency || 88.0,
       maxFrequency: config.maxFrequency || 108.0,
-      signalFrequencies: config.signalFrequencies || [91.5, 96.3, 103.7],
+      signalFrequencies: config.signalFrequencies || [91.5, 94.2, 96.3, 99.8, 103.7, 105.1],
       signalTolerance: config.signalTolerance || 0.3,
       backgroundColor: config.backgroundColor || 0x333333,
       sliderColor: config.sliderColor || 0x666666,
@@ -548,6 +554,24 @@ export class RadioTuner extends Phaser.GameObjects.Container {
         frequency: 103.7,
         type: 'location',
         data: { locationId: 'ruins1', coordinates: { x: 15, y: 12 } },
+      },
+      {
+        id: 'signal4',
+        frequency: 94.2,
+        type: 'location',
+        data: { locationId: 'bunker1', coordinates: { x: 5, y: 20 } },
+      },
+      {
+        id: 'signal5',
+        frequency: 99.8,
+        type: 'message',
+        data: { message: 'Security protocol... code 7-3-9-2... emergency override...' },
+      },
+      {
+        id: 'signal6',
+        frequency: 105.1,
+        type: 'item',
+        data: { itemId: 'radio_enhancer', name: 'Signal Enhancer', description: 'Improves radio reception and range.' },
       },
     ];
 
