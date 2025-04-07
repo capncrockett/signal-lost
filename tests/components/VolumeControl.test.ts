@@ -334,4 +334,54 @@ describe('VolumeControl', () => {
     // Check that all listeners were notified
     expect(mockAudioManager.setMasterVolume).toHaveBeenCalledWith(expect.any(Number));
   });
+
+  test('should handle volume clamping correctly', () => {
+    volumeControl = new VolumeControl(mockScene as any, 100, 100);
+
+    // Test setting volume below minimum (0)
+    volumeControl.setVolume(-0.5);
+    expect(mockAudioManager.setMasterVolume).toHaveBeenCalledWith(0);
+    expect(SaveManager.setData).toHaveBeenCalledWith('volume', 0);
+
+    // Reset mocks
+    mockAudioManager.setMasterVolume.mockClear();
+    SaveManager.setData.mockClear();
+
+    // Test setting volume above maximum (1)
+    volumeControl.setVolume(1.5);
+    expect(mockAudioManager.setMasterVolume).toHaveBeenCalledWith(1);
+    expect(SaveManager.setData).toHaveBeenCalledWith('volume', 1);
+  });
+
+  test('should handle mute/unmute correctly', () => {
+    volumeControl = new VolumeControl(mockScene as any, 100, 100);
+
+    // Mock the current volume
+    mockAudioManager.getMasterVolume.mockReturnValue(0.8);
+
+    // Set up volumeControl properties
+    (volumeControl as any).isMuted = false;
+    (volumeControl as any).previousVolume = 0.8;
+    (volumeControl as any).muteButton = { setText: jest.fn() };
+
+    // Call toggleMute method
+    (volumeControl as any).toggleMute();
+
+    // Verify mute was applied
+    expect(mockAudioManager.setMasterVolume).toHaveBeenCalledWith(0);
+    expect((volumeControl as any).isMuted).toBe(true);
+    expect((volumeControl as any).muteButton.setText).toHaveBeenCalledWith('🔇');
+
+    // Reset mocks
+    mockAudioManager.setMasterVolume.mockClear();
+    (volumeControl as any).muteButton.setText.mockClear();
+
+    // Call toggleMute again to unmute
+    (volumeControl as any).toggleMute();
+
+    // Verify unmute was applied
+    expect(mockAudioManager.setMasterVolume).toHaveBeenCalledWith(0.8);
+    expect((volumeControl as any).isMuted).toBe(false);
+    expect((volumeControl as any).muteButton.setText).toHaveBeenCalledWith('🔊');
+  });
 });

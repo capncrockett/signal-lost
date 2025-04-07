@@ -123,41 +123,73 @@ describe('SoundscapeManager', () => {
     // Initialize the manager
     soundscapeManager.initialize();
 
+    // Create a spy to access private methods
+    const getStaticVolumeSpy = jest.spyOn(soundscapeManager as any, 'getStaticVolume');
+
     // Update layers with different signal strengths
     soundscapeManager.updateLayers(0); // No signal
-    soundscapeManager.updateLayers(0.5); // Medium signal
-    soundscapeManager.updateLayers(1); // Perfect signal
+    expect(getStaticVolumeSpy).toHaveBeenCalledWith(0);
 
-    // Verify adjustments were made
-    // We can't check specific values easily due to the private properties,
-    // but we can verify the method doesn't throw errors
-    expect(true).toBe(true);
+    soundscapeManager.updateLayers(0.5); // Medium signal
+    expect(getStaticVolumeSpy).toHaveBeenCalledWith(0.5);
+
+    soundscapeManager.updateLayers(1); // Perfect signal
+    expect(getStaticVolumeSpy).toHaveBeenCalledWith(1);
+
+    // Restore the spy
+    getStaticVolumeSpy.mockRestore();
   });
 
   test('should adjust panning based on player position', () => {
     // Initialize the manager
     soundscapeManager.initialize();
 
+    // Set up spies to access private properties
+    const staticPannerSpy = jest.spyOn(soundscapeManager as any, 'staticPanner', 'get').mockReturnValue({
+      pan: { value: 0 }
+    });
+
+    const dronePannerSpy = jest.spyOn(soundscapeManager as any, 'dronePanner', 'get').mockReturnValue({
+      pan: { value: 0 }
+    });
+
+    const blipPannerSpy = jest.spyOn(soundscapeManager as any, 'blipPanner', 'get').mockReturnValue({
+      pan: { value: 0 }
+    });
+
     // Adjust panning with different positions
     soundscapeManager.adjustPanning(-1); // Far left
+    expect(staticPannerSpy).toHaveBeenCalled();
+    expect(dronePannerSpy).toHaveBeenCalled();
+    expect(blipPannerSpy).toHaveBeenCalled();
+
     soundscapeManager.adjustPanning(0); // Center
     soundscapeManager.adjustPanning(1); // Far right
 
-    // Verify adjustments were made
-    expect(true).toBe(true);
+    // Restore spies
+    staticPannerSpy.mockRestore();
+    dronePannerSpy.mockRestore();
+    blipPannerSpy.mockRestore();
   });
 
   test('should set master volume', () => {
     // Initialize the manager
     soundscapeManager.initialize();
 
+    // Create a spy for the master gain node
+    const masterGainSpy = jest.spyOn(soundscapeManager as any, 'masterGain', 'get').mockReturnValue({
+      gain: { value: 0 }
+    });
+
     // Set different volumes
     soundscapeManager.setVolume(0); // Silent
+    expect(masterGainSpy).toHaveBeenCalled();
+
     soundscapeManager.setVolume(0.5); // Half volume
     soundscapeManager.setVolume(1); // Full volume
 
-    // Verify volume was set
-    expect(true).toBe(true);
+    // Restore spy
+    masterGainSpy.mockRestore();
   });
 
   test('should dispose resources correctly', () => {
@@ -180,9 +212,26 @@ describe('SoundscapeManager', () => {
 
     // Verify setTimeout was called to schedule blips
     expect(mockSetTimeout).toHaveBeenCalled();
+
+    // Create a spy for the createBlip method
+    const createBlipSpy = jest.spyOn(soundscapeManager as any, 'createBlip').mockImplementation(() => {});
+
+    // Call the callback passed to setTimeout
+    const setTimeoutCalls = mockSetTimeout.mock.calls;
+    const blipCallback = setTimeoutCalls[setTimeoutCalls.length - 1][0];
+    blipCallback();
+
+    // Verify createBlip was called
+    expect(createBlipSpy).toHaveBeenCalled();
+
+    // Restore spy
+    createBlipSpy.mockRestore();
   });
 
   test('should handle operations when not initialized', () => {
+    // Create spies for private properties
+    const isInitializedSpy = jest.spyOn(soundscapeManager as any, 'isInitialized', 'get').mockReturnValue(false);
+
     // Try to update layers without initializing
     soundscapeManager.updateLayers(0.5);
 
@@ -195,7 +244,44 @@ describe('SoundscapeManager', () => {
     // Try to dispose without initializing
     soundscapeManager.dispose();
 
-    // Verify no errors were thrown
-    expect(true).toBe(true);
+    // Verify isInitialized was checked
+    expect(isInitializedSpy).toHaveBeenCalled();
+
+    // Restore spy
+    isInitializedSpy.mockRestore();
+  });
+
+  test('should create static noise', () => {
+    // Initialize the manager
+    soundscapeManager.initialize();
+
+    // Create a spy for the createStaticNoise method
+    const createStaticNoiseSpy = jest.spyOn(soundscapeManager as any, 'createStaticNoise');
+
+    // Call the method directly
+    (soundscapeManager as any).createStaticNoise();
+
+    // Verify the method was called
+    expect(createStaticNoiseSpy).toHaveBeenCalled();
+
+    // Restore spy
+    createStaticNoiseSpy.mockRestore();
+  });
+
+  test('should handle audio context state changes', () => {
+    // Initialize the manager
+    soundscapeManager.initialize();
+
+    // Create a spy for the audioContext
+    const audioContextSpy = jest.spyOn(soundscapeManager as any, 'audioContext', 'get').mockReturnValue({
+      state: 'suspended',
+      resume: jest.fn().mockResolvedValue(undefined),
+    });
+
+    // Call a method that would use the audio context
+    soundscapeManager.updateLayers(0.5);
+
+    // Restore spy
+    audioContextSpy.mockRestore();
   });
 });
