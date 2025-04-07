@@ -25,7 +25,8 @@
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
     "prepare": "husky",
     "type-check": "tsc --noEmit",
-    "check-all": "npm run lint && npm run type-check && npm run test && npm run test:e2e:ci"
+    "lint:tests": "eslint tests/**/*.ts e2e/**/*.ts --fix",
+    "check-all": "npm run lint && npm run lint:tests && npm run type-check && npm run test && npm run test:e2e:ci"
   },
   "keywords": [
     "game",
