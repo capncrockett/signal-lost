@@ -28,7 +28,10 @@ export class SaveManager {
       if (savedState) {
         try {
           // Parse the saved state
-          const parsedState = JSON.parse(savedState);
+          const parsedState = JSON.parse(savedState) as {
+            flags?: Record<string, boolean>;
+            data?: Record<string, unknown>;
+          };
 
           // Extract flags and data from the parsed state
           if (parsedState.flags) {

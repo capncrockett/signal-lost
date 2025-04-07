@@ -294,7 +294,7 @@ export class SoundscapeManager {
   private scheduleBlips(): void {
     if (!this.audioContext) return;
 
-    const scheduleNextBlip = () => {
+    const scheduleNextBlip = (): void => {
       this.createBlip();
       this.blipSchedulerId = window.setTimeout(scheduleNextBlip, this.config.blipInterval);
     };

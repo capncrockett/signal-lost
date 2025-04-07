@@ -7,7 +7,7 @@ import Phaser from 'phaser';
  */
 export class GridSystem {
   // Reference to the scene
-  private scene: Phaser.Scene;
+  private readonly scene: Phaser.Scene;
 
   // Grid dimensions
   private width: number;
@@ -35,7 +35,7 @@ export class GridSystem {
     // Initialize collision grid
     this.collisionGrid = Array(height)
       .fill(null)
-      .map(() => Array(width).fill(false));
+      .map(() => Array(width).fill(false)) as boolean[][];
   }
 
   /**

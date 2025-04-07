@@ -10,6 +10,7 @@ import { Inventory } from '../../inventory/Inventory';
 import { InventoryUI } from '../../inventory/InventoryUI';
 import { itemsData } from '../../inventory/ItemsConfig';
 import { Item } from '../../inventory/Item';
+import { NarrativeEventData, NarrativeChoiceResultData } from '../../types/events';
 
 /**
  * FieldScene
@@ -231,7 +232,7 @@ export class FieldScene extends Phaser.Scene {
     for (let y = 0; y < gridHeight; y++) {
       for (let x = 0; x < gridWidth; x++) {
         const tile = obstaclesLayer.getTileAt(x, y);
-        if (tile && tile.properties.collides) {
+        if (tile && tile.properties && tile.properties.collides) {
           this.gridSystem.setTileCollision(x, y, true);
         }
       }
@@ -657,11 +658,11 @@ export class FieldScene extends Phaser.Scene {
    */
   private setupNarrativeEventListeners(): void {
     // Listen for narrative events
-    this.narrativeEngine.on('narrativeEvent', (event) => {
+    this.narrativeEngine.on('narrativeEvent', (event: NarrativeEventData) => {
       console.log(`Narrative event triggered: ${event.id}`);
     });
 
-    this.narrativeEngine.on('narrativeChoice', (data) => {
+    this.narrativeEngine.on('narrativeChoice', (data: NarrativeChoiceResultData) => {
       console.log(`Choice made: ${data.choice.text}`);
     });
 
@@ -830,8 +831,8 @@ export class FieldScene extends Phaser.Scene {
     // Adjust camera bounds if needed
     if (this.cameras.main && this.gridSystem) {
       // Get the map dimensions in pixels
-      const mapWidth = this.gridSystem.getMapWidth() * this.gridSystem.getTileSize();
-      const mapHeight = this.gridSystem.getMapHeight() * this.gridSystem.getTileSize();
+      const mapWidth = this.gridSystem.getWidth() * this.gridSystem.getTileSize();
+      const mapHeight = this.gridSystem.getHeight() * this.gridSystem.getTileSize();
 
       // Set camera bounds to ensure the map is fully visible
       this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
@@ -847,10 +848,8 @@ export class FieldScene extends Phaser.Scene {
 
       // Make sure the camera is still following the player
       if (this.player) {
-        const playerSprite = this.player.getSprite();
-        if (playerSprite && playerSprite instanceof Phaser.GameObjects.GameObject) {
-          this.cameras.main.startFollow(playerSprite);
-        }
+        // The player is already a sprite, so we can follow it directly
+        this.cameras.main.startFollow(this.player);
       }
     }
 
