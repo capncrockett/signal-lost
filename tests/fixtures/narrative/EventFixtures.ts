@@ -1,4 +1,4 @@
-import { EventFixture, FixtureCollection } from '../types';
+import { FixtureCollection } from '../types';
 
 /**
  * Event fixtures
@@ -12,7 +12,8 @@ export const EventFixtures: FixtureCollection<Record<string, unknown>> = {
         events: [
           {
             id: 'signal1_discovery',
-            message: 'You\'ve tuned into the emergency broadcast frequency. Through the static, you hear coordinates being repeated: \'...survivors at coordinates 10, 8... medical supplies available... approach with caution...\'',
+            message:
+              "You've tuned into the emergency broadcast frequency. Through the static, you hear coordinates being repeated: '...survivors at coordinates 10, 8... medical supplies available... approach with caution...'",
             choices: [
               {
                 text: 'Mark the coordinates',
@@ -27,7 +28,8 @@ export const EventFixtures: FixtureCollection<Record<string, unknown>> = {
           },
           {
             id: 'signal1_more',
-            message: 'The message continues: \'...repeat, survivors at tower coordinates 10, 8... we have limited medical supplies... radio frequency 91.5 MHz for contact...\'',
+            message:
+              "The message continues: '...repeat, survivors at tower coordinates 10, 8... we have limited medical supplies... radio frequency 91.5 MHz for contact...'",
             choices: [
               {
                 text: 'Mark the coordinates',
@@ -42,7 +44,8 @@ export const EventFixtures: FixtureCollection<Record<string, unknown>> = {
           },
           {
             id: 'signal2_discovery',
-            message: 'You\'ve tuned into a distress signal. A panicked voice speaks through bursts of static: \'If anyone can hear this... we\'re trapped... coordinates 15, 12... need immediate assistance...\'',
+            message:
+              "You've tuned into a distress signal. A panicked voice speaks through bursts of static: 'If anyone can hear this... we're trapped... coordinates 15, 12... need immediate assistance...'",
             choices: [
               {
                 text: 'Mark the coordinates',
@@ -68,7 +71,8 @@ export const EventFixtures: FixtureCollection<Record<string, unknown>> = {
         events: [
           {
             id: 'tower_discovery',
-            message: 'You hear whispers in the static. The radio tower looms above you, its red light blinking in the fog.',
+            message:
+              'You hear whispers in the static. The radio tower looms above you, its red light blinking in the fog.',
             choices: [
               {
                 text: 'Investigate the tower',
@@ -83,7 +87,8 @@ export const EventFixtures: FixtureCollection<Record<string, unknown>> = {
           },
           {
             id: 'tower_investigation',
-            message: 'As you approach the tower, the static on your radio intensifies. You notice a small door at the base of the structure.',
+            message:
+              'As you approach the tower, the static on your radio intensifies. You notice a small door at the base of the structure.',
             choices: [
               {
                 text: 'Try to open the door',
@@ -102,7 +107,8 @@ export const EventFixtures: FixtureCollection<Record<string, unknown>> = {
           },
           {
             id: 'ruins_discovery',
-            message: 'The ruins appear to be an old research facility. Most of the building has collapsed, but one section remains intact.',
+            message:
+              'The ruins appear to be an old research facility. Most of the building has collapsed, but one section remains intact.',
             choices: [
               {
                 text: 'Enter the intact section',
@@ -146,7 +152,8 @@ export const EventFixtures: FixtureCollection<Record<string, unknown>> = {
           },
           {
             id: 'note_tower_read',
-            message: 'The note reads: "The signal protocol requires three specific frequencies to be activated in sequence. The first is at 91.5 MHz. Find the others by exploring the ruins."',
+            message:
+              'The note reads: "The signal protocol requires three specific frequencies to be activated in sequence. The first is at 91.5 MHz. Find the others by exploring the ruins."',
             choices: [
               {
                 text: 'Take the note',
@@ -185,7 +192,8 @@ export const EventFixtures: FixtureCollection<Record<string, unknown>> = {
         events: [
           {
             id: 'protocol_activation',
-            message: 'You tune your radio to each frequency in sequence: 91.5, 96.3, 103.7, 105.1. The static clears, and a voice speaks clearly through your radio...',
+            message:
+              'You tune your radio to each frequency in sequence: 91.5, 96.3, 103.7, 105.1. The static clears, and a voice speaks clearly through your radio...',
             choices: [
               {
                 text: 'Listen carefully',
@@ -195,7 +203,8 @@ export const EventFixtures: FixtureCollection<Record<string, unknown>> = {
           },
           {
             id: 'protocol_message',
-            message: '"Thank you for activating the Signal Protocol. We have been waiting for someone to find us. Our signal has been broadcasting for decades, hoping someone would discover the truth. Now, at last, we can tell our story..."',
+            message:
+              '"Thank you for activating the Signal Protocol. We have been waiting for someone to find us. Our signal has been broadcasting for decades, hoping someone would discover the truth. Now, at last, we can tell our story..."',
             choices: [
               {
                 text: 'Continue listening',
@@ -205,7 +214,8 @@ export const EventFixtures: FixtureCollection<Record<string, unknown>> = {
           },
           {
             id: 'protocol_revelation',
-            message: 'The voice reveals the truth about what happened to the research facility and the surrounding area. The experiments with radio frequencies opened something that should have remained closed. The voice thanks you for listening and fades away, leaving you alone with the knowledge of what happened here.',
+            message:
+              'The voice reveals the truth about what happened to the research facility and the surrounding area. The experiments with radio frequencies opened something that should have remained closed. The voice thanks you for listening and fades away, leaving you alone with the knowledge of what happened here.',
             choices: [
               {
                 text: 'End',
@@ -226,7 +236,8 @@ export const EventFixtures: FixtureCollection<Record<string, unknown>> = {
         events: [
           {
             id: 'tutorial_intro',
-            message: 'Welcome to Signal Lost. In this game, you\'ll use your radio to find signals and explore mysterious locations.',
+            message:
+              "Welcome to Signal Lost. In this game, you'll use your radio to find signals and explore mysterious locations.",
             choices: [
               {
                 text: 'Continue',
@@ -236,7 +247,8 @@ export const EventFixtures: FixtureCollection<Record<string, unknown>> = {
           },
           {
             id: 'tutorial_radio',
-            message: 'Your radio is your most important tool. Use it to tune into different frequencies and discover signals. Try tuning to 91.5 MHz to find your first signal.',
+            message:
+              'Your radio is your most important tool. Use it to tune into different frequencies and discover signals. Try tuning to 91.5 MHz to find your first signal.',
             choices: [
               {
                 text: 'Got it',
@@ -246,7 +258,8 @@ export const EventFixtures: FixtureCollection<Record<string, unknown>> = {
           },
           {
             id: 'tutorial_movement',
-            message: 'Use WASD or arrow keys to move around the field. Press E or Space to interact with objects.',
+            message:
+              'Use WASD or arrow keys to move around the field. Press E or Space to interact with objects.',
             choices: [
               {
                 text: 'Got it',
@@ -256,7 +269,8 @@ export const EventFixtures: FixtureCollection<Record<string, unknown>> = {
           },
           {
             id: 'tutorial_inventory',
-            message: 'Press I to open your inventory. You\'ll collect items as you explore, which can help you progress through the game.',
+            message:
+              "Press I to open your inventory. You'll collect items as you explore, which can help you progress through the game.",
             choices: [
               {
                 text: 'Got it',

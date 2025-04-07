@@ -9,7 +9,7 @@ const snapshotsDir = path.join(process.cwd(), 'e2e', 'visual-tests', 'snapshots'
 const diffDir = path.join(process.cwd(), 'e2e', 'visual-tests', 'diffs');
 
 // Ensure directories exist
-[snapshotsDir, diffDir].forEach(dir => {
+[snapshotsDir, diffDir].forEach((dir) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -56,10 +56,7 @@ export interface VisualComparisonOptions {
  * @param name Name of the screenshot (without extension)
  * @returns Path to the saved screenshot
  */
-export async function takeElementSnapshot(
-  element: Locator,
-  name: string
-): Promise<string> {
+export async function takeElementSnapshot(element: Locator, name: string): Promise<string> {
   // Ensure element is visible
   await expect(element).toBeVisible();
 
@@ -79,10 +76,7 @@ export async function takeElementSnapshot(
  * @param name Name of the screenshot (without extension)
  * @returns Path to the saved screenshot
  */
-export async function takeGameSnapshot(
-  page: Page,
-  name: string
-): Promise<string> {
+export async function takeGameSnapshot(page: Page, name: string): Promise<string> {
   // Find the game canvas
   const canvas = page.locator('canvas').first();
 
@@ -141,7 +135,7 @@ export function compareSnapshots(
     const expectedCopy = PNG.sync.read(fs.readFileSync(expectedPath));
 
     // Apply mask to both images
-    maskAreas.forEach(area => {
+    maskAreas.forEach((area) => {
       for (let y = area.y; y < area.y + area.height; y++) {
         for (let x = area.x; x < area.x + area.width; x++) {
           if (x < width && y < height) {
@@ -161,14 +155,9 @@ export function compareSnapshots(
     });
 
     // Compare masked images
-    const diffPixels = pixelmatch(
-      actualCopy.data,
-      expectedCopy.data,
-      diffImg.data,
-      width,
-      height,
-      { threshold }
-    );
+    const diffPixels = pixelmatch(actualCopy.data, expectedCopy.data, diffImg.data, width, height, {
+      threshold,
+    });
 
     // Calculate diff percentage
     const totalPixels = width * height;
@@ -190,14 +179,9 @@ export function compareSnapshots(
   }
 
   // Compare images without masking
-  const diffPixels = pixelmatch(
-    actualImg.data,
-    expectedImg.data,
-    diffImg.data,
-    width,
-    height,
-    { threshold }
-  );
+  const diffPixels = pixelmatch(actualImg.data, expectedImg.data, diffImg.data, width, height, {
+    threshold,
+  });
 
   // Calculate diff percentage
   const totalPixels = width * height;
@@ -245,7 +229,8 @@ export async function expectComponentToMatchSnapshot(
   });
 
   // Assert match
-  expect(result.match,
+  expect(
+    result.match,
     `Visual comparison failed for ${name}: ${result.diffPixels} different pixels (${result.diffPercentage.toFixed(2)}%)`
   ).toBeTruthy();
 }
@@ -285,7 +270,7 @@ export async function waitForAnimationsToComplete(
   await page.waitForFunction(
     () => {
       const animations = document.getAnimations();
-      return animations.length === 0 || animations.every(a => a.playState === 'finished');
+      return animations.length === 0 || animations.every((a) => a.playState === 'finished');
     },
     { timeout }
   );
@@ -304,11 +289,7 @@ export async function waitForGameToStabilize(
     maxConsecutiveMatches?: number;
   } = {}
 ): Promise<void> {
-  const {
-    timeout = 10000,
-    checkInterval = 500,
-    maxConsecutiveMatches = 3,
-  } = options;
+  const { timeout = 10000, checkInterval = 500, maxConsecutiveMatches = 3 } = options;
 
   // Find the game canvas
   const canvas = page.locator('canvas').first();
@@ -332,14 +313,9 @@ export async function waitForGameToStabilize(
     const { width, height } = img1;
     const diff = new PNG({ width, height });
 
-    const diffPixels = pixelmatch(
-      img1.data,
-      img2.data,
-      diff.data,
-      width,
-      height,
-      { threshold: 0.1 }
-    );
+    const diffPixels = pixelmatch(img1.data, img2.data, diff.data, width, height, {
+      threshold: 0.1,
+    });
 
     // If no difference, increment consecutive matches
     if (diffPixels === 0) {

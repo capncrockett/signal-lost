@@ -10,12 +10,12 @@ export interface Fixture<T> {
    * Fixture ID
    */
   id: string;
-  
+
   /**
    * Fixture data
    */
   data: T;
-  
+
   /**
    * Fixture metadata
    */
@@ -30,27 +30,27 @@ export interface FixtureMetadata {
    * Fixture description
    */
   description?: string;
-  
+
   /**
    * Fixture tags
    */
   tags?: string[];
-  
+
   /**
    * Fixture dependencies
    */
   dependencies?: string[];
-  
+
   /**
    * Fixture author
    */
   author?: string;
-  
+
   /**
    * Fixture creation date
    */
   createdAt?: string;
-  
+
   /**
    * Fixture update date
    */
@@ -65,12 +65,12 @@ export interface FixtureCollection<T> {
    * Collection ID
    */
   id: string;
-  
+
   /**
    * Collection fixtures
    */
   fixtures: Fixture<T>[];
-  
+
   /**
    * Collection metadata
    */
@@ -85,12 +85,12 @@ export interface FixtureLoaderOptions {
    * Whether to deep clone fixtures
    */
   deepClone?: boolean;
-  
+
   /**
    * Whether to validate fixtures
    */
   validate?: boolean;
-  
+
   /**
    * Whether to resolve dependencies
    */

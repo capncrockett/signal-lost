@@ -8,7 +8,7 @@ export default defineConfig({
   retries: 0, // No retries for performance tests
   workers: 1, // Use a single worker to avoid interference
   reporter: process.env.CI ? 'dot' : [['html', { open: 'never' }], ['list']],
-  
+
   // Shared settings for all projects
   use: {
     baseURL: 'http://localhost:5173',
@@ -21,7 +21,7 @@ export default defineConfig({
     actionTimeout: 15000,
     navigationTimeout: 15000,
   },
-  
+
   // Configure projects for different browsers
   projects: [
     {
@@ -29,7 +29,7 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  
+
   // Output directory for test results
   outputDir: path.join(__dirname, 'performance-reports/results'),
 });

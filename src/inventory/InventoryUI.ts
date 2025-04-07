@@ -56,11 +56,7 @@ export class InventoryUI extends Phaser.GameObjects.Container {
    * @param inventory Inventory to display
    * @param config UI configuration
    */
-  constructor(
-    scene: Phaser.Scene,
-    inventory: Inventory,
-    config?: Partial<InventoryUIConfig>
-  ) {
+  constructor(scene: Phaser.Scene, inventory: Inventory, config?: Partial<InventoryUIConfig>) {
     // Default position
     const x = config?.x ?? 400;
     const y = config?.y ?? 300;
@@ -85,7 +81,7 @@ export class InventoryUI extends Phaser.GameObjects.Container {
       slotSpacing: 10,
       selectedSlotColor: 0x666666,
       selectedSlotAlpha: 0.8,
-      ...config
+      ...config,
     };
 
     // Create UI elements
@@ -133,7 +129,7 @@ export class InventoryUI extends Phaser.GameObjects.Container {
       {
         fontSize: '24px',
         color: '#ffffff',
-        fontStyle: 'bold'
+        fontStyle: 'bold',
       }
     );
     this.titleText.setOrigin(0.5, 0);
@@ -151,7 +147,7 @@ export class InventoryUI extends Phaser.GameObjects.Container {
       {
         fontSize: '24px',
         color: '#ff0000',
-        fontStyle: 'bold'
+        fontStyle: 'bold',
       }
     );
     this.closeButton.setOrigin(1, 0);
@@ -212,17 +208,12 @@ export class InventoryUI extends Phaser.GameObjects.Container {
       this.add(sprite);
 
       // Create placeholder for item quantity text
-      const text = this.scene.add.text(
-        x + slotSize / 2 - 5,
-        y + slotSize / 2 - 5,
-        '',
-        {
-          fontSize: '14px',
-          color: '#ffffff',
-          backgroundColor: '#000000',
-          padding: { x: 2, y: 2 }
-        }
-      );
+      const text = this.scene.add.text(x + slotSize / 2 - 5, y + slotSize / 2 - 5, '', {
+        fontSize: '14px',
+        color: '#ffffff',
+        backgroundColor: '#000000',
+        padding: { x: 2, y: 2 },
+      });
       text.setOrigin(1, 1);
       text.setVisible(false);
       this.itemTexts.push(text);
@@ -242,7 +233,7 @@ export class InventoryUI extends Phaser.GameObjects.Container {
       {
         fontSize: '16px',
         color: '#ffffff',
-        wordWrap: { width: this.config.width - this.config.padding * 2 }
+        wordWrap: { width: this.config.width - this.config.padding * 2 },
       }
     );
     this.descriptionText.setOrigin(0.5, 1);
@@ -262,7 +253,7 @@ export class InventoryUI extends Phaser.GameObjects.Container {
         fontSize: '18px',
         color: '#ffffff',
         backgroundColor: '#006600',
-        padding: { x: 10, y: 5 }
+        padding: { x: 10, y: 5 },
       }
     );
     this.useButton.setOrigin(0.5, 0.5);
@@ -282,7 +273,7 @@ export class InventoryUI extends Phaser.GameObjects.Container {
         fontSize: '18px',
         color: '#ffffff',
         backgroundColor: '#660000',
-        padding: { x: 10, y: 5 }
+        padding: { x: 10, y: 5 },
       }
     );
     this.dropButton.setOrigin(0.5, 0.5);
@@ -331,10 +322,7 @@ export class InventoryUI extends Phaser.GameObjects.Container {
       this.itemTexts[i].setVisible(false);
 
       // Reset slot appearance
-      this.slots[i].setFillStyle(
-        this.config.slotColor,
-        this.config.slotAlpha
-      );
+      this.slots[i].setFillStyle(this.config.slotColor, this.config.slotAlpha);
     }
 
     // Update slots with items
@@ -367,10 +355,7 @@ export class InventoryUI extends Phaser.GameObjects.Container {
   selectSlot(index: number): void {
     // Clear previous selection
     if (this.selectedSlot >= 0 && this.selectedSlot < this.slots.length) {
-      this.slots[this.selectedSlot].setFillStyle(
-        this.config.slotColor,
-        this.config.slotAlpha
-      );
+      this.slots[this.selectedSlot].setFillStyle(this.config.slotColor, this.config.slotAlpha);
     }
 
     // Set new selection
@@ -382,10 +367,7 @@ export class InventoryUI extends Phaser.GameObjects.Container {
 
     if (item) {
       // Highlight the slot
-      this.slots[index].setFillStyle(
-        this.config.selectedSlotColor,
-        this.config.selectedSlotAlpha
-      );
+      this.slots[index].setFillStyle(this.config.selectedSlotColor, this.config.selectedSlotAlpha);
 
       // Update description
       this.descriptionText.setText(`${item.getName()}\n\n${item.getDescription()}`);

@@ -36,11 +36,7 @@ export class PerformanceBenchmark {
    * @param iterations Number of iterations (overrides config)
    * @returns Benchmark result
    */
-  public run(
-    name: string,
-    fn: () => void,
-    iterations?: number
-  ): BenchmarkResult {
+  public run(name: string, fn: () => void, iterations?: number): BenchmarkResult {
     const iterCount = iterations || this.config.iterations;
 
     // Warm up
@@ -58,11 +54,11 @@ export class PerformanceBenchmark {
     if (this.config.logToConsole) {
       console.log(
         `Benchmark "${name}" (${iterCount} iterations): ` +
-        `Avg: ${result.average.toFixed(2)}ms, ` +
-        `Median: ${result.median.toFixed(2)}ms, ` +
-        `Min: ${result.min.toFixed(2)}ms, ` +
-        `Max: ${result.max.toFixed(2)}ms, ` +
-        `StdDev: ${result.stdDev.toFixed(2)}ms`
+          `Avg: ${result.average.toFixed(2)}ms, ` +
+          `Median: ${result.median.toFixed(2)}ms, ` +
+          `Min: ${result.min.toFixed(2)}ms, ` +
+          `Max: ${result.max.toFixed(2)}ms, ` +
+          `StdDev: ${result.stdDev.toFixed(2)}ms`
       );
     }
 
@@ -78,11 +74,7 @@ export class PerformanceBenchmark {
     const results: BenchmarkResult[] = [];
 
     for (const benchmark of benchmarks) {
-      const result = this.run(
-        benchmark.name,
-        benchmark.fn,
-        benchmark.iterations
-      );
+      const result = this.run(benchmark.name, benchmark.fn, benchmark.iterations);
       results.push(result);
     }
 
@@ -95,10 +87,7 @@ export class PerformanceBenchmark {
    * @param result2 Second benchmark result
    * @returns Comparison result
    */
-  public compare(
-    result1: BenchmarkResult,
-    result2: BenchmarkResult
-  ): BenchmarkComparison {
+  public compare(result1: BenchmarkResult, result2: BenchmarkResult): BenchmarkComparison {
     const avgDiff = result2.average - result1.average;
     const avgPercent = (avgDiff / result1.average) * 100;
     const medianDiff = result2.median - result1.median;
@@ -128,10 +117,10 @@ export class PerformanceBenchmark {
       const sign = avgPercent >= 0 ? '+' : '';
       console.log(
         `Benchmark comparison "${result1.name}" vs "${result2.name}": ` +
-        `Avg: ${sign}${avgPercent.toFixed(2)}%, ` +
-        `Median: ${sign}${medianPercent.toFixed(2)}%, ` +
-        `Min: ${sign}${minPercent.toFixed(2)}%, ` +
-        `Max: ${sign}${maxPercent.toFixed(2)}%`
+          `Avg: ${sign}${avgPercent.toFixed(2)}%, ` +
+          `Median: ${sign}${medianPercent.toFixed(2)}%, ` +
+          `Min: ${sign}${minPercent.toFixed(2)}%, ` +
+          `Max: ${sign}${maxPercent.toFixed(2)}%`
       );
     }
 
@@ -162,7 +151,8 @@ export class PerformanceBenchmark {
       summary: {
         totalBenchmarks: this.results.length,
         totalTime: this.results.reduce((sum, result) => sum + result.total, 0),
-        averageTime: this.results.reduce((sum, result) => sum + result.average, 0) / this.results.length,
+        averageTime:
+          this.results.reduce((sum, result) => sum + result.average, 0) / this.results.length,
       },
     };
 
@@ -170,9 +160,9 @@ export class PerformanceBenchmark {
     if (this.config.logToConsole) {
       console.log(
         `Benchmark report: ` +
-        `${report.summary.totalBenchmarks} benchmarks, ` +
-        `Total time: ${report.summary.totalTime.toFixed(2)}ms, ` +
-        `Average time: ${report.summary.averageTime.toFixed(2)}ms`
+          `${report.summary.totalBenchmarks} benchmarks, ` +
+          `Total time: ${report.summary.totalTime.toFixed(2)}ms, ` +
+          `Average time: ${report.summary.averageTime.toFixed(2)}ms`
       );
     }
 

@@ -110,7 +110,9 @@ describe('AudioVisualizer', () => {
     // Mock the clear and visualization methods
     const clearSpy = jest.spyOn(audioVisualizer as any, 'clear').mockImplementation(() => {});
     const drawBarsSpy = jest.spyOn(audioVisualizer as any, 'drawBars').mockImplementation(() => {});
-    const drawWaveformSpy = jest.spyOn(audioVisualizer as any, 'drawWaveform').mockImplementation(() => {});
+    const drawWaveformSpy = jest
+      .spyOn(audioVisualizer as any, 'drawWaveform')
+      .mockImplementation(() => {});
 
     // Call preUpdate
     audioVisualizer.preUpdate();

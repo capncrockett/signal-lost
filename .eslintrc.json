@@ -15,10 +15,13 @@
   },
   "rules": {
     "prettier/prettier": "error",
-    "@typescript-eslint/explicit-function-return-type": ["warn", {
-      "allowExpressions": true,
-      "allowTypedFunctionExpressions": true
-    }],
+    "@typescript-eslint/explicit-function-return-type": [
+      "warn",
+      {
+        "allowExpressions": true,
+        "allowTypedFunctionExpressions": true
+      }
+    ],
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-non-null-assertion": "warn",
@@ -36,7 +39,15 @@
   },
   "overrides": [
     {
-      "files": ["**/*.test.ts", "**/*.spec.ts", "**/tests/**/*.ts", "**/e2e/**/*.ts", "**/mocks/**/*.ts", "**/fixtures/**/*.ts", "**/performance/**/*.ts"],
+      "files": [
+        "**/*.test.ts",
+        "**/*.spec.ts",
+        "**/tests/**/*.ts",
+        "**/e2e/**/*.ts",
+        "**/mocks/**/*.ts",
+        "**/fixtures/**/*.ts",
+        "**/performance/**/*.ts"
+      ],
       "rules": {
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-unsafe-assignment": "off",

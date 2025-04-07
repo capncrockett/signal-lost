@@ -1,6 +1,6 @@
 # 🎮 Signal Lost
 
-> *A lo-fi, pixel-art narrative exploration game where a lone radio operator pieces together a fractured world through distorted frequencies and eerie signals.*
+> _A lo-fi, pixel-art narrative exploration game where a lone radio operator pieces together a fractured world through distorted frequencies and eerie signals._
 
 ---
 
@@ -21,13 +21,13 @@ npm run check-all          # Run all checks (lint, type-check, tests, E2E tests)
 
 ## 📂 Project Structure
 
-| Folder | Description |
-| ------ | ----------- |
-| src/ | Core TypeScript game source (Phaser 3) |
-| assets/ | Pixel art, audio files, tilemaps |
-| tests/ | Jest unit/integration tests (ts-jest) |
-| e2e/ | Playwright tests for browser interactions |
-| docs/ | Feature specs, prompt definitions, tasks |
+| Folder  | Description                               |
+| ------- | ----------------------------------------- |
+| src/    | Core TypeScript game source (Phaser 3)    |
+| assets/ | Pixel art, audio files, tilemaps          |
+| tests/  | Jest unit/integration tests (ts-jest)     |
+| e2e/    | Playwright tests for browser interactions |
+| docs/   | Feature specs, prompt definitions, tasks  |
 
 ## ✅ Development Rules
 
@@ -107,6 +107,7 @@ The workflow runs automatically on pushes to `main` and `develop` branches, as w
 - If you crash or lose state, re-read the prompt and resume from the last ❌ section.
 
 Refer to:
+
 - docs/prompts.md
 - docs/tests.md
 - docs/todo.md

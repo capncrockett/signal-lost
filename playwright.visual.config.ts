@@ -8,7 +8,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: 1, // Use a single worker to avoid race conditions
   reporter: process.env.CI ? 'dot' : [['html', { open: 'never' }], ['list']],
-  
+
   // Snapshot configuration
   expect: {
     toMatchSnapshot: {
@@ -18,7 +18,7 @@ export default defineConfig({
       threshold: 0.2,
     },
   },
-  
+
   // Shared settings for all projects
   use: {
     baseURL: 'http://localhost:5173',
@@ -30,30 +30,30 @@ export default defineConfig({
     viewport: { width: 1280, height: 800 },
     actionTimeout: 15000,
     navigationTimeout: 15000,
-    
+
     // Screenshot configuration
     screenshot: 'only-on-failure',
   },
-  
+
   // Configure projects for different browsers
   projects: [
     {
       name: 'chromium',
-      use: { 
+      use: {
         ...devices['Desktop Chrome'],
         // Store snapshots in browser-specific directories
         snapshotPathTemplate: '{testDir}/{testFileDir}/{testFileName}-{arg}{ext}',
       },
     },
   ],
-  
+
   // Start the development server
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
   },
-  
+
   // Output directory for snapshots
   outputDir: path.join(__dirname, 'e2e/visual-tests/results'),
 });

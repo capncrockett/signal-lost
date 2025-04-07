@@ -1,4 +1,4 @@
-import { AudioFixture, FixtureCollection } from '../types';
+import { FixtureCollection } from '../types';
 
 /**
  * Audio fixtures
@@ -121,22 +121,22 @@ export const AudioFixtures: FixtureCollection<Record<string, unknown>> = {
       id: 'audioBuffers',
       data: {
         buffers: {
-          'static': {
+          static: {
             duration: 2.0,
             sampleRate: 44100,
             numberOfChannels: 1,
           },
-          'drone': {
+          drone: {
             duration: 10.0,
             sampleRate: 44100,
             numberOfChannels: 2,
           },
-          'blip': {
+          blip: {
             duration: 0.5,
             sampleRate: 44100,
             numberOfChannels: 1,
           },
-          'click': {
+          click: {
             duration: 0.1,
             sampleRate: 44100,
             numberOfChannels: 1,

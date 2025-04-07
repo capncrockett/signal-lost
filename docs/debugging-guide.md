@@ -76,7 +76,7 @@ The game implements fallback mechanisms:
 this.load.on('loaderror', (file: Phaser.Loader.File) => {
   const url = typeof file.url === 'string' ? file.url : String(file.url);
   console.error(`Error loading asset: ${file.key} from ${url}`);
-  
+
   // Try alternative path
   if (!file.key.endsWith('_alt')) {
     if (url.startsWith('/')) {

@@ -151,7 +151,9 @@ test('Measure FPS stability', async ({ page }) => {
     };
   });
 
-  console.log(`FPS: Avg=${fpsData.avg.toFixed(2)}, Min=${fpsData.min.toFixed(2)}, Max=${fpsData.max.toFixed(2)}, StdDev=${fpsData.stdDev.toFixed(2)}`);
+  console.log(
+    `FPS: Avg=${fpsData.avg.toFixed(2)}, Min=${fpsData.min.toFixed(2)}, Max=${fpsData.max.toFixed(2)}, StdDev=${fpsData.stdDev.toFixed(2)}`
+  );
 
   // Save FPS data
   const outputDir = path.resolve('performance-reports');

@@ -1,9 +1,6 @@
 import { test } from '@playwright/test';
 import { waitForGameLoad, clickGamePosition } from '../helpers/gameTestHelpers';
-import {
-  expectGameToMatchSnapshot,
-  waitForGameToStabilize,
-} from '../helpers/visualTestHelpers';
+import { expectGameToMatchSnapshot, waitForGameToStabilize } from '../helpers/visualTestHelpers';
 
 // Increase timeout for visual tests
 test.setTimeout(120000);

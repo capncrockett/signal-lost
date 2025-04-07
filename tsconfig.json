@@ -16,5 +16,13 @@
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true
   },
-  "include": ["src", "tests", "e2e", "*.ts", "vite.config.ts", "playwright.config.ts", "jest.config.ts"]
+  "include": [
+    "src",
+    "tests",
+    "e2e",
+    "*.ts",
+    "vite.config.ts",
+    "playwright.config.ts",
+    "jest.config.ts"
+  ]
 }

@@ -22,7 +22,11 @@ declare global {
 
 // Assign to window
 const win = window as any;
-win.PerformanceMonitor = import('../../src/utils/PerformanceMonitor').then(m => m.PerformanceMonitor);
-win.PerformanceBenchmark = import('../../src/utils/PerformanceBenchmark').then(m => m.PerformanceBenchmark);
-win.PerformanceTests = import('./PerformanceTests').then(m => m.PerformanceTests);
-win.PerformanceTestRunner = import('./PerformanceTestRunner').then(m => m.PerformanceTestRunner);
+win.PerformanceMonitor = import('../../src/utils/PerformanceMonitor').then(
+  (m) => m.PerformanceMonitor
+);
+win.PerformanceBenchmark = import('../../src/utils/PerformanceBenchmark').then(
+  (m) => m.PerformanceBenchmark
+);
+win.PerformanceTests = import('./PerformanceTests').then((m) => m.PerformanceTests);
+win.PerformanceTestRunner = import('./PerformanceTestRunner').then((m) => m.PerformanceTestRunner);

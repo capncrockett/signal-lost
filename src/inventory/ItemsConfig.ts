@@ -41,7 +41,7 @@ export const itemsData: ItemData[] = [
       action: 'toggle_light',
     },
   },
-  
+
   // Documents
   {
     id: 'journal',
@@ -58,14 +58,16 @@ export const itemsData: ItemData[] = [
   {
     id: 'note_tower',
     name: 'Tower Note',
-    description: 'A note found at the radio tower. It mentions something about a "signal protocol".',
+    description:
+      'A note found at the radio tower. It mentions something about a "signal protocol".',
     type: ItemType.DOCUMENT,
     icon: 'note_item',
     usable: true,
     stackable: false,
     effects: {
       action: 'read_note',
-      content: 'The signal protocol requires three specific frequencies to be activated in sequence. The first is at 91.5 MHz. Find the others by exploring the ruins.',
+      content:
+        'The signal protocol requires three specific frequencies to be activated in sequence. The first is at 91.5 MHz. Find the others by exploring the ruins.',
     },
   },
   {
@@ -78,10 +80,11 @@ export const itemsData: ItemData[] = [
     stackable: false,
     effects: {
       action: 'read_note',
-      content: 'Second frequency: 96.3 MHz. The third frequency is hidden in the bunker. Be careful, the area is unstable.',
+      content:
+        'Second frequency: 96.3 MHz. The third frequency is hidden in the bunker. Be careful, the area is unstable.',
     },
   },
-  
+
   // Keys
   {
     id: 'key_bunker',
@@ -101,7 +104,7 @@ export const itemsData: ItemData[] = [
     usable: false,
     stackable: false,
   },
-  
+
   // Radio Parts
   {
     id: 'radio_enhancer',
@@ -129,7 +132,7 @@ export const itemsData: ItemData[] = [
       clarityBoost: 2.0,
     },
   },
-  
+
   // Consumables
   {
     id: 'battery',

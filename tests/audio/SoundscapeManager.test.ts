@@ -145,17 +145,23 @@ describe('SoundscapeManager', () => {
     soundscapeManager.initialize();
 
     // Set up spies to access private properties
-    const staticPannerSpy = jest.spyOn(soundscapeManager as any, 'staticPanner', 'get').mockReturnValue({
-      pan: { value: 0 }
-    });
+    const staticPannerSpy = jest
+      .spyOn(soundscapeManager as any, 'staticPanner', 'get')
+      .mockReturnValue({
+        pan: { value: 0 },
+      });
 
-    const dronePannerSpy = jest.spyOn(soundscapeManager as any, 'dronePanner', 'get').mockReturnValue({
-      pan: { value: 0 }
-    });
+    const dronePannerSpy = jest
+      .spyOn(soundscapeManager as any, 'dronePanner', 'get')
+      .mockReturnValue({
+        pan: { value: 0 },
+      });
 
-    const blipPannerSpy = jest.spyOn(soundscapeManager as any, 'blipPanner', 'get').mockReturnValue({
-      pan: { value: 0 }
-    });
+    const blipPannerSpy = jest
+      .spyOn(soundscapeManager as any, 'blipPanner', 'get')
+      .mockReturnValue({
+        pan: { value: 0 },
+      });
 
     // Adjust panning with different positions
     soundscapeManager.adjustPanning(-1); // Far left
@@ -177,9 +183,11 @@ describe('SoundscapeManager', () => {
     soundscapeManager.initialize();
 
     // Create a spy for the master gain node
-    const masterGainSpy = jest.spyOn(soundscapeManager as any, 'masterGain', 'get').mockReturnValue({
-      gain: { value: 0 }
-    });
+    const masterGainSpy = jest
+      .spyOn(soundscapeManager as any, 'masterGain', 'get')
+      .mockReturnValue({
+        gain: { value: 0 },
+      });
 
     // Set different volumes
     soundscapeManager.setVolume(0); // Silent
@@ -214,7 +222,9 @@ describe('SoundscapeManager', () => {
     expect(mockSetTimeout).toHaveBeenCalled();
 
     // Create a spy for the createBlip method
-    const createBlipSpy = jest.spyOn(soundscapeManager as any, 'createBlip').mockImplementation(() => {});
+    const createBlipSpy = jest
+      .spyOn(soundscapeManager as any, 'createBlip')
+      .mockImplementation(() => {});
 
     // Call the callback passed to setTimeout
     const setTimeoutCalls = mockSetTimeout.mock.calls;
@@ -230,7 +240,9 @@ describe('SoundscapeManager', () => {
 
   test('should handle operations when not initialized', () => {
     // Create spies for private properties
-    const isInitializedSpy = jest.spyOn(soundscapeManager as any, 'isInitialized', 'get').mockReturnValue(false);
+    const isInitializedSpy = jest
+      .spyOn(soundscapeManager as any, 'isInitialized', 'get')
+      .mockReturnValue(false);
 
     // Try to update layers without initializing
     soundscapeManager.updateLayers(0.5);
@@ -273,10 +285,12 @@ describe('SoundscapeManager', () => {
     soundscapeManager.initialize();
 
     // Create a spy for the audioContext
-    const audioContextSpy = jest.spyOn(soundscapeManager as any, 'audioContext', 'get').mockReturnValue({
-      state: 'suspended',
-      resume: jest.fn().mockResolvedValue(undefined),
-    });
+    const audioContextSpy = jest
+      .spyOn(soundscapeManager as any, 'audioContext', 'get')
+      .mockReturnValue({
+        state: 'suspended',
+        resume: jest.fn().mockResolvedValue(undefined),
+      });
 
     // Call a method that would use the audio context
     soundscapeManager.updateLayers(0.5);

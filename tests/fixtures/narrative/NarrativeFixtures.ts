@@ -1,4 +1,4 @@
-import { NarrativeFixture, FixtureCollection } from '../types';
+import { FixtureCollection } from '../types';
 
 /**
  * Narrative fixtures
@@ -24,7 +24,7 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
       id: 'basicEngine',
       data: {
         events: {
-          'intro': {
+          intro: {
             id: 'intro',
             message: 'Welcome to Signal Lost. Your journey begins now.',
             choices: [
@@ -34,7 +34,7 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
               },
             ],
           },
-          'tutorial': {
+          tutorial: {
             id: 'tutorial',
             message: 'Use the radio to find signals and discover locations.',
             choices: [
@@ -46,7 +46,7 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
           },
         },
         flags: {
-          'tutorial_complete': false,
+          tutorial_complete: false,
         },
         history: ['intro'],
         currentEvent: 'intro',
@@ -70,7 +70,7 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
       id: 'midGameEngine',
       data: {
         events: {
-          'intro': {
+          intro: {
             id: 'intro',
             message: 'Welcome to Signal Lost. Your journey begins now.',
             choices: [
@@ -80,7 +80,7 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
               },
             ],
           },
-          'tutorial': {
+          tutorial: {
             id: 'tutorial',
             message: 'Use the radio to find signals and discover locations.',
             choices: [
@@ -90,9 +90,10 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
               },
             ],
           },
-          'tower_discovery': {
+          tower_discovery: {
             id: 'tower_discovery',
-            message: 'You hear whispers in the static. The radio tower looms above you, its red light blinking in the fog.',
+            message:
+              'You hear whispers in the static. The radio tower looms above you, its red light blinking in the fog.',
             choices: [
               {
                 text: 'Investigate the tower',
@@ -104,9 +105,10 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
               },
             ],
           },
-          'tower_investigation': {
+          tower_investigation: {
             id: 'tower_investigation',
-            message: 'As you approach the tower, the static on your radio intensifies. You notice a small door at the base of the structure.',
+            message:
+              'As you approach the tower, the static on your radio intensifies. You notice a small door at the base of the structure.',
             choices: [
               {
                 text: 'Try to open the door',
@@ -124,14 +126,15 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
           },
         },
         flags: {
-          'tutorial_complete': true,
-          'discovered_tower1': true,
+          tutorial_complete: true,
+          discovered_tower1: true,
         },
         history: ['intro', 'tutorial', 'tower_discovery'],
         currentEvent: 'tower_discovery',
         activeEvent: {
           id: 'tower_discovery',
-          message: 'You hear whispers in the static. The radio tower looms above you, its red light blinking in the fog.',
+          message:
+            'You hear whispers in the static. The radio tower looms above you, its red light blinking in the fog.',
           choices: [
             {
               text: 'Investigate the tower',
@@ -153,9 +156,10 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
       id: 'conditionalEvents',
       data: {
         events: {
-          'bunker_discovery': {
+          bunker_discovery: {
             id: 'bunker_discovery',
-            message: 'You\'ve found a bunker entrance partially hidden by vegetation. The heavy metal door is locked.',
+            message:
+              "You've found a bunker entrance partially hidden by vegetation. The heavy metal door is locked.",
             choices: [
               {
                 text: 'Use the bunker key',
@@ -172,9 +176,10 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
               },
             ],
           },
-          'bunker_force': {
+          bunker_force: {
             id: 'bunker_force',
-            message: 'You try to force the door, but it\'s too sturdy. You\'ll need the proper key to open it.',
+            message:
+              "You try to force the door, but it's too sturdy. You'll need the proper key to open it.",
             choices: [
               {
                 text: 'Look for another way in',
@@ -188,14 +193,15 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
           },
         },
         flags: {
-          'discovered_bunker1': true,
-          'has_bunker_key': false,
+          discovered_bunker1: true,
+          has_bunker_key: false,
         },
         history: ['bunker_discovery', 'bunker_force'],
         currentEvent: 'bunker_force',
         activeEvent: {
           id: 'bunker_force',
-          message: 'You try to force the door, but it\'s too sturdy. You\'ll need the proper key to open it.',
+          message:
+            "You try to force the door, but it's too sturdy. You'll need the proper key to open it.",
           choices: [
             {
               text: 'Look for another way in',
@@ -217,9 +223,10 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
       id: 'complexBranching',
       data: {
         events: {
-          'signal_protocol_decision': {
+          signal_protocol_decision: {
             id: 'signal_protocol_decision',
-            message: 'You\'ve discovered all the frequencies for the Signal Protocol. Do you want to activate it?',
+            message:
+              "You've discovered all the frequencies for the Signal Protocol. Do you want to activate it?",
             choices: [
               {
                 text: 'Activate the protocol',
@@ -235,9 +242,10 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
               },
             ],
           },
-          'protocol_activation': {
+          protocol_activation: {
             id: 'protocol_activation',
-            message: 'You tune your radio to each frequency in sequence: 91.5, 96.3, 103.7, 105.1. The static clears, and a voice speaks clearly through your radio...',
+            message:
+              'You tune your radio to each frequency in sequence: 91.5, 96.3, 103.7, 105.1. The static clears, and a voice speaks clearly through your radio...',
             choices: [
               {
                 text: 'Listen carefully',
@@ -245,9 +253,10 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
               },
             ],
           },
-          'protocol_delay': {
+          protocol_delay: {
             id: 'protocol_delay',
-            message: 'You decide to wait and gather more information before activating the protocol. Perhaps there\'s more to discover.',
+            message:
+              "You decide to wait and gather more information before activating the protocol. Perhaps there's more to discover.",
             choices: [
               {
                 text: 'Continue exploring',
@@ -255,9 +264,10 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
               },
             ],
           },
-          'protocol_destroy': {
+          protocol_destroy: {
             id: 'protocol_destroy',
-            message: 'You destroy the protocol documentation, ensuring that whatever it might activate remains dormant. Perhaps some things are better left undiscovered.',
+            message:
+              'You destroy the protocol documentation, ensuring that whatever it might activate remains dormant. Perhaps some things are better left undiscovered.',
             choices: [
               {
                 text: 'Continue exploring',
@@ -267,14 +277,15 @@ export const NarrativeFixtures: FixtureCollection<Record<string, unknown>> = {
           },
         },
         flags: {
-          'knows_frequency_sequence': true,
-          'has_all_frequencies': true,
+          knows_frequency_sequence: true,
+          has_all_frequencies: true,
         },
         history: ['signal_protocol_decision'],
         currentEvent: 'signal_protocol_decision',
         activeEvent: {
           id: 'signal_protocol_decision',
-          message: 'You\'ve discovered all the frequencies for the Signal Protocol. Do you want to activate it?',
+          message:
+            "You've discovered all the frequencies for the Signal Protocol. Do you want to activate it?",
           choices: [
             {
               text: 'Activate the protocol',

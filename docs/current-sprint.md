@@ -1,13 +1,16 @@
 # Current Sprint Tasks
 
 ## Critical Issues
+
 - ✅ Remove duplicate "Go to Field" button
+
   - ✅ Remove DOM button from MainScene
   - ✅ Keep only the Phaser Text button
   - ✅ Update e2e tests to target correct button
   - ✅ Added TestOverlay utility for better E2E testing with data-testid attributes
 
 - ✅ Fix Volume Control
+
   - ✅ Set initial volume to 80% in VolumeControl constructor
   - ✅ Normalize volume scaling across components
   - ✅ Add volume curve for more natural adjustment
@@ -16,6 +19,7 @@
   - ✅ Ensure volume control affects static noise
 
 - ✅ Audio Improvements
+
   - ✅ Reduce overall volume of static noise
     - ✅ Cut static volume in half across all components
     - ✅ Normalized volume scaling for better user experience
@@ -25,6 +29,7 @@
     - ✅ Created NoiseGenerator utility for consistent noise generation
 
 - ⏸️ Viewport & Scaling (postponed for future sprint)
+
   - ✅ Fix Phaser scale configuration (using fixed dimensions)
   - ✅ Test responsive behavior
   - ✅ Add viewport meta tags
@@ -50,11 +55,13 @@
   - ✅ Test save/load functionality
 
 ### Critical Issues Summary
+
 - ✅ 4/5 critical issues fully resolved (Button duplication, Volume Control, Audio Improvements, E2E Tests)
 - ⏸️ 1/5 critical issues postponed for future sprint (Viewport & Scaling)
 - Next steps: Focus on implementing signal discovery mechanics and field exploration content
 
 ## Game Development
+
 - ⚠️ Add actual gameplay elements
   - ⚠️ Implement signal discovery mechanics
     - ✅ Fixed asset loading paths
@@ -67,18 +74,21 @@
   - ✅ Implement save/load system
 
 ## Documentation
+
 - ✅ Update README with actual gameplay instructions
 - ✅ Add debugging guide
 - ✅ Document audio system architecture
 - ✅ Add contribution guidelines
 
 ## Testing Infrastructure
+
 - ✅ Add visual regression testing
 - ✅ Improve test coverage for audio components
 - ✅ Add performance benchmarks
 - ✅ Create test data fixtures
 
 ## Troubleshooting Game Rendering Issues
+
 - ✅ Created diagnostic test pages to isolate rendering problems
   - ✅ Added path-test.html to verify asset loading paths
   - ✅ Added cdn-test.html using CDN-loaded Phaser

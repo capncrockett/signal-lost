@@ -26,3 +26,4 @@
 - [x] Narrative Engine (97%+ test coverage for NarrativeEngine.ts)
 - [x] Playwright scene load test (implemented)
 - [x] Playwright console log listener test (implemented)
+```

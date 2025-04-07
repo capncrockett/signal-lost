@@ -1,4 +1,13 @@
 /**
+ * Memory info from performance.memory
+ */
+interface MemoryInfo {
+  totalJSHeapSize: number;
+  usedJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
+/**
  * Performance monitoring utility for tracking game performance metrics
  */
 export class PerformanceMonitor {
@@ -29,7 +38,7 @@ export class PerformanceMonitor {
   private sceneTransitions: SceneTransition[] = [];
 
   // Event listeners
-  private listeners: Record<PerformanceEventType, Array<(data: any) => void>> = {
+  private listeners: Record<PerformanceEventType, Array<(data: unknown) => void>> = {
     fps: [],
     memory: [],
     loadTime: [],
@@ -114,7 +123,7 @@ export class PerformanceMonitor {
     if (this.config.logToConsole) {
       console.log(
         `Scene "${sceneName}" loaded in ${loadTime.toFixed(2)}ms ` +
-        `(Assets: ${totalAssetLoadTime.toFixed(2)}ms, Other: ${otherTime.toFixed(2)}ms)`
+          `(Assets: ${totalAssetLoadTime.toFixed(2)}ms, Other: ${otherTime.toFixed(2)}ms)`
       );
     }
   }
@@ -188,7 +197,7 @@ export class PerformanceMonitor {
     // Update FPS stats
     if (time - this.fpsUpdateTime >= this.config.fpsUpdateInterval) {
       // Calculate average FPS
-      this.averageFps = this.frameCount * 1000 / (time - this.fpsUpdateTime);
+      this.averageFps = (this.frameCount * 1000) / (time - this.fpsUpdateTime);
       this.frameCount = 0;
       this.fpsUpdateTime = time;
 
@@ -217,7 +226,7 @@ export class PerformanceMonitor {
       if (this.config.logToConsole) {
         console.log(
           `FPS: ${this.averageFps.toFixed(2)} ` +
-          `(Min: ${this.minFps.toFixed(2)}, Max: ${this.maxFps.toFixed(2)})`
+            `(Min: ${this.minFps.toFixed(2)}, Max: ${this.maxFps.toFixed(2)})`
         );
       }
     }
@@ -227,12 +236,12 @@ export class PerformanceMonitor {
       this.config.trackMemory &&
       time - this.memoryUpdateTime >= this.config.memoryUpdateInterval &&
       window.performance &&
-      (performance as any).memory
+      (performance as unknown as { memory: MemoryInfo }).memory
     ) {
       this.memoryUpdateTime = time;
 
       // Get memory usage
-      const memoryInfo = (performance as any).memory;
+      const memoryInfo = (performance as unknown as { memory: MemoryInfo }).memory;
       const memoryUsage: MemoryUsage = {
         totalJSHeapSize: memoryInfo.totalJSHeapSize,
         usedJSHeapSize: memoryInfo.usedJSHeapSize,
@@ -265,7 +274,7 @@ export class PerformanceMonitor {
       if (this.config.logToConsole) {
         console.log(
           `Memory: ${(memoryUsage.usedJSHeapSize / 1024 / 1024).toFixed(2)}MB ` +
-          `(Peak: ${(this.peakMemoryUsage / 1024 / 1024).toFixed(2)}MB)`
+            `(Peak: ${(this.peakMemoryUsage / 1024 / 1024).toFixed(2)}MB)`
         );
       }
     }
@@ -278,11 +287,7 @@ export class PerformanceMonitor {
    * @param iterations Number of iterations to run
    * @returns Benchmark results
    */
-  public runBenchmark(
-    name: string,
-    fn: () => void,
-    iterations: number = 100
-  ): BenchmarkResult {
+  public runBenchmark(name: string, fn: () => void, iterations: number = 100): BenchmarkResult {
     // Warm up
     fn();
 
@@ -327,11 +332,11 @@ export class PerformanceMonitor {
     if (this.config.logToConsole) {
       console.log(
         `Benchmark "${name}" (${iterations} iterations): ` +
-        `Avg: ${average.toFixed(2)}ms, ` +
-        `Median: ${median.toFixed(2)}ms, ` +
-        `Min: ${min.toFixed(2)}ms, ` +
-        `Max: ${max.toFixed(2)}ms, ` +
-        `StdDev: ${stdDev.toFixed(2)}ms`
+          `Avg: ${average.toFixed(2)}ms, ` +
+          `Median: ${median.toFixed(2)}ms, ` +
+          `Min: ${min.toFixed(2)}ms, ` +
+          `Max: ${max.toFixed(2)}ms, ` +
+          `StdDev: ${stdDev.toFixed(2)}ms`
       );
     }
 
@@ -343,10 +348,7 @@ export class PerformanceMonitor {
    * @param event Event type
    * @param callback Callback function
    */
-  public addEventListener(
-    event: PerformanceEventType,
-    callback: (data: any) => void
-  ): void {
+  public addEventListener(event: PerformanceEventType, callback: (data: unknown) => void): void {
     this.listeners[event].push(callback);
   }
 
@@ -355,10 +357,7 @@ export class PerformanceMonitor {
    * @param event Event type
    * @param callback Callback function
    */
-  public removeEventListener(
-    event: PerformanceEventType,
-    callback: (data: any) => void
-  ): void {
+  public removeEventListener(event: PerformanceEventType, callback: (data: unknown) => void): void {
     const index = this.listeners[event].indexOf(callback);
     if (index !== -1) {
       this.listeners[event].splice(index, 1);
@@ -370,7 +369,7 @@ export class PerformanceMonitor {
    * @param event Event type
    * @param data Event data
    */
-  private notifyListeners(event: PerformanceEventType, data: any): void {
+  private notifyListeners(event: PerformanceEventType, data: unknown): void {
     for (const listener of this.listeners[event]) {
       listener(data);
     }

@@ -121,7 +121,7 @@ export class PerformanceTestRunner {
     // Compare individual benchmarks
     for (const currentResult of result.results) {
       // Find matching baseline result
-      const baselineResult = baseline.results.find(r => r.name === currentResult.name);
+      const baselineResult = baseline.results.find((r) => r.name === currentResult.name);
       if (!baselineResult) {
         continue;
       }
@@ -168,7 +168,7 @@ export class PerformanceTestRunner {
       for (const regression of regressions) {
         console.log(
           `${regression.name}: ${regression.baseline.toFixed(2)}ms -> ${regression.current.toFixed(2)}ms ` +
-          `(${(regression.percentDiff * 100).toFixed(2)}%)`
+            `(${(regression.percentDiff * 100).toFixed(2)}%)`
         );
       }
     }
@@ -179,7 +179,7 @@ export class PerformanceTestRunner {
       for (const improvement of improvements) {
         console.log(
           `${improvement.name}: ${improvement.baseline.toFixed(2)}ms -> ${improvement.current.toFixed(2)}ms ` +
-          `(${(improvement.percentDiff * 100).toFixed(2)}%)`
+            `(${(improvement.percentDiff * 100).toFixed(2)}%)`
         );
       }
     }

@@ -1,4 +1,4 @@
-import { RadioFixture, FixtureCollection } from '../types';
+import { FixtureCollection } from '../types';
 
 /**
  * Radio fixtures

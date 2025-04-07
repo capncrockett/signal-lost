@@ -1,4 +1,4 @@
-import { InventoryFixture, FixtureCollection } from '../types';
+import { FixtureCollection } from '../types';
 
 /**
  * Inventory fixtures
@@ -124,10 +124,12 @@ export const InventoryFixtures: FixtureCollection<Record<string, unknown>> = {
     {
       id: 'fullInventory',
       data: {
-        items: Array(20).fill(null).map((_, i) => ({
-          id: i < 10 ? `item_${i + 1}` : 'battery',
-          quantity: i < 10 ? 1 : 2,
-        })),
+        items: Array(20)
+          .fill(null)
+          .map((_, i) => ({
+            id: i < 10 ? `item_${i + 1}` : 'battery',
+            quantity: i < 10 ? 1 : 2,
+          })),
         capacity: 20,
         selectedItemIndex: 0,
       },

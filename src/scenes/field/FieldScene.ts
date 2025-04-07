@@ -517,13 +517,13 @@ export class FieldScene extends Phaser.Scene {
     // Check if this is the first time loading the scene
     if (!SaveManager.getFlag('field_scene_visited')) {
       // Add radio to inventory
-      const radioItem = itemsData.find(item => item.id === 'radio');
+      const radioItem = itemsData.find((item) => item.id === 'radio');
       if (radioItem) {
         this.inventory.addItem(new Item(radioItem));
       }
 
       // Add journal to inventory
-      const journalItem = itemsData.find(item => item.id === 'journal');
+      const journalItem = itemsData.find((item) => item.id === 'journal');
       if (journalItem) {
         this.inventory.addItem(new Item(journalItem));
       }
@@ -590,7 +590,7 @@ export class FieldScene extends Phaser.Scene {
       // Check if this interactable gives an item
       if (type === 'item') {
         // Find the corresponding item in the item definitions
-        const itemData = itemsData.find(item => item.id === id);
+        const itemData = itemsData.find((item) => item.id === id);
         if (itemData) {
           // Add the item to the inventory
           const item = new Item(itemData);

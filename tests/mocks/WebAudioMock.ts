@@ -35,11 +35,7 @@ export class AudioContext {
     return new AudioBufferSourceNode(this);
   }
 
-  public createBuffer(
-    numberOfChannels: number,
-    length: number,
-    sampleRate: number
-  ): AudioBuffer {
+  public createBuffer(numberOfChannels: number, length: number, sampleRate: number): AudioBuffer {
     return new AudioBuffer({
       numberOfChannels,
       length,
@@ -221,11 +217,7 @@ export class AudioBuffer {
   public numberOfChannels: number;
   private channels: Float32Array[];
 
-  constructor(options: {
-    numberOfChannels: number;
-    length: number;
-    sampleRate: number;
-  }) {
+  constructor(options: { numberOfChannels: number; length: number; sampleRate: number }) {
     this.numberOfChannels = options.numberOfChannels;
     this.length = options.length;
     this.sampleRate = options.sampleRate;
@@ -242,7 +234,11 @@ export class AudioBuffer {
     return this.channels[channel];
   }
 
-  public copyFromChannel(destination: Float32Array, channelNumber: number, startInChannel?: number): void {
+  public copyFromChannel(
+    destination: Float32Array,
+    channelNumber: number,
+    startInChannel?: number
+  ): void {
     const source = this.getChannelData(channelNumber);
     const start = startInChannel || 0;
     for (let i = 0; i < destination.length; i++) {

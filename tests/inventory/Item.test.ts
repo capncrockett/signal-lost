@@ -235,12 +235,7 @@ describe('Item', () => {
       const sprite = stackableItem.createSprite(mockScene as any, 100, 100);
 
       expect(mockScene.add.sprite).toHaveBeenCalledWith(100, 100, 'test_icon');
-      expect(mockScene.add.text).toHaveBeenCalledWith(
-        110,
-        110,
-        '3',
-        expect.any(Object)
-      );
+      expect(mockScene.add.text).toHaveBeenCalledWith(110, 110, '3', expect.any(Object));
       expect(mockScene.add.container).toHaveBeenCalled();
       expect(sprite).toBeDefined();
     });

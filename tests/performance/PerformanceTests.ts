@@ -86,25 +86,19 @@ export class PerformanceTests {
     const results: BenchmarkResult[] = [];
 
     // Test basic rendering
-    const basicRenderResult = this.benchmark.run(
-      'Basic Render',
-      () => {
-        // Simulate a render cycle
-        game.renderer.render(game.scene.scenes[0], 0);
-      }
-    );
+    const basicRenderResult = this.benchmark.run('Basic Render', () => {
+      // Simulate a render cycle
+      game.renderer.render(game.scene.scenes[0], 0);
+    });
     results.push(basicRenderResult);
 
     // Test complex rendering
-    const complexRenderResult = this.benchmark.run(
-      'Complex Render',
-      () => {
-        // Simulate a complex render cycle
-        for (const scene of game.scene.scenes) {
-          game.renderer.render(scene, 0);
-        }
+    const complexRenderResult = this.benchmark.run('Complex Render', () => {
+      // Simulate a complex render cycle
+      for (const scene of game.scene.scenes) {
+        game.renderer.render(scene, 0);
       }
-    );
+    });
     results.push(complexRenderResult);
 
     return results;
@@ -119,25 +113,19 @@ export class PerformanceTests {
     const results: BenchmarkResult[] = [];
 
     // Test basic update
-    const basicUpdateResult = this.benchmark.run(
-      'Basic Update',
-      () => {
-        // Simulate an update cycle
-        game.scene.scenes[0].update(0, 16);
-      }
-    );
+    const basicUpdateResult = this.benchmark.run('Basic Update', () => {
+      // Simulate an update cycle
+      game.scene.scenes[0].update(0, 16);
+    });
     results.push(basicUpdateResult);
 
     // Test complex update
-    const complexUpdateResult = this.benchmark.run(
-      'Complex Update',
-      () => {
-        // Simulate a complex update cycle
-        for (const scene of game.scene.scenes) {
-          scene.update(0, 16);
-        }
+    const complexUpdateResult = this.benchmark.run('Complex Update', () => {
+      // Simulate a complex update cycle
+      for (const scene of game.scene.scenes) {
+        scene.update(0, 16);
       }
-    );
+    });
     results.push(complexUpdateResult);
 
     return results;
@@ -270,11 +258,11 @@ export class PerformanceTests {
     if (this.config.logToConsole) {
       console.log(
         `Benchmark "${name}" (${iterations} iterations): ` +
-        `Avg: ${average.toFixed(2)}ms, ` +
-        `Median: ${median.toFixed(2)}ms, ` +
-        `Min: ${min.toFixed(2)}ms, ` +
-        `Max: ${max.toFixed(2)}ms, ` +
-        `StdDev: ${stdDev.toFixed(2)}ms`
+          `Avg: ${average.toFixed(2)}ms, ` +
+          `Median: ${median.toFixed(2)}ms, ` +
+          `Min: ${min.toFixed(2)}ms, ` +
+          `Max: ${max.toFixed(2)}ms, ` +
+          `StdDev: ${stdDev.toFixed(2)}ms`
       );
     }
 
@@ -287,16 +275,22 @@ export class PerformanceTests {
    */
   public generateReport(): PerformanceTestResult {
     // Calculate overall results
-    const renderResults = this.results.filter(r => r.name.includes('Render'));
-    const updateResults = this.results.filter(r => r.name.includes('Update'));
-    const assetLoadResults = this.results.filter(r => r.name.includes('Load') && !r.name.includes('Scene'));
-    const sceneLoadResults = this.results.filter(r => r.name.includes('Scene'));
+    const renderResults = this.results.filter((r) => r.name.includes('Render'));
+    const updateResults = this.results.filter((r) => r.name.includes('Update'));
+    const assetLoadResults = this.results.filter(
+      (r) => r.name.includes('Load') && !r.name.includes('Scene')
+    );
+    const sceneLoadResults = this.results.filter((r) => r.name.includes('Scene'));
 
     // Calculate averages
-    const avgRenderTime = renderResults.reduce((sum, r) => sum + r.average, 0) / renderResults.length;
-    const avgUpdateTime = updateResults.reduce((sum, r) => sum + r.average, 0) / updateResults.length;
-    const avgAssetLoadTime = assetLoadResults.reduce((sum, r) => sum + r.average, 0) / assetLoadResults.length;
-    const avgSceneLoadTime = sceneLoadResults.reduce((sum, r) => sum + r.average, 0) / sceneLoadResults.length;
+    const avgRenderTime =
+      renderResults.reduce((sum, r) => sum + r.average, 0) / renderResults.length;
+    const avgUpdateTime =
+      updateResults.reduce((sum, r) => sum + r.average, 0) / updateResults.length;
+    const avgAssetLoadTime =
+      assetLoadResults.reduce((sum, r) => sum + r.average, 0) / assetLoadResults.length;
+    const avgSceneLoadTime =
+      sceneLoadResults.reduce((sum, r) => sum + r.average, 0) / sceneLoadResults.length;
 
     // Check thresholds
     const renderThreshold = this.config.thresholds.renderTime;
@@ -341,10 +335,18 @@ export class PerformanceTests {
     // Log to console if enabled
     if (this.config.logToConsole) {
       console.log('Performance Test Report:');
-      console.log(`Render Time: ${avgRenderTime.toFixed(2)}ms (Threshold: ${renderThreshold}ms) - ${renderPass ? 'PASS' : 'FAIL'}`);
-      console.log(`Update Time: ${avgUpdateTime.toFixed(2)}ms (Threshold: ${updateThreshold}ms) - ${updatePass ? 'PASS' : 'FAIL'}`);
-      console.log(`Asset Load Time: ${avgAssetLoadTime.toFixed(2)}ms (Threshold: ${assetLoadThreshold}ms) - ${assetLoadPass ? 'PASS' : 'FAIL'}`);
-      console.log(`Scene Load Time: ${avgSceneLoadTime.toFixed(2)}ms (Threshold: ${sceneLoadThreshold}ms) - ${sceneLoadPass ? 'PASS' : 'FAIL'}`);
+      console.log(
+        `Render Time: ${avgRenderTime.toFixed(2)}ms (Threshold: ${renderThreshold}ms) - ${renderPass ? 'PASS' : 'FAIL'}`
+      );
+      console.log(
+        `Update Time: ${avgUpdateTime.toFixed(2)}ms (Threshold: ${updateThreshold}ms) - ${updatePass ? 'PASS' : 'FAIL'}`
+      );
+      console.log(
+        `Asset Load Time: ${avgAssetLoadTime.toFixed(2)}ms (Threshold: ${assetLoadThreshold}ms) - ${assetLoadPass ? 'PASS' : 'FAIL'}`
+      );
+      console.log(
+        `Scene Load Time: ${avgSceneLoadTime.toFixed(2)}ms (Threshold: ${sceneLoadThreshold}ms) - ${sceneLoadPass ? 'PASS' : 'FAIL'}`
+      );
       console.log(`Overall: ${report.summary.overallPass ? 'PASS' : 'FAIL'}`);
     }
 

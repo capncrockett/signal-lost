@@ -93,47 +93,47 @@ test('Inventory system functionality', async ({ page }) => {
 
   // Try to interact with an item in the field
   console.log('Moving to interact with an item...');
-  
+
   // Move to the right (where an item should be)
   for (let i = 0; i < 5; i++) {
     await page.keyboard.press('KeyD');
     await page.waitForTimeout(500);
   }
-  
+
   // Move down
   for (let i = 0; i < 3; i++) {
     await page.keyboard.press('KeyS');
     await page.waitForTimeout(500);
   }
-  
+
   // Take a screenshot after moving
   await takeScreenshot(page, 'inventory-moved-to-item', true);
-  
+
   // Try to interact with the item
   console.log('Interacting with the item...');
   await page.keyboard.press('KeyE');
   await page.waitForTimeout(1000);
-  
+
   // Take a screenshot after interaction
   await takeScreenshot(page, 'inventory-after-interaction', true);
-  
+
   // Capture console logs to check for item pickup events
   const pickupLogs = await captureConsoleLogs(page, 1000);
   console.log('Pickup logs:', pickupLogs.logs);
-  
+
   // Open inventory again to check if the item was added
   console.log('Opening inventory again...');
   await page.keyboard.press('KeyI');
   await page.waitForTimeout(1000);
-  
+
   // Take a screenshot of the inventory after pickup
   await takeScreenshot(page, 'inventory-after-pickup', true);
-  
+
   // Close inventory
   console.log('Closing inventory...');
   await page.keyboard.press('KeyI');
   await page.waitForTimeout(1000);
-  
+
   // Take a final screenshot
   await takeScreenshot(page, 'inventory-final', true);
 });

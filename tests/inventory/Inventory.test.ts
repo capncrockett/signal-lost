@@ -356,16 +356,16 @@ describe('Inventory', () => {
       // Save inventory
       inventory.saveInventory();
 
-      expect(SaveManager.setData).toHaveBeenCalledWith('inventory', [{ id: 'test_item', quantity: 1 }]);
+      expect(SaveManager.setData).toHaveBeenCalledWith('inventory', [
+        { id: 'test_item', quantity: 1 },
+      ]);
     });
   });
 
   describe('loadInventory', () => {
     test('should load the inventory state', () => {
       // Mock saved data
-      (SaveManager.getData as jest.Mock).mockReturnValue([
-        { id: 'test_item', quantity: 2 },
-      ]);
+      (SaveManager.getData as jest.Mock).mockReturnValue([{ id: 'test_item', quantity: 2 }]);
 
       // Load item definitions
       inventory.loadItemDefinitions([mockItemData]);

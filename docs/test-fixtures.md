@@ -17,6 +17,7 @@ The test fixtures system is organized into collections of related fixtures:
 - **Inventory**: Inventory and item fixtures
 
 Each fixture has:
+
 - **ID**: Unique identifier
 - **Data**: The actual fixture data
 - **Metadata**: Optional metadata like description, tags, and dependencies

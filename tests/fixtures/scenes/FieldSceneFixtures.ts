@@ -61,7 +61,8 @@ export const FieldSceneFixtures: FixtureCollection<Record<string, unknown>> = {
         narrativeActive: true,
         currentNarrativeEvent: {
           id: 'tower_discovery',
-          message: 'You hear whispers in the static. The radio tower looms above you, its red light blinking in the fog.',
+          message:
+            'You hear whispers in the static. The radio tower looms above you, its red light blinking in the fog.',
           choices: [
             {
               text: 'Investigate the tower',

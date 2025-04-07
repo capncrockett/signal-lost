@@ -1,105 +1,111 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Signal Lost</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #000;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    #game {
-      width: 800px;
-      height: 600px;
-      background-color: #111;
-      position: relative;
-    }
-    #debug {
-      margin-top: 10px;
-      color: #fff;
-      font-family: monospace;
-      font-size: 12px;
-      width: 800px;
-      max-height: 100px;
-      overflow-y: auto;
-      background-color: #222;
-      padding: 5px;
-      display: none;
-    }
-    #debug-toggle {
-      margin-top: 5px;
-      cursor: pointer;
-      color: #aaa;
-      font-family: monospace;
-      font-size: 12px;
-    }
-  </style>
-</head>
-<body>
-  <div id="game"></div>
-  <div id="debug-toggle" onclick="toggleDebug()">Show Debug</div>
-  <div id="debug"></div>
-
-  <script>
-    // Debug helper functions
-    function toggleDebug() {
-      const debugEl = document.getElementById('debug');
-      const toggleEl = document.getElementById('debug-toggle');
-      if (debugEl.style.display === 'none' || !debugEl.style.display) {
-        debugEl.style.display = 'block';
-        toggleEl.textContent = 'Hide Debug';
-      } else {
-        debugEl.style.display = 'none';
-        toggleEl.textContent = 'Show Debug';
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signal Lost</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
       }
-    }
-
-    // Override console.log to also output to debug div
-    const originalConsoleLog = console.log;
-    const originalConsoleError = console.error;
-    const originalConsoleWarn = console.warn;
-
-    console.log = function() {
-      const debugEl = document.getElementById('debug');
-      if (debugEl) {
-        const args = Array.from(arguments);
-        const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
-        debugEl.innerHTML += `<div>[LOG] ${message}</div>`;
-        debugEl.scrollTop = debugEl.scrollHeight;
+      #game {
+        width: 800px;
+        height: 600px;
+        background-color: #111;
+        position: relative;
       }
-      originalConsoleLog.apply(console, arguments);
-    };
-
-    console.error = function() {
-      const debugEl = document.getElementById('debug');
-      if (debugEl) {
-        const args = Array.from(arguments);
-        const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
-        debugEl.innerHTML += `<div style="color: red">[ERROR] ${message}</div>`;
-        debugEl.scrollTop = debugEl.scrollHeight;
+      #debug {
+        margin-top: 10px;
+        color: #fff;
+        font-family: monospace;
+        font-size: 12px;
+        width: 800px;
+        max-height: 100px;
+        overflow-y: auto;
+        background-color: #222;
+        padding: 5px;
+        display: none;
       }
-      originalConsoleError.apply(console, arguments);
-    };
-
-    console.warn = function() {
-      const debugEl = document.getElementById('debug');
-      if (debugEl) {
-        const args = Array.from(arguments);
-        const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
-        debugEl.innerHTML += `<div style="color: orange">[WARN] ${message}</div>`;
-        debugEl.scrollTop = debugEl.scrollHeight;
+      #debug-toggle {
+        margin-top: 5px;
+        cursor: pointer;
+        color: #aaa;
+        font-family: monospace;
+        font-size: 12px;
       }
-      originalConsoleWarn.apply(console, arguments);
-    };
-  </script>
+    </style>
+  </head>
+  <body>
+    <div id="game"></div>
+    <div id="debug-toggle" onclick="toggleDebug()">Show Debug</div>
+    <div id="debug"></div>
 
-  <script type="module" src="/src/main.ts"></script>
-</body>
+    <script>
+      // Debug helper functions
+      function toggleDebug() {
+        const debugEl = document.getElementById('debug');
+        const toggleEl = document.getElementById('debug-toggle');
+        if (debugEl.style.display === 'none' || !debugEl.style.display) {
+          debugEl.style.display = 'block';
+          toggleEl.textContent = 'Hide Debug';
+        } else {
+          debugEl.style.display = 'none';
+          toggleEl.textContent = 'Show Debug';
+        }
+      }
+
+      // Override console.log to also output to debug div
+      const originalConsoleLog = console.log;
+      const originalConsoleError = console.error;
+      const originalConsoleWarn = console.warn;
+
+      console.log = function () {
+        const debugEl = document.getElementById('debug');
+        if (debugEl) {
+          const args = Array.from(arguments);
+          const message = args
+            .map((arg) => (typeof arg === 'object' ? JSON.stringify(arg) : arg))
+            .join(' ');
+          debugEl.innerHTML += `<div>[LOG] ${message}</div>`;
+          debugEl.scrollTop = debugEl.scrollHeight;
+        }
+        originalConsoleLog.apply(console, arguments);
+      };
+
+      console.error = function () {
+        const debugEl = document.getElementById('debug');
+        if (debugEl) {
+          const args = Array.from(arguments);
+          const message = args
+            .map((arg) => (typeof arg === 'object' ? JSON.stringify(arg) : arg))
+            .join(' ');
+          debugEl.innerHTML += `<div style="color: red">[ERROR] ${message}</div>`;
+          debugEl.scrollTop = debugEl.scrollHeight;
+        }
+        originalConsoleError.apply(console, arguments);
+      };
+
+      console.warn = function () {
+        const debugEl = document.getElementById('debug');
+        if (debugEl) {
+          const args = Array.from(arguments);
+          const message = args
+            .map((arg) => (typeof arg === 'object' ? JSON.stringify(arg) : arg))
+            .join(' ');
+          debugEl.innerHTML += `<div style="color: orange">[WARN] ${message}</div>`;
+          debugEl.scrollTop = debugEl.scrollHeight;
+        }
+        originalConsoleWarn.apply(console, arguments);
+      };
+    </script>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>

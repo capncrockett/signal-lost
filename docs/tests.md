@@ -2,11 +2,11 @@
 
 ## Test Types
 
-| Layer         | Tool        | Goal                                    |
-|---------------|-------------|-----------------------------------------|
-| Unit          | Jest        | Utilities, parsing, signal logic        |
-| Integration   | Jest        | Components working together             |
-| E2E           | Playwright  | Browser-based validation, logs, flow    |
+| Layer       | Tool       | Goal                                 |
+| ----------- | ---------- | ------------------------------------ |
+| Unit        | Jest       | Utilities, parsing, signal logic     |
+| Integration | Jest       | Components working together          |
+| E2E         | Playwright | Browser-based validation, logs, flow |
 
 ---
 
@@ -17,7 +17,7 @@
 - Access console logs:
 
 ```ts
-page.on('console', msg => {
+page.on('console', (msg) => {
   console.log(`[Browser] ${msg.text()}`);
 });
 ```

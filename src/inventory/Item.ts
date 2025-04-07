@@ -28,7 +28,7 @@ export interface ItemData {
 
 /**
  * Item class
- * 
+ *
  * Represents an item in the game that can be collected and used
  */
 export class Item {
@@ -177,30 +177,25 @@ export class Item {
    */
   createSprite(scene: Phaser.Scene, x: number, y: number): Phaser.GameObjects.Sprite {
     const sprite = scene.add.sprite(x, y, this.icon);
-    
+
     // Add quantity text if stackable and quantity > 1
     if (this.stackable && this.quantity > 1) {
-      const quantityText = scene.add.text(
-        x + 10, 
-        y + 10, 
-        this.quantity.toString(), 
-        { 
-          fontSize: '12px',
-          color: '#ffffff',
-          backgroundColor: '#000000',
-          padding: { x: 2, y: 2 }
-        }
-      );
+      const quantityText = scene.add.text(x + 10, y + 10, this.quantity.toString(), {
+        fontSize: '12px',
+        color: '#ffffff',
+        backgroundColor: '#000000',
+        padding: { x: 2, y: 2 },
+      });
       quantityText.setOrigin(1, 1);
-      
+
       // Group the sprite and text
       const container = scene.add.container(x, y, [sprite, quantityText]);
       container.setSize(sprite.width, sprite.height);
-      
+
       // Return the sprite for consistency
       return sprite;
     }
-    
+
     return sprite;
   }
 
@@ -210,7 +205,7 @@ export class Item {
   toJSON(): Record<string, unknown> {
     return {
       id: this.id,
-      quantity: this.quantity
+      quantity: this.quantity,
     };
   }
 
@@ -222,7 +217,7 @@ export class Item {
    */
   static fromJSON(data: Record<string, unknown>, itemsData: ItemData[]): Item | null {
     // Find the item definition
-    const itemData = itemsData.find(item => item.id === data.id);
+    const itemData = itemsData.find((item) => item.id === data.id);
     if (!itemData) {
       console.error(`Item definition not found for ID: ${data.id}`);
       return null;

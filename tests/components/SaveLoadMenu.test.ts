@@ -124,7 +124,12 @@ describe('SaveLoadMenu', () => {
   test('should create UI elements on construction', () => {
     // Check if UI elements were created
     expect(mockScene.add.rectangle).toHaveBeenCalled();
-    expect(mockScene.add.text).toHaveBeenCalledWith(0, -170, 'Save / Load Game', expect.any(Object));
+    expect(mockScene.add.text).toHaveBeenCalledWith(
+      0,
+      -170,
+      'Save / Load Game',
+      expect.any(Object)
+    );
     expect(mockScene.add.text).toHaveBeenCalledWith(280, -170, 'X', expect.any(Object));
     expect(mockScene.add.container).toHaveBeenCalled();
     expect(mockScene.add.existing).toHaveBeenCalledWith(saveLoadMenu);
@@ -170,7 +175,7 @@ describe('SaveLoadMenu', () => {
     localStorageMock.setItem('signal-lost-save-slots', JSON.stringify(mockSaveSlots));
 
     // Create new instance to trigger loadSaveSlots
-    const newSaveLoadMenu = new SaveLoadMenu(mockScene as any, 400, 300);
+    new SaveLoadMenu(mockScene as any, 400, 300);
 
     // Check if slots were loaded
     expect(localStorageMock.getItem).toHaveBeenCalledWith('signal-lost-save-slots');

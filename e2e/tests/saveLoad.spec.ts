@@ -96,7 +96,9 @@ test('Save and load game functionality', async ({ page }) => {
 
   // Capture console logs to check for save events
   const saveLogs = await captureConsoleLogs(page, 1000);
-  const saveEvents = saveLogs.logs.filter((log) => log.includes('Game saved') || log.includes('save'));
+  const saveEvents = saveLogs.logs.filter(
+    (log) => log.includes('Game saved') || log.includes('save')
+  );
   console.log('Save events:', saveEvents);
 
   // Now let's change the game state by tuning to a frequency
@@ -173,7 +175,9 @@ test('Save and load game functionality', async ({ page }) => {
 
   // Capture console logs to check for load events
   const loadLogs = await captureConsoleLogs(page, 1000);
-  const loadEvents = loadLogs.logs.filter((log) => log.includes('Game loaded') || log.includes('load'));
+  const loadEvents = loadLogs.logs.filter(
+    (log) => log.includes('Game loaded') || log.includes('load')
+  );
   console.log('Load events:', loadEvents);
 
   // Test export functionality if possible

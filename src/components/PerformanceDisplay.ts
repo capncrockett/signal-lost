@@ -102,15 +102,10 @@ export class PerformanceDisplay extends Phaser.GameObjects.Container {
 
     // Create FPS text
     if (this.config.showFps) {
-      this.fpsText = this.scene.add.text(
-        padding,
-        padding,
-        'FPS: 0',
-        {
-          color: this.config.textColor,
-          fontSize: '14px',
-        }
-      );
+      this.fpsText = this.scene.add.text(padding, padding, 'FPS: 0', {
+        color: this.config.textColor,
+        fontSize: '14px',
+      });
       this.fpsText.setOrigin(0);
       this.add(this.fpsText);
     }
@@ -167,7 +162,7 @@ export class PerformanceDisplay extends Phaser.GameObjects.Container {
     if (this.config.showFps && this.fpsText) {
       this.fpsText.setText(
         `FPS: ${data.average.toFixed(1)} ` +
-        `(Min: ${data.min.toFixed(1)}, Max: ${data.max.toFixed(1)})`
+          `(Min: ${data.min.toFixed(1)}, Max: ${data.max.toFixed(1)})`
       );
     }
 
@@ -189,7 +184,7 @@ export class PerformanceDisplay extends Phaser.GameObjects.Container {
       const limitMB = data.current.jsHeapSizeLimit / 1024 / 1024;
       this.memoryText.setText(
         `Memory: ${usedMB.toFixed(1)} MB / ${totalMB.toFixed(1)} MB ` +
-        `(${(usedMB / limitMB * 100).toFixed(1)}%)`
+          `(${((usedMB / limitMB) * 100).toFixed(1)}%)`
       );
     }
 
@@ -254,9 +249,7 @@ export class PerformanceDisplay extends Phaser.GameObjects.Container {
     const padding = this.config.padding;
     const graphWidth = this.config.graphWidth;
     const graphHeight = this.config.graphHeight;
-    const graphY = this.config.showFps
-      ? padding + 40 + this.config.graphHeight + 10
-      : padding + 20;
+    const graphY = this.config.showFps ? padding + 40 + this.config.graphHeight + 10 : padding + 20;
 
     // Clear graph
     this.memoryGraph.clear();

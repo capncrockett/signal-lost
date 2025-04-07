@@ -46,10 +46,13 @@ By participating in this project, you agree to maintain a respectful and inclusi
 ## Development Workflow
 
 1. Create a new branch for your feature or bugfix:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
+
    or
+
    ```bash
    git checkout -b fix/issue-description
    ```
@@ -57,21 +60,26 @@ By participating in this project, you agree to maintain a respectful and inclusi
 2. Make your changes, following the [coding standards](#coding-standards)
 
 3. Run tests to ensure your changes don't break existing functionality:
+
    ```bash
    npm run test
    npm run test:e2e:ci
    ```
 
 4. Commit your changes with a descriptive message:
+
    ```bash
    git commit -m "feat: Add new feature X"
    ```
+
    or
+
    ```bash
    git commit -m "fix: Resolve issue with Y"
    ```
 
 5. Push your branch to your fork:
+
    ```bash
    git push origin feature/your-feature-name
    ```

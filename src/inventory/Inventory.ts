@@ -208,7 +208,7 @@ export class Inventory {
    * @returns Item or undefined if not found
    */
   findItemById(id: string): Item | undefined {
-    return this.items.find(item => item.getId() === id);
+    return this.items.find((item) => item.getId() === id);
   }
 
   /**
@@ -217,7 +217,7 @@ export class Inventory {
    * @returns Array of items of the specified type
    */
   findItemsByType(type: ItemType): Item[] {
-    return this.items.filter(item => item.getType() === type);
+    return this.items.filter((item) => item.getType() === type);
   }
 
   /**
@@ -255,7 +255,7 @@ export class Inventory {
    */
   saveInventory(): void {
     // Convert items to JSON
-    const itemsData = this.items.map(item => item.toJSON());
+    const itemsData = this.items.map((item) => item.toJSON());
 
     // Save to game state
     SaveManager.setData('inventory', itemsData);

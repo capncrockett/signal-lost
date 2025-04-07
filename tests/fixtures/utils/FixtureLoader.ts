@@ -61,15 +61,13 @@ export class FixtureLoader {
     }
 
     // Get fixture
-    const fixture = collection.fixtures.find(f => f.id === fixtureId);
+    const fixture = collection.fixtures.find((f) => f.id === fixtureId);
     if (!fixture) {
       throw new Error(`Fixture not found: ${collectionId}.${fixtureId}`);
     }
 
     // Clone data
-    const data = mergedOptions.deepClone
-      ? JSON.parse(JSON.stringify(fixture.data))
-      : fixture.data;
+    const data = mergedOptions.deepClone ? JSON.parse(JSON.stringify(fixture.data)) : fixture.data;
 
     // Validate data
     if (mergedOptions.validate) {
@@ -96,7 +94,7 @@ export class FixtureLoader {
     fixtureIds: string[],
     options?: Partial<FixtureLoaderOptions>
   ): T[] {
-    return fixtureIds.map(id => this.load<T>(collectionId, id, options));
+    return fixtureIds.map((id) => this.load<T>(collectionId, id, options));
   }
 
   /**
@@ -105,10 +103,7 @@ export class FixtureLoader {
    * @param options Loader options
    * @returns Array of fixture data
    */
-  public static loadAll<T>(
-    collectionId: string,
-    options?: Partial<FixtureLoaderOptions>
-  ): T[] {
+  public static loadAll<T>(collectionId: string, options?: Partial<FixtureLoaderOptions>): T[] {
     // Get collection
     const collection = fixtureCollections[collectionId];
     if (!collection) {
@@ -116,7 +111,7 @@ export class FixtureLoader {
     }
 
     // Load all fixtures
-    return collection.fixtures.map(fixture => this.load<T>(collectionId, fixture.id, options));
+    return collection.fixtures.map((fixture) => this.load<T>(collectionId, fixture.id, options));
   }
 
   /**
@@ -125,10 +120,7 @@ export class FixtureLoader {
    * @param fixtureId Fixture ID
    * @returns Fixture
    */
-  public static getFixture<T>(
-    collectionId: string,
-    fixtureId: string
-  ): Fixture<T> {
+  public static getFixture<T>(collectionId: string, fixtureId: string): Fixture<T> {
     // Get collection
     const collection = fixtureCollections[collectionId];
     if (!collection) {
@@ -136,7 +128,7 @@ export class FixtureLoader {
     }
 
     // Get fixture
-    const fixture = collection.fixtures.find(f => f.id === fixtureId);
+    const fixture = collection.fixtures.find((f) => f.id === fixtureId);
     if (!fixture) {
       throw new Error(`Fixture not found: ${collectionId}.${fixtureId}`);
     }

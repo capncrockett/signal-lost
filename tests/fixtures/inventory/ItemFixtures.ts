@@ -1,4 +1,4 @@
-import { ItemFixture, FixtureCollection } from '../types';
+import { FixtureCollection } from '../types';
 
 // Define ItemType enum locally to avoid circular dependencies
 enum ItemType {
@@ -134,7 +134,8 @@ export const ItemFixtures: FixtureCollection<Record<string, unknown>> = {
           stackable: false,
           effects: {
             action: 'read_note',
-            content: 'The journal contains notes about the Signal Protocol. It mentions that the protocol requires four specific frequencies to be tuned in sequence: 91.5, 96.3, 103.7, and 105.1 MHz. The purpose of the protocol is unclear, but it seems to be related to communication with something beyond our understanding.',
+            content:
+              'The journal contains notes about the Signal Protocol. It mentions that the protocol requires four specific frequencies to be tuned in sequence: 91.5, 96.3, 103.7, and 105.1 MHz. The purpose of the protocol is unclear, but it seems to be related to communication with something beyond our understanding.',
           },
         },
         {
@@ -147,7 +148,8 @@ export const ItemFixtures: FixtureCollection<Record<string, unknown>> = {
           stackable: false,
           effects: {
             action: 'read_note',
-            content: 'The note reads: "Something\'s happening at the research facility. They were experimenting with those frequencies again. I\'m going to investigate."',
+            content:
+              'The note reads: "Something\'s happening at the research facility. They were experimenting with those frequencies again. I\'m going to investigate."',
           },
         },
         {
@@ -160,7 +162,8 @@ export const ItemFixtures: FixtureCollection<Record<string, unknown>> = {
           stackable: false,
           effects: {
             action: 'read_note',
-            content: 'The note reads: "The experiments with the Signal Protocol have yielded unexpected results. We\'ve made contact with something, but I\'m not sure we should continue. The frequencies seem to be opening a channel to... somewhere else."',
+            content:
+              'The note reads: "The experiments with the Signal Protocol have yielded unexpected results. We\'ve made contact with something, but I\'m not sure we should continue. The frequencies seem to be opening a channel to... somewhere else."',
           },
         },
       ],
@@ -264,7 +267,8 @@ export const ItemFixtures: FixtureCollection<Record<string, unknown>> = {
           stackable: false,
           effects: {
             action: 'read_note',
-            content: 'The journal contains notes about the Signal Protocol. It mentions that the protocol requires four specific frequencies to be tuned in sequence: 91.5, 96.3, 103.7, and 105.1 MHz. The purpose of the protocol is unclear, but it seems to be related to communication with something beyond our understanding.',
+            content:
+              'The journal contains notes about the Signal Protocol. It mentions that the protocol requires four specific frequencies to be tuned in sequence: 91.5, 96.3, 103.7, and 105.1 MHz. The purpose of the protocol is unclear, but it seems to be related to communication with something beyond our understanding.',
           },
         },
         {
@@ -277,7 +281,8 @@ export const ItemFixtures: FixtureCollection<Record<string, unknown>> = {
           stackable: false,
           effects: {
             action: 'read_note',
-            content: 'The note reads: "Something\'s happening at the research facility. They were experimenting with those frequencies again. I\'m going to investigate."',
+            content:
+              'The note reads: "Something\'s happening at the research facility. They were experimenting with those frequencies again. I\'m going to investigate."',
           },
         },
         {
@@ -290,7 +295,8 @@ export const ItemFixtures: FixtureCollection<Record<string, unknown>> = {
           stackable: false,
           effects: {
             action: 'read_note',
-            content: 'The note reads: "The experiments with the Signal Protocol have yielded unexpected results. We\'ve made contact with something, but I\'m not sure we should continue. The frequencies seem to be opening a channel to... somewhere else."',
+            content:
+              'The note reads: "The experiments with the Signal Protocol have yielded unexpected results. We\'ve made contact with something, but I\'m not sure we should continue. The frequencies seem to be opening a channel to... somewhere else."',
           },
         },
       ],

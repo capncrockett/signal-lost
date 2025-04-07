@@ -32,6 +32,7 @@ npm run test:visual
 ```
 
 This will:
+
 1. Start the development server
 2. Run the visual regression tests
 3. Compare screenshots with reference screenshots
@@ -70,10 +71,10 @@ import {
 test('Component renders correctly', async ({ page }) => {
   // Navigate to the page
   await page.goto('http://localhost:5173/');
-  
+
   // Wait for the game to load and stabilize
   await waitForGameToStabilize(page);
-  
+
   // Take a snapshot of the component
   const component = page.locator('[data-testid="my-component"]');
   await expectComponentToMatchSnapshot(component, 'my-component');

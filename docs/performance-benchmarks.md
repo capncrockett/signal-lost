@@ -37,6 +37,7 @@ npm run test:performance
 ```
 
 This will:
+
 1. Build the performance test bundle
 2. Start the development server
 3. Run the performance tests
@@ -64,6 +65,7 @@ The system tracks frame rate metrics:
 - **FPS Stability**: Standard deviation of FPS values
 
 Target values:
+
 - Average FPS: 60+
 - Minimum FPS: 30+
 - FPS Stability: < 10 (standard deviation)
@@ -78,6 +80,7 @@ The system tracks memory usage metrics:
 - **Memory Growth**: Rate of memory increase over time
 
 Target values:
+
 - Memory Growth: < 1MB/minute (to avoid memory leaks)
 
 ### Load Times
@@ -89,6 +92,7 @@ The system tracks load time metrics:
 - **Total Load Time**: Total time from start to playable state
 
 Target values:
+
 - Asset Load Time: < 500ms per asset
 - Scene Load Time: < 2000ms per scene
 - Total Load Time: < 5000ms
@@ -102,6 +106,7 @@ The system tracks render and update performance:
 - **Physics Time**: Time spent on physics calculations
 
 Target values:
+
 - Render Time: < 16ms (for 60 FPS)
 - Update Time: < 8ms (half of render time)
 - Physics Time: < 4ms (quarter of render time)
@@ -131,7 +136,7 @@ Example report:
       "stdDev": 0.5,
       "total": 250,
       "timestamp": 1621234567890
-    },
+    }
     // More benchmark results...
   ],
   "summary": {
@@ -185,12 +190,16 @@ You can run manual benchmarks in the browser console:
 const monitor = PerformanceMonitor.getInstance();
 
 // Run a benchmark
-monitor.runBenchmark('My Benchmark', () => {
-  // Code to benchmark
-  for (let i = 0; i < 1000; i++) {
-    Math.sqrt(i);
-  }
-}, 100);
+monitor.runBenchmark(
+  'My Benchmark',
+  () => {
+    // Code to benchmark
+    for (let i = 0; i < 1000; i++) {
+      Math.sqrt(i);
+    }
+  },
+  100
+);
 ```
 
 ## CI/CD Integration

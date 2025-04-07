@@ -9,7 +9,8 @@ const fs = require('fs');
 const config = {
   serverPort: 5173,
   serverCommand: 'npm run dev',
-  testCommand: 'npx playwright test tests/performance/performance.spec.ts --config=playwright.performance.config.ts',
+  testCommand:
+    'npx playwright test tests/performance/performance.spec.ts --config=playwright.performance.config.ts',
   updateBaseline: process.argv.includes('--update-baseline'),
   outputDir: 'performance-reports',
 };
@@ -22,14 +23,10 @@ if (!fs.existsSync(outputDir)) {
 
 // Start the development server
 console.log('Starting development server...');
-const serverProcess = require('child_process').spawn(
-  'npm',
-  ['run', 'dev'],
-  {
-    stdio: 'pipe',
-    shell: true,
-  }
-);
+const serverProcess = require('child_process').spawn('npm', ['run', 'dev'], {
+  stdio: 'pipe',
+  shell: true,
+});
 
 // Wait for server to start
 console.log('Waiting for server to start...');
@@ -37,7 +34,7 @@ let serverStarted = false;
 serverProcess.stdout.on('data', (data) => {
   const output = data.toString();
   console.log(`[Server] ${output}`);
-  
+
   if (output.includes('Local:') && !serverStarted) {
     serverStarted = true;
     runTests();
@@ -56,7 +53,7 @@ function runTests() {
     const testCommand = config.updateBaseline
       ? `${config.testCommand} --update-baseline`
       : config.testCommand;
-    
+
     execSync(testCommand, { stdio: 'inherit' });
     console.log('Performance tests completed successfully');
   } catch (error) {
