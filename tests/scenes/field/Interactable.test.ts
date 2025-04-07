@@ -18,6 +18,9 @@ jest.mock('phaser', () => {
         setOrigin() {
           return this;
         }
+        setDepth() {
+          return this;
+        }
       },
     },
     Events: {

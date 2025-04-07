@@ -14,6 +14,14 @@ const config: Config = {
     },
   },
   setupFilesAfterEnv: ['./tests/setup.ts'],
+  // Handle ESM modules like tone.js
+  transformIgnorePatterns: [
+    '/node_modules/(?!tone)'
+  ],
+  // Mock modules that cause issues
+  moduleNameMapper: {
+    '^tone$': '<rootDir>/tests/mocks/ToneMock.ts',
+  },
 };
 
 export default config;

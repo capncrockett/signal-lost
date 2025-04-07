@@ -230,6 +230,9 @@ describe('Inventory', () => {
       // Add item
       inventory.addItem(nonUsableItem);
 
+      // Reset mock to clear the itemAdded event
+      jest.clearAllMocks();
+
       // Try to use item
       const result = inventory.useItem(0);
 

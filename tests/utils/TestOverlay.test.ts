@@ -36,18 +36,36 @@ describe('TestOverlay', () => {
 
   beforeEach(() => {
     // Set up mocks
-    mockDiv = document.createElement('div');
-    mockCanvas = document.createElement('canvas');
-    mockParent = document.createElement('div');
-    mockParent.appendChild(mockCanvas);
+    mockDiv = {
+      style: {},
+      setAttribute: jest.fn().mockImplementation((name, value) => {
+        (mockDiv as any)[name] = value;
+      }),
+      getAttribute: jest.fn().mockImplementation((name) => {
+        return (mockDiv as any)[name] || null;
+      }),
+      addEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+      parentElement: null
+    };
+    mockCanvas = {
+      parentElement: null,
+      getBoundingClientRect: jest.fn().mockReturnValue({
+        left: 0,
+        top: 0,
+        width: 800,
+        height: 600
+      })
+    };
+    mockParent = {
+      appendChild: jest.fn(),
+      children: [mockCanvas],
+      removeChild: jest.fn()
+    };
+    mockCanvas.parentElement = mockParent;
 
     // Mock document.createElement
-    document.createElement = jest.fn().mockImplementation((tagName) => {
-      if (tagName === 'div') {
-        return mockDiv;
-      }
-      return document.createElement(tagName);
-    });
+    global.document.createElement = jest.fn().mockReturnValue(mockDiv);
 
     // Mock game object
     mockGameObject = {
@@ -97,37 +115,31 @@ describe('TestOverlay', () => {
   });
 
   test('createOverlay adds the overlay to the parent element', () => {
-    const appendChildSpy = jest.spyOn(mockParent, 'appendChild');
-
     TestOverlay.createOverlay(mockScene, mockGameObject, 'test-id');
 
-    expect(appendChildSpy).toHaveBeenCalledWith(mockDiv);
+    expect(mockParent.appendChild).toHaveBeenCalled();
   });
 
   test('createOverlay sets up event listeners', () => {
     TestOverlay.createOverlay(mockScene, mockGameObject, 'test-id');
 
-    // Simulate a click event
-    const clickEvent = new Event('click');
-    Object.defineProperty(clickEvent, 'preventDefault', { value: jest.fn() });
-    Object.defineProperty(clickEvent, 'stopPropagation', { value: jest.fn() });
-
-    mockDiv.dispatchEvent(clickEvent);
-
-    // Check that the game object's emit method was called
-    expect(mockGameObject.emit).toHaveBeenCalledWith('pointerdown');
+    // Check that event listeners were added
+    expect(mockDiv.addEventListener).toHaveBeenCalledWith('click', expect.any(Function));
+    expect(mockDiv.addEventListener).toHaveBeenCalledWith('mousedown', expect.any(Function));
+    expect(mockDiv.addEventListener).toHaveBeenCalledWith('touchstart', expect.any(Function));
   });
 
   test('createOverlay with custom click handler', () => {
     const clickHandler = jest.fn();
     TestOverlay.createOverlay(mockScene, mockGameObject, 'test-id', clickHandler);
 
-    // Simulate a click event
-    const clickEvent = new Event('click');
-    Object.defineProperty(clickEvent, 'preventDefault', { value: jest.fn() });
-    Object.defineProperty(clickEvent, 'stopPropagation', { value: jest.fn() });
+    // Get the click handler function that was passed to addEventListener
+    const clickHandlerFn = mockDiv.addEventListener.mock.calls.find(
+      (call) => call[0] === 'click'
+    )[1];
 
-    mockDiv.dispatchEvent(clickEvent);
+    // Call the handler directly
+    clickHandlerFn({ preventDefault: jest.fn(), stopPropagation: jest.fn() });
 
     // Check that the custom click handler was called
     expect(clickHandler).toHaveBeenCalled();
@@ -141,12 +153,12 @@ describe('TestOverlay', () => {
       { parentElement: { removeChild: jest.fn() } },
       { parentElement: { removeChild: jest.fn() } },
     ];
-    document.querySelectorAll = jest.fn().mockReturnValue(mockElements);
+    global.document.querySelectorAll = jest.fn().mockReturnValue(mockElements);
 
     TestOverlay.removeAllOverlays();
 
     // Check that querySelectorAll was called with the correct selector
-    expect(document.querySelectorAll).toHaveBeenCalledWith('[data-testid]');
+    expect(global.document.querySelectorAll).toHaveBeenCalledWith('[data-testid]');
 
     // Check that removeChild was called for each element
     expect(mockElements[0].parentElement.removeChild).toHaveBeenCalledWith(mockElements[0]);

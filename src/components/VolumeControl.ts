@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { AudioManager } from '../audio/AudioManager';
+import { SaveManager } from '../utils/SaveManager';
 
 interface VolumeControlConfig {
   width?: number;
@@ -245,11 +246,17 @@ export class VolumeControl extends Phaser.GameObjects.Container {
    * @param volume Value between 0 (silent) and 1 (full volume)
    */
   public setVolume(volume: number): void {
+    // Clamp volume between 0 and 1 before applying curve
+    const clampedVolume = Math.max(0, Math.min(1, volume));
+
     // Apply volume curve for more natural adjustment
-    const curvedVolume = this.applyVolumeCurve(volume);
+    const curvedVolume = this.applyVolumeCurve(clampedVolume);
 
     // Update audio manager
     this.audioManager.setMasterVolume(curvedVolume);
+
+    // Save volume setting to persistent storage
+    SaveManager.setData('volume', clampedVolume);
 
     // Update display
     this.updateDisplay();

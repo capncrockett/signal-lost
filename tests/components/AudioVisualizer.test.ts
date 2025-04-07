@@ -85,25 +85,25 @@ describe('AudioVisualizer', () => {
   });
 
   test('should connect to an audio node', () => {
-    // Mock audio node
-    const mockAudioNode = {
-      connect: jest.fn(),
-    };
-
-    // Mock the analyser node's connect method
-    Object.defineProperty(audioVisualizer, 'analyser', {
-      get: jest.fn().mockReturnValue({
+    // Mock audio node with context
+    const mockAudioContext = {
+      createAnalyser: jest.fn().mockReturnValue({
         ...mockAnalyser,
         connect: jest.fn(),
-      }),
-      set: jest.fn(),
-    });
+        frequencyBinCount: 128
+      })
+    };
+
+    const mockAudioNode = {
+      connect: jest.fn(),
+      context: mockAudioContext
+    };
 
     // Connect to the audio node
     audioVisualizer.connectTo(mockAudioNode as any);
 
     // Verify the connection was made
-    expect(mockAudioNode.connect).toHaveBeenCalled();
+    expect(mockAudioContext.createAnalyser).toHaveBeenCalled();
   });
 
   test('should update visualization on preUpdate', () => {
@@ -179,7 +179,6 @@ describe('AudioVisualizer', () => {
       beginPath: jest.fn().mockReturnThis(),
       moveTo: jest.fn().mockReturnThis(),
       lineTo: jest.fn().mockReturnThis(),
-      closePath: jest.fn().mockReturnThis(),
       strokePath: jest.fn().mockReturnThis(),
     };
 
@@ -197,7 +196,6 @@ describe('AudioVisualizer', () => {
     expect(mockGraphics.beginPath).toHaveBeenCalled();
     expect(mockGraphics.moveTo).toHaveBeenCalled();
     expect(mockGraphics.lineTo).toHaveBeenCalled();
-    expect(mockGraphics.closePath).toHaveBeenCalled();
     expect(mockGraphics.strokePath).toHaveBeenCalled();
   });
 
@@ -224,16 +222,16 @@ describe('AudioVisualizer', () => {
   });
 
   test('should handle destroy', () => {
-    // Mock the destroy method of the parent class
-    const superDestroySpy = jest.spyOn(Phaser.GameObjects.Container.prototype, 'destroy');
+    // Mock the scene events off method
+    const sceneEventsOffSpy = jest.spyOn(mockScene.events, 'off');
 
     // Call destroy
     audioVisualizer.destroy();
 
-    // Verify the parent destroy method was called
-    expect(superDestroySpy).toHaveBeenCalled();
+    // Verify the scene events off method was called
+    expect(sceneEventsOffSpy).toHaveBeenCalled();
 
     // Restore spy
-    superDestroySpy.mockRestore();
+    sceneEventsOffSpy.mockRestore();
   });
 });

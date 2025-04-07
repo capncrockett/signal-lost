@@ -62,17 +62,39 @@ describe('Audio System Integration', () => {
   const mockScene = {
     add: {
       container: jest.fn().mockReturnThis(),
-      graphics: jest.fn().mockReturnThis(),
-      text: jest.fn().mockReturnThis(),
+      graphics: jest.fn(() => ({
+        fillStyle: jest.fn().mockReturnThis(),
+        fillRoundedRect: jest.fn().mockReturnThis(),
+        fillRect: jest.fn().mockReturnThis(),
+        fillCircle: jest.fn().mockReturnThis(),
+        lineStyle: jest.fn().mockReturnThis(),
+        strokeRoundedRect: jest.fn().mockReturnThis(),
+        strokeRect: jest.fn().mockReturnThis(),
+        strokeCircle: jest.fn().mockReturnThis(),
+        setInteractive: jest.fn().mockReturnThis(),
+        on: jest.fn(),
+        x: 0,
+      })),
+      text: jest.fn(() => ({
+        setOrigin: jest.fn().mockReturnThis(),
+        setText: jest.fn(),
+        x: 0,
+      })),
       existing: jest.fn(),
     },
     input: {
       on: jest.fn(),
       off: jest.fn(),
+      setDraggable: jest.fn(),
     },
     events: {
       on: jest.fn(),
       off: jest.fn(),
+    },
+    cameras: {
+      main: {
+        scrollX: 0,
+      },
     },
     sys: {
       game: {

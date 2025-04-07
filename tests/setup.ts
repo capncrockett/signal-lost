@@ -134,3 +134,49 @@ global.AudioContext = MockAudioContext as any;
 global.window = global.window || {};
 global.window.AudioContext = MockAudioContext as any;
 global.window.webkitAudioContext = MockAudioContext as any;
+
+// Mock document for TestOverlay tests
+class MockElement {
+  style: Record<string, string> = {};
+  parentElement: MockElement | null = null;
+  children: MockElement[] = [];
+  innerHTML: string = '';
+
+  setAttribute(name: string, value: string): void {
+    (this as any)[name] = value;
+  }
+
+  getAttribute(name: string): string | null {
+    return (this as any)[name] || null;
+  }
+
+  appendChild(child: MockElement): MockElement {
+    this.children.push(child);
+    child.parentElement = this;
+    return child;
+  }
+
+  removeChild(child: MockElement): MockElement {
+    const index = this.children.indexOf(child);
+    if (index !== -1) {
+      this.children.splice(index, 1);
+      child.parentElement = null;
+    }
+    return child;
+  }
+
+  addEventListener(_type: string, _listener: EventListener): void {}
+  dispatchEvent(_event: Event): boolean { return true; }
+}
+
+class MockDocument extends MockElement {
+  createElement(tagName: string): MockElement {
+    return new MockElement();
+  }
+
+  querySelectorAll(_selector: string): MockElement[] {
+    return [];
+  }
+}
+
+global.document = new MockDocument() as any;
