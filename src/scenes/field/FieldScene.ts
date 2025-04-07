@@ -232,7 +232,7 @@ export class FieldScene extends Phaser.Scene {
     for (let y = 0; y < gridHeight; y++) {
       for (let x = 0; x < gridWidth; x++) {
         const tile = obstaclesLayer.getTileAt(x, y);
-        if (tile && tile.properties && tile.properties.collides) {
+        if (tile && tile.properties && (tile.properties as { collides?: boolean }).collides) {
           this.gridSystem.setTileCollision(x, y, true);
         }
       }
@@ -633,7 +633,7 @@ export class FieldScene extends Phaser.Scene {
     this.narrativeEngine = new NarrativeEngine();
 
     // Load narrative events
-    const eventsData = this.cache.json.get('narrative_events');
+    const eventsData = this.cache.json.get('narrative_events') as Record<string, unknown>[];
     if (eventsData) {
       this.narrativeEngine.loadEvents(JSON.stringify(eventsData));
     }

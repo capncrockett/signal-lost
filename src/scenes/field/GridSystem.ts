@@ -33,9 +33,9 @@ export class GridSystem {
     this.tileSize = tileSize;
 
     // Initialize collision grid
-    this.collisionGrid = Array(height)
-      .fill(null)
-      .map(() => Array(width).fill(false)) as boolean[][];
+    this.collisionGrid = Array.from({ length: height }, () =>
+      Array.from({ length: width }, () => false)
+    );
   }
 
   /**
