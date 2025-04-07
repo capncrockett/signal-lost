@@ -1,111 +1,90 @@
-# Current Sprint Tasks
+# Sprint 2: Cleanup and Maintenance
 
-## Critical Issues
+## Goals
+This sprint focuses on cleaning up the codebase, improving test infrastructure, and addressing technical debt to ensure a more maintainable and stable codebase moving forward.
 
-- ✅ Remove duplicate "Go to Field" button
+## Code Cleanup
 
-  - ✅ Remove DOM button from MainScene
-  - ✅ Keep only the Phaser Text button
-  - ✅ Update e2e tests to target correct button
-  - ✅ Added TestOverlay utility for better E2E testing with data-testid attributes
+- [ ] Fix TypeScript errors and warnings
+  - [ ] Address all remaining `any` types in non-test code
+  - [ ] Fix type safety issues in core components
+  - [ ] Ensure proper typing for all public interfaces
 
-- ✅ Fix Volume Control
+- [ ] Refactor duplicated code
+  - [ ] Identify and consolidate duplicate logic across components
+  - [ ] Create shared utilities for common operations
+  - [ ] Standardize patterns for similar functionality
 
-  - ✅ Set initial volume to 80% in VolumeControl constructor
-  - ✅ Normalize volume scaling across components
-  - ✅ Add volume curve for more natural adjustment
-  - ✅ Test volume levels across all audio components
-  - ✅ Fix volume knob jumping when clicked
-  - ✅ Ensure volume control affects static noise
+- [ ] Remove unused code
+  - [ ] Delete dead code paths
+  - [ ] Remove commented-out code blocks
+  - [ ] Clean up unused imports and variables
 
-- ✅ Audio Improvements
+## Test Infrastructure
 
-  - ✅ Reduce overall volume of static noise
-    - ✅ Cut static volume in half across all components
-    - ✅ Normalized volume scaling for better user experience
-  - ✅ Use pink noise instead of white noise for gentler sound
-    - ✅ Implemented in both SoundscapeManager and RadioTuner
-    - ✅ Added fallback implementation using Voss algorithm
-    - ✅ Created NoiseGenerator utility for consistent noise generation
+- [ ] Fix failing tests
+  - [ ] Update tests to account for new components
+  - [ ] Fix mocks for components that have changed
+  - [ ] Address environment-specific test failures
 
-- ⏸️ Viewport & Scaling (postponed for future sprint)
+- [ ] Improve test coverage
+  - [ ] Add tests for untested components
+  - [ ] Increase coverage for critical paths
+  - [ ] Add edge case testing
 
-  - ✅ Fix Phaser scale configuration (using fixed dimensions)
-  - ✅ Test responsive behavior
-  - ✅ Add viewport meta tags
-  - ❌ Verify mobile compatibility (skipped - focusing on desktop only)
-  - ✅ Add rendering tests with screenshots
-  - ✅ Fix TypeScript errors in test files
-  - ❌ Game rendering issues persist despite tests passing
-  - ⏸️ Decision: Using fixed-size approach for now, will revisit responsive design in future sprint
+- [ ] Standardize test patterns
+  - [ ] Create consistent mocking approach
+  - [ ] Standardize test setup and teardown
+  - [ ] Improve test readability and maintainability
 
-- ✅ Improve E2E Tests
-  - ✅ Add comprehensive rendering tests for different resolutions
-  - ✅ Test audio initialization
-  - ✅ Capture screenshots for visual verification
-  - ✅ Standardize screenshot handling with helper functions
-  - ✅ Update ESLint configuration for stricter type checking
-  - ✅ Skip mobile/tablet tests (focusing on desktop only)
-  - ✅ Enhanced test helpers with better error handling and fallbacks
-  - ✅ Added detailed logging and screenshots for debugging
-  - ✅ Improved test reliability with retry mechanisms
-  - ✅ Add actual gameplay flow testing
-  - ✅ Verify signal detection
-  - ✅ Add field exploration tests
-  - ✅ Test save/load functionality
+## Environment Cleanup
 
-### Critical Issues Summary
+- [ ] Fix build process
+  - [ ] Address ESM/CommonJS module issues
+  - [ ] Optimize build configuration
+  - [ ] Ensure consistent builds across environments
 
-- ✅ 4/5 critical issues fully resolved (Button duplication, Volume Control, Audio Improvements, E2E Tests)
-- ⏸️ 1/5 critical issues postponed for future sprint (Viewport & Scaling)
-- Next steps: Focus on implementing signal discovery mechanics and field exploration content
+- [ ] Improve development workflow
+  - [ ] Streamline local development setup
+  - [ ] Enhance debugging capabilities
+  - [ ] Optimize hot reloading
 
-## Game Development
-
-- ⚠️ Add actual gameplay elements
-  - ⚠️ Implement signal discovery mechanics
-    - ✅ Fixed asset loading paths
-    - ✅ Fixed Phaser initialization
-    - ✅ Added fallback mechanisms for different environments
-    - ✅ Add more signal types and frequencies
-  - ✅ Add narrative elements
-  - ✅ Create field exploration content
-  - ✅ Add inventory system
-  - ✅ Implement save/load system
+- [ ] Update dependencies
+  - [ ] Audit and update outdated packages
+  - [ ] Address security vulnerabilities
+  - [ ] Ensure compatibility between dependencies
 
 ## Documentation
 
-- ✅ Update README with actual gameplay instructions
-- ✅ Add debugging guide
-- ✅ Document audio system architecture
-- ✅ Add contribution guidelines
+- [ ] Update technical documentation
+  - [ ] Document architecture decisions
+  - [ ] Create component documentation
+  - [ ] Update API documentation
 
-## Testing Infrastructure
+- [ ] Improve code comments
+  - [ ] Add JSDoc comments to public interfaces
+  - [ ] Document complex algorithms
+  - [ ] Explain non-obvious design decisions
 
-- ✅ Add visual regression testing
-- ✅ Improve test coverage for audio components
-- ✅ Add performance benchmarks
-- ✅ Create test data fixtures
+## Performance Optimization
 
-## Troubleshooting Game Rendering Issues
+- [ ] Identify performance bottlenecks
+  - [ ] Run performance benchmarks
+  - [ ] Profile critical paths
+  - [ ] Identify memory leaks
 
-- ✅ Created diagnostic test pages to isolate rendering problems
-  - ✅ Added path-test.html to verify asset loading paths
-  - ✅ Added cdn-test.html using CDN-loaded Phaser
-  - ✅ Added direct.html for direct asset loading
-  - ✅ Added test.html with simplified game structure
-  - ✅ Created separate test-phaser project for minimal testing
-- ✅ Asset management improvements
-  - ✅ Copied assets to public directory
-  - ✅ Updated Vite configuration for public directory
-  - ✅ Tested various asset paths
-- ✅ Simplified game initialization
-  - ✅ Created TestScene with minimal functionality
-  - ✅ Simplified HTML structure
-  - ✅ Removed complex scaling and responsive code
-  - ✅ Added detailed console logging
-- ✅ Issues identified and resolved
-  - ✅ Asset loading path issues - implemented multiple path formats and fallbacks
-  - ✅ Phaser initialization problems - added LoadingScene and error handling
-  - ✅ Disconnect between E2E tests and actual game rendering - improved TestOverlay utility
-  - ✅ Browser-specific rendering issues - added fallback mechanisms
+- [ ] Optimize rendering
+  - [ ] Reduce unnecessary re-renders
+  - [ ] Optimize asset loading
+  - [ ] Improve animation performance
+
+## Accessibility
+
+- [ ] Improve keyboard navigation
+  - [ ] Ensure all interactive elements are keyboard accessible
+  - [ ] Add keyboard shortcuts for common actions
+
+- [ ] Enhance screen reader support
+  - [ ] Add ARIA attributes
+  - [ ] Ensure proper focus management
+  - [ ] Test with screen readers
