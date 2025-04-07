@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { Inventory } from './Inventory';
-import { Item } from './Item';
 
 /**
  * Configuration for the inventory UI
@@ -24,16 +23,16 @@ interface InventoryUIConfig {
 
 /**
  * InventoryUI class
- * 
+ *
  * UI component for displaying and interacting with the inventory
  */
 export class InventoryUI extends Phaser.GameObjects.Container {
   // Reference to the inventory
   private inventory: Inventory;
-  
+
   // UI configuration
   private config: InventoryUIConfig;
-  
+
   // UI elements
   private background!: Phaser.GameObjects.Rectangle;
   private slots: Phaser.GameObjects.Rectangle[] = [];
@@ -44,10 +43,10 @@ export class InventoryUI extends Phaser.GameObjects.Container {
   private closeButton!: Phaser.GameObjects.Text;
   private useButton!: Phaser.GameObjects.Text;
   private dropButton!: Phaser.GameObjects.Text;
-  
+
   // Selected slot index
   private selectedSlot: number = -1;
-  
+
   // Visibility state
   private isVisible: boolean = false;
 
@@ -65,11 +64,11 @@ export class InventoryUI extends Phaser.GameObjects.Container {
     // Default position
     const x = config?.x ?? 400;
     const y = config?.y ?? 300;
-    
+
     super(scene, x, y);
-    
+
     this.inventory = inventory;
-    
+
     // Default configuration
     this.config = {
       x,
@@ -88,7 +87,7 @@ export class InventoryUI extends Phaser.GameObjects.Container {
       selectedSlotAlpha: 0.8,
       ...config
     };
-    
+
     // Create UI elements
     this.createBackground();
     this.createTitle();
@@ -96,13 +95,13 @@ export class InventoryUI extends Phaser.GameObjects.Container {
     this.createSlots();
     this.createItemInfo();
     this.createActionButtons();
-    
+
     // Set up event listeners
     this.setupEventListeners();
-    
+
     // Add to scene
     scene.add.existing(this);
-    
+
     // Hide initially
     this.setVisible(false);
     this.isVisible = false;
@@ -169,23 +168,23 @@ export class InventoryUI extends Phaser.GameObjects.Container {
   private createSlots(): void {
     const { columns, slotSize, slotSpacing } = this.config;
     const rows = Math.ceil(this.inventory.getMaxItems() / columns);
-    
+
     // Calculate total width and height of the slots grid
     const gridWidth = columns * slotSize + (columns - 1) * slotSpacing;
     const gridHeight = rows * slotSize + (rows - 1) * slotSpacing;
-    
+
     // Calculate starting position (top-left of the grid)
     const startX = -gridWidth / 2;
     const startY = -gridHeight / 2 + 50; // Offset for title
-    
+
     // Create slots
     for (let i = 0; i < this.inventory.getMaxItems(); i++) {
       const row = Math.floor(i / columns);
       const col = i % columns;
-      
+
       const x = startX + col * (slotSize + slotSpacing) + slotSize / 2;
       const y = startY + row * (slotSize + slotSpacing) + slotSize / 2;
-      
+
       // Create slot background
       const slot = this.scene.add.rectangle(
         x,
@@ -197,21 +196,21 @@ export class InventoryUI extends Phaser.GameObjects.Container {
       );
       slot.setStrokeStyle(2, 0xffffff, 0.5);
       slot.setInteractive({ useHandCursor: true });
-      
+
       // Add click handler
       slot.on('pointerdown', () => {
         this.selectSlot(i);
       });
-      
+
       this.slots.push(slot);
       this.add(slot);
-      
+
       // Create placeholder for item sprite
       const sprite = this.scene.add.sprite(x, y, '');
       sprite.setVisible(false);
       this.itemSprites.push(sprite);
       this.add(sprite);
-      
+
       // Create placeholder for item quantity text
       const text = this.scene.add.text(
         x + slotSize / 2 - 5,
@@ -273,7 +272,7 @@ export class InventoryUI extends Phaser.GameObjects.Container {
     });
     this.useButton.setVisible(false);
     this.add(this.useButton);
-    
+
     // Drop button
     this.dropButton = this.scene.add.text(
       80,
@@ -300,17 +299,18 @@ export class InventoryUI extends Phaser.GameObjects.Container {
    */
   private setupEventListeners(): void {
     // Listen for inventory events
-    this.inventory.on('itemAdded', () => this.refreshItems(), this);
-    this.inventory.on('itemRemoved', () => this.refreshItems(), this);
-    this.inventory.on('itemUpdated', () => this.refreshItems(), this);
-    this.inventory.on('inventoryLoaded', () => this.refreshItems(), this);
-    this.inventory.on('inventoryCleared', () => this.refreshItems(), this);
-    
+    const refreshItems = (): void => this.refreshItems();
+    this.inventory.on('itemAdded', refreshItems, this);
+    this.inventory.on('itemRemoved', refreshItems, this);
+    this.inventory.on('itemUpdated', refreshItems, this);
+    this.inventory.on('inventoryLoaded', refreshItems, this);
+    this.inventory.on('inventoryCleared', refreshItems, this);
+
     // Listen for keyboard events
     this.scene.input.keyboard?.on('keydown-I', () => {
       this.toggle();
     });
-    
+
     this.scene.input.keyboard?.on('keydown-ESC', () => {
       if (this.isVisible) {
         this.hide();
@@ -323,35 +323,35 @@ export class InventoryUI extends Phaser.GameObjects.Container {
    */
   refreshItems(): void {
     const items = this.inventory.getItems();
-    
+
     // Reset all slots
     for (let i = 0; i < this.inventory.getMaxItems(); i++) {
       // Hide item sprite and text
       this.itemSprites[i].setVisible(false);
       this.itemTexts[i].setVisible(false);
-      
+
       // Reset slot appearance
       this.slots[i].setFillStyle(
         this.config.slotColor,
         this.config.slotAlpha
       );
     }
-    
+
     // Update slots with items
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
-      
+
       // Set item sprite
       this.itemSprites[i].setTexture(item.getIcon());
       this.itemSprites[i].setVisible(true);
-      
+
       // Set quantity text for stackable items
       if (item.isStackable() && item.getQuantity() > 1) {
         this.itemTexts[i].setText(item.getQuantity().toString());
         this.itemTexts[i].setVisible(true);
       }
     }
-    
+
     // Update selected slot
     if (this.selectedSlot >= 0 && this.selectedSlot < items.length) {
       this.selectSlot(this.selectedSlot);
@@ -372,24 +372,24 @@ export class InventoryUI extends Phaser.GameObjects.Container {
         this.config.slotAlpha
       );
     }
-    
+
     // Set new selection
     this.selectedSlot = index;
-    
+
     // Get the item at this slot
     const items = this.inventory.getItems();
     const item = items[index];
-    
+
     if (item) {
       // Highlight the slot
       this.slots[index].setFillStyle(
         this.config.selectedSlotColor,
         this.config.selectedSlotAlpha
       );
-      
+
       // Update description
       this.descriptionText.setText(`${item.getName()}\n\n${item.getDescription()}`);
-      
+
       // Show action buttons
       this.useButton.setVisible(item.isUsable());
       this.dropButton.setVisible(true);
@@ -431,10 +431,10 @@ export class InventoryUI extends Phaser.GameObjects.Container {
    */
   show(): void {
     if (this.isVisible) return;
-    
+
     this.setVisible(true);
     this.isVisible = true;
-    
+
     // Refresh items
     this.refreshItems();
   }
@@ -444,10 +444,10 @@ export class InventoryUI extends Phaser.GameObjects.Container {
    */
   hide(): void {
     if (!this.isVisible) return;
-    
+
     this.setVisible(false);
     this.isVisible = false;
-    
+
     // Clear selection
     this.clearSelection();
   }
@@ -480,7 +480,7 @@ export class InventoryUI extends Phaser.GameObjects.Container {
     this.inventory.off('itemUpdated', this.refreshItems, this);
     this.inventory.off('inventoryLoaded', this.refreshItems, this);
     this.inventory.off('inventoryCleared', this.refreshItems, this);
-    
+
     super.destroy(fromScene);
   }
 }

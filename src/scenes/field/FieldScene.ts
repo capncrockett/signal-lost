@@ -361,9 +361,10 @@ export class FieldScene extends Phaser.Scene {
       case 'KeyE':
         this.interact();
         break;
-      case 'KeyI':
+      case 'KeyI': {
         this.toggleInventory();
         break;
+      }
     }
   }
 

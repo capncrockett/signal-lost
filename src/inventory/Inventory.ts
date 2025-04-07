@@ -4,19 +4,19 @@ import { SaveManager } from '../utils/SaveManager';
 
 /**
  * Inventory class
- * 
+ *
  * Manages the player's inventory of items
  */
 export class Inventory {
   // Event emitter for inventory events
   private eventEmitter: Phaser.Events.EventEmitter;
-  
+
   // Items in the inventory
   private items: Item[] = [];
-  
+
   // Maximum number of items in the inventory
   private maxItems: number;
-  
+
   // Item definitions
   private itemsData: ItemData[] = [];
 
@@ -54,27 +54,27 @@ export class Inventory {
       const existingItem = this.findItemById(item.getId());
       if (existingItem) {
         // Add to existing stack
-        const newQuantity = existingItem.addQuantity(item.getQuantity());
-        
+        existingItem.addQuantity(item.getQuantity());
+
         // Emit event
         this.eventEmitter.emit('itemUpdated', existingItem);
-        
+
         // Save inventory state
         this.saveInventory();
-        
+
         return true;
       }
     }
 
     // Add as a new item
     this.items.push(item);
-    
+
     // Emit event
     this.eventEmitter.emit('itemAdded', item);
-    
+
     // Save inventory state
     this.saveInventory();
-    
+
     return true;
   }
 
@@ -91,12 +91,12 @@ export class Inventory {
     }
 
     const item = this.items[index];
-    
+
     // If quantity is specified and the item is stackable
     if (quantity !== undefined && item.isStackable()) {
       // Remove the specified quantity
       const newQuantity = item.removeQuantity(quantity);
-      
+
       // If the quantity is now 0, remove the item
       if (newQuantity <= 0) {
         this.items.splice(index, 1);
@@ -109,10 +109,10 @@ export class Inventory {
       this.items.splice(index, 1);
       this.eventEmitter.emit('itemRemoved', item);
     }
-    
+
     // Save inventory state
     this.saveInventory();
-    
+
     return true;
   }
 
@@ -128,19 +128,19 @@ export class Inventory {
     }
 
     const item = this.items[index];
-    
+
     // Check if the item is usable
     if (!item.isUsable()) {
       return false;
     }
-    
+
     // Emit event
     this.eventEmitter.emit('itemUsed', item);
-    
+
     // If the item is consumable, reduce quantity
     if (item.getType() === ItemType.CONSUMABLE) {
       const newQuantity = item.removeQuantity(1);
-      
+
       // If the quantity is now 0, remove the item
       if (newQuantity <= 0) {
         this.items.splice(index, 1);
@@ -148,11 +148,11 @@ export class Inventory {
       } else {
         this.eventEmitter.emit('itemUpdated', item);
       }
-      
+
       // Save inventory state
       this.saveInventory();
     }
-    
+
     return true;
   }
 
@@ -245,7 +245,7 @@ export class Inventory {
   clear(): void {
     this.items = [];
     this.eventEmitter.emit('inventoryCleared');
-    
+
     // Save inventory state
     this.saveInventory();
   }
@@ -256,7 +256,7 @@ export class Inventory {
   saveInventory(): void {
     // Convert items to JSON
     const itemsData = this.items.map(item => item.toJSON());
-    
+
     // Save to game state
     SaveManager.setData('inventory', itemsData);
   }
@@ -268,13 +268,13 @@ export class Inventory {
   loadInventory(): boolean {
     // Clear current inventory
     this.items = [];
-    
+
     // Get saved inventory data
     const savedData = SaveManager.getData('inventory');
     if (!savedData || !Array.isArray(savedData)) {
       return false;
     }
-    
+
     // Convert JSON to items
     for (const itemData of savedData) {
       if (typeof itemData === 'object' && itemData !== null) {
@@ -284,10 +284,10 @@ export class Inventory {
         }
       }
     }
-    
+
     // Emit event
     this.eventEmitter.emit('inventoryLoaded');
-    
+
     return true;
   }
 
@@ -297,7 +297,7 @@ export class Inventory {
    * @param fn Callback function
    * @param context Context for the callback
    */
-  on(event: string, fn: Function, context?: any): void {
+  on(event: string, fn: (...args: unknown[]) => void, context?: unknown): void {
     this.eventEmitter.on(event, fn, context);
   }
 
@@ -307,7 +307,7 @@ export class Inventory {
    * @param fn Callback function
    * @param context Context for the callback
    */
-  off(event: string, fn?: Function, context?: any): void {
+  off(event: string, fn?: (...args: unknown[]) => void, context?: unknown): void {
     this.eventEmitter.off(event, fn, context);
   }
 
