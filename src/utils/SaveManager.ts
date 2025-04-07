@@ -85,7 +85,7 @@ export class SaveManager {
       // Create a combined state object with flags and data
       const combinedState = {
         flags: this.flagCache,
-        data: this.dataCache
+        data: this.dataCache,
       };
 
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(combinedState));
@@ -214,7 +214,7 @@ export class SaveManager {
 
     try {
       // Parse the JSON state
-      const importedState = JSON.parse(jsonState);
+      const importedState = JSON.parse(jsonState) as Record<string, unknown>;
 
       // Validate the imported state
       if (typeof importedState !== 'object' || importedState === null) {
@@ -229,7 +229,8 @@ export class SaveManager {
       // Handle new format with separate flags and data
       if (importedState.flags && typeof importedState.flags === 'object') {
         // Copy flags (boolean values only)
-        for (const [key, value] of Object.entries(importedState.flags)) {
+        const flagsObj = importedState.flags as Record<string, unknown>;
+        for (const [key, value] of Object.entries(flagsObj)) {
           if (typeof value === 'boolean') {
             this.flagCache[key] = value;
           }
@@ -239,13 +240,14 @@ export class SaveManager {
       // Handle data values
       if (importedState.data && typeof importedState.data === 'object') {
         // Copy all data values
-        this.dataCache = { ...importedState.data };
+        const dataObj = importedState.data as Record<string, unknown>;
+        this.dataCache = { ...dataObj };
       }
 
       // Handle old format (backward compatibility)
       if (!importedState.flags && !importedState.data) {
         // Cast to Record<string, unknown> to ensure type safety
-        const safeImportedState: Record<string, unknown> = importedState as Record<string, unknown>;
+        const safeImportedState: Record<string, unknown> = importedState;
         for (const [key, value] of Object.entries(safeImportedState)) {
           if (typeof value === 'boolean') {
             this.flagCache[key] = value;
@@ -346,7 +348,7 @@ export class SaveManager {
     // Create a combined state object with flags and data
     const combinedState = {
       flags: this.flagCache,
-      data: this.dataCache
+      data: this.dataCache,
     };
 
     return JSON.stringify(combinedState);

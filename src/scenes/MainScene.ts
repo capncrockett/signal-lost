@@ -20,7 +20,7 @@ export class MainScene extends Phaser.Scene {
     super({ key: 'MainScene' });
   }
 
-  preload() {
+  preload(): void {
     // Load assets with multiple path formats to handle different environments
     // Try with leading slash first
     this.load.image('radio', '/assets/images/radio.png');
@@ -46,7 +46,7 @@ export class MainScene extends Phaser.Scene {
     // Static noise is generated programmatically, no need to load an audio file
   }
 
-  create() {
+  create(): void {
     // Initialize SaveManager
     SaveManager.initialize();
 
@@ -273,7 +273,7 @@ export class MainScene extends Phaser.Scene {
     });
   }
 
-  update(_time: number, _delta: number) {
+  update(_time: number, _delta: number): void {
     // Update game objects
 
     // Update soundscape based on radio tuner signal strength

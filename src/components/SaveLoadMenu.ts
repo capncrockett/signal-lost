@@ -13,7 +13,7 @@ interface SaveSlot {
 
 /**
  * SaveLoadMenu component
- * 
+ *
  * Provides a UI for saving and loading game state
  */
 export class SaveLoadMenu extends Phaser.GameObjects.Container {
@@ -40,23 +40,23 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y);
-    
+
     // Create UI elements
     this.createBackground();
     this.createTitle();
     this.createCloseButton();
     this.createButtons();
     this.createSlotContainer();
-    
+
     // Load save slots
     this.loadSaveSlots();
-    
+
     // Create HTML elements for input
     this.createInputElements();
-    
+
     // Add to scene
     scene.add.existing(this);
-    
+
     // Hide initially
     this.setVisible(false);
     this.isVisible = false;
@@ -233,7 +233,7 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
     try {
       const savedSlots = localStorage.getItem(this.SAVE_SLOTS_KEY);
       if (savedSlots) {
-        this.saveSlots = JSON.parse(savedSlots);
+        this.saveSlots = JSON.parse(savedSlots) as SaveSlot[];
       } else {
         this.saveSlots = [];
       }
@@ -286,25 +286,30 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
       const slot = this.saveSlots[i];
       const date = new Date(slot.timestamp);
       const dateString = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
-      
-      const slotText = this.scene.add.text(0, -80 + i * 40, `${i + 1}. ${slot.name} (${dateString})`, {
-        fontSize: '18px',
-        color: '#ffffff',
-        padding: { x: 10, y: 5 },
-      });
+
+      const slotText = this.scene.add.text(
+        0,
+        -80 + i * 40,
+        `${i + 1}. ${slot.name} (${dateString})`,
+        {
+          fontSize: '18px',
+          color: '#ffffff',
+          padding: { x: 10, y: 5 },
+        }
+      );
       slotText.setOrigin(0.5, 0.5);
       slotText.setInteractive({ useHandCursor: true });
-      
+
       // Highlight selected slot
       if (i === this.selectedSlot) {
         slotText.setBackgroundColor('#444444');
       }
-      
+
       // Add click handler
       slotText.on('pointerdown', () => {
         this.selectSlot(i);
       });
-      
+
       this.slotContainer.add(slotText);
       this.slotTexts.push(slotText);
     }
@@ -319,10 +324,10 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
     if (this.selectedSlot >= 0 && this.selectedSlot < this.slotTexts.length) {
       this.slotTexts[this.selectedSlot].setBackgroundColor('');
     }
-    
+
     // Select new slot
     this.selectedSlot = index;
-    
+
     // Highlight new slot
     if (this.selectedSlot >= 0 && this.selectedSlot < this.slotTexts.length) {
       this.slotTexts[this.selectedSlot].setBackgroundColor('#444444');
@@ -339,34 +344,34 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
       const bounds = canvas.getBoundingClientRect();
       const x = bounds.left + this.x + canvas.width / 2;
       const y = bounds.top + this.y + canvas.height / 2;
-      
+
       this.inputField.style.left = `${x - 100}px`;
       this.inputField.style.top = `${y}px`;
       this.inputField.value = `Save ${this.saveSlots.length + 1}`;
       this.inputField.focus();
-      
+
       // Handle input confirmation
-      const handleKeyDown = (event: KeyboardEvent) => {
+      const handleKeyDown = (event: KeyboardEvent): void => {
         if (event.key === 'Enter' && this.inputField) {
           const saveName = this.inputField.value.trim() || `Save ${this.saveSlots.length + 1}`;
           this.createSaveSlot(saveName);
-          
+
           // Hide input field
           this.inputField.style.left = '-1000px';
           this.inputField.style.top = '-1000px';
-          
+
           // Remove event listener
           this.inputField.removeEventListener('keydown', handleKeyDown);
         } else if (event.key === 'Escape' && this.inputField) {
           // Hide input field
           this.inputField.style.left = '-1000px';
           this.inputField.style.top = '-1000px';
-          
+
           // Remove event listener
           this.inputField.removeEventListener('keydown', handleKeyDown);
         }
       };
-      
+
       this.inputField.addEventListener('keydown', handleKeyDown);
     }
   }
@@ -378,7 +383,7 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
   private createSaveSlot(name: string): void {
     // Get current game state
     const gameState = SaveManager.exportState();
-    
+
     // Create new save slot
     const newSlot: SaveSlot = {
       id: `save_${Date.now()}`,
@@ -386,27 +391,27 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
       timestamp: Date.now(),
       data: gameState,
     };
-    
+
     // Add to save slots
     if (this.saveSlots.length >= this.MAX_SLOTS) {
       // Remove oldest save if at max capacity
       this.saveSlots.shift();
     }
-    
+
     this.saveSlots.push(newSlot);
-    
+
     // Save to storage
     this.saveSlotsToStorage();
-    
+
     // Update display
     this.updateSlotDisplay();
-    
+
     // Select the new slot
     this.selectSlot(this.saveSlots.length - 1);
-    
+
     // Emit save event
     this.emit('save', newSlot.id);
-    
+
     console.log(`Game saved to slot "${name}" (${newSlot.id})`);
   }
 
@@ -419,19 +424,19 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
       console.warn('No save slot selected');
       return;
     }
-    
+
     // Get selected slot
     const slot = this.saveSlots[this.selectedSlot];
-    
+
     // Import game state
     const success = SaveManager.importState(slot.data);
-    
+
     if (success) {
       console.log(`Game loaded from slot "${slot.name}" (${slot.id})`);
-      
+
       // Emit load event
       this.emit('load', slot.id);
-      
+
       // Hide menu
       this.hide();
     } else {
@@ -448,22 +453,22 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
       console.warn('No save slot selected');
       return;
     }
-    
+
     // Get selected slot
     const slot = this.saveSlots[this.selectedSlot];
-    
+
     // Remove slot
     this.saveSlots.splice(this.selectedSlot, 1);
-    
+
     // Save to storage
     this.saveSlotsToStorage();
-    
+
     // Update display
     this.updateSlotDisplay();
-    
+
     // Reset selection
     this.selectedSlot = -1;
-    
+
     console.log(`Deleted save slot "${slot.name}" (${slot.id})`);
   }
 
@@ -472,7 +477,7 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
    */
   private exportGame(): void {
     let dataToExport: string;
-    
+
     // If a slot is selected, export that save
     if (this.selectedSlot >= 0 && this.selectedSlot < this.saveSlots.length) {
       dataToExport = this.saveSlots[this.selectedSlot].data;
@@ -480,7 +485,7 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
       // Otherwise export current game state
       dataToExport = SaveManager.exportState();
     }
-    
+
     // Create a blob and download link
     const blob = new Blob([dataToExport], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -489,13 +494,13 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
     a.download = 'signal-lost-save.json';
     document.body.appendChild(a);
     a.click();
-    
+
     // Clean up
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }, 0);
-    
+
     console.log('Game state exported');
   }
 
@@ -515,12 +520,12 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
    */
   private importSaveData(data: string): void {
     try {
-      // Validate JSON
+      // Validate JSON by parsing it
       JSON.parse(data);
-      
+
       // Create a new save slot
       const saveName = `Imported Save ${new Date().toLocaleDateString()}`;
-      
+
       // Create new save slot
       const newSlot: SaveSlot = {
         id: `import_${Date.now()}`,
@@ -528,24 +533,24 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
         timestamp: Date.now(),
         data: data,
       };
-      
+
       // Add to save slots
       if (this.saveSlots.length >= this.MAX_SLOTS) {
         // Remove oldest save if at max capacity
         this.saveSlots.shift();
       }
-      
+
       this.saveSlots.push(newSlot);
-      
+
       // Save to storage
       this.saveSlotsToStorage();
-      
+
       // Update display
       this.updateSlotDisplay();
-      
+
       // Select the new slot
       this.selectSlot(this.saveSlots.length - 1);
-      
+
       console.log(`Save data imported as "${saveName}"`);
     } catch (e) {
       console.error('Failed to import save data:', e);
@@ -557,13 +562,13 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
    */
   public show(): void {
     if (this.isVisible) return;
-    
+
     this.setVisible(true);
     this.isVisible = true;
-    
+
     // Refresh save slots
     this.loadSaveSlots();
-    
+
     // Emit show event
     this.emit('show');
   }
@@ -573,16 +578,16 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
    */
   public hide(): void {
     if (!this.isVisible) return;
-    
+
     this.setVisible(false);
     this.isVisible = false;
-    
+
     // Hide input field
     if (this.inputField) {
       this.inputField.style.left = '-1000px';
       this.inputField.style.top = '-1000px';
     }
-    
+
     // Emit hide event
     this.emit('hide');
   }
@@ -606,11 +611,11 @@ export class SaveLoadMenu extends Phaser.GameObjects.Container {
     if (this.inputField && document.body.contains(this.inputField)) {
       document.body.removeChild(this.inputField);
     }
-    
+
     if (this.fileInput && document.body.contains(this.fileInput)) {
       document.body.removeChild(this.fileInput);
     }
-    
+
     super.destroy(fromScene);
   }
 }

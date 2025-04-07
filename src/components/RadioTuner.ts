@@ -432,8 +432,10 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       this.staticSource.loop = true;
 
       // Connect to gain node with reduced volume (half of original)
-      this.staticGain!.gain.value = 0.25; // Half of the original 0.5
-      this.staticSource.connect(this.staticGain!);
+      if (this.staticGain) {
+        this.staticGain.gain.value = 0.25; // Half of the original 0.5
+        this.staticSource.connect(this.staticGain);
+      }
 
       // Start playback
       this.staticSource.start();
@@ -571,7 +573,11 @@ export class RadioTuner extends Phaser.GameObjects.Container {
         id: 'signal6',
         frequency: 105.1,
         type: 'item',
-        data: { itemId: 'radio_enhancer', name: 'Signal Enhancer', description: 'Improves radio reception and range.' },
+        data: {
+          itemId: 'radio_enhancer',
+          name: 'Signal Enhancer',
+          description: 'Improves radio reception and range.',
+        },
       },
     ];
 
@@ -680,7 +686,7 @@ export class RadioTuner extends Phaser.GameObjects.Container {
     // Close audio context
     if (this.audioContext && this.audioContext.state !== 'closed') {
       try {
-        this.audioContext.close();
+        void this.audioContext.close();
         this.audioContext = null;
       } catch (error) {
         console.error('Error closing audio context:', error);
