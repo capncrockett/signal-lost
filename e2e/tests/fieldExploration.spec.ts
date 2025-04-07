@@ -109,7 +109,10 @@ test('Field exploration and interaction with objects', async ({ page }) => {
           break;
         }
       } catch (error) {
-        console.log(`Error clicking position ${index + 1}:`, error instanceof Error ? error.message : String(error));
+        console.log(
+          `Error clicking position ${index + 1}:`,
+          error instanceof Error ? error.message : String(error)
+        );
       }
     }
   }
