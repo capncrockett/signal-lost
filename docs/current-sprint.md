@@ -18,10 +18,10 @@ This sprint focuses on cleaning up the codebase, improving test infrastructure, 
   - ⬜ Create shared utilities for common operations
   - ⬜ Standardize patterns for similar functionality
 
-- [ ] Remove unused code
-  - [ ] Delete dead code paths
-  - [ ] Remove commented-out code blocks
-  - [ ] Clean up unused imports and variables
+- ⬜ Remove unused code
+  - ⬜ Delete dead code paths
+  - ⬜ Remove commented-out code blocks
+  - ✅ Clean up unused imports and variables
 
 ## Test Infrastructure
 
