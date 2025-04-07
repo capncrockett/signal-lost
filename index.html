@@ -28,29 +28,12 @@
     #game {
       width: 800px;
       height: 600px;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
       background-color: #111;
       margin: 0 auto;
       overflow: hidden;
     }
 
-    /* Responsive scaling for smaller screens */
-    @media (max-width: 800px), (max-height: 600px) {
-      #game {
-        width: 100vw;
-        height: 75vw; /* Maintain 4:3 aspect ratio */
-        max-height: 100vh;
-      }
-
-      canvas {
-        width: 100% !important;
-        height: 100% !important;
-      }
-    }
-
+    /* Fixed size canvas */
     canvas {
       display: block;
       margin: 0 auto;

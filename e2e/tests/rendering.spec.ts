@@ -54,14 +54,14 @@ test.describe('Game Rendering', () => {
     await testResolution(page, resolution);
   });
 
-  // Test tablet portrait resolution
-  test('Game renders correctly at tablet portrait resolution', async ({ page }) => {
+  // Test tablet portrait resolution - SKIPPED (fixed size game)
+  test.skip('Game renders correctly at tablet portrait resolution', async ({ page }) => {
     const resolution = { width: 768, height: 1024, name: 'tablet-portrait' };
     await testResolution(page, resolution);
   });
 
-  // Test mobile resolution
-  test('Game renders correctly at mobile resolution', async ({ page }) => {
+  // Test mobile resolution - SKIPPED (fixed size game)
+  test.skip('Game renders correctly at mobile resolution', async ({ page }) => {
     const resolution = { width: 375, height: 667, name: 'mobile' };
     await testResolution(page, resolution);
   });

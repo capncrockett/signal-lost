@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { takeScreenshot } from '../helpers/gameTestHelpers';
 
-test.describe('Responsive behavior', () => {
+test.describe.skip('Responsive behavior - SKIPPED (fixed size game)', () => {
   test('Game scales correctly on desktop', async ({ page }) => {
     // Navigate to the game
     await page.goto('http://localhost:5173/');

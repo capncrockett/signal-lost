@@ -19,7 +19,7 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   pixelArt: true,
   scale: {
-    mode: Phaser.Scale.NONE, // Use NONE and handle scaling manually for better control
+    mode: Phaser.Scale.NONE, // Fixed size, no scaling
     parent: 'game',
     width: 800,
     height: 600,
