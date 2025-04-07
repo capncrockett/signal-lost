@@ -16,7 +16,7 @@ interface MouseClickOptions {
 }
 
 // Ensure the screenshots directory exists
-const screenshotsDir = path.join(process.cwd(), 'e2e-screenshots');
+const screenshotsDir = path.join(process.cwd(), 'e2e', 'screenshots');
 if (!fs.existsSync(screenshotsDir)) {
   fs.mkdirSync(screenshotsDir, { recursive: true });
 }
