@@ -61,7 +61,7 @@ const mockAudioContext = {
       setTargetAtTime: jest.fn(),
       setValueAtTime: jest.fn(),
       linearRampToValueAtTime: jest.fn(),
-      exponentialRampToValueAtTime: jest.fn()
+      exponentialRampToValueAtTime: jest.fn(),
     },
     connect: jest.fn(),
     disconnect: jest.fn(),
@@ -73,7 +73,7 @@ const mockAudioContext = {
       setTargetAtTime: jest.fn(),
       setValueAtTime: jest.fn(),
       linearRampToValueAtTime: jest.fn(),
-      exponentialRampToValueAtTime: jest.fn()
+      exponentialRampToValueAtTime: jest.fn(),
     },
     connect: jest.fn(),
     start: jest.fn(),
@@ -86,7 +86,7 @@ const mockAudioContext = {
       setTargetAtTime: jest.fn(),
       setValueAtTime: jest.fn(),
       linearRampToValueAtTime: jest.fn(),
-      exponentialRampToValueAtTime: jest.fn()
+      exponentialRampToValueAtTime: jest.fn(),
     },
     connect: jest.fn(),
     disconnect: jest.fn(),

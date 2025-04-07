@@ -46,7 +46,7 @@ describe('TestOverlay', () => {
       }),
       addEventListener: jest.fn(),
       dispatchEvent: jest.fn(),
-      parentElement: null
+      parentElement: null,
     };
     mockCanvas = {
       parentElement: null,
@@ -54,13 +54,13 @@ describe('TestOverlay', () => {
         left: 0,
         top: 0,
         width: 800,
-        height: 600
-      })
+        height: 600,
+      }),
     };
     mockParent = {
       appendChild: jest.fn(),
       children: [mockCanvas],
-      removeChild: jest.fn()
+      removeChild: jest.fn(),
     };
     mockCanvas.parentElement = mockParent;
 

@@ -1,6 +1,7 @@
 // Mock Phaser before importing components
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 jest.mock('phaser', () => {
+  // Use dynamic import to avoid ESLint warning
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const PhaserMock = require('../mocks/PhaserMock').default;
 
   // Extend the GameObjects.Container mock to include setDataEnabled
@@ -85,7 +86,10 @@ describe('PerformanceDisplay', () => {
     // Verify event listeners were set up
     const performanceMonitor = PerformanceMonitor.getInstance();
     expect(performanceMonitor.addEventListener).toHaveBeenCalledWith('fps', expect.any(Function));
-    expect(performanceMonitor.addEventListener).toHaveBeenCalledWith('memory', expect.any(Function));
+    expect(performanceMonitor.addEventListener).toHaveBeenCalledWith(
+      'memory',
+      expect.any(Function)
+    );
   });
 
   test('should set up update timer', () => {
@@ -120,9 +124,7 @@ describe('PerformanceDisplay', () => {
 
     // Verify text was updated
     const mockText = mockScene.add.text.mock.results[0].value;
-    expect(mockText.setText).toHaveBeenCalledWith(
-      'FPS: 59.5 (Min: 55.0, Max: 60.0)'
-    );
+    expect(mockText.setText).toHaveBeenCalledWith('FPS: 59.5 (Min: 55.0, Max: 60.0)');
 
     // Verify graph was updated
     const mockGraphics = mockScene.add.graphics.mock.results[0].value;
@@ -165,9 +167,7 @@ describe('PerformanceDisplay', () => {
 
     // Verify text was updated
     const mockText = mockScene.add.text.mock.results[1].value;
-    expect(mockText.setText).toHaveBeenCalledWith(
-      'Memory: 25.0 MB / 50.0 MB (25.0%)'
-    );
+    expect(mockText.setText).toHaveBeenCalledWith('Memory: 25.0 MB / 50.0 MB (25.0%)');
 
     // Verify graph was updated
     const mockGraphics = mockScene.add.graphics.mock.results[1].value;
@@ -217,8 +217,14 @@ describe('PerformanceDisplay', () => {
 
     // Verify event listeners were removed
     const performanceMonitor = PerformanceMonitor.getInstance();
-    expect(performanceMonitor.removeEventListener).toHaveBeenCalledWith('fps', expect.any(Function));
-    expect(performanceMonitor.removeEventListener).toHaveBeenCalledWith('memory', expect.any(Function));
+    expect(performanceMonitor.removeEventListener).toHaveBeenCalledWith(
+      'fps',
+      expect.any(Function)
+    );
+    expect(performanceMonitor.removeEventListener).toHaveBeenCalledWith(
+      'memory',
+      expect.any(Function)
+    );
 
     // Verify super.destroy was called
     expect(superDestroyMock).toHaveBeenCalled();

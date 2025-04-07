@@ -90,13 +90,13 @@ describe('AudioVisualizer', () => {
       createAnalyser: jest.fn().mockReturnValue({
         ...mockAnalyser,
         connect: jest.fn(),
-        frequencyBinCount: 128
-      })
+        frequencyBinCount: 128,
+      }),
     };
 
     const mockAudioNode = {
       connect: jest.fn(),
-      context: mockAudioContext
+      context: mockAudioContext,
     };
 
     // Connect to the audio node

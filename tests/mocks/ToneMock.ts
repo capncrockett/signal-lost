@@ -15,26 +15,26 @@ const ToneMock = {
   start: jest.fn(),
 
   // Instruments and effects
-  Gain: jest.fn().mockImplementation(function() {
+  Gain: jest.fn().mockImplementation(function () {
     return {
       gain: { value: 0 },
       connect: jest.fn().mockReturnThis(),
       toDestination: jest.fn().mockReturnThis(),
-      dispose: jest.fn()
+      dispose: jest.fn(),
     };
   }),
 
-  Noise: jest.fn().mockImplementation(function(type) {
+  Noise: jest.fn().mockImplementation(function (type) {
     return {
       type: type,
       connect: jest.fn().mockReturnThis(),
       start: jest.fn().mockReturnThis(),
       stop: jest.fn().mockReturnThis(),
-      dispose: jest.fn()
+      dispose: jest.fn(),
     };
   }),
 
-  Player: jest.fn().mockImplementation(function(url) {
+  Player: jest.fn().mockImplementation(function (url) {
     return {
       url: url,
       connect: jest.fn().mockReturnThis(),
@@ -42,27 +42,27 @@ const ToneMock = {
       stop: jest.fn().mockReturnThis(),
       dispose: jest.fn(),
       loop: false,
-      volume: { value: 0 }
+      volume: { value: 0 },
     };
   }),
 
-  Filter: jest.fn().mockImplementation(function(frequency, type) {
+  Filter: jest.fn().mockImplementation(function (frequency, type) {
     return {
       frequency: { value: frequency },
       type: type,
       Q: { value: 1 },
       connect: jest.fn().mockReturnThis(),
-      dispose: jest.fn()
+      dispose: jest.fn(),
     };
   }),
 
   // Analyzers
-  Analyser: jest.fn().mockImplementation(function(options) {
+  Analyser: jest.fn().mockImplementation(function (options) {
     const size = options?.size || 1024;
     return {
       size: size,
       getValue: jest.fn().mockReturnValue(new Float32Array(size)),
-      dispose: jest.fn()
+      dispose: jest.fn(),
     };
   }),
 

@@ -226,7 +226,9 @@ class MockElement {
   }
 
   addEventListener(_type: string, _listener: EventListener): void {}
-  dispatchEvent(_event: Event): boolean { return true; }
+  dispatchEvent(_event: Event): boolean {
+    return true;
+  }
 }
 
 class MockDocument extends MockElement {

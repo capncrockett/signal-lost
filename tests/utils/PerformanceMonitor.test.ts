@@ -156,10 +156,13 @@ describe('PerformanceMonitor', () => {
     );
 
     // Verify benchmark event was emitted
-    expect(notifyListenersSpy).toHaveBeenCalledWith('benchmark', expect.objectContaining({
-      name: 'test-benchmark',
-      iterations: 3,
-    }));
+    expect(notifyListenersSpy).toHaveBeenCalledWith(
+      'benchmark',
+      expect.objectContaining({
+        name: 'test-benchmark',
+        iterations: 3,
+      })
+    );
 
     // Restore spy
     notifyListenersSpy.mockRestore();
