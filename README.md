@@ -8,10 +8,15 @@
 
 ```bash
 npm install
-npm run dev          # Start local dev server
-npm run test         # Run all Jest tests
-npm run test:e2e     # Run E2E Playwright tests
-npm run coverage     # Output coverage report
+npm run dev                # Start local dev server
+npm run test               # Run all Jest tests
+npm run test:e2e:ci        # Run E2E tests without opening reports
+npm run test:e2e:report    # Run E2E tests and generate HTML report
+npm run test:e2e:show-report # Show the HTML report from previous E2E test run
+npm run coverage           # Output coverage report
+npm run lint               # Run ESLint
+npm run type-check         # Run TypeScript compiler check
+npm run check-all          # Run all checks (lint, type-check, tests, E2E tests)
 ```
 
 ## 📂 Project Structure
@@ -28,6 +33,20 @@ npm run coverage     # Output coverage report
 
 - TypeScript must be used throughout
 - Tests must cover ≥ 80% of code (unit + integration + E2E)
+
+## 🔄 CI/CD Workflow
+
+This project uses GitHub Actions for continuous integration and deployment. The workflow is defined in `.github/workflows/agent-workflow.yml` and includes:
+
+- Linting with ESLint
+- TypeScript compiler checks
+- Unit and integration tests with Jest
+- E2E tests with Playwright
+- Building the project
+- Uploading test reports and screenshots as artifacts
+
+The workflow runs automatically on pushes to `main` and `develop` branches, as well as on pull requests to these branches. You can also trigger it manually from the GitHub Actions tab.
+
 - Console logs must be accessible and validated in browser-based tests
 - All prompts/tasks live in docs/ files and serve as acceptance criteria
 - If Agent fails, it must re-read the relevant README task before retrying

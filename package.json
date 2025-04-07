@@ -18,7 +18,8 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
     "prepare": "husky",
-    "check-all": "npm run lint && npm run test && npm run test:e2e:ci"
+    "type-check": "tsc --noEmit",
+    "check-all": "npm run lint && npm run type-check && npm run test && npm run test:e2e:ci"
   },
   "keywords": [
     "game",
@@ -45,7 +46,8 @@
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
-    "vite": "^4.4.11"
+    "vite": "^4.4.11",
+    "wait-on": "^8.0.3"
   },
   "dependencies": {
     "phaser": "^3.60.0",
