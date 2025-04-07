@@ -47,8 +47,8 @@ export class AudioVisualizer extends Phaser.GameObjects.Container {
     this.graphics = this.scene.add.graphics();
     this.add(this.graphics);
 
-    // Set up update event
-    this.scene.events.on('preupdate', this.preUpdate, this);
+    // Set up update event with bound method
+    this.scene.events.on('preupdate', (time: number, delta: number) => this.preUpdate(time, delta));
   }
 
   /**
@@ -206,7 +206,8 @@ export class AudioVisualizer extends Phaser.GameObjects.Container {
    */
   public destroy(fromScene?: boolean): void {
     // Remove event listener
-    this.scene.events.off('preupdate', this.preUpdate, this);
+    // Note: We need to remove all listeners for this event since we're using an arrow function
+    this.scene.events.off('preupdate');
 
     // Call parent destroy
     super.destroy(fromScene);

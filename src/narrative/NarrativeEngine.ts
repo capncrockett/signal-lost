@@ -68,7 +68,9 @@ export class NarrativeEngine {
   loadEvents(data: string): boolean {
     try {
       // Parse the data
-      const events = JSON.parse(data);
+      const events = JSON.parse(data) as unknown[];
+
+      // Validate that events is an array
 
       // Validate and add events
       if (Array.isArray(events)) {

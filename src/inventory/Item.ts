@@ -219,7 +219,7 @@ export class Item {
     // Find the item definition
     const itemData = itemsData.find((item) => item.id === data.id);
     if (!itemData) {
-      console.error(`Item definition not found for ID: ${data.id}`);
+      console.error(`Item definition not found for ID: ${String(data.id)}`);
       return null;
     }
 

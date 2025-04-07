@@ -50,10 +50,13 @@ test('Complete gameplay flow from tuning radio to field exploration', async ({ p
   console.log('Testing specific frequencies...');
 
   // Test frequency 91.5 MHz
+  // Take a screenshot before dragging
+  await takeScreenshot(page, 'frequency-91.5');
+
+  // Drag in the game
   await dragInGame(page, 400, 300, 350, 300, {
     steps: 20,
     takeScreenshot: true,
-    screenshotName: 'frequency-91.5',
   });
   await page.waitForTimeout(2000);
 
@@ -65,10 +68,13 @@ test('Complete gameplay flow from tuning radio to field exploration', async ({ p
   console.log(`Signal events at 91.5 MHz: ${signalEvents91_5.length}`);
 
   // Test frequency 96.3 MHz
+  // Take a screenshot before dragging
+  await takeScreenshot(page, 'frequency-96.3');
+
+  // Drag in the game
   await dragInGame(page, 350, 300, 400, 300, {
     steps: 20,
     takeScreenshot: true,
-    screenshotName: 'frequency-96.3',
   });
   await page.waitForTimeout(2000);
 
@@ -80,10 +86,13 @@ test('Complete gameplay flow from tuning radio to field exploration', async ({ p
   console.log(`Signal events at 96.3 MHz: ${signalEvents96_3.length}`);
 
   // Test frequency 103.7 MHz
+  // Take a screenshot before dragging
+  await takeScreenshot(page, 'frequency-103.7');
+
+  // Drag in the game
   await dragInGame(page, 400, 300, 450, 300, {
     steps: 20,
     takeScreenshot: true,
-    screenshotName: 'frequency-103.7',
   });
   await page.waitForTimeout(2000);
 
@@ -101,8 +110,13 @@ test('Complete gameplay flow from tuning radio to field exploration', async ({ p
   console.log('Using game container as a proxy for Go to Field button');
 
   // Simulate a button position in the top part of the container
-  const buttonX = gameContainerBounds.x + gameContainerBounds.width * 0.5;
-  const buttonY = gameContainerBounds.y + 100; // Approximately where a button might be
+  if (!containerBounds) {
+    console.error('Container bounds not found');
+    return;
+  }
+
+  const buttonX = containerBounds.x + containerBounds.width * 0.5;
+  const buttonY = containerBounds.y + 100; // Approximately where a button might be
 
   console.log(`Simulated button position: ${buttonX}, ${buttonY}`);
 

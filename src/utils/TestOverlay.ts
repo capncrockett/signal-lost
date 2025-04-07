@@ -63,7 +63,7 @@ export class TestOverlay {
     this.updateOverlayPosition(scene, gameObject, overlay);
 
     // Add click handler with multiple event types for better reliability
-    const handleClick = (e: Event) => {
+    const handleClick = (e: Event): void => {
       e.preventDefault();
       e.stopPropagation();
 

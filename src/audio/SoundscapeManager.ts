@@ -158,7 +158,9 @@ export class SoundscapeManager {
 
     // Connect nodes
     this.staticGain.connect(this.staticPanner);
-    this.staticPanner.connect(this.masterGain!);
+    if (this.masterGain) {
+      this.staticPanner.connect(this.masterGain);
+    }
 
     // Create noise using Web Audio API
     this.createStaticNoise();
@@ -186,7 +188,9 @@ export class SoundscapeManager {
     // Connect nodes
     this.droneSource.connect(this.droneGain);
     this.droneGain.connect(this.dronePanner);
-    this.dronePanner.connect(this.masterGain!);
+    if (this.masterGain) {
+      this.dronePanner.connect(this.masterGain);
+    }
 
     // Start oscillator
     this.droneSource.start();
@@ -208,7 +212,9 @@ export class SoundscapeManager {
 
     // Connect nodes
     this.blipGain.connect(this.blipPanner);
-    this.blipPanner.connect(this.masterGain!);
+    if (this.masterGain) {
+      this.blipPanner.connect(this.masterGain);
+    }
 
     // Start scheduling blips
     this.scheduleBlips();
@@ -269,7 +275,9 @@ export class SoundscapeManager {
       this.staticSource.loop = true;
 
       // Connect to gain node
-      this.staticSource.connect(this.staticGain!);
+      if (this.staticGain) {
+        this.staticSource.connect(this.staticGain);
+      }
 
       // Start playback
       this.staticSource.start();
@@ -514,7 +522,7 @@ export class SoundscapeManager {
 
     // Close audio context
     if (this.audioContext && this.audioContext.state !== 'closed') {
-      this.audioContext.close();
+      void this.audioContext.close(); // Use void operator to explicitly ignore the promise
     }
 
     this.isInitialized = false;

@@ -23,9 +23,12 @@ test('Field exploration and interaction with objects', async ({ page }) => {
 
   // Initialize audio by clicking in the game
   console.log('Initializing audio...');
+  // Take a screenshot before clicking
+  await takeScreenshot(page, 'field-exploration-audio-init');
+
+  // Click in the game
   await clickGamePosition(page, 400, 300, {
     takeScreenshot: true,
-    screenshotName: 'field-exploration-audio-init',
   });
   await page.waitForTimeout(1000);
 
@@ -47,7 +50,7 @@ test('Field exploration and interaction with objects', async ({ page }) => {
       buttonClicked = true;
     }
   } catch (error) {
-    console.log('Error in approach 1:', error.message);
+    console.log('Error in approach 1:', error instanceof Error ? error.message : String(error));
   }
 
   // Approach 2: Look for any element containing "field" text
@@ -63,7 +66,7 @@ test('Field exploration and interaction with objects', async ({ page }) => {
         buttonClicked = true;
       }
     } catch (error) {
-      console.log('Error in approach 2:', error.message);
+      console.log('Error in approach 2:', error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -82,9 +85,12 @@ test('Field exploration and interaction with objects', async ({ page }) => {
       if (buttonClicked) break;
 
       try {
+        // Take a screenshot before clicking
+        await takeScreenshot(page, `field-exploration-click-position-${index + 1}`);
+
+        // Click in the game
         await clickGamePosition(page, pos.x, pos.y, {
           takeScreenshot: true,
-          screenshotName: `field-exploration-click-position-${index + 1}`,
         });
         console.log(`Clicked position ${index + 1}: (${pos.x}, ${pos.y})`);
 
@@ -103,7 +109,7 @@ test('Field exploration and interaction with objects', async ({ page }) => {
           break;
         }
       } catch (error) {
-        console.log(`Error clicking position ${index + 1}:`, error.message);
+        console.log(`Error clicking position ${index + 1}:`, error instanceof Error ? error.message : String(error));
       }
     }
   }

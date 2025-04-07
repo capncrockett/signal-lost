@@ -8,7 +8,7 @@ class LoadingScene extends Phaser.Scene {
     super({ key: 'LoadingScene' });
   }
 
-  preload() {
+  preload(): void {
     // Set up loading bar
     const progressBar = this.add.graphics();
     const progressBox = this.add.graphics();
@@ -77,7 +77,7 @@ class LoadingScene extends Phaser.Scene {
     this.load.image('background_alt', 'assets/images/menuBackground.png'); // Alternative path
   }
 
-  create() {
+  create(): void {
     console.log('LoadingScene completed');
   }
 }

@@ -1,7 +1,7 @@
 import { Page, Locator, expect } from '@playwright/test';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as pixelmatch from 'pixelmatch';
+import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 
 // Directory for storing visual test snapshots

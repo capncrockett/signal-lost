@@ -167,7 +167,13 @@ export class GridSystem {
       openSet.sort((a, b) => a.f - b.f);
 
       // Get the node with the lowest f value
-      const current = openSet.shift()!;
+      const current = openSet.shift();
+
+      // This should never happen since we check openSet.length > 0
+      // But we'll handle it just in case
+      if (!current) {
+        break;
+      }
 
       // Check if we reached the end
       if (current.x === endX && current.y === endY) {

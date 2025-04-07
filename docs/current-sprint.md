@@ -5,10 +5,12 @@ This sprint focuses on cleaning up the codebase, improving test infrastructure, 
 
 ## Code Cleanup
 
-- [ ] Fix TypeScript errors and warnings
-  - [ ] Address all remaining `any` types in non-test code
-  - [ ] Fix type safety issues in core components
-  - [ ] Ensure proper typing for all public interfaces
+- ⬜ Fix TypeScript errors and warnings
+  - ✅ Fix ESLint errors in core components
+  - ✅ Add type declarations for external libraries
+  - ⬜ Address remaining `any` types in non-test code
+  - ⬜ Fix type safety issues in core components
+  - ⬜ Ensure proper typing for all public interfaces
 
 - [ ] Refactor duplicated code
   - [ ] Identify and consolidate duplicate logic across components
