@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { takeScreenshot } from '../helpers/gameTestHelpers';
 
 test('RadioTuner component loads and emits signal lock event', async ({ page }) => {
   // Navigate to the game
@@ -42,4 +43,7 @@ test('RadioTuner component loads and emits signal lock event', async ({ page }) 
 
   // Wait for signal lock event to be logged
   await page.waitForTimeout(1000);
+
+  // Take a screenshot
+  await takeScreenshot(page, 'radio-tuner-basic');
 });

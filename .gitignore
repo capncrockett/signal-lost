@@ -30,6 +30,6 @@ coverage
 /playwright-report/
 /playwright/.cache/
 
-# Screenshots
-e2e-*.png
-radio-tuner-*.png
+# Keep screenshots
+!e2e-screenshots/
+!*.png

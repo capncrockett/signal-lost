@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { takeScreenshot } from '../helpers/gameTestHelpers';
 
 test('Basic page load test with detailed diagnostics', async ({ page }) => {
   // Set up console log collection before navigation
@@ -96,7 +97,7 @@ test('Basic page load test with detailed diagnostics', async ({ page }) => {
 
   // Take a screenshot for debugging
   console.log('Taking screenshot...');
-  await page.screenshot({ path: 'e2e-screenshot.png', fullPage: true });
+  await takeScreenshot(page, 'e2e-screenshot', true);
   console.log('Screenshot saved');
 
   // Evaluate JavaScript in the page context

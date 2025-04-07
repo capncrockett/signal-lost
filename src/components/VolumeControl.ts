@@ -33,7 +33,7 @@ export class VolumeControl extends Phaser.GameObjects.Container {
       backgroundColor: config.backgroundColor || 0x333333,
       sliderColor: config.sliderColor || 0x666666,
       knobColor: config.knobColor || 0xcccccc,
-      initialVolume: config.initialVolume !== undefined ? config.initialVolume : 0.5,
+      initialVolume: config.initialVolume !== undefined ? config.initialVolume : 0.8, // Default to 80% volume
     };
 
     // Get the audio manager
@@ -139,11 +139,14 @@ export class VolumeControl extends Phaser.GameObjects.Container {
           // Update knob position
           this.knob.x = clampedX;
 
-          // Calculate volume (0-1)
-          const t = (clampedX - minX) / (maxX - minX);
+          // Calculate linear volume (0-1)
+          const linearVolume = (clampedX - minX) / (maxX - minX);
+
+          // Apply volume curve for more natural adjustment
+          const curvedVolume = this.applyVolumeCurve(linearVolume);
 
           // Update audio manager
-          this.audioManager.setMasterVolume(t);
+          this.audioManager.setMasterVolume(curvedVolume);
 
           // Update display
           this.updateDisplay();
@@ -167,17 +170,22 @@ export class VolumeControl extends Phaser.GameObjects.Container {
       const maxX = this.config.width / 2 - 10;
       const clampedX = Phaser.Math.Clamp(localX, minX, maxX);
 
-      // Update knob position
-      this.knob.x = clampedX;
+      // Calculate linear volume (0-1)
+      const linearVolume = (clampedX - minX) / (maxX - minX);
 
-      // Calculate volume (0-1)
-      const t = (clampedX - minX) / (maxX - minX);
+      // Apply volume curve for more natural adjustment
+      const curvedVolume = this.applyVolumeCurve(linearVolume);
 
       // Update audio manager
-      this.audioManager.setMasterVolume(t);
+      this.audioManager.setMasterVolume(curvedVolume);
 
-      // Update display
+      // Update display - this will also update the knob position
+      // based on the actual volume, preventing jumps
       this.updateDisplay();
+
+      // Start dragging the knob from this position
+      this.isDragging = true;
+      this.scene.input.setDraggable(this.knob, true);
     });
   }
 
@@ -202,12 +210,42 @@ export class VolumeControl extends Phaser.GameObjects.Container {
   }
 
   /**
+   * Apply a volume curve to make volume adjustment feel more natural
+   * Uses a cubic curve that gives better control at lower volumes
+   * @param linearVolume Linear volume value between 0 and 1
+   * @returns Curved volume value between 0 and 1
+   */
+  private applyVolumeCurve(linearVolume: number): number {
+    // Use a cubic curve (x^3) for more natural volume control
+    // This gives finer control at lower volumes where human hearing is more sensitive
+    return Phaser.Math.Easing.Cubic.Out(linearVolume);
+  }
+
+  /**
+   * Handle scene resize events to maintain proper positioning
+   * @param width New width of the scene
+   * @param height New height of the scene
+   */
+  public onResize(width: number, _height: number): void {
+    // Adjust position based on new dimensions
+    // Keep the volume control in the top-right corner
+    this.x = width - this.config.width / 2 - 20;
+    this.y = 50; // Fixed distance from top
+
+    // Update display
+    this.updateDisplay();
+  }
+
+  /**
    * Set the volume directly
    * @param volume Value between 0 (silent) and 1 (full volume)
    */
   public setVolume(volume: number): void {
+    // Apply volume curve for more natural adjustment
+    const curvedVolume = this.applyVolumeCurve(volume);
+
     // Update audio manager
-    this.audioManager.setMasterVolume(volume);
+    this.audioManager.setMasterVolume(curvedVolume);
 
     // Update display
     this.updateDisplay();

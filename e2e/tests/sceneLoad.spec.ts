@@ -31,14 +31,20 @@ test('Game loads and scenes can be navigated', async ({ page }) => {
   // Wait for the game to load
   await page.waitForTimeout(2000);
 
-  // Find and click the "Go to Field" button
-  // Since this is a Phaser game, we need to click at the button's position
-  await canvas.click({
-    position: {
-      x: 400, // Button X position
-      y: 500, // Button Y position
-    },
-  });
+  // Find and click the "Go to Field" button using its test ID
+  const goToFieldButton = page.locator('[data-testid="go-to-field-button"]');
+  await goToFieldButton.waitFor({ state: 'visible', timeout: 5000 });
+
+  // Get the position of the button
+  const buttonBounds = await goToFieldButton.boundingBox();
+  if (!buttonBounds) {
+    throw new Error('Could not get button bounds');
+  }
+
+  // Click in the center of the button using mouse actions for more reliability
+  const centerX = buttonBounds.x + buttonBounds.width / 2;
+  const centerY = buttonBounds.y + buttonBounds.height / 2;
+  await page.mouse.click(centerX, centerY);
 
   // Wait for scene transition
   await page.waitForTimeout(1000);

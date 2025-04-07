@@ -5,6 +5,7 @@ import {
   dragInGame,
   // captureConsoleLogs, // Not used in this test
   testRadioTuner,
+  takeScreenshot,
 } from '../helpers/gameTestHelpers';
 
 test('Radio tuner interaction test', async ({ page }) => {
@@ -80,7 +81,7 @@ test('Radio tuner interaction test', async ({ page }) => {
   console.log('Signal lock events:', signalEvents.length);
 
   // Take a screenshot
-  await page.screenshot({ path: 'radio-tuner-test.png' });
+  await takeScreenshot(page, 'radio-tuner-test');
 
   // Check for errors (ignoring audio loading errors)
   const nonAudioErrors = errors.filter(
@@ -114,7 +115,7 @@ test('Comprehensive radio tuner test using helper', async ({ page }) => {
   console.log(`- Errors: ${results.logResults.errors.length}`);
 
   // Take a screenshot
-  await page.screenshot({ path: 'radio-tuner-comprehensive.png' });
+  await takeScreenshot(page, 'radio-tuner-comprehensive');
 
   // Verify audio was initialized
   expect(results.audioInitialized).toBe(true);

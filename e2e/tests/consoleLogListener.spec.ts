@@ -58,13 +58,10 @@ test('Console log listener captures all game events', async ({ page }) => {
   // Wait for audio initialization to be logged
   await page.waitForTimeout(1000);
 
-  // Click on the radio tuner
-  await canvas.click({
-    position: {
-      x: 400, // Radio tuner X position
-      y: 300, // Radio tuner Y position
-    },
-  });
+  // Find and click the radio tuner using its test ID
+  const radioTuner = page.locator('[data-testid="radio-tuner"]');
+  await radioTuner.waitFor({ state: 'visible', timeout: 5000 });
+  await radioTuner.click();
 
   // Wait for potential signal lock event
   await page.waitForTimeout(1000);
@@ -72,13 +69,20 @@ test('Console log listener captures all game events', async ({ page }) => {
   // Wait for signal events to be logged
   await page.waitForTimeout(1000);
 
-  // Click on the "Go to Field" button
-  await canvas.click({
-    position: {
-      x: 400, // Button X position
-      y: 500, // Button Y position
-    },
-  });
+  // Find and click the "Go to Field" button using its test ID
+  const goToFieldButton = page.locator('[data-testid="go-to-field-button"]');
+  await goToFieldButton.waitFor({ state: 'visible', timeout: 5000 });
+
+  // Get the position of the button
+  const buttonBounds = await goToFieldButton.boundingBox();
+  if (!buttonBounds) {
+    throw new Error('Could not get button bounds');
+  }
+
+  // Click in the center of the button using mouse actions for more reliability
+  const centerX = buttonBounds.x + buttonBounds.width / 2;
+  const centerY = buttonBounds.y + buttonBounds.height / 2;
+  await page.mouse.click(centerX, centerY);
 
   // Wait for scene transition
   await page.waitForTimeout(1000);

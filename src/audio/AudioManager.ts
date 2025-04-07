@@ -5,7 +5,7 @@
  */
 export class AudioManager {
   private static instance: AudioManager;
-  private masterVolume: number = 0.1; // Default to 10% volume
+  private masterVolume: number = 0.8; // Default to 80% volume
   private listeners: ((volume: number) => void)[] = [];
 
   private constructor() {

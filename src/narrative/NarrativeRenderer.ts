@@ -11,8 +11,8 @@ export class NarrativeRenderer extends Phaser.GameObjects.Container {
   private engine: NarrativeEngine;
 
   // UI elements
-  private background: Phaser.GameObjects.Rectangle;
-  private messageText: Phaser.GameObjects.Text;
+  private background!: Phaser.GameObjects.Rectangle;
+  private messageText!: Phaser.GameObjects.Text;
   private choiceTexts: Phaser.GameObjects.Text[] = [];
 
   // Current event
@@ -100,8 +100,8 @@ export class NarrativeRenderer extends Phaser.GameObjects.Container {
    */
   private setupEventListeners(): void {
     // Listen for narrative events
-    this.engine.on('narrativeEvent', (event: NarrativeEvent) => {
-      this.showEvent(event);
+    this.engine.on('narrativeEvent', (event: unknown) => {
+      this.showEvent(event as NarrativeEvent);
     });
 
     // Listen for narrative choices
@@ -213,6 +213,26 @@ export class NarrativeRenderer extends Phaser.GameObjects.Container {
           }
         }
       }
+    }
+  }
+
+  /**
+   * Handle resize events
+   * @param width New width of the scene
+   * @param height New height of the scene
+   */
+  public onResize(width: number, height: number): void {
+    // Adjust the dialog box size based on the new dimensions
+    this.config.width = Math.min(600, width * 0.8);
+    this.config.height = Math.min(400, height * 0.6);
+
+    // Center the dialog in the screen
+    this.x = width / 2;
+    this.y = height / 2;
+
+    // Redraw the dialog if it's currently visible
+    if (this.visible && this.currentEvent) {
+      this.showEvent(this.currentEvent);
     }
   }
 }

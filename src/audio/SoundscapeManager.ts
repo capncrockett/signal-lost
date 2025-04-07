@@ -1,4 +1,7 @@
 import { AudioManager } from './AudioManager';
+import { createNoise } from './NoiseGenerator';
+import { NoiseType } from './NoiseType';
+import * as Tone from 'tone';
 
 /**
  * SoundscapeManager
@@ -16,6 +19,10 @@ export class SoundscapeManager {
   private staticSource: AudioBufferSourceNode | null = null;
   private droneSource: OscillatorNode | null = null;
   private blipSchedulerId: number | null = null;
+
+  // Tone.js nodes
+  private noiseGenerator: Tone.Noise | null = null;
+  private noiseGain: Tone.Gain<'gain'> | null = null;
 
   // Gain nodes for volume control
   private staticGain: GainNode | null = null;
@@ -75,15 +82,27 @@ export class SoundscapeManager {
 
       // Create master gain
       this.masterGain = this.audioContext.createGain();
-      this.masterGain.gain.value = 0.5; // Overall volume at 50% (reduced from 70%)
+      this.masterGain.gain.value = 0.5; // Base volume at 50%
       this.masterGain.connect(this.audioContext.destination);
 
       // Set up volume change listener
       this.volumeChangeListener = (volume: number) => {
         if (this.masterGain) {
-          // Scale volume so that 50% in UI is maximum (0.25 gain)
-          // This makes the overall volume much lower
-          this.masterGain.gain.value = Math.min(0.25, volume * 0.5);
+          // Apply a normalized volume scale
+          // Map the 0-1 range to a more appropriate gain range for Web Audio API
+          // Max gain of 0.5 prevents distortion while still allowing good volume range
+          const normalizedGain = volume * 0.5;
+
+          // Set the gain value with a small time constant for smooth transitions
+          if (this.audioContext) {
+            this.masterGain.gain.setTargetAtTime(
+              normalizedGain,
+              this.audioContext.currentTime,
+              0.01
+            );
+          } else {
+            this.masterGain.gain.value = normalizedGain;
+          }
         }
       };
 
@@ -113,9 +132,25 @@ export class SoundscapeManager {
   private initializeStaticLayer(): void {
     if (!this.audioContext) return;
 
+    try {
+      // Try to use Tone.js for better quality noise
+      const result = createNoise(NoiseType.Pink, 0.1125); // Half of the original 0.225
+      if (result) {
+        this.noiseGenerator = result.noise;
+        this.noiseGain = result.gain;
+        console.log('Static noise initialized with Tone.js (pink noise)');
+        return;
+      }
+    } catch (error) {
+      console.error('Failed to initialize Tone.js noise:', error);
+    }
+
+    // Fallback to Web Audio API if Tone.js fails
+    console.log('Falling back to Web Audio API for noise generation');
+
     // Create gain node for static volume
     this.staticGain = this.audioContext.createGain();
-    this.staticGain.gain.value = 0.225; // Start at 22.5% volume (reduced by 25%)
+    this.staticGain.gain.value = 0.1125; // Half of the original 0.225
 
     // Create panner for static
     this.staticPanner = this.audioContext.createStereoPanner();
@@ -125,7 +160,7 @@ export class SoundscapeManager {
     this.staticGain.connect(this.staticPanner);
     this.staticPanner.connect(this.masterGain!);
 
-    // Create white noise
+    // Create noise using Web Audio API
     this.createStaticNoise();
   }
 
@@ -180,31 +215,69 @@ export class SoundscapeManager {
   }
 
   /**
-   * Create white noise for the static layer
+   * Create pink noise for the static layer (fallback method)
    */
   private createStaticNoise(): void {
     if (!this.audioContext) return;
 
-    // Create buffer for white noise
-    const bufferSize = 2 * this.audioContext.sampleRate;
-    const noiseBuffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+    try {
+      // Create buffer for noise
+      const bufferSize = 2 * this.audioContext.sampleRate;
+      const noiseBuffer = this.audioContext.createBuffer(
+        1,
+        bufferSize,
+        this.audioContext.sampleRate
+      );
+      const data = noiseBuffer.getChannelData(0);
 
-    // Fill buffer with white noise
-    const data = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = Math.random() * 2 - 1;
+      // Generate pink noise using the Voss algorithm
+      // Pink noise has a frequency spectrum that falls off at 3dB per octave
+      // This sounds more natural and less harsh than white noise
+      let b0 = 0,
+        b1 = 0,
+        b2 = 0,
+        b3 = 0,
+        b4 = 0,
+        b5 = 0;
+      const b6 = 0;
+
+      for (let i = 0; i < bufferSize; i++) {
+        // White noise
+        const white = Math.random() * 2 - 1;
+
+        // Pink noise calculation
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.969 * b2 + white * 0.153852;
+        b3 = 0.8665 * b3 + white * 0.3104856;
+        b4 = 0.55 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.016898;
+
+        // Combine components
+        data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+
+        // Normalize to [-1, 1]
+        data[i] *= 0.11; // Adjust amplitude
+
+        // Clamp to prevent clipping
+        data[i] = Math.max(-1, Math.min(1, data[i]));
+      }
+
+      // Create source node
+      this.staticSource = this.audioContext.createBufferSource();
+      this.staticSource.buffer = noiseBuffer;
+      this.staticSource.loop = true;
+
+      // Connect to gain node
+      this.staticSource.connect(this.staticGain!);
+
+      // Start playback
+      this.staticSource.start();
+
+      console.log('Pink noise generated using Web Audio API (fallback)');
+    } catch (error) {
+      console.error('Failed to create pink noise:', error);
     }
-
-    // Create source node
-    this.staticSource = this.audioContext.createBufferSource();
-    this.staticSource.buffer = noiseBuffer;
-    this.staticSource.loop = true;
-
-    // Connect to gain node
-    this.staticSource.connect(this.staticGain!);
-
-    // Start playback
-    this.staticSource.start();
   }
 
   /**
@@ -304,6 +377,18 @@ export class SoundscapeManager {
   }
 
   /**
+   * Calculate the static volume based on signal strength
+   * @param signalStrength The current signal strength (0-1)
+   * @returns The static volume value before master volume scaling
+   */
+  private getStaticVolume(signalStrength: number): number {
+    // Calculate the static volume (inverse of signal strength)
+    // 0.1875 = reduced static (no signal), 0.0 = no static (perfect signal)
+    // This is half of the original 0.375 value
+    return 0.1875 * (1 - signalStrength);
+  }
+
+  /**
    * Update audio layers based on signal strength
    * @param signalStrength Value between 0 (no signal) and 1 (perfect signal)
    */
@@ -313,9 +398,20 @@ export class SoundscapeManager {
     // Clamp signal strength between 0 and 1
     const strength = Math.max(0, Math.min(1, signalStrength));
 
-    // Adjust static volume (inverse relationship with signal strength)
-    if (this.staticGain) {
-      this.staticGain.gain.value = 0.375 * (1 - strength); // Reduced by 25% from 0.5
+    // Get the base static volume based on signal strength
+    const baseStaticVolume = this.getStaticVolume(strength);
+
+    // Apply master volume scaling
+    const masterVolume = this.audioManager.getMasterVolume();
+    const finalStaticVolume = baseStaticVolume * masterVolume;
+
+    // Use Tone.js noise generator if available
+    if (this.noiseGain) {
+      this.noiseGain.gain.value = finalStaticVolume;
+    }
+    // Fallback to Web Audio API
+    else if (this.staticGain) {
+      this.staticGain.gain.value = finalStaticVolume;
     }
 
     // Adjust drone characteristics
@@ -379,6 +475,17 @@ export class SoundscapeManager {
    * Clean up resources
    */
   public dispose(): void {
+    // Stop Tone.js noise generator
+    if (this.noiseGenerator) {
+      this.noiseGenerator.stop();
+      this.noiseGenerator = null;
+    }
+
+    // Clean up Tone.js gain node
+    if (this.noiseGain) {
+      this.noiseGain = null;
+    }
+
     // Stop all audio sources
     if (this.staticSource) {
       this.staticSource.stop();
