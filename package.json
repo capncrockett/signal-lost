@@ -20,13 +20,14 @@
     "test:performance:update": "node scripts/run-performance-tests.js --update-baseline",
     "build:performance": "webpack --config webpack.performance.config.js",
     "coverage": "jest --coverage --coverageReporters=text",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint . --ext .ts --max-warnings=0",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
     "prepare": "husky",
     "type-check": "tsc --noEmit",
-    "lint:tests": "eslint tests/**/*.ts e2e/**/*.ts --fix",
-    "check-all": "npm run lint && npm run lint:tests && npm run type-check && npm run test && npm run test:e2e:ci"
+    "unused-check": "tsc --noEmit --noUnusedLocals --noUnusedParameters",
+    "lint:tests": "eslint tests/**/*.ts e2e/**/*.ts --max-warnings=0",
+    "check-all": "npm run lint && npm run lint:tests && npm run type-check && npm run unused-check && npm run test && npm run test:e2e:ci"
   },
   "keywords": [
     "game",

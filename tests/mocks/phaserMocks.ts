@@ -2,15 +2,12 @@
  * Helper functions for creating Phaser-related mocks
  */
 
-import { 
-  MockScene, 
-  MockContainer, 
-  MockSprite, 
-  MockText, 
-  MockRectangle, 
-  MockKeyboard, 
-  MockTweenManager, 
-  MockClock,
+import {
+  MockScene,
+  MockContainer,
+  MockSprite,
+  MockText,
+  MockRectangle,
   MockGame
 } from '../types/phaser';
 
@@ -168,11 +165,11 @@ export function createMockText(x: number = 0, y: number = 0, text: string = ''):
  * @returns A mock Phaser.GameObjects.Rectangle
  */
 export function createMockRectangle(
-  x: number = 0, 
-  y: number = 0, 
-  width: number = 100, 
-  height: number = 100, 
-  fillColor: number = 0xffffff, 
+  x: number = 0,
+  y: number = 0,
+  width: number = 100,
+  height: number = 100,
+  fillColor: number = 0xffffff,
   fillAlpha: number = 1
 ): MockRectangle {
   return {
