@@ -123,15 +123,12 @@ This sprint focuses on setting up the new React-based project structure and esta
 - Set up testing infrastructure
 - Implemented state management with React Context
 - Created design system and basic styling
-- Implemented radio tuner component with frequency dial and signal detection
-- Created audio system with Web Audio API integration
-- Developed narrative system with message display and decoding
 
 ### In Progress
 
 - Building UI component library
-- Implementing field exploration component
-- Creating inventory system
+- Implementing radio tuner component
+- Setting up audio system
 
 ## Dependencies
 

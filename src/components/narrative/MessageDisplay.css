@@ -1,0 +1,121 @@
+.message-display {
+  background-color: #111;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 15px;
+  margin-top: 20px;
+  font-family: 'Courier New', monospace;
+  color: #0f0;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+  max-width: 600px;
+  width: 100%;
+  margin: 20px auto;
+}
+
+.message-header {
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.message-title {
+  margin: 0 0 10px 0;
+  color: #0f0;
+  font-size: 1.2rem;
+}
+
+.message-sender,
+.message-timestamp {
+  font-size: 0.8rem;
+  color: #0a0;
+  margin-bottom: 5px;
+}
+
+.message-content {
+  line-height: 1.5;
+  margin-bottom: 15px;
+  min-height: 100px;
+}
+
+.message-content p {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.message-coordinates {
+  font-size: 0.9rem;
+  padding: 8px;
+  background-color: #0a0a0a;
+  border-radius: 4px;
+  border-left: 3px solid #0f0;
+}
+
+/* Decoding animation */
+.decoding-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+}
+
+.decoding-text {
+  margin-bottom: 10px;
+  animation: blink 1s infinite;
+}
+
+.decoding-progress-bar {
+  width: 100%;
+  height: 10px;
+  background-color: #222;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.decoding-progress-fill {
+  height: 100%;
+  background-color: #0f0;
+  transition: width 0.1s linear;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Static effect for undecoded content */
+.static-text {
+  position: relative;
+  display: inline-block;
+  background-color: #222;
+  color: #0f0;
+  padding: 0 5px;
+  border-radius: 2px;
+}
+
+.static-text::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"><rect width="1" height="1" fill="white" opacity="0.1"/></svg>');
+  opacity: 0.3;
+  animation: static 0.2s steps(1) infinite;
+  pointer-events: none;
+}
+
+@keyframes static {
+  0% { opacity: 0.1; }
+  10% { opacity: 0.3; }
+  20% { opacity: 0.1; }
+  30% { opacity: 0.5; }
+  40% { opacity: 0.2; }
+  50% { opacity: 0.7; }
+  60% { opacity: 0.3; }
+  70% { opacity: 0.2; }
+  80% { opacity: 0.5; }
+  90% { opacity: 0.1; }
+  100% { opacity: 0.4; }
+}

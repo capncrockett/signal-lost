@@ -1,18 +1,104 @@
-.App {
+/* Base styles */
+:root {
+  --primary-color: #1a1a1a;
+  --secondary-color: #333333;
+  --accent-color: #00ff00;
+  --text-color: #f0f0f0;
+  --background-color: #000000;
+  --header-height: 60px;
+  --footer-height: 40px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Courier New', monospace;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+/* App container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 800px;
+  margin: 0 auto;
+  background-color: var(--primary-color);
+}
+
+/* Header */
+.app-header {
+  background-color: var(--secondary-color);
+  height: var(--header-height);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 2px solid var(--accent-color);
+}
+
+.app-header h1 {
+  font-size: 1.5rem;
+  color: var(--accent-color);
+}
+
+.app-header nav ul {
+  display: flex;
+  list-style: none;
+}
+
+.app-header nav ul li {
+  margin-left: 20px;
+}
+
+.app-header nav ul li a {
+  color: var(--text-color);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.app-header nav ul li a:hover {
+  color: var(--accent-color);
+}
+
+/* Main content */
+.app-content {
+  flex: 1;
+  padding: 20px;
+  overflow: auto;
+}
+
+/* Footer */
+.app-footer {
+  background-color: var(--secondary-color);
+  height: var(--footer-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+  border-top: 2px solid var(--accent-color);
+  font-size: 0.8rem;
+}
+
+/* Page styles */
+.page {
+  min-height: calc(100vh - var(--header-height) - var(--footer-height) - 40px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
+/* Responsive adjustments */
+@media (max-width: 800px) {
+  .app-container {
+    width: 100%;
+  }
 }

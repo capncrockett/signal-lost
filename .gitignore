@@ -25,4 +25,14 @@ dist-ssr
 *.sw?
 
 # Testing
+coverage
+/test-results/
+/playwright-report/
 /playwright/.cache/
+
+# Screenshots
+e2e/screenshots/**/*.png
+e2e/screenshots/*.png
+
+# Screenshot backups
+e2e/screenshots-backup*/

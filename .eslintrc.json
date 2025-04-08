@@ -85,15 +85,14 @@
       }
     }
   ],
-  "ignorePatterns": ["dist", "node_modules", "coverage", "playwright-report", "tests-archive", "src/main.tsx"],
+  "ignorePatterns": ["dist", "node_modules", "coverage", "playwright-report"],
   "parserOptions": {
     "ecmaVersion": 2020,
     "sourceType": "module",
     "project": "./tsconfig.json",
     "ecmaFeatures": {
       "jsx": true
-    },
-    "tsconfigRootDir": "."
+    }
   },
   "settings": {
     "react": {
