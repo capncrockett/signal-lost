@@ -7,7 +7,7 @@ import { AudioProvider } from '../../../src/context/AudioContext';
 
 describe('RadioTuner Component', () => {
   // Helper function to render with providers
-  const renderWithProviders = (ui: React.ReactElement): React.ReactElement => {
+  const renderWithProviders = (ui: React.ReactElement) => {
     return render(
       <GameStateProvider>
         <AudioProvider>{ui}</AudioProvider>
