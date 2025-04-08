@@ -62,6 +62,11 @@
       "tilewidth": 32,
       "tileheight": 32,
       "tilecount": 2,
+      "image": "../images/tiles.png",
+      "imagewidth": 64,
+      "imageheight": 32,
+      "margin": 0,
+      "spacing": 0,
       "tiles": [
         {
           "id": 0,

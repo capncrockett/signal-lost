@@ -322,6 +322,31 @@ export class FieldScene extends Phaser.Scene {
                     });
                   }
 
+                  // Fix tileset image paths if needed
+                  if (fixedData.tilesets) {
+                    fixedData.tilesets.forEach((tileset: any) => {
+                      if (tileset.image) {
+                        // Store the original path for reference
+                        const originalPath = tileset.image;
+
+                        // Try different path formats
+                        const baseName = originalPath.split('/').pop(); // Get just the filename
+                        const possiblePaths = [
+                          `assets/images/${baseName}`,
+                          `/assets/images/${baseName}`,
+                          `./assets/images/${baseName}`,
+                          originalPath
+                        ];
+
+                        console.log(`FieldScene: Original tileset image path: ${originalPath}`);
+                        console.log(`FieldScene: Trying alternative paths: ${possiblePaths.join(', ')}`);
+
+                        // Update the path to a format that might work
+                        tileset.image = possiblePaths[0]; // Use the first format as default
+                      }
+                    });
+                  }
+
                   // Add the fixed data to the cache with a new key
                   const fixedKey = `${tilemapKey}_fixed`;
                   this.cache.json.add(fixedKey, fixedData);
@@ -495,13 +520,50 @@ export class FieldScene extends Phaser.Scene {
             this.textures.addCanvas(blankTilesetKey, canvas);
 
             // Try to add the tileset to the map
-            tileset = map.addTilesetImage('tiles', blankTilesetKey);
-
-            if (tileset) {
+            try {
+              // First try the standard way
+              tileset = map.addTilesetImage('tiles', blankTilesetKey);
               console.log('FieldScene: Successfully created and added blank tileset');
-            } else {
-              console.error('FieldScene: Failed to add blank tileset to map');
-              return null;
+            } catch (tilesetErr) {
+              console.log('FieldScene: Standard tileset creation failed, trying manual approach');
+
+              // If that fails, try to create the tileset manually
+              try {
+                // Get the tileset data from the map
+                const tilesetData = map.tilesets[0];
+                if (tilesetData) {
+                  console.log('FieldScene: Found tileset data in map:', tilesetData);
+
+                  // Create a new tileset with the blank texture
+                  const texture = this.textures.get(blankTilesetKey);
+                  if (texture) {
+                    console.log('FieldScene: Found texture for blank tileset');
+
+                    // Create a new tileset manually
+                    tileset = new Phaser.Tilemaps.Tileset(
+                      'tiles',           // name
+                      1,                 // firstgid
+                      32, 32,            // tileWidth, tileHeight
+                      0, 0,              // margin, spacing
+                      {},                // properties
+                      {}                 // tile properties
+                    );
+
+                    // Add the tileset to the map
+                    map.tilesets = [tileset];
+                    console.log('FieldScene: Manually created and added tileset to map');
+                  } else {
+                    console.error('FieldScene: Could not find texture for blank tileset');
+                    return null;
+                  }
+                } else {
+                  console.error('FieldScene: No tileset data found in map');
+                  return null;
+                }
+              } catch (manualErr) {
+                console.error('FieldScene: Manual tileset creation failed:', manualErr);
+                return null;
+              }
             }
           } else {
             console.error('FieldScene: Failed to get 2D context for canvas');
