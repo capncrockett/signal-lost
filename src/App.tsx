@@ -21,9 +21,15 @@ const App: React.FC = () => {
           <h1>Signal Lost</h1>
           <nav>
             <ul>
-              <li><a href="/">Home</a></li>
-              <li><a href="/radio">Radio</a></li>
-              <li><a href="/field">Field</a></li>
+              <li>
+                <a href="/">Home</a>
+              </li>
+              <li>
+                <a href="/radio">Radio</a>
+              </li>
+              <li>
+                <a href="/field">Field</a>
+              </li>
             </ul>
           </nav>
         </header>

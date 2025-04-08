@@ -24,29 +24,29 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, isVisible }) =
 
     // Get the appropriate content based on game progress
     const content = getDecodedMessage(message, state.gameProgress);
-    
+
     // If the message is not fully decoded, simulate decoding
     if (!message.isDecoded && message.decodedContent) {
       setIsDecoding(true);
       setDecodingProgress(0);
-      
+
       // Simulate decoding progress
       const totalDecodingTime = 3000; // 3 seconds
       const interval = 100; // Update every 100ms
       const steps = totalDecodingTime / interval;
-      
+
       let currentStep = 0;
       const timer = setInterval(() => {
         currentStep++;
         setDecodingProgress(currentStep / steps);
-        
+
         if (currentStep >= steps) {
           clearInterval(timer);
           setIsDecoding(false);
           setDisplayedContent(content);
         }
       }, interval);
-      
+
       return () => clearInterval(timer);
     } else {
       // If the message is already decoded, just display it
@@ -62,20 +62,16 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, isVisible }) =
     <div className="message-display" data-testid="message-display">
       <div className="message-header">
         <h3 className="message-title">{message.title}</h3>
-        {message.sender && (
-          <div className="message-sender">From: {message.sender}</div>
-        )}
-        {message.timestamp && (
-          <div className="message-timestamp">Time: {message.timestamp}</div>
-        )}
+        {message.sender && <div className="message-sender">From: {message.sender}</div>}
+        {message.timestamp && <div className="message-timestamp">Time: {message.timestamp}</div>}
       </div>
-      
+
       <div className="message-content">
         {isDecoding ? (
           <div className="decoding-container">
             <div className="decoding-text">Decoding message...</div>
             <div className="decoding-progress-bar">
-              <div 
+              <div
                 className="decoding-progress-fill"
                 style={{ width: `${decodingProgress * 100}%` }}
               />
@@ -85,7 +81,7 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, isVisible }) =
           <p>{displayedContent}</p>
         )}
       </div>
-      
+
       {message.coordinates && (
         <div className="message-coordinates">
           <strong>Coordinates:</strong> {message.coordinates}

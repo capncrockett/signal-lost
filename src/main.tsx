@@ -6,12 +6,14 @@ import { GameStateProvider } from './context/GameStateContext';
 import { AudioProvider } from './context/AudioContext';
 
 // Create root element if it doesn't exist
-const rootElement = document.getElementById('root') || (() => {
-  const root = document.createElement('div');
-  root.id = 'root';
-  document.body.appendChild(root);
-  return root;
-})();
+const rootElement =
+  document.getElementById('root') ||
+  (() => {
+    const root = document.createElement('div');
+    root.id = 'root';
+    document.body.appendChild(root);
+    return root;
+  })();
 
 // Render the React application
 ReactDOM.createRoot(rootElement).render(

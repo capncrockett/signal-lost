@@ -21,7 +21,7 @@ const initialState: GameState = {
 };
 
 // Define action types
-type ActionType = 
+type ActionType =
   | { type: 'SET_FREQUENCY'; payload: number }
   | { type: 'ADD_DISCOVERED_FREQUENCY'; payload: number }
   | { type: 'SET_LOCATION'; payload: string }
@@ -62,7 +62,7 @@ const gameStateReducer = (state: GameState, action: ActionType): GameState => {
     case 'REMOVE_INVENTORY_ITEM':
       return {
         ...state,
-        inventory: state.inventory.filter(item => item !== action.payload),
+        inventory: state.inventory.filter((item) => item !== action.payload),
       };
     case 'SET_GAME_PROGRESS':
       return {
@@ -96,9 +96,7 @@ export const GameStateProvider: React.FC<GameStateProviderProps> = ({ children }
   const [state, dispatch] = useReducer(gameStateReducer, initialState);
 
   return (
-    <GameStateContext.Provider value={{ state, dispatch }}>
-      {children}
-    </GameStateContext.Provider>
+    <GameStateContext.Provider value={{ state, dispatch }}>{children}</GameStateContext.Provider>
   );
 };
 

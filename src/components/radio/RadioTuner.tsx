@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useGameState } from '../../context/GameStateContext';
-import { findSignalAtFrequency, calculateSignalStrength, getStaticIntensity } from '../../data/frequencies';
+import {
+  findSignalAtFrequency,
+  calculateSignalStrength,
+  getStaticIntensity,
+} from '../../data/frequencies';
 import { getMessage } from '../../data/messages';
 import MessageDisplay from '../narrative/MessageDisplay';
 import './RadioTuner.css';
@@ -176,10 +180,7 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
         onMouseMove={state.isRadioOn ? handleMouseMove : undefined}
       >
         <div className="tuner-dial-track">
-          <div
-            className="tuner-dial-knob"
-            style={{ left: `${dialPosition}%` }}
-          />
+          <div className="tuner-dial-knob" style={{ left: `${dialPosition}%` }} />
         </div>
       </div>
 
@@ -197,14 +198,14 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
         <button
           className="tune-button decrease"
           disabled={!state.isRadioOn}
-          onClick={() => setFrequency(prev => Math.max(minFrequency, prev - 0.1))}
+          onClick={() => setFrequency((prev) => Math.max(minFrequency, prev - 0.1))}
         >
           -0.1
         </button>
         <button
           className="tune-button increase"
           disabled={!state.isRadioOn}
-          onClick={() => setFrequency(prev => Math.min(maxFrequency, prev + 0.1))}
+          onClick={() => setFrequency((prev) => Math.min(maxFrequency, prev + 0.1))}
         >
           +0.1
         </button>
@@ -213,10 +214,7 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
       {state.isRadioOn && currentSignalId && signalStrength > 0.5 && (
         <div className="message-indicator">
           <div className="signal-detected">Signal Detected</div>
-          <button
-            className="view-message-button"
-            onClick={toggleMessage}
-          >
+          <button className="view-message-button" onClick={toggleMessage}>
             {showMessage ? 'Hide Message' : 'View Message'}
           </button>
         </div>
