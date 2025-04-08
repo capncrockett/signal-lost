@@ -85,7 +85,7 @@ This sprint focuses on setting up the new React-based project structure and esta
   - ✅ Set up CSS reset
   - ✅ Create global styles
   - ✅ Implement responsive layout
-  - ⬜ Add accessibility styles
+  - ✅ Add accessibility styles
 
 - ✅ Build UI component library
   - ✅ Create button components
@@ -130,7 +130,6 @@ This sprint focuses on setting up the new React-based project structure and esta
 
 - Implementing radio tuner component
 - Setting up audio system
-- Adding accessibility styles
 
 ## Dependencies
 
