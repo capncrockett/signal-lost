@@ -18,9 +18,6 @@ export class NarrativeRenderer extends Phaser.GameObjects.Container {
   // Current event
   private currentEvent: NarrativeEvent | null = null;
 
-  // Visibility state
-  private _visible: boolean = false;
-
   // UI configuration
   private config = {
     width: 600,

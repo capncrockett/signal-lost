@@ -130,7 +130,7 @@ export class Player extends Phaser.GameObjects.Sprite {
    * @param time Current time
    * @param delta Time since last update
    */
-  update(time: number, delta: number): void {
+  update(_time: number, delta: number): void {
     // Skip if not moving
     if (this.targetX === null || this.targetY === null) {
       return;

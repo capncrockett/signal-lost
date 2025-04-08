@@ -6,8 +6,7 @@ import Phaser from 'phaser';
  * Manages a grid-based system for movement and collision detection
  */
 export class GridSystem {
-  // Reference to the scene
-  private readonly scene: Phaser.Scene;
+  // Grid properties
 
   // Grid dimensions
   private width: number;
@@ -26,8 +25,7 @@ export class GridSystem {
    * @param height Grid height in tiles
    * @param tileSize Tile size in pixels
    */
-  constructor(scene: Phaser.Scene, width: number, height: number, tileSize: number) {
-    this.scene = scene;
+  constructor(_scene: Phaser.Scene, width: number, height: number, tileSize: number) {
     this.width = width;
     this.height = height;
     this.tileSize = tileSize;
