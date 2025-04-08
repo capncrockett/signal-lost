@@ -89,6 +89,9 @@ See [sprint-3.md](sprint-3.md) for details on these deferred tasks.
 - Added robust error handling for asset loading
 - Fixed TypeScript errors in FieldScene.ts
 - Updated ESLint configuration to handle specific warnings in FieldScene.ts
+- Added screenshot cleanup script to manage E2E test screenshots
+- Improved screenshot handling in E2E tests
+- Added configuration to limit screenshots per test
 
 ### In Progress
 
