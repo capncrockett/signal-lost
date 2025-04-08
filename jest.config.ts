@@ -4,7 +4,13 @@ const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   testMatch: ['**/tests/**/*.test.ts', '**/tests/**/*.test.tsx'],
-  collectCoverageFrom: ['src/**/*.ts', 'src/**/*.tsx', '!src/main.ts', '!src/main.tsx', '!src/vite-env.d.ts'],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    'src/**/*.tsx',
+    '!src/main.ts',
+    '!src/main.tsx',
+    '!src/vite-env.d.ts',
+  ],
   coverageThreshold: {
     global: {
       branches: 80,
@@ -22,6 +28,9 @@ const config: Config = {
     '\\.(css|less|scss|sass)$': '<rootDir>/tests/mocks/styleMock.ts',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  // Fix memory issues
+  maxWorkers: 1,
+  forceExit: true,
 };
 
 export default config;

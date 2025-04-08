@@ -22,9 +22,12 @@
     }
   },
   "include": [
-    "src",
-    "tests",
-    "e2e",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "e2e/**/*.ts",
+    "e2e/**/*.tsx",
     "*.ts",
     "*.tsx",
     "vite.config.ts",
