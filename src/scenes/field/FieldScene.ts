@@ -230,7 +230,38 @@ export class FieldScene extends Phaser.Scene {
       for (const tilemapKey of availableTilemaps) {
         try {
           console.log(`FieldScene: Attempting to create tilemap with key: ${tilemapKey}`);
+
+          // Check if the tilemap data exists and has the expected structure
+          const mapData = this.cache.json.get(tilemapKey);
+          console.log(`FieldScene: Tilemap data for ${tilemapKey}:`, mapData);
+
+          if (!mapData) {
+            console.error(`FieldScene: No data found for tilemap key ${tilemapKey}`);
+            continue;
+          }
+
+          // Add missing properties if needed
+          if (!mapData.orientation) {
+            console.log(`FieldScene: Adding missing orientation property to tilemap data for ${tilemapKey}`);
+            mapData.orientation = 'orthogonal';
+          }
+
+          if (!mapData.renderorder) {
+            console.log(`FieldScene: Adding missing renderorder property to tilemap data for ${tilemapKey}`);
+            mapData.renderorder = 'right-down';
+          }
+
+          if (!mapData.version) {
+            console.log(`FieldScene: Adding missing version property to tilemap data for ${tilemapKey}`);
+            mapData.version = 1;
+          }
+
+          // Update the cache with the modified data
+          this.cache.json.add(tilemapKey, mapData);
+
+          // Now try to create the tilemap
           map = this.make.tilemap({ key: tilemapKey });
+
           if (map) {
             console.log(`FieldScene: Successfully created tilemap with key: ${tilemapKey}`);
             break;
@@ -257,13 +288,33 @@ export class FieldScene extends Phaser.Scene {
       console.log('FieldScene: Adding tileset...');
       let tileset: Phaser.Tilemaps.Tileset | null = null;
 
+      // Get the tilemap data to check tileset names
+      const mapData = this.cache.json.get(availableTilemaps[0]);
+      const tilesetNames = mapData?.tilesets?.map(ts => ts.name) || ['tiles'];
+      console.log(`FieldScene: Tileset names from map data:`, tilesetNames);
+
       for (const tilesetKey of availableTilesets) {
         try {
           console.log(`FieldScene: Attempting to add tileset with key: ${tilesetKey}`);
-          // The first parameter is the name in the Tiled map file, the second is the key in Phaser
-          tileset = map.addTilesetImage('tiles', tilesetKey);
-          if (tileset) {
-            console.log(`FieldScene: Successfully added tileset with key: ${tilesetKey}`);
+
+          // Try each tileset name from the map data
+          let success = false;
+          for (const tilesetName of tilesetNames) {
+            try {
+              console.log(`FieldScene: Trying tileset name '${tilesetName}' with key '${tilesetKey}'`);
+              tileset = map.addTilesetImage(tilesetName, tilesetKey);
+              if (tileset) {
+                console.log(`FieldScene: Successfully added tileset with name '${tilesetName}' and key '${tilesetKey}'`);
+                success = true;
+                break;
+              }
+            } catch (innerErr) {
+              console.log(`FieldScene: Could not add tileset with name '${tilesetName}' and key '${tilesetKey}':`, innerErr);
+            }
+          }
+
+          // If we found a working tileset, break out of the outer loop
+          if (success) {
             break;
           }
         } catch (err) {
