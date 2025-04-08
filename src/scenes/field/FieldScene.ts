@@ -106,23 +106,33 @@ export class FieldScene extends Phaser.Scene {
    */
   create(): void {
     try {
+      console.log('FieldScene: create method started');
+
       // Create tilemap and layers
       const mapData = this.createTilemap();
-      if (!mapData) return;
+      if (!mapData) {
+        console.error('FieldScene: Failed to create tilemap');
+        return;
+      }
+      console.log('FieldScene: Tilemap created successfully');
 
       const { map, obstaclesLayer } = mapData;
 
       // Initialize grid system and set up collisions
       this.setupGridSystem(map, obstaclesLayer);
+      console.log('FieldScene: Grid system initialized');
 
       // Create player
       this.createPlayer();
+      console.log('FieldScene: Player created');
 
       // Set up camera to follow player
       this.setupCamera(map);
+      console.log('FieldScene: Camera setup complete');
 
       // Create interactables
       this.createInteractables();
+      console.log('FieldScene: Interactables created');
 
       // Set up resize handler
       this.scale.on(
@@ -130,23 +140,38 @@ export class FieldScene extends Phaser.Scene {
         (width: number, height: number) => this.handleResize(width, height),
         this
       );
+      console.log('FieldScene: Resize handler set up');
 
       // Initial resize to set correct positions
       this.handleResize(this.scale.width, this.scale.height);
+      console.log('FieldScene: Initial resize complete');
 
       // Set up input
       this.setupInput();
+      console.log('FieldScene: Input setup complete');
 
       // Initialize SaveManager
       SaveManager.initialize();
+      console.log('FieldScene: SaveManager initialized');
 
       // Initialize narrative engine
       this.initializeNarrativeEngine();
+      console.log('FieldScene: Narrative engine initialized');
 
       // Initialize inventory system
       this.initializeInventorySystem();
+      console.log('FieldScene: Inventory system initialized');
+
+      console.log('FieldScene: create method completed successfully');
     } catch (error) {
-      console.error('Error creating field scene:', error);
+      console.error(
+        'Error creating field scene:',
+        error instanceof Error ? error.message : String(error)
+      );
+      console.error(
+        'Error stack:',
+        error instanceof Error ? error.stack : 'No stack trace available'
+      );
     }
   }
 
@@ -160,44 +185,72 @@ export class FieldScene extends Phaser.Scene {
     obstaclesLayer: Phaser.Tilemaps.TilemapLayer;
   } | null {
     try {
+      console.log('FieldScene: Creating tilemap...');
+
+      // Check if assets were loaded
+      const fieldKey = this.cache.tilemap?.exists?.('field') ?? false;
+      const fieldAltKey = this.cache.tilemap?.exists?.('field_alt') ?? false;
+      const tilesKey = this.cache.image?.exists?.('tiles') ?? false;
+      const tilesAltKey = this.cache.image?.exists?.('tiles_alt') ?? false;
+
+      console.log(
+        `FieldScene: Asset check - field: ${fieldKey}, field_alt: ${fieldAltKey}, tiles: ${tilesKey}, tiles_alt: ${tilesAltKey}`
+      );
+
       // Try to create tilemap with primary key
       let map = this.make.tilemap({ key: 'field' });
+      console.log('FieldScene: Attempted to create tilemap with primary key');
 
       // If that fails, try the alternative key
       if (!map) {
-        console.log('Trying alternative tilemap key');
+        console.log('FieldScene: Trying alternative tilemap key');
         map = this.make.tilemap({ key: 'field_alt' });
       }
 
       if (!map) {
-        console.error('Failed to create tilemap with both keys');
+        console.error('FieldScene: Failed to create tilemap with both keys');
         return null;
       }
+      console.log('FieldScene: Tilemap created successfully');
 
       // Add orientation property to fix the error
       if (map.orientation === undefined) {
+        console.log('FieldScene: Adding missing orientation property');
         // Add missing property with type assertion
         // Using unknown as an intermediate step to avoid any
         (map as unknown as { orientation: string }).orientation = 'orthogonal';
       }
 
       // Try primary tileset key first
+      console.log('FieldScene: Adding tileset...');
       let tileset = map.addTilesetImage('tiles', 'tiles');
 
       // If that fails, try the alternative key
       if (!tileset) {
-        console.log('Trying alternative tileset key');
+        console.log('FieldScene: Trying alternative tileset key');
         tileset = map.addTilesetImage('tiles', 'tiles_alt');
       }
 
       if (!tileset) {
-        console.error('Failed to load tileset with both keys');
+        console.error('FieldScene: Failed to load tileset with both keys');
+        return null;
+      }
+      console.log('FieldScene: Tileset added successfully');
+
+      // Create layers
+      console.log('FieldScene: Creating layers...');
+      const groundLayer = map.createLayer('Ground', tileset);
+      if (!groundLayer) {
+        console.error('FieldScene: Failed to create Ground layer');
         return null;
       }
 
-      // Create layers
-      const groundLayer = map.createLayer('Ground', tileset);
       const obstaclesLayer = map.createLayer('Obstacles', tileset);
+      if (!obstaclesLayer) {
+        console.error('FieldScene: Failed to create Obstacles layer');
+        return null;
+      }
+      console.log('FieldScene: Layers created successfully');
 
       if (!groundLayer || !obstaclesLayer) {
         console.error('Failed to create layers');
