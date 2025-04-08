@@ -1,8 +1,7 @@
 import { VolumeControl } from '../../src/components/VolumeControl';
 import { AudioManager } from '../../src/audio/AudioManager';
 import { SaveManager } from '../../src/utils/SaveManager';
-import { MockSaveManager } from '../types/mocks';
-import { createMockSaveManager } from '../mocks/generalMocks';
+// No unused imports
 
 // Mock the AudioManager
 jest.mock('../../src/audio/AudioManager', () => {

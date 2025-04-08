@@ -51,7 +51,7 @@ const mockScene = {
     }),
   },
   time: {
-    delayedCall: jest.fn((delay: number, callback: () => void) => {
+    delayedCall: jest.fn((_delay: number, callback: () => void) => {
       // Call the callback immediately for testing
       callback();
     }),

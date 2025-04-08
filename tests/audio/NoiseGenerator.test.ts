@@ -19,8 +19,7 @@ jest.mock('tone', () => {
 // Import after mocking
 import { createNoise } from '../../src/audio/NoiseGenerator';
 import * as Tone from 'tone';
-import { MockToneNoise, NoiseResult } from '../types/audio';
-import { createMockGainNode } from '../mocks/audioMocks';
+import { NoiseResult } from '../types/audio';
 
 describe('NoiseGenerator', () => {
   beforeEach(() => {

@@ -1,6 +1,6 @@
 import { SoundscapeManager } from '../../src/audio/SoundscapeManager';
 import { AudioManager } from '../../src/audio/AudioManager';
-import { MockAudioContext, MockGainNode, MockStereoPannerNode } from '../types/audio';
+import { MockGainNode, MockStereoPannerNode } from '../types/audio';
 import { createMockGainNode, createMockAudioContext, createMockStereoPannerNode } from '../mocks/audioMocks';
 
 // Add DOM types
@@ -99,10 +99,6 @@ describe('SoundscapeManager', () => {
       return context;
     });
 
-    // Mock setTimeout and clearTimeout
-    const originalSetTimeout = window.setTimeout;
-    const originalClearTimeout = window.clearTimeout;
-
     // Use type assertion to avoid TypeScript errors
     window.setTimeout = mockSetTimeout as unknown as typeof setTimeout;
     window.clearTimeout = mockClearTimeout as unknown as typeof clearTimeout;
@@ -113,8 +109,7 @@ describe('SoundscapeManager', () => {
 
   afterEach(() => {
     // Restore original setTimeout and clearTimeout
-    window.setTimeout = originalSetTimeout as unknown as typeof setTimeout;
-    window.clearTimeout = originalClearTimeout as unknown as typeof clearTimeout;
+    jest.restoreAllMocks();
   });
 
   test('should initialize correctly', () => {

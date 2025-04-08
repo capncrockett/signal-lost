@@ -10,8 +10,7 @@ export class PerformanceTests {
   // Performance benchmark
   private benchmark: PerformanceBenchmark;
 
-  // Performance monitor
-  private performanceMonitor: PerformanceMonitor;
+  // Performance monitor (unused but kept for future use)
 
   // Test results
   private results: BenchmarkResult[] = [];
