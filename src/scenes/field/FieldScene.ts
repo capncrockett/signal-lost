@@ -215,6 +215,8 @@ export class FieldScene extends Phaser.Scene {
 
       // Check for tileset assets
       const availableTilesets = [];
+
+      // First check using the standard method
       basePaths.forEach((_, index) => {
         const suffix = index === 0 ? '' : `_alt${index}`;
         const key = `tiles${suffix}`;
@@ -224,6 +226,19 @@ export class FieldScene extends Phaser.Scene {
           console.log(`FieldScene: Found tileset in cache: ${key}`);
         }
       });
+
+      // If no tilesets were found, check the texture manager directly
+      if (availableTilesets.length === 0) {
+        const textureKeys = this.textures.getTextureKeys();
+        console.log(`FieldScene: Available texture keys:`, textureKeys);
+
+        for (const key of textureKeys) {
+          if (key.includes('tiles')) {
+            availableTilesets.push(key);
+            console.log(`FieldScene: Found tileset in textures: ${key}`);
+          }
+        }
+      }
 
       console.log(`FieldScene: Available tilemaps: ${availableTilemaps.join(', ')}`);
       console.log(`FieldScene: Available tilesets: ${availableTilesets.length > 0 ? availableTilesets.join(', ') : 'None found'}`);
@@ -447,7 +462,55 @@ export class FieldScene extends Phaser.Scene {
 
       if (!tileset) {
         console.error('FieldScene: Failed to add tileset with any available key');
-        return null;
+
+        // As a last resort, try to create a blank tileset programmatically
+        try {
+          console.log('FieldScene: Attempting to create a blank tileset programmatically');
+
+          // Create a blank canvas for the tileset
+          const tileWidth = 32;
+          const tileHeight = 32;
+          const canvas = document.createElement('canvas');
+          canvas.width = tileWidth * 2; // For 2 tiles
+          canvas.height = tileHeight;
+
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            // Draw a simple grid pattern for the first tile (ground)
+            ctx.fillStyle = '#8B4513'; // Brown for ground
+            ctx.fillRect(0, 0, tileWidth, tileHeight);
+            ctx.strokeStyle = '#A0522D'; // Darker brown for grid
+            ctx.lineWidth = 1;
+            ctx.strokeRect(2, 2, tileWidth - 4, tileHeight - 4);
+
+            // Draw a simple pattern for the second tile (obstacle)
+            ctx.fillStyle = '#556B2F'; // Dark olive green for obstacles
+            ctx.fillRect(tileWidth, 0, tileWidth, tileHeight);
+            ctx.strokeStyle = '#2F4F4F'; // Dark slate gray for border
+            ctx.lineWidth = 2;
+            ctx.strokeRect(tileWidth + 4, 4, tileWidth - 8, tileHeight - 8);
+
+            // Add the canvas as a texture
+            const blankTilesetKey = 'blank_tileset';
+            this.textures.addCanvas(blankTilesetKey, canvas);
+
+            // Try to add the tileset to the map
+            tileset = map.addTilesetImage('tiles', blankTilesetKey);
+
+            if (tileset) {
+              console.log('FieldScene: Successfully created and added blank tileset');
+            } else {
+              console.error('FieldScene: Failed to add blank tileset to map');
+              return null;
+            }
+          } else {
+            console.error('FieldScene: Failed to get 2D context for canvas');
+            return null;
+          }
+        } catch (err) {
+          console.error('FieldScene: Error creating blank tileset:', err);
+          return null;
+        }
       }
       console.log('FieldScene: Tileset added successfully');
 
