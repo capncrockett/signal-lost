@@ -24,3 +24,6 @@ export type { DialogProps, DialogType } from './Dialog';
 
 export { default as LoadingIndicator } from './LoadingIndicator';
 export type { LoadingIndicatorProps } from './LoadingIndicator';
+
+export { default as AssetLoader } from './AssetLoader';
+export type { AssetLoaderProps } from './AssetLoader';
