@@ -33,3 +33,6 @@ coverage
 # Keep screenshots
 !e2e-screenshots/
 !*.png
+
+# Screenshot backups
+e2e/screenshots-backup*/
