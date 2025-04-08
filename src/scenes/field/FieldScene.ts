@@ -71,6 +71,10 @@ export class FieldScene extends Phaser.Scene {
       this.load.tilemapTiledJSON(`field${suffix}`, `${basePath}assets/maps/field.json`);
       console.log(`FieldScene: Loading field${suffix} from ${basePath}assets/maps/field.json`);
 
+      // Also load the tilemap as a regular JSON file for direct access
+      this.load.json(`field_json${suffix}`, `${basePath}assets/maps/field.json`);
+      console.log(`FieldScene: Loading field_json${suffix} from ${basePath}assets/maps/field.json`);
+
       // Load player sprite
       this.load.spritesheet(`player${suffix}`, `${basePath}assets/images/player.png`, {
         frameWidth: 32,
@@ -222,52 +226,124 @@ export class FieldScene extends Phaser.Scene {
       });
 
       console.log(`FieldScene: Available tilemaps: ${availableTilemaps.join(', ')}`);
-      console.log(`FieldScene: Available tilesets: ${availableTilesets.join(', ')}`);
+      console.log(`FieldScene: Available tilesets: ${availableTilesets.length > 0 ? availableTilesets.join(', ') : 'None found'}`);
 
       // Try to create tilemap with any available key
       let map: Phaser.Tilemaps.Tilemap | null = null;
 
-      for (const tilemapKey of availableTilemaps) {
+      // Create a simple tilemap if no assets are available
+      if (availableTilemaps.length === 0) {
+        console.log('FieldScene: No tilemaps found in cache, creating a simple tilemap');
         try {
-          console.log(`FieldScene: Attempting to create tilemap with key: ${tilemapKey}`);
-
-          // Check if the tilemap data exists and has the expected structure
-          const mapData = this.cache.json.get(tilemapKey);
-          console.log(`FieldScene: Tilemap data for ${tilemapKey}:`, mapData);
-
-          if (!mapData) {
-            console.error(`FieldScene: No data found for tilemap key ${tilemapKey}`);
-            continue;
-          }
-
-          // Add missing properties if needed
-          if (!mapData.orientation) {
-            console.log(`FieldScene: Adding missing orientation property to tilemap data for ${tilemapKey}`);
-            mapData.orientation = 'orthogonal';
-          }
-
-          if (!mapData.renderorder) {
-            console.log(`FieldScene: Adding missing renderorder property to tilemap data for ${tilemapKey}`);
-            mapData.renderorder = 'right-down';
-          }
-
-          if (!mapData.version) {
-            console.log(`FieldScene: Adding missing version property to tilemap data for ${tilemapKey}`);
-            mapData.version = 1;
-          }
-
-          // Update the cache with the modified data
-          this.cache.json.add(tilemapKey, mapData);
-
-          // Now try to create the tilemap
-          map = this.make.tilemap({ key: tilemapKey });
-
-          if (map) {
-            console.log(`FieldScene: Successfully created tilemap with key: ${tilemapKey}`);
-            break;
-          }
+          // Create a simple tilemap programmatically
+          map = this.make.tilemap({
+            width: 20,
+            height: 15,
+            tileWidth: 32,
+            tileHeight: 32
+          });
+          console.log('FieldScene: Successfully created simple tilemap');
         } catch (err) {
-          console.error(`FieldScene: Error creating tilemap with key ${tilemapKey}:`, err);
+          console.error('FieldScene: Error creating simple tilemap:', err);
+        }
+      } else {
+        // Try each available tilemap key
+        for (const tilemapKey of availableTilemaps) {
+          try {
+            console.log(`FieldScene: Attempting to create tilemap with key: ${tilemapKey}`);
+
+            // Direct approach - try to create the tilemap without modifying the data
+            try {
+              map = this.make.tilemap({ key: tilemapKey });
+              if (map) {
+                console.log(`FieldScene: Successfully created tilemap with key: ${tilemapKey}`);
+                break;
+              }
+            } catch (directErr) {
+              console.log(`FieldScene: Direct tilemap creation failed:`, directErr);
+
+              // If direct approach fails, try to fix the data
+              try {
+                // Try to get the JSON data from the corresponding field_json key
+                const jsonKey = tilemapKey.replace('field', 'field_json');
+                console.log(`FieldScene: Looking for JSON data with key: ${jsonKey}`);
+
+                const rawData = this.cache.json.get(jsonKey);
+                if (rawData) {
+                  console.log(`FieldScene: Found raw JSON data for ${jsonKey}:`, rawData);
+
+                  // Create a modified copy with required properties
+                  const fixedData = { ...rawData };
+                  fixedData.orientation = fixedData.orientation || 'orthogonal';
+                  fixedData.renderorder = fixedData.renderorder || 'right-down';
+                  fixedData.version = fixedData.version || 1;
+
+                  // Convert properties arrays to objects if needed
+                  if (fixedData.layers) {
+                    fixedData.layers.forEach((layer: any) => {
+                      if (layer.properties && Array.isArray(layer.properties)) {
+                        const propsObj: Record<string, any> = {};
+                        layer.properties.forEach((prop: any) => {
+                          propsObj[prop.name] = prop.value;
+                        });
+                        layer.properties = propsObj;
+                      }
+                    });
+                  }
+
+                  if (fixedData.tilesets) {
+                    fixedData.tilesets.forEach((tileset: any) => {
+                      if (tileset.tiles) {
+                        tileset.tiles.forEach((tile: any) => {
+                          if (tile.properties && Array.isArray(tile.properties)) {
+                            const propsObj: Record<string, any> = {};
+                            tile.properties.forEach((prop: any) => {
+                              propsObj[prop.name] = prop.value;
+                            });
+                            tile.properties = propsObj;
+                          }
+                        });
+                      }
+                    });
+                  }
+
+                  // Add the fixed data to the cache with a new key
+                  const fixedKey = `${tilemapKey}_fixed`;
+                  this.cache.json.add(fixedKey, fixedData);
+
+                  // Try to create the tilemap with the fixed data
+                  map = this.make.tilemap({ key: fixedKey });
+                  if (map) {
+                    console.log(`FieldScene: Successfully created tilemap with fixed key: ${fixedKey}`);
+                    break;
+                  }
+                } else {
+                  console.error(`FieldScene: No JSON data found for ${jsonKey}`);
+
+                  // As a last resort, create a simple tilemap programmatically
+                  try {
+                    console.log('FieldScene: Creating a simple tilemap programmatically as fallback');
+                    map = this.make.tilemap({
+                      width: 20,
+                      height: 15,
+                      tileWidth: 32,
+                      tileHeight: 32
+                    });
+                    if (map) {
+                      console.log('FieldScene: Successfully created simple tilemap as fallback');
+                      break;
+                    }
+                  } catch (fallbackErr) {
+                    console.error('FieldScene: Error creating simple tilemap fallback:', fallbackErr);
+                  }
+                }
+              } catch (fixErr) {
+                console.error(`FieldScene: Error fixing tilemap data:`, fixErr);
+              }
+            }
+          } catch (err) {
+            console.error(`FieldScene: Error creating tilemap with key ${tilemapKey}:`, err);
+          }
         }
       }
 
@@ -288,17 +364,38 @@ export class FieldScene extends Phaser.Scene {
       console.log('FieldScene: Adding tileset...');
       let tileset: Phaser.Tilemaps.Tileset | null = null;
 
-      // Get the tilemap data to check tileset names
-      const mapData = this.cache.json.get(availableTilemaps[0]);
-      const tilesetNames = mapData?.tilesets?.map(ts => ts.name) || ['tiles'];
-      console.log(`FieldScene: Tileset names from map data:`, tilesetNames);
+      // Try to get tileset names from the map data
+      let tilesetNames: string[] = ['tiles']; // Default fallback
 
+      // Try to get the JSON data from any available source
+      const jsonKeys = availableTilemaps.map(key => key.replace('field', 'field_json'));
+      jsonKeys.push(...availableTilemaps.map(key => `${key}_fixed`));
+
+      // Try each JSON key to find tileset names
+      for (const jsonKey of jsonKeys) {
+        try {
+          const mapData = this.cache.json.get(jsonKey);
+          if (mapData?.tilesets?.length > 0) {
+            tilesetNames = mapData.tilesets.map((ts: any) => ts.name);
+            console.log(`FieldScene: Found tileset names from ${jsonKey}:`, tilesetNames);
+            break;
+          }
+        } catch (err) {
+          console.log(`FieldScene: Could not get tileset names from ${jsonKey}:`, err);
+        }
+      }
+
+      console.log(`FieldScene: Using tileset names:`, tilesetNames);
+
+      // Try all possible combinations of tileset names and keys
       for (const tilesetKey of availableTilesets) {
         try {
           console.log(`FieldScene: Attempting to add tileset with key: ${tilesetKey}`);
 
-          // Try each tileset name from the map data
+          // Try each tileset name with this key
           let success = false;
+
+          // First try the exact matches
           for (const tilesetName of tilesetNames) {
             try {
               console.log(`FieldScene: Trying tileset name '${tilesetName}' with key '${tilesetKey}'`);
@@ -309,7 +406,33 @@ export class FieldScene extends Phaser.Scene {
                 break;
               }
             } catch (innerErr) {
-              console.log(`FieldScene: Could not add tileset with name '${tilesetName}' and key '${tilesetKey}':`, innerErr);
+              console.log(`FieldScene: Could not add tileset with name '${tilesetName}' and key '${tilesetKey}'`);
+            }
+          }
+
+          // If no exact match worked, try with the key as both name and key
+          if (!success) {
+            try {
+              console.log(`FieldScene: Trying tileset with key as both name and key: '${tilesetKey}'`);
+              tileset = map.addTilesetImage(tilesetKey, tilesetKey);
+              if (tileset) {
+                console.log(`FieldScene: Successfully added tileset using key as both name and key: '${tilesetKey}'`);
+                success = true;
+              }
+            } catch (keyErr) {
+              console.log(`FieldScene: Could not add tileset using key as both name and key: '${tilesetKey}'`);
+
+              // As a last resort, try with 'tiles' as the name regardless of what we found
+              try {
+                console.log(`FieldScene: Trying fallback with name 'tiles' and key '${tilesetKey}'`);
+                tileset = map.addTilesetImage('tiles', tilesetKey);
+                if (tileset) {
+                  console.log(`FieldScene: Successfully added tileset with fallback name 'tiles' and key '${tilesetKey}'`);
+                  success = true;
+                }
+              } catch (fallbackErr) {
+                console.log(`FieldScene: Could not add tileset with fallback name 'tiles' and key '${tilesetKey}'`);
+              }
             }
           }
 
