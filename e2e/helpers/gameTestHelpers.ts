@@ -23,7 +23,7 @@ interface MouseClickOptions {
 const SCREENSHOT_CONFIG = {
   enabled: process.env.TAKE_SCREENSHOTS !== 'false', // Enable screenshots by default, disable with TAKE_SCREENSHOTS=false
   maxPerTest: 3, // Maximum screenshots per test
-  directory: path.join(process.cwd(), 'e2e', 'screenshots')
+  directory: path.join(process.cwd(), 'e2e', 'screenshots'),
 };
 
 // Ensure the screenshots directory exists
@@ -107,7 +107,9 @@ export async function takeElementScreenshot(element: any, name: string): Promise
 
   // Check if we've exceeded the maximum screenshots for this test
   if (screenshotCounts[testName] > SCREENSHOT_CONFIG.maxPerTest) {
-    console.log(`Maximum screenshots reached for test ${testName}, skipping element screenshot: ${name}`);
+    console.log(
+      `Maximum screenshots reached for test ${testName}, skipping element screenshot: ${name}`
+    );
     return null;
   }
 

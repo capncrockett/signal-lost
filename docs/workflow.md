@@ -47,6 +47,21 @@ npm run check-all  # Run all checks (type-check, lint, tests, e2e tests)
 - Check browser console for errors
 - Use Chrome DevTools Audio tab for volume issues
 - Verify viewport sizing with browser responsive mode
+- Use the debug helper script for streamlined development:
+  ```bash
+  # Start the debug helper menu
+  powershell -File scripts/debug-helper.ps1
+  ```
+
+### Debug Helper Features
+
+- Start development server and open browser
+- Run tests in watch mode
+- Run E2E tests and visual tests
+- Clean up screenshots
+- Check for TypeScript errors
+- Run linting
+- Start a complete development environment with all tools
 
 ## Development Priorities
 
