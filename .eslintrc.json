@@ -85,7 +85,7 @@
       }
     }
   ],
-  "ignorePatterns": ["dist", "node_modules", "coverage", "playwright-report", "src-react"],
+  "ignorePatterns": ["dist", "node_modules", "coverage", "playwright-report", "src-react", "src/main.tsx"],
   "parserOptions": {
     "ecmaVersion": 2020,
     "sourceType": "module",

@@ -24,6 +24,8 @@
     "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
+    "format:tests": "prettier --write 'tests/**/*.{ts,tsx}'",
+    "format:all": "prettier --write '{src,tests}/**/*.{ts,tsx}'",
     "prepare": "husky",
     "type-check": "tsc --noEmit",
     "unused-check": "tsc --noEmit --noUnusedLocals --noUnusedParameters",

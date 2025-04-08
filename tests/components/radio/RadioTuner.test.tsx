@@ -10,9 +10,7 @@ describe('RadioTuner Component', () => {
   const renderWithProviders = (ui: React.ReactElement) => {
     return render(
       <GameStateProvider>
-        <AudioProvider>
-          {ui}
-        </AudioProvider>
+        <AudioProvider>{ui}</AudioProvider>
       </GameStateProvider>
     );
   };
@@ -55,10 +53,7 @@ describe('RadioTuner Component', () => {
   test('calls onFrequencyChange when frequency changes', () => {
     const mockOnFrequencyChange = jest.fn();
     renderWithProviders(
-      <RadioTuner
-        initialFrequency={100.0}
-        onFrequencyChange={mockOnFrequencyChange}
-      />
+      <RadioTuner initialFrequency={100.0} onFrequencyChange={mockOnFrequencyChange} />
     );
 
     // Turn on the radio first
@@ -77,11 +72,7 @@ describe('RadioTuner Component', () => {
 
   test('respects min and max frequency limits', () => {
     renderWithProviders(
-      <RadioTuner
-        initialFrequency={90.0}
-        minFrequency={90.0}
-        maxFrequency={92.0}
-      />
+      <RadioTuner initialFrequency={90.0} minFrequency={90.0} maxFrequency={92.0} />
     );
 
     // Turn on the radio first

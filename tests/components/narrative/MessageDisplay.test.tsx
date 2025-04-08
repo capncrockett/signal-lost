@@ -31,11 +31,7 @@ const decodedMessage: Message = {
 
 describe('MessageDisplay Component', () => {
   const renderWithProvider = (ui: React.ReactElement) => {
-    return render(
-      <GameStateProvider>
-        {ui}
-      </GameStateProvider>
-    );
+    return render(<GameStateProvider>{ui}</GameStateProvider>);
   };
 
   test('renders message when visible', () => {
