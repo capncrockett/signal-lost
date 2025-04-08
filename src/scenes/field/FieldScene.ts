@@ -377,6 +377,11 @@ export class FieldScene extends Phaser.Scene {
    * @returns True if the player moved successfully
    */
   movePlayer(dx: number, dy: number): boolean {
+    // Check if player and grid system exist
+    if (!this.player || !this.gridSystem) {
+      return false;
+    }
+
     // Get current player position
     const currentX = this.player.getGridX();
     const currentY = this.player.getGridY();
@@ -408,6 +413,11 @@ export class FieldScene extends Phaser.Scene {
    * Check for interactables near the player
    */
   private checkInteractables(): void {
+    // Check if player and grid system exist
+    if (!this.player || !this.gridSystem) {
+      return;
+    }
+
     const playerX = this.player.getGridX();
     const playerY = this.player.getGridY();
 
@@ -456,6 +466,11 @@ export class FieldScene extends Phaser.Scene {
    * Interact with the nearest interactable
    */
   private interact(): void {
+    // Check if player exists
+    if (!this.player || !this.gridSystem) {
+      return;
+    }
+
     const playerX = this.player.getGridX();
     const playerY = this.player.getGridY();
 
@@ -691,7 +706,9 @@ export class FieldScene extends Phaser.Scene {
    */
   update(time: number, delta: number): void {
     // Update player
-    this.player.update(time, delta);
+    if (this.player) {
+      this.player.update(time, delta);
+    }
 
     // Update interactables
     for (const interactable of this.interactables) {
@@ -701,6 +718,11 @@ export class FieldScene extends Phaser.Scene {
     // Update narrative renderer
     if (this.narrativeRenderer) {
       this.narrativeRenderer.update(time, delta);
+    }
+
+    // Update inventory UI
+    if (this.inventoryUI) {
+      // No need to call update on inventoryUI as it's a Container that updates automatically
     }
   }
 
