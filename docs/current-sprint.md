@@ -240,6 +240,7 @@ We're tracking the number of TypeScript errors to measure our progress:
 | 2023-07-14 | 42           | 0          | 42         | Fixed E2E test file errors          |
 | 2023-07-15 | 30           | 0          | 30         | Fixed audio test file errors        |
 | 2023-07-16 | 0            | 0          | 0          | Fixed all remaining test file errors |
+| 2023-07-17 | 0            | 0          | 0          | Fixed remaining core file errors     |
 
 ### Completed Tasks
 
