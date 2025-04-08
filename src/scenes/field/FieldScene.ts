@@ -200,7 +200,7 @@ export class FieldScene extends Phaser.Scene {
       console.log('FieldScene: Checking available assets in cache...');
 
       // Check for tilemap assets
-      const availableTilemaps = [];
+      const availableTilemaps: string[] = [];
       const basePaths = ['', '/', './'];
 
       basePaths.forEach((_, index) => {
@@ -214,13 +214,14 @@ export class FieldScene extends Phaser.Scene {
       });
 
       // Check for tileset assets
-      const availableTilesets = [];
+      const availableTilesets: string[] = [];
 
       // First check using the standard method
       basePaths.forEach((_, index) => {
         const suffix = index === 0 ? '' : `_alt${index}`;
         const key = `tiles${suffix}`;
-        const exists = this.cache.image?.exists?.(key) ?? false;
+        // Use textures manager to check if the image exists
+        const exists = this.textures.exists(key);
         if (exists) {
           availableTilesets.push(key);
           console.log(`FieldScene: Found tileset in cache: ${key}`);
@@ -241,7 +242,9 @@ export class FieldScene extends Phaser.Scene {
       }
 
       console.log(`FieldScene: Available tilemaps: ${availableTilemaps.join(', ')}`);
-      console.log(`FieldScene: Available tilesets: ${availableTilesets.length > 0 ? availableTilesets.join(', ') : 'None found'}`);
+      console.log(
+        `FieldScene: Available tilesets: ${availableTilesets.length > 0 ? availableTilesets.join(', ') : 'None found'}`
+      );
 
       // Try to create tilemap with any available key
       let map: Phaser.Tilemaps.Tilemap | null = null;
@@ -255,7 +258,7 @@ export class FieldScene extends Phaser.Scene {
             width: 20,
             height: 15,
             tileWidth: 32,
-            tileHeight: 32
+            tileHeight: 32,
           });
           console.log('FieldScene: Successfully created simple tilemap');
         } catch (err) {
@@ -295,11 +298,12 @@ export class FieldScene extends Phaser.Scene {
 
                   // Convert properties arrays to objects if needed
                   if (fixedData.layers) {
-                    fixedData.layers.forEach((layer: any) => {
+                    fixedData.layers.forEach((layer: Record<string, unknown>) => {
                       if (layer.properties && Array.isArray(layer.properties)) {
-                        const propsObj: Record<string, any> = {};
-                        layer.properties.forEach((prop: any) => {
-                          propsObj[prop.name] = prop.value;
+                        const propsObj: Record<string, unknown> = {};
+                        (layer.properties as Array<Record<string, unknown>>).forEach((prop) => {
+                          const name = prop.name as string;
+                          propsObj[name] = prop.value;
                         });
                         layer.properties = propsObj;
                       }
@@ -307,13 +311,14 @@ export class FieldScene extends Phaser.Scene {
                   }
 
                   if (fixedData.tilesets) {
-                    fixedData.tilesets.forEach((tileset: any) => {
-                      if (tileset.tiles) {
-                        tileset.tiles.forEach((tile: any) => {
+                    fixedData.tilesets.forEach((tileset: Record<string, unknown>) => {
+                      if (tileset.tiles && Array.isArray(tileset.tiles)) {
+                        (tileset.tiles as Array<Record<string, unknown>>).forEach((tile) => {
                           if (tile.properties && Array.isArray(tile.properties)) {
-                            const propsObj: Record<string, any> = {};
-                            tile.properties.forEach((prop: any) => {
-                              propsObj[prop.name] = prop.value;
+                            const propsObj: Record<string, unknown> = {};
+                            (tile.properties as Array<Record<string, unknown>>).forEach((prop) => {
+                              const name = prop.name as string;
+                              propsObj[name] = prop.value;
                             });
                             tile.properties = propsObj;
                           }
@@ -324,10 +329,10 @@ export class FieldScene extends Phaser.Scene {
 
                   // Fix tileset image paths if needed
                   if (fixedData.tilesets) {
-                    fixedData.tilesets.forEach((tileset: any) => {
+                    fixedData.tilesets.forEach((tileset: Record<string, unknown>) => {
                       if (tileset.image) {
                         // Store the original path for reference
-                        const originalPath = tileset.image;
+                        const originalPath = tileset.image as string;
 
                         // Try different path formats
                         const baseName = originalPath.split('/').pop(); // Get just the filename
@@ -335,11 +340,13 @@ export class FieldScene extends Phaser.Scene {
                           `assets/images/${baseName}`,
                           `/assets/images/${baseName}`,
                           `./assets/images/${baseName}`,
-                          originalPath
+                          originalPath,
                         ];
 
                         console.log(`FieldScene: Original tileset image path: ${originalPath}`);
-                        console.log(`FieldScene: Trying alternative paths: ${possiblePaths.join(', ')}`);
+                        console.log(
+                          `FieldScene: Trying alternative paths: ${possiblePaths.join(', ')}`
+                        );
 
                         // Update the path to a format that might work
                         tileset.image = possiblePaths[0]; // Use the first format as default
@@ -354,7 +361,9 @@ export class FieldScene extends Phaser.Scene {
                   // Try to create the tilemap with the fixed data
                   map = this.make.tilemap({ key: fixedKey });
                   if (map) {
-                    console.log(`FieldScene: Successfully created tilemap with fixed key: ${fixedKey}`);
+                    console.log(
+                      `FieldScene: Successfully created tilemap with fixed key: ${fixedKey}`
+                    );
                     break;
                   }
                 } else {
@@ -362,19 +371,24 @@ export class FieldScene extends Phaser.Scene {
 
                   // As a last resort, create a simple tilemap programmatically
                   try {
-                    console.log('FieldScene: Creating a simple tilemap programmatically as fallback');
+                    console.log(
+                      'FieldScene: Creating a simple tilemap programmatically as fallback'
+                    );
                     map = this.make.tilemap({
                       width: 20,
                       height: 15,
                       tileWidth: 32,
-                      tileHeight: 32
+                      tileHeight: 32,
                     });
                     if (map) {
                       console.log('FieldScene: Successfully created simple tilemap as fallback');
                       break;
                     }
                   } catch (fallbackErr) {
-                    console.error('FieldScene: Error creating simple tilemap fallback:', fallbackErr);
+                    console.error(
+                      'FieldScene: Error creating simple tilemap fallback:',
+                      fallbackErr
+                    );
                   }
                 }
               } catch (fixErr) {
@@ -408,15 +422,15 @@ export class FieldScene extends Phaser.Scene {
       let tilesetNames: string[] = ['tiles']; // Default fallback
 
       // Try to get the JSON data from any available source
-      const jsonKeys = availableTilemaps.map(key => key.replace('field', 'field_json'));
-      jsonKeys.push(...availableTilemaps.map(key => `${key}_fixed`));
+      const jsonKeys = availableTilemaps.map((key) => key.replace('field', 'field_json'));
+      jsonKeys.push(...availableTilemaps.map((key) => `${key}_fixed`));
 
       // Try each JSON key to find tileset names
       for (const jsonKey of jsonKeys) {
         try {
           const mapData = this.cache.json.get(jsonKey);
           if (mapData?.tilesets?.length > 0) {
-            tilesetNames = mapData.tilesets.map((ts: any) => ts.name);
+            tilesetNames = mapData.tilesets.map((ts: Record<string, unknown>) => ts.name as string);
             console.log(`FieldScene: Found tileset names from ${jsonKey}:`, tilesetNames);
             break;
           }
@@ -438,40 +452,58 @@ export class FieldScene extends Phaser.Scene {
           // First try the exact matches
           for (const tilesetName of tilesetNames) {
             try {
-              console.log(`FieldScene: Trying tileset name '${tilesetName}' with key '${tilesetKey}'`);
+              console.log(
+                `FieldScene: Trying tileset name '${tilesetName}' with key '${tilesetKey}'`
+              );
               tileset = map.addTilesetImage(tilesetName, tilesetKey);
               if (tileset) {
-                console.log(`FieldScene: Successfully added tileset with name '${tilesetName}' and key '${tilesetKey}'`);
+                console.log(
+                  `FieldScene: Successfully added tileset with name '${tilesetName}' and key '${tilesetKey}'`
+                );
                 success = true;
                 break;
               }
             } catch (innerErr) {
-              console.log(`FieldScene: Could not add tileset with name '${tilesetName}' and key '${tilesetKey}'`);
+              console.log(
+                `FieldScene: Could not add tileset with name '${tilesetName}' and key '${tilesetKey}'`
+              );
             }
           }
 
           // If no exact match worked, try with the key as both name and key
           if (!success) {
             try {
-              console.log(`FieldScene: Trying tileset with key as both name and key: '${tilesetKey}'`);
+              console.log(
+                `FieldScene: Trying tileset with key as both name and key: '${tilesetKey}'`
+              );
               tileset = map.addTilesetImage(tilesetKey, tilesetKey);
               if (tileset) {
-                console.log(`FieldScene: Successfully added tileset using key as both name and key: '${tilesetKey}'`);
+                console.log(
+                  `FieldScene: Successfully added tileset using key as both name and key: '${tilesetKey}'`
+                );
                 success = true;
               }
             } catch (keyErr) {
-              console.log(`FieldScene: Could not add tileset using key as both name and key: '${tilesetKey}'`);
+              console.log(
+                `FieldScene: Could not add tileset using key as both name and key: '${tilesetKey}'`
+              );
 
               // As a last resort, try with 'tiles' as the name regardless of what we found
               try {
-                console.log(`FieldScene: Trying fallback with name 'tiles' and key '${tilesetKey}'`);
+                console.log(
+                  `FieldScene: Trying fallback with name 'tiles' and key '${tilesetKey}'`
+                );
                 tileset = map.addTilesetImage('tiles', tilesetKey);
                 if (tileset) {
-                  console.log(`FieldScene: Successfully added tileset with fallback name 'tiles' and key '${tilesetKey}'`);
+                  console.log(
+                    `FieldScene: Successfully added tileset with fallback name 'tiles' and key '${tilesetKey}'`
+                  );
                   success = true;
                 }
               } catch (fallbackErr) {
-                console.log(`FieldScene: Could not add tileset with fallback name 'tiles' and key '${tilesetKey}'`);
+                console.log(
+                  `FieldScene: Could not add tileset with fallback name 'tiles' and key '${tilesetKey}'`
+                );
               }
             }
           }
@@ -541,12 +573,14 @@ export class FieldScene extends Phaser.Scene {
 
                     // Create a new tileset manually
                     tileset = new Phaser.Tilemaps.Tileset(
-                      'tiles',           // name
-                      1,                 // firstgid
-                      32, 32,            // tileWidth, tileHeight
-                      0, 0,              // margin, spacing
-                      {},                // properties
-                      {}                 // tile properties
+                      'tiles', // name
+                      1, // firstgid
+                      32,
+                      32, // tileWidth, tileHeight
+                      0,
+                      0, // margin, spacing
+                      {}, // properties
+                      {} // tile properties
                     );
 
                     // Add the tileset to the map
@@ -578,6 +612,13 @@ export class FieldScene extends Phaser.Scene {
 
       // Create layers
       console.log('FieldScene: Creating layers...');
+
+      // Ensure tileset is not null before creating layers
+      if (!tileset) {
+        console.error('FieldScene: Tileset is null, cannot create layers');
+        return null;
+      }
+
       const groundLayer = map.createLayer('Ground', tileset);
       if (!groundLayer) {
         console.error('FieldScene: Failed to create Ground layer');
