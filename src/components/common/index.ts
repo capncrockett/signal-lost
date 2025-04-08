@@ -27,3 +27,6 @@ export type { LoadingIndicatorProps } from './LoadingIndicator';
 
 export { default as AssetLoader } from './AssetLoader';
 export type { AssetLoaderProps } from './AssetLoader';
+
+export { default as SkipToContent } from './SkipToContent';
+export type { SkipToContentProps } from './SkipToContent';

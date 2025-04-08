@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
+import './styles/accessibility.css';
 import RadioTuner from './components/radio/RadioTuner';
-import { AssetLoader } from './components/common';
+import { AssetLoader, SkipToContent } from './components/common';
 import { ESSENTIAL_ASSETS } from './assets';
 
 // Placeholder components - will be replaced with actual components later
@@ -41,6 +42,7 @@ const App: React.FC = () => {
     >
       <Router>
         <div className="app-container" data-testid="app-container">
+          <SkipToContent contentId="main-content" />
           <header className="app-header" data-testid="app-header">
             <h1 data-testid="app-title">Signal Lost</h1>
             <nav data-testid="app-nav">
@@ -63,7 +65,7 @@ const App: React.FC = () => {
               </ul>
             </nav>
           </header>
-          <main className="app-content" data-testid="app-content">
+          <main className="app-content" id="main-content" data-testid="app-content" tabIndex={-1}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/radio" element={<RadioPage />} />
