@@ -1,6 +1,8 @@
 import { VolumeControl } from '../../src/components/VolumeControl';
 import { AudioManager } from '../../src/audio/AudioManager';
 import { SaveManager } from '../../src/utils/SaveManager';
+import { MockSaveManager } from '../types/mocks';
+import { createMockSaveManager } from '../mocks/generalMocks';
 
 // Mock the AudioManager
 jest.mock('../../src/audio/AudioManager', () => {
@@ -358,7 +360,7 @@ describe('VolumeControl', () => {
 
     // Reset mocks
     mockAudioManager.setMasterVolume.mockClear();
-    SaveManager.setData.mockClear();
+    (SaveManager.setData as jest.Mock).mockClear();
 
     // Test setting volume above maximum (1)
     volumeControl.setVolume(1.5);

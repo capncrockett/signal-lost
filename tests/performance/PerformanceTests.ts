@@ -1,4 +1,6 @@
-import { PerformanceBenchmark, BenchmarkResult } from '../../src/utils/PerformanceBenchmark';
+import { PerformanceBenchmark } from '../../src/utils/PerformanceBenchmark';
+import { BenchmarkResult } from '../../src/utils/PerformanceMonitor';
+import * as Phaser from 'phaser';
 import { PerformanceMonitor } from '../../src/utils/PerformanceMonitor';
 
 /**
@@ -88,15 +90,19 @@ export class PerformanceTests {
     // Test basic rendering
     const basicRenderResult = this.benchmark.run('Basic Render', () => {
       // Simulate a render cycle
-      game.renderer.render(game.scene.scenes[0], 0);
+      // Add a mock camera for the render call
+      const mockCamera = { id: 1 } as unknown as Phaser.Cameras.Scene2D.Camera;
+      game.renderer.render(game.scene.scenes[0], [], mockCamera);
     });
     results.push(basicRenderResult);
 
     // Test complex rendering
     const complexRenderResult = this.benchmark.run('Complex Render', () => {
       // Simulate a complex render cycle
+      // Add a mock camera for the render call
+      const mockCamera = { id: 1 } as unknown as Phaser.Cameras.Scene2D.Camera;
       for (const scene of game.scene.scenes) {
-        game.renderer.render(scene, 0);
+        game.renderer.render(scene, [], mockCamera);
       }
     });
     results.push(complexRenderResult);
@@ -193,7 +199,8 @@ export class PerformanceTests {
           const nextScene = currentScene === 'MainScene' ? 'FieldScene' : 'MainScene';
 
           game.scene.scenes[0].scene.start(nextScene);
-          game.scene.scenes[0].scene.once('start', () => {
+          // Use type assertion to access the once method
+          (game.scene.scenes[0].scene as any).once('start', () => {
             resolve();
           });
         });
