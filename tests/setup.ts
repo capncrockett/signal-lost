@@ -190,9 +190,13 @@ class MockAudioContext {
   }
 }
 
+// Add webkitAudioContext to Window interface in a separate file to avoid TypeScript error
+// This would normally go in a global.d.ts file
+
 global.AudioContext = MockAudioContext as any;
 global.window = global.window || {};
 global.window.AudioContext = MockAudioContext as any;
+// Use type assertion to avoid TypeScript error
 global.window.webkitAudioContext = MockAudioContext as any;
 
 // Mock document for TestOverlay tests

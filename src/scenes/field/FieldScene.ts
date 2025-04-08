@@ -177,7 +177,8 @@ export class FieldScene extends Phaser.Scene {
       // Add orientation property to fix the error
       if (map.orientation === undefined) {
         // Add missing property with type assertion
-        (map as any).orientation = 'orthogonal';
+        // Using unknown as an intermediate step to avoid any
+        (map as unknown as { orientation: string }).orientation = 'orthogonal';
       }
 
       // Try primary tileset key first
@@ -542,7 +543,7 @@ export class FieldScene extends Phaser.Scene {
    */
   private setupInventoryEventListeners(): void {
     // Listen for item use events
-    this.inventory.on('itemUsed', ((...args: unknown[]) => {
+    this.inventory.on('itemUsed', (...args: unknown[]) => {
       const item = args[0] as Item;
       console.log(`Item used: ${item.getName()}`);
 
@@ -588,10 +589,10 @@ export class FieldScene extends Phaser.Scene {
             break;
         }
       }
-    }));
+    });
 
     // Listen for interactable events that give items
-    this.eventEmitter.on('interactableTriggered', ((...args: unknown[]) => {
+    this.eventEmitter.on('interactableTriggered', (...args: unknown[]) => {
       const id = args[0] as string;
       const type = args[1] as string;
       // Check if this interactable gives an item
@@ -620,7 +621,7 @@ export class FieldScene extends Phaser.Scene {
       } else if (type === 'ruins') {
         this.narrativeEngine.triggerEvent('ruins_discovery');
       }
-    }));
+    });
   }
 
   /**
@@ -670,15 +671,15 @@ export class FieldScene extends Phaser.Scene {
    */
   private setupNarrativeEventListeners(): void {
     // Listen for narrative events
-    this.narrativeEngine.on('narrativeEvent', ((...args: unknown[]) => {
+    this.narrativeEngine.on('narrativeEvent', (...args: unknown[]) => {
       const event = args[0] as NarrativeEventData;
       console.log(`Narrative event triggered: ${event.id}`);
-    }));
+    });
 
-    this.narrativeEngine.on('narrativeChoice', ((...args: unknown[]) => {
+    this.narrativeEngine.on('narrativeChoice', (...args: unknown[]) => {
       const data = args[0] as NarrativeChoiceResultData;
       console.log(`Choice made: ${data.choice.text}`);
-    }));
+    });
 
     // Note: interactableTriggered events are handled in setupInventoryEventListeners
   }

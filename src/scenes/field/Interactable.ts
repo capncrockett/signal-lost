@@ -103,13 +103,8 @@ export class Interactable extends Phaser.GameObjects.Sprite {
     });
 
     // Add particle effect
-    // Use a numeric key for particles (0 is a valid key)
-    const particles = this.scene.add.particles(0);
-
-    // Create emitter with proper parameters
-    const emitter = particles.createEmitter({
-      x: this.x,
-      y: this.y,
+    // Use a string key for particles
+    const particles = this.scene.add.particles(this.x, this.y, 'particle', {
       speed: { min: 20, max: 50 },
       angle: { min: 0, max: 360 },
       scale: { start: 0.5, end: 0 },

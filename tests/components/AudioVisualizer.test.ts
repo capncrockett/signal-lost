@@ -114,8 +114,8 @@ describe('AudioVisualizer', () => {
       .spyOn(audioVisualizer as any, 'drawWaveform')
       .mockImplementation(() => {});
 
-    // Call preUpdate
-    audioVisualizer.preUpdate();
+    // Call preUpdate with required parameters
+    audioVisualizer.preUpdate(0, 0);
 
     // Verify methods were called
     expect(clearSpy).toHaveBeenCalled();

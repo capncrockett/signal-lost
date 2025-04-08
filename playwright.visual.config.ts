@@ -41,12 +41,12 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        // Store snapshots in browser-specific directories
-        // Use a custom property instead of snapshotPathTemplate
-        _snapshotPath: '{testDir}/{testFileDir}/{testFileName}-{arg}{ext}',
       },
     },
   ],
+
+  // Configure snapshot path template
+  snapshotPathTemplate: '{testDir}/{testFileDir}/{testFileName}-{arg}{ext}',
 
   // Start the development server
   webServer: {

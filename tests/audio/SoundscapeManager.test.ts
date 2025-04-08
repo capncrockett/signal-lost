@@ -1,7 +1,11 @@
 import { SoundscapeManager } from '../../src/audio/SoundscapeManager';
 import { AudioManager } from '../../src/audio/AudioManager';
 import { MockGainNode, MockStereoPannerNode } from '../types/audio';
-import { createMockGainNode, createMockAudioContext, createMockStereoPannerNode } from '../mocks/audioMocks';
+import {
+  createMockGainNode,
+  createMockAudioContext,
+  createMockStereoPannerNode,
+} from '../mocks/audioMocks';
 
 // Add DOM types
 type GainNode = globalThis.GainNode;
@@ -35,8 +39,6 @@ describe('SoundscapeManager', () => {
   const mockClose = jest.fn();
 
   // Mock for setTimeout and clearTimeout
-  const originalSetTimeout = window.setTimeout;
-  const originalClearTimeout = window.clearTimeout;
   const mockSetTimeout = jest.fn().mockReturnValue(123);
   const mockClearTimeout = jest.fn();
 

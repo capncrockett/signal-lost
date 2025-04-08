@@ -615,26 +615,26 @@ export class MainScene extends Phaser.Scene {
     this.narrativeRenderer.setDepth(200);
 
     // Listen for narrative events
-    this.narrativeEngine.on('narrativeEvent', ((...args: unknown[]) => {
+    this.narrativeEngine.on('narrativeEvent', (...args: unknown[]) => {
       const event = args[0] as NarrativeEventData;
       console.log(`Narrative event triggered: ${event.id}`);
       this.narrativeRenderer.setVisible(true);
-    }));
+    });
 
     // Listen for narrative choices
-    this.narrativeEngine.on('narrativeChoice', ((...args: unknown[]) => {
+    this.narrativeEngine.on('narrativeChoice', (...args: unknown[]) => {
       const data = args[0] as NarrativeChoiceResultData;
       console.log(`Choice made: ${data.choice.text}`);
       this.narrativeRenderer.setVisible(false);
-    }));
+    });
 
     // Listen for location discoveries
-    this.narrativeEngine.on('locationDiscovered', ((...args: unknown[]) => {
+    this.narrativeEngine.on('locationDiscovered', (...args: unknown[]) => {
       const data = args[0] as LocationDiscoveryData;
       console.log(`Location discovered: ${data.id} at (${data.x}, ${data.y})`);
       SaveManager.setFlag(`discovered_${data.id}`, true);
       SaveManager.setData(`location_${data.id}`, { x: data.x, y: data.y });
-    }));
+    });
   }
 
   /**

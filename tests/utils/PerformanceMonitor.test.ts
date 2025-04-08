@@ -100,7 +100,7 @@ describe('PerformanceMonitor', () => {
     const notifyListenersSpy = jest.spyOn(performanceMonitor as any, 'notifyListeners');
 
     // Track asset load time
-    performanceMonitor.trackAssetLoad('test-asset', 'image');
+    performanceMonitor.trackAssetLoad('test-asset', 'image', 100);
 
     // Verify assetLoad event was emitted with the correct asset info
     expect(notifyListenersSpy).toHaveBeenCalledWith(
@@ -120,7 +120,7 @@ describe('PerformanceMonitor', () => {
     const notifyListenersSpy = jest.spyOn(performanceMonitor as any, 'notifyListeners');
 
     // Track scene transition
-    performanceMonitor.trackSceneTransition('scene-a', 'scene-b');
+    performanceMonitor.trackSceneTransition('scene-a', 'scene-b', 500);
 
     // Verify sceneTransition event was emitted with the correct scene info
     expect(notifyListenersSpy).toHaveBeenCalledWith(

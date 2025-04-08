@@ -16,7 +16,7 @@ declare global {
     PerformanceBenchmark: typeof import('../../src/utils/PerformanceBenchmark').PerformanceBenchmark;
     PerformanceTests: typeof import('./PerformanceTests').PerformanceTests;
     PerformanceTestRunner: typeof import('./PerformanceTestRunner').PerformanceTestRunner;
-    game: any;
+    game: unknown;
   }
 }
 

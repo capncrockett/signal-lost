@@ -10,7 +10,9 @@ export class PerformanceTests {
   // Performance benchmark
   private benchmark: PerformanceBenchmark;
 
-  // Performance monitor (unused but kept for future use)
+  // Performance monitor - initialized in constructor but not used directly
+  // @ts-expect-error - Suppressing unused variable warning
+  private performanceMonitor: PerformanceMonitor;
 
   // Test results
   private results: BenchmarkResult[] = [];

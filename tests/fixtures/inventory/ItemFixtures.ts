@@ -12,7 +12,27 @@ enum ItemType {
 /**
  * Item fixtures
  */
-export const ItemFixtures: FixtureCollection<Record<string, unknown>> = {
+// Define a more specific type for item data
+type ItemData = {
+  id: string;
+  name: string;
+  description: string;
+  type: ItemType;
+  icon: string;
+  usable: boolean;
+  stackable: boolean;
+  maxStack?: number;
+  effects?: {
+    action: string;
+    amount?: number;
+    content?: string;
+  };
+};
+
+// Define a type for the fixture data that's an array of ItemData
+type ItemFixtureData = Record<string, unknown> | ItemData[];
+
+export const ItemFixtures: FixtureCollection<ItemFixtureData> = {
   id: 'items',
   fixtures: [
     {

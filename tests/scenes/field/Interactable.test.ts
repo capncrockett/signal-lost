@@ -108,8 +108,9 @@ describe('Interactable', () => {
       expect(mockScene.tweens.add.mock.calls[1][0].targets).toBe(interactable);
 
       // Should add particles
-      expect(mockScene.add.particles).toHaveBeenCalledWith('tower');
-      expect(mockScene.add.particles().createEmitter).toHaveBeenCalled();
+      expect(mockScene.add.particles).toHaveBeenCalled();
+      // The new implementation passes x, y, texture key, and config directly
+      expect(mockScene.add.particles.mock.calls[0][2]).toBe('particle');
 
       // Should set up a delayed call to destroy particles
       expect(mockScene.time.delayedCall).toHaveBeenCalled();

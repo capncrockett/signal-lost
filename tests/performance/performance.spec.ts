@@ -40,7 +40,16 @@ test('Run performance benchmarks', async ({ page }) => {
     });
 
     // Run tests
-    const result = await runner.run(game);
+    // Create a minimal Game object with the required properties
+    const mockGame = {
+      config: {},
+      renderer: {},
+      domContainer: document.createElement('div'),
+      canvas: document.createElement('canvas'),
+      loop: { actualFps: 60 },
+    } as unknown as Phaser.Game;
+
+    const result = await runner.run(mockGame);
 
     // Update baseline if requested
     if (updateBaseline) {
@@ -115,10 +124,18 @@ test('Measure FPS stability', async ({ page }) => {
 
   // Inject FPS monitoring code
   await page.evaluate(() => {
-    window['fpsValues'] = [];
-    window['fpsMonitoringInterval'] = setInterval(() => {
-      const fps = window['game'].loop.actualFps;
-      window['fpsValues'].push(fps);
+    interface ExtendedWindow extends Window {
+      fpsValues: number[];
+      fpsMonitoringInterval: any; // Using any to accommodate both number and NodeJS.Timeout
+      game: { loop: { actualFps: number } };
+    }
+
+    const extWindow = window as unknown as ExtendedWindow;
+    extWindow.fpsValues = [];
+    // Cast to any to avoid type conflicts between browser and Node environments
+    extWindow.fpsMonitoringInterval = setInterval(() => {
+      const fps = extWindow.game.loop.actualFps;
+      extWindow.fpsValues.push(fps);
     }, 100);
   });
 
@@ -127,17 +144,24 @@ test('Measure FPS stability', async ({ page }) => {
 
   // Get FPS data
   const fpsData = await page.evaluate(() => {
-    clearInterval(window['fpsMonitoringInterval']);
-    const values = window['fpsValues'];
-    const sum = values.reduce((a, b) => a + b, 0);
+    interface ExtendedWindow extends Window {
+      fpsValues: number[];
+      fpsMonitoringInterval: any; // Using any to accommodate both number and NodeJS.Timeout
+    }
+
+    const extWindow = window as unknown as ExtendedWindow;
+    clearInterval(extWindow.fpsMonitoringInterval as any);
+    const values = extWindow.fpsValues;
+    const sum = values.reduce((a: number, b: number) => a + b, 0);
     const avg = sum / values.length;
     const min = Math.min(...values);
     const max = Math.max(...values);
-    const sorted = [...values].sort((a, b) => a - b);
+    const sorted = [...values].sort((a: number, b: number) => a - b);
     const median = sorted[Math.floor(sorted.length / 2)];
 
     // Calculate standard deviation
-    const variance = values.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / values.length;
+    const variance =
+      values.reduce((a: number, b: number) => a + Math.pow(b - avg, 2), 0) / values.length;
     const stdDev = Math.sqrt(variance);
 
     return {

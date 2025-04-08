@@ -49,7 +49,9 @@ export class TestOverlay {
     overlay.style.pointerEvents = 'all';
     overlay.style.userSelect = 'none';
     overlay.style.touchAction = 'none';
-    (overlay.style as any).webkitTapHighlightColor = 'transparent';
+    // Using unknown as an intermediate step to avoid any
+    const extendedStyle = overlay.style as unknown as { webkitTapHighlightColor: string };
+    extendedStyle.webkitTapHighlightColor = 'transparent';
 
     // Add a small indicator in development mode to show the test overlay
     if (process.env.NODE_ENV !== 'production') {

@@ -87,7 +87,8 @@ describe('MainScene', () => {
 
   test.skip('should create RadioTuner and SoundscapeManager in create method', () => {
     // Mock the RadioTuner constructor
-    (RadioTuner as jest.Mock).mockImplementation(() => ({
+    const mockRadioTunerClass = RadioTuner as unknown as jest.Mock;
+    mockRadioTunerClass.mockImplementation(() => ({
       on: jest.fn().mockReturnThis(),
     }));
 
@@ -111,7 +112,11 @@ describe('MainScene', () => {
     console.log = jest.fn();
 
     // Mock the RadioTuner
-    const mockRadioTuner = {
+    interface MockRadioTuner {
+      on: jest.Mock;
+    }
+
+    const mockRadioTuner: MockRadioTuner = {
       on: jest.fn().mockImplementation((event, callback) => {
         if (event === 'signalLock') {
           // Simulate the callback being called
@@ -120,7 +125,9 @@ describe('MainScene', () => {
         return mockRadioTuner;
       }),
     };
-    (RadioTuner as jest.Mock).mockImplementation(() => mockRadioTuner);
+
+    const mockRadioTunerClass = RadioTuner as unknown as jest.Mock;
+    mockRadioTunerClass.mockImplementation(() => mockRadioTuner);
 
     // Call the create method
     mainScene.create();
@@ -138,7 +145,8 @@ describe('MainScene', () => {
   test.skip('should update soundscape in update method', () => {
     // Mock the RadioTuner
     const mockGetSignalStrength = jest.fn().mockReturnValue(0.5);
-    (RadioTuner as jest.Mock).mockImplementation(() => ({
+    const mockRadioTunerClass = RadioTuner as unknown as jest.Mock;
+    mockRadioTunerClass.mockImplementation(() => ({
       on: jest.fn().mockReturnThis(),
       getSignalStrengthValue: mockGetSignalStrength,
     }));

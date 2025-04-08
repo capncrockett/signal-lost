@@ -44,12 +44,14 @@ describe('Inventory', () => {
     mockItem = new Item(mockItemData);
 
     // Mock event emitter methods
-    inventory['eventEmitter'] = {
+    const mockEventEmitter: Partial<Phaser.Events.EventEmitter> = {
       on: jest.fn(),
       off: jest.fn(),
       emit: jest.fn(),
       removeAllListeners: jest.fn(),
     };
+
+    inventory['eventEmitter'] = mockEventEmitter as Phaser.Events.EventEmitter;
   });
 
   describe('addItem', () => {

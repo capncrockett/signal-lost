@@ -186,9 +186,9 @@ export class GridSystem {
             x: number;
             y: number;
             parent: GridNode | null;
-            f?: number;
-            g?: number;
-            h?: number;
+            f: number;
+            g: number;
+            h: number;
           };
 
           // Create a new node without circular reference
@@ -196,9 +196,9 @@ export class GridSystem {
           node = {
             ...node.parent,
             parent: null,
-            f: 0,  // Default values for required properties
+            f: 0, // Default values for required properties
             g: 0,
-            h: 0
+            h: 0,
           } as GridNode;
         }
 

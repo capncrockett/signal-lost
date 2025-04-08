@@ -16,6 +16,8 @@ jest.mock('../../src/utils/SaveManager');
 
 describe('NarrativeEngine and MessageDecoder Integration', () => {
   let narrativeEngine: NarrativeEngine;
+  // We'll use the MessageDecoder class directly rather than an instance
+  // let messageDecoder: MessageDecoder;
 
   // Sample events for testing
   const sampleEvent: NarrativeEvent = {
@@ -52,8 +54,8 @@ describe('NarrativeEngine and MessageDecoder Integration', () => {
     // Create a new NarrativeEngine instance
     narrativeEngine = new NarrativeEngine();
 
-    // Create a new MessageDecoder instance
-    messageDecoder = new MessageDecoder();
+    // We don't need to create a MessageDecoder instance
+    // as we're using the static methods directly
 
     // Add sample events
     narrativeEngine.addEvent(sampleEvent);
