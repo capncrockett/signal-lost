@@ -33,7 +33,7 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
       frequency: 1000,
       Q: 1,
     }).toDestination();
-    
+
     setFilter(newFilter);
 
     // Clean up on unmount
@@ -50,7 +50,7 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
         newFilter.dispose();
       }
     };
-  }, []);
+  }, [noiseNode, oscillator]);
 
   // Update master volume when volume state changes
   useEffect(() => {
@@ -67,16 +67,16 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
 
   const playStaticNoise = (intensity: number): void => {
     if (!filter) return;
-    
+
     // Stop any existing noise
     stopStaticNoise();
-    
+
     // Create a new noise node
     const noise = new Tone.Noise({
       type: 'pink', // pink noise is less harsh than white noise
       volume: Tone.gainToDb(intensity * 0.5), // Reduce volume by half
     }).connect(filter);
-    
+
     // Start the noise
     noise.start();
     setNoiseNode(noise);
@@ -92,17 +92,17 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
 
   const playSignal = (frequency: number): void => {
     if (!filter) return;
-    
+
     // Stop any existing oscillator
     stopSignal();
-    
+
     // Create a new oscillator
     const osc = new Tone.Oscillator({
       frequency,
       type: 'sine',
       volume: -20, // Lower volume for the signal
     }).connect(filter);
-    
+
     // Start the oscillator
     osc.start();
     setOscillator(osc);

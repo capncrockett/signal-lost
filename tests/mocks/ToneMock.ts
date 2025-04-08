@@ -10,12 +10,12 @@ export class Noise {
     // Store options for testing if needed
     Object.assign(this, options);
   }
-  connect() {
+  connect(): this {
     return this;
   }
-  start() {}
-  stop() {}
-  dispose() {}
+  start(): void {}
+  stop(): void {}
+  dispose(): void {}
 }
 
 export class Oscillator {
@@ -23,12 +23,12 @@ export class Oscillator {
     // Store options for testing if needed
     Object.assign(this, options);
   }
-  connect() {
+  connect(): this {
     return this;
   }
-  start() {}
-  stop() {}
-  dispose() {}
+  start(): void {}
+  stop(): void {}
+  dispose(): void {}
 }
 
 export class Filter {
@@ -36,10 +36,10 @@ export class Filter {
     // Store options for testing if needed
     Object.assign(this, options);
   }
-  toDestination() {
+  toDestination(): this {
     return this;
   }
-  dispose() {}
+  dispose(): void {}
 }
 
 export const gainToDb = (gain: number): number => gain * 20;

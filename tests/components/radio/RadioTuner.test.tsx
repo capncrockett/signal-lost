@@ -2,10 +2,23 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import RadioTuner from '../../../src/components/radio/RadioTuner';
+import { GameStateProvider } from '../../../src/context/GameStateContext';
+import { AudioProvider } from '../../../src/context/AudioContext';
 
 describe('RadioTuner Component', () => {
+  // Helper function to render with providers
+  const renderWithProviders = (ui: React.ReactElement) => {
+    return render(
+      <GameStateProvider>
+        <AudioProvider>
+          {ui}
+        </AudioProvider>
+      </GameStateProvider>
+    );
+  };
+
   test('renders with default frequency', () => {
-    render(<RadioTuner />);
+    renderWithProviders(<RadioTuner />);
 
     // Check if the component renders with the default frequency
     expect(screen.getByText('90.0')).toBeInTheDocument();
@@ -13,14 +26,18 @@ describe('RadioTuner Component', () => {
   });
 
   test('renders with custom initial frequency', () => {
-    render(<RadioTuner initialFrequency={95.5} />);
+    renderWithProviders(<RadioTuner initialFrequency={95.5} />);
 
     // Check if the component renders with the custom frequency
     expect(screen.getByText('95.5')).toBeInTheDocument();
   });
 
   test('frequency changes when clicking tune buttons', () => {
-    render(<RadioTuner initialFrequency={100.0} />);
+    renderWithProviders(<RadioTuner initialFrequency={100.0} />);
+
+    // Turn on the radio first
+    const powerButton = screen.getByText('OFF');
+    fireEvent.click(powerButton);
 
     // Get the tune buttons
     const decreaseButton = screen.getByText('-0.1');
@@ -37,12 +54,16 @@ describe('RadioTuner Component', () => {
 
   test('calls onFrequencyChange when frequency changes', () => {
     const mockOnFrequencyChange = jest.fn();
-    render(
+    renderWithProviders(
       <RadioTuner
         initialFrequency={100.0}
         onFrequencyChange={mockOnFrequencyChange}
       />
     );
+
+    // Turn on the radio first
+    const powerButton = screen.getByText('OFF');
+    fireEvent.click(powerButton);
 
     // Get the tune button
     const decreaseButton = screen.getByText('-0.1');
@@ -55,13 +76,17 @@ describe('RadioTuner Component', () => {
   });
 
   test('respects min and max frequency limits', () => {
-    render(
+    renderWithProviders(
       <RadioTuner
         initialFrequency={90.0}
         minFrequency={90.0}
         maxFrequency={92.0}
       />
     );
+
+    // Turn on the radio first
+    const powerButton = screen.getByText('OFF');
+    fireEvent.click(powerButton);
 
     // Get the tune buttons
     const decreaseButton = screen.getByText('-0.1');
@@ -86,5 +111,35 @@ describe('RadioTuner Component', () => {
 
     // Should not exceed maximum
     expect(screen.getByText('92.0')).toBeInTheDocument();
+  });
+
+  test('toggles radio power', () => {
+    renderWithProviders(<RadioTuner />);
+
+    // Radio should be off initially
+    const powerButton = screen.getByText('OFF');
+
+    // Turn on the radio
+    fireEvent.click(powerButton);
+    expect(screen.getByText('ON')).toBeInTheDocument();
+
+    // Turn off the radio
+    fireEvent.click(screen.getByText('ON'));
+    expect(screen.getByText('OFF')).toBeInTheDocument();
+  });
+
+  test('controls volume', () => {
+    renderWithProviders(<RadioTuner />);
+
+    // Find the volume slider
+    const volumeSlider = screen.getByLabelText('Volume');
+
+    // Change the volume
+    fireEvent.change(volumeSlider, { target: { value: '0.8' } });
+
+    // Test mute button
+    const muteButton = screen.getByText('Mute');
+    fireEvent.click(muteButton);
+    expect(screen.getByText('Unmute')).toBeInTheDocument();
   });
 });
