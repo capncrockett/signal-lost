@@ -8,7 +8,7 @@ import {
   MockSprite,
   MockText,
   MockRectangle,
-  MockGame
+  MockGame,
 } from '../types/phaser';
 
 /**
@@ -78,7 +78,12 @@ export function createMockScene(): MockScene {
  * @param height Height
  * @returns A mock Phaser.GameObjects.Container
  */
-export function createMockContainer(x: number = 0, y: number = 0, width: number = 100, height: number = 100): MockContainer {
+export function createMockContainer(
+  x: number = 0,
+  y: number = 0,
+  width: number = 100,
+  height: number = 100
+): MockContainer {
   return {
     x,
     y,
@@ -105,7 +110,12 @@ export function createMockContainer(x: number = 0, y: number = 0, width: number 
  * @param height Height
  * @returns A mock Phaser.GameObjects.Sprite
  */
-export function createMockSprite(x: number = 0, y: number = 0, width: number = 100, height: number = 100): MockSprite {
+export function createMockSprite(
+  x: number = 0,
+  y: number = 0,
+  width: number = 100,
+  height: number = 100
+): MockSprite {
   return {
     x,
     y,

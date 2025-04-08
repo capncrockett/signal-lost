@@ -2,7 +2,13 @@
  * Helper functions for creating audio-related mocks
  */
 
-import { MockAudioContext, MockGainNode, MockStereoPannerNode, MockOscillatorNode, MockAnalyserNode } from '../types/audio';
+import {
+  MockAudioContext,
+  MockGainNode,
+  MockStereoPannerNode,
+  MockOscillatorNode,
+  MockAnalyserNode,
+} from '../types/audio';
 
 /**
  * Create a mock GainNode
@@ -44,7 +50,10 @@ export function createMockStereoPannerNode(panValue: number = 0): MockStereoPann
  * @param type Oscillator type
  * @returns A mock OscillatorNode
  */
-export function createMockOscillatorNode(frequency: number = 440, type: string = 'sine'): MockOscillatorNode {
+export function createMockOscillatorNode(
+  frequency: number = 440,
+  type: string = 'sine'
+): MockOscillatorNode {
   return {
     connect: jest.fn(),
     disconnect: jest.fn(),

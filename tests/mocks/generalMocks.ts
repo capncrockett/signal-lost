@@ -2,7 +2,13 @@
  * Helper functions for creating general test mocks
  */
 
-import { MockEventEmitter, MockElement, MockPerformanceMonitor, MockSaveManager, MockInventory } from '../types/mocks';
+import {
+  MockEventEmitter,
+  MockElement,
+  MockPerformanceMonitor,
+  MockSaveManager,
+  MockInventory,
+} from '../types/mocks';
 
 /**
  * Create a mock EventEmitter
@@ -60,7 +66,9 @@ export function createMockPerformanceMonitor(): MockPerformanceMonitor {
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
     getFPS: jest.fn().mockReturnValue(60),
-    getMemoryUsage: jest.fn().mockReturnValue({ totalJSHeapSize: 10000000, usedJSHeapSize: 5000000 }),
+    getMemoryUsage: jest
+      .fn()
+      .mockReturnValue({ totalJSHeapSize: 10000000, usedJSHeapSize: 5000000 }),
     startTracking: jest.fn(),
     stopTracking: jest.fn(),
   };
@@ -72,7 +80,7 @@ export function createMockPerformanceMonitor(): MockPerformanceMonitor {
  */
 export function createMockSaveManager(): MockSaveManager {
   const dataStore: Record<string, any> = {};
-  
+
   return {
     setData: jest.fn().mockImplementation((key: string, value: any) => {
       dataStore[key] = value;
@@ -95,7 +103,7 @@ export function createMockSaveManager(): MockSaveManager {
  */
 export function createMockInventory(): MockInventory {
   const items: Record<string, any> = {};
-  
+
   return {
     addItem: jest.fn().mockImplementation((item: any) => {
       items[item.id] = item;
