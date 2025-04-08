@@ -176,8 +176,8 @@ export class FieldScene extends Phaser.Scene {
 
       // Add orientation property to fix the error
       if (map.orientation === undefined) {
-        // @ts-expect-error - Adding missing property
-        map.orientation = 'orthogonal';
+        // Add missing property with type assertion
+        (map as any).orientation = 'orthogonal';
       }
 
       // Try primary tileset key first
@@ -308,8 +308,8 @@ export class FieldScene extends Phaser.Scene {
       data.triggerDistance
     );
 
-    // Add to scene
-    this.add.existing(interactable);
+    // Add to scene with type assertion
+    this.add.existing(interactable as unknown as Phaser.GameObjects.GameObject);
 
     return interactable;
   }
@@ -507,6 +507,9 @@ export class FieldScene extends Phaser.Scene {
     });
     this.add.existing(this.inventoryUI);
 
+    // Set up inventory event listeners
+    this.setupInventoryEventListeners();
+
     // Add starting items if this is a new game
     this.addStartingItems();
   }
@@ -539,7 +542,8 @@ export class FieldScene extends Phaser.Scene {
    */
   private setupInventoryEventListeners(): void {
     // Listen for item use events
-    this.inventory.on('itemUsed', (item: Item) => {
+    this.inventory.on('itemUsed', ((...args: unknown[]) => {
+      const item = args[0] as Item;
       console.log(`Item used: ${item.getName()}`);
 
       // Handle item effects
@@ -584,10 +588,12 @@ export class FieldScene extends Phaser.Scene {
             break;
         }
       }
-    });
+    }));
 
     // Listen for interactable events that give items
-    this.eventEmitter.on('interactableTriggered', (id: string, type: string) => {
+    this.eventEmitter.on('interactableTriggered', ((...args: unknown[]) => {
+      const id = args[0] as string;
+      const type = args[1] as string;
       // Check if this interactable gives an item
       if (type === 'item') {
         // Find the corresponding item in the item definitions
@@ -608,7 +614,13 @@ export class FieldScene extends Phaser.Scene {
           }
         }
       }
-    });
+      // Handle narrative events for specific interactable types
+      else if (type === 'tower') {
+        this.narrativeEngine.triggerEvent('tower_discovery');
+      } else if (type === 'ruins') {
+        this.narrativeEngine.triggerEvent('ruins_discovery');
+      }
+    }));
   }
 
   /**
@@ -658,23 +670,17 @@ export class FieldScene extends Phaser.Scene {
    */
   private setupNarrativeEventListeners(): void {
     // Listen for narrative events
-    this.narrativeEngine.on('narrativeEvent', (event: NarrativeEventData) => {
+    this.narrativeEngine.on('narrativeEvent', ((...args: unknown[]) => {
+      const event = args[0] as NarrativeEventData;
       console.log(`Narrative event triggered: ${event.id}`);
-    });
+    }));
 
-    this.narrativeEngine.on('narrativeChoice', (data: NarrativeChoiceResultData) => {
+    this.narrativeEngine.on('narrativeChoice', ((...args: unknown[]) => {
+      const data = args[0] as NarrativeChoiceResultData;
       console.log(`Choice made: ${data.choice.text}`);
-    });
+    }));
 
-    // Listen for interactable events
-    this.eventEmitter.on('interactableTriggered', (id: string, type: string) => {
-      // Trigger corresponding narrative event
-      if (type === 'tower') {
-        this.narrativeEngine.triggerEvent('tower_discovery');
-      } else if (type === 'ruins') {
-        this.narrativeEngine.triggerEvent('ruins_discovery');
-      }
-    });
+    // Note: interactableTriggered events are handled in setupInventoryEventListeners
   }
 
   /**
