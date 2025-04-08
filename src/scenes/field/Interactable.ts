@@ -10,7 +10,7 @@ export class Interactable extends Phaser.GameObjects.Sprite {
   private id: string;
 
   // Type of interactable (tower, ruins, etc.)
-  private type: string;
+  private interactableType: string;
 
   // Grid position
   private gridX: number;
@@ -53,7 +53,7 @@ export class Interactable extends Phaser.GameObjects.Sprite {
     super(scene, worldX, worldY, type);
 
     this.id = id;
-    this.type = type;
+    this.interactableType = type;
     this.gridX = gridX;
     this.gridY = gridY;
     this.triggerDistance = triggerDistance;
@@ -103,9 +103,11 @@ export class Interactable extends Phaser.GameObjects.Sprite {
     });
 
     // Add particle effect
-    const particles = this.scene.add.particles(this.type);
+    // Use a numeric key for particles (0 is a valid key)
+    const particles = this.scene.add.particles(0);
 
-    particles.createEmitter({
+    // Create emitter with proper parameters
+    const emitter = particles.createEmitter({
       x: this.x,
       y: this.y,
       speed: { min: 20, max: 50 },
@@ -140,7 +142,7 @@ export class Interactable extends Phaser.GameObjects.Sprite {
    * Get the interactable's type
    */
   getType(): string {
-    return this.type;
+    return this.interactableType;
   }
 
   /**

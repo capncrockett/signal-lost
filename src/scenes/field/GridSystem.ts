@@ -192,7 +192,14 @@ export class GridSystem {
           };
 
           // Create a new node without circular reference
-          node = { ...node.parent, parent: null } as GridNode;
+          // Use type assertion to ensure all required properties are present
+          node = {
+            ...node.parent,
+            parent: null,
+            f: 0,  // Default values for required properties
+            g: 0,
+            h: 0
+          } as GridNode;
         }
 
         return path;

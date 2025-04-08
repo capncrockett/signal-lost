@@ -593,7 +593,8 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       }
     }
 
-    return closestSignal;
+    // Type assertion to ensure the signal type is correct
+    return closestSignal as RadioSignalInfo | undefined;
   }
 
   /**

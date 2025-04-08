@@ -78,7 +78,7 @@ export class AudioVisualizer extends Phaser.GameObjects.Container {
   /**
    * Update the visualization
    */
-  public preUpdate(): void {
+  public preUpdate(_time: number, _delta: number): void {
     if (!this.analyser || !this.dataArray || !this.timeDataArray) return;
 
     // Get frequency data

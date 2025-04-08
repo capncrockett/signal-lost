@@ -144,12 +144,16 @@ export class PerformanceDisplay extends Phaser.GameObjects.Container {
   private setupEventListeners(): void {
     // Listen for FPS updates
     if (this.config.showFps) {
-      this.performanceMonitor.addEventListener('fps', this.handleFpsUpdate.bind(this));
+      this.performanceMonitor.addEventListener('fps', ((data: unknown) => {
+        this.handleFpsUpdate(data as FpsData);
+      }) as (data: unknown) => void);
     }
 
     // Listen for memory updates
     if (this.config.showMemory) {
-      this.performanceMonitor.addEventListener('memory', this.handleMemoryUpdate.bind(this));
+      this.performanceMonitor.addEventListener('memory', ((data: unknown) => {
+        this.handleMemoryUpdate(data as MemoryData);
+      }) as (data: unknown) => void);
     }
   }
 
@@ -314,8 +318,14 @@ export class PerformanceDisplay extends Phaser.GameObjects.Container {
    */
   public destroy(): void {
     // Remove event listeners
-    this.performanceMonitor.removeEventListener('fps', this.handleFpsUpdate.bind(this));
-    this.performanceMonitor.removeEventListener('memory', this.handleMemoryUpdate.bind(this));
+    // Note: We're using new wrapper functions here since we can't access the original wrappers
+    this.performanceMonitor.removeEventListener('fps', ((data: unknown) => {
+      this.handleFpsUpdate(data as FpsData);
+    }) as (data: unknown) => void);
+
+    this.performanceMonitor.removeEventListener('memory', ((data: unknown) => {
+      this.handleMemoryUpdate(data as MemoryData);
+    }) as (data: unknown) => void);
 
     // Call parent destroy
     super.destroy();
