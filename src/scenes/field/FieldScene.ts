@@ -54,33 +54,38 @@ export class FieldScene extends Phaser.Scene {
    * Preload assets for the scene
    */
   preload(): void {
+    console.log('FieldScene: preload started');
+
+    // Try multiple path formats to handle different deployment environments
+    const basePaths = ['', '/', './'];
+
     // Load tilemap with multiple path formats
-    this.load.image('tiles', '/assets/images/tiles.png');
-    this.load.tilemapTiledJSON('field', '/assets/maps/field.json');
+    basePaths.forEach((basePath, index) => {
+      const suffix = index === 0 ? '' : `_alt${index}`;
 
-    // Alternative paths without leading slash
-    this.load.image('tiles_alt', 'assets/images/tiles.png');
-    this.load.tilemapTiledJSON('field_alt', 'assets/maps/field.json');
+      // Load tileset image
+      this.load.image(`tiles${suffix}`, `${basePath}assets/images/tiles.png`);
+      console.log(`FieldScene: Loading tiles${suffix} from ${basePath}assets/images/tiles.png`);
 
-    // Load player sprite
-    this.load.spritesheet('player', '/assets/images/player.png', {
-      frameWidth: 32,
-      frameHeight: 32,
+      // Load tilemap JSON
+      this.load.tilemapTiledJSON(`field${suffix}`, `${basePath}assets/maps/field.json`);
+      console.log(`FieldScene: Loading field${suffix} from ${basePath}assets/maps/field.json`);
+
+      // Load player sprite
+      this.load.spritesheet(`player${suffix}`, `${basePath}assets/images/player.png`, {
+        frameWidth: 32,
+        frameHeight: 32,
+      });
+
+      // Load interactable sprites
+      this.load.image(`tower${suffix}`, `${basePath}assets/images/tower.png`);
+      this.load.image(`ruins${suffix}`, `${basePath}assets/images/ruins.png`);
+
+      // Load narrative events
+      this.load.json(`narrative_events${suffix}`, `${basePath}assets/narrative/events.json`);
     });
-    this.load.spritesheet('player_alt', 'assets/images/player.png', {
-      frameWidth: 32,
-      frameHeight: 32,
-    });
 
-    // Load interactable sprites
-    this.load.image('tower', '/assets/images/tower.png');
-    this.load.image('ruins', '/assets/images/ruins.png');
-    this.load.image('tower_alt', 'assets/images/tower.png');
-    this.load.image('ruins_alt', 'assets/images/ruins.png');
-
-    // Load narrative events
-    this.load.json('narrative_events', '/assets/narrative/events.json');
-    this.load.json('narrative_events_alt', 'assets/narrative/events.json');
+    console.log('FieldScene: All asset loading requests initiated');
 
     // Log asset loading events
     this.load.on('filecomplete', (key: string, type: string) => {
@@ -187,31 +192,58 @@ export class FieldScene extends Phaser.Scene {
     try {
       console.log('FieldScene: Creating tilemap...');
 
-      // Check if assets were loaded
-      const fieldKey = this.cache.tilemap?.exists?.('field') ?? false;
-      const fieldAltKey = this.cache.tilemap?.exists?.('field_alt') ?? false;
-      const tilesKey = this.cache.image?.exists?.('tiles') ?? false;
-      const tilesAltKey = this.cache.image?.exists?.('tiles_alt') ?? false;
+      // Check which assets were successfully loaded
+      console.log('FieldScene: Checking available assets in cache...');
 
-      console.log(
-        `FieldScene: Asset check - field: ${fieldKey}, field_alt: ${fieldAltKey}, tiles: ${tilesKey}, tiles_alt: ${tilesAltKey}`
-      );
+      // Check for tilemap assets
+      const availableTilemaps = [];
+      const basePaths = ['', '/', './'];
 
-      // Try to create tilemap with primary key
-      let map = this.make.tilemap({ key: 'field' });
-      console.log('FieldScene: Attempted to create tilemap with primary key');
+      basePaths.forEach((_, index) => {
+        const suffix = index === 0 ? '' : `_alt${index}`;
+        const key = `field${suffix}`;
+        const exists = this.cache.tilemap?.exists?.(key) ?? false;
+        if (exists) {
+          availableTilemaps.push(key);
+          console.log(`FieldScene: Found tilemap in cache: ${key}`);
+        }
+      });
 
-      // If that fails, try the alternative key
-      if (!map) {
-        console.log('FieldScene: Trying alternative tilemap key');
-        map = this.make.tilemap({ key: 'field_alt' });
+      // Check for tileset assets
+      const availableTilesets = [];
+      basePaths.forEach((_, index) => {
+        const suffix = index === 0 ? '' : `_alt${index}`;
+        const key = `tiles${suffix}`;
+        const exists = this.cache.image?.exists?.(key) ?? false;
+        if (exists) {
+          availableTilesets.push(key);
+          console.log(`FieldScene: Found tileset in cache: ${key}`);
+        }
+      });
+
+      console.log(`FieldScene: Available tilemaps: ${availableTilemaps.join(', ')}`);
+      console.log(`FieldScene: Available tilesets: ${availableTilesets.join(', ')}`);
+
+      // Try to create tilemap with any available key
+      let map: Phaser.Tilemaps.Tilemap | null = null;
+
+      for (const tilemapKey of availableTilemaps) {
+        try {
+          console.log(`FieldScene: Attempting to create tilemap with key: ${tilemapKey}`);
+          map = this.make.tilemap({ key: tilemapKey });
+          if (map) {
+            console.log(`FieldScene: Successfully created tilemap with key: ${tilemapKey}`);
+            break;
+          }
+        } catch (err) {
+          console.error(`FieldScene: Error creating tilemap with key ${tilemapKey}:`, err);
+        }
       }
 
       if (!map) {
-        console.error('FieldScene: Failed to create tilemap with both keys');
+        console.error('FieldScene: Failed to create tilemap with any available key');
         return null;
       }
-      console.log('FieldScene: Tilemap created successfully');
 
       // Add orientation property to fix the error
       if (map.orientation === undefined) {
@@ -221,18 +253,26 @@ export class FieldScene extends Phaser.Scene {
         (map as unknown as { orientation: string }).orientation = 'orthogonal';
       }
 
-      // Try primary tileset key first
+      // Try all available tileset keys
       console.log('FieldScene: Adding tileset...');
-      let tileset = map.addTilesetImage('tiles', 'tiles');
+      let tileset: Phaser.Tilemaps.Tileset | null = null;
 
-      // If that fails, try the alternative key
-      if (!tileset) {
-        console.log('FieldScene: Trying alternative tileset key');
-        tileset = map.addTilesetImage('tiles', 'tiles_alt');
+      for (const tilesetKey of availableTilesets) {
+        try {
+          console.log(`FieldScene: Attempting to add tileset with key: ${tilesetKey}`);
+          // The first parameter is the name in the Tiled map file, the second is the key in Phaser
+          tileset = map.addTilesetImage('tiles', tilesetKey);
+          if (tileset) {
+            console.log(`FieldScene: Successfully added tileset with key: ${tilesetKey}`);
+            break;
+          }
+        } catch (err) {
+          console.error(`FieldScene: Error adding tileset with key ${tilesetKey}:`, err);
+        }
       }
 
       if (!tileset) {
-        console.error('FieldScene: Failed to load tileset with both keys');
+        console.error('FieldScene: Failed to add tileset with any available key');
         return null;
       }
       console.log('FieldScene: Tileset added successfully');
