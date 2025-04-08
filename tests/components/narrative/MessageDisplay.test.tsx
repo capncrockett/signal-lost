@@ -30,7 +30,7 @@ const decodedMessage: Message = {
 };
 
 describe('MessageDisplay Component', () => {
-  const renderWithProvider = (ui: React.ReactElement) => {
+  const renderWithProvider = (ui: React.ReactElement): React.ReactElement => {
     return render(<GameStateProvider>{ui}</GameStateProvider>);
   };
 
