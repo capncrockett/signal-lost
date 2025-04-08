@@ -1,68 +1,214 @@
-# Development Workflow
+# Development Workflow (React-Based Approach)
+
+> **Note**: This workflow document has been updated for the React-based rewrite of Signal Lost. The previous Phaser-based workflow can be found in `workflow-phaser.md`.
 
 ## Pre-coding Checklist
 
-1. Pull latest changes
+1. Pull latest changes from the `rewrite-dom-approach` branch
 2. Install/update dependencies: `npm install`
 3. Start dev server: `npm run dev`
 4. Open separate terminal for continuous testing: `npm test -- --watch`
 
-## During Development
+## Component Development Workflow
 
-1. Write tests first
-2. Implement feature
-3. **Run TypeScript compiler first**: `npm run type-check` or `npx tsc --noEmit`
-   - Type checking is your first layer of defense
-   - Fix all TypeScript errors before proceeding
-   - Never ignore TypeScript errors (e.g., uninitialized properties)
-4. **Run linter next**: `npm run lint` or `npx eslint . --ext .ts --fix`
-   - Linting is your second layer of testing
-   - Fix all ESLint errors and warnings
-5. Run full test suite: `npm run test`
-6. Run e2e tests: `npm run test:e2e`
-7. Format code: `npm run format`
+1. **Plan the component**:
+   - Define props and state requirements
+   - Sketch the component structure
+   - Identify potential reusable sub-components
+
+2. **Write tests first**:
+   - Create test file with the same name as the component
+   - Write tests for all expected behaviors
+   - Include accessibility tests where appropriate
+
+3. **Implement the component**:
+   - Create the component file
+   - Implement the component logic
+   - Add styling
+   - Ensure accessibility
+
+4. **Verify**:
+   - Run tests: `npm test -- --watch ComponentName`
+   - Check TypeScript: `npm run type-check`
+   - Run linter: `npm run lint`
+   - Manually test in the browser
+
+5. **Document**:
+   - Add JSDoc comments
+   - Update component documentation
+   - Add usage examples if needed
+
+## Testing Approach
+
+### Unit Tests (Jest + React Testing Library)
+
+- Test each component in isolation
+- Focus on behavior, not implementation details
+- Use `data-testid` attributes for element selection
+- Mock external dependencies
+
+```jsx
+// Example component test
+import { render, screen, fireEvent } from '@testing-library/react';
+import { RadioTuner } from './RadioTuner';
+
+test('adjusts frequency when dial is moved', () => {
+  // Arrange
+  render(<RadioTuner initialFrequency={91.5} />);
+  const dial = screen.getByTestId('frequency-dial');
+
+  // Act
+  fireEvent.mouseDown(dial);
+  fireEvent.mouseMove(dial, { clientX: 100 });
+  fireEvent.mouseUp(dial);
+
+  // Assert
+  expect(screen.getByTestId('frequency-display')).toHaveTextContent('92.5');
+});
+```
+
+### E2E Tests (Playwright)
+
+- Test critical user flows
+- Verify interactions between components
+- Test in multiple browsers
+- Capture screenshots for visual verification
+
+```typescript
+// Example E2E test
+test('user can tune radio and receive signal', async ({ page }) => {
+  // Navigate to the game
+  await page.goto('http://localhost:5173');
+
+  // Interact with the radio
+  await page.getByTestId('frequency-dial').click();
+  await page.mouse.move(300, 300);
+  await page.mouse.up();
+
+  // Verify signal received
+  await expect(page.getByTestId('signal-indicator')).toBeVisible();
+});
+```
 
 ## Pre-commit Checklist
 
 ```bash
-# ALWAYS run type checking first - this is your first layer of defense
-npm run type-check  # Check for TypeScript errors (or npx tsc --noEmit)
+# Run type checking
+npm run type-check
 
-# THEN run linter - this is your second layer of testing
-npm run lint        # Check for lint issues (or npx eslint . --ext .ts --fix)
-npm run lint:tests  # Check for lint issues in test files
+# Run linter
+npm run lint
+npm run lint:tests
 
-# Then proceed with other checks
-npm run format     # Format all files
-npm test          # Run unit tests
-npm run test:e2e  # Run e2e tests
-npm run coverage  # Verify coverage thresholds
+# Format code
+npm run format
 
-# Or run everything at once
-npm run check-all  # Run all checks (type-check, lint, tests, e2e tests)
+# Run tests
+npm test
+npm run test:e2e
+
+# Check coverage
+npm run coverage
+
+# Run all checks at once
+npm run check-all
 ```
 
 ## Debugging Tips
 
+- Use React DevTools for component inspection
 - Check browser console for errors
-- Use Chrome DevTools Audio tab for volume issues
-- Verify viewport sizing with browser responsive mode
+- Use Chrome DevTools for network and performance analysis
+- Leverage React's StrictMode for detecting potential problems
+- Use the debug helper script for streamlined development:
+  ```bash
+  # Start the debug helper menu
+  powershell -File scripts/debug-helper.ps1
+  ```
+
+### Debug Helper Features
+
+- Start development server and open browser
+- Run tests in watch mode
+- Run E2E tests and visual tests
+- Check for TypeScript errors
+- Run linting
+- Start a complete development environment with all tools
+
+## State Management
+
+- Use React Context for global state
+- Keep component state local when possible
+- Use custom hooks to encapsulate state logic
+- Follow unidirectional data flow
+
+```jsx
+// Example state management with context
+import { createContext, useContext, useReducer } from 'react';
+
+// Create context
+const GameStateContext = createContext();
+
+// Create provider
+export function GameStateProvider({ children }) {
+  const [state, dispatch] = useReducer(gameReducer, initialState);
+  return (
+    <GameStateContext.Provider value={{ state, dispatch }}>
+      {children}
+    </GameStateContext.Provider>
+  );
+}
+
+// Custom hook for using the context
+export function useGameState() {
+  const context = useContext(GameStateContext);
+  if (!context) {
+    throw new Error('useGameState must be used within a GameStateProvider');
+  }
+  return context;
+}
+```
 
 ## Development Priorities
 
-1. **Functionality First**: Focus on making the game work from start to finish
-2. **Type Safety**: Fix TypeScript errors to ensure code quality and prevent bugs
-3. **Test Coverage**: Ensure all critical paths are tested
-4. **Code Cleanup**: Refactor and clean up code once functionality is stable
-5. **Performance Optimization**: Address performance issues after the game is working properly
+1. **Component Architecture**: Focus on creating a clean, maintainable component structure
+2. **Accessibility**: Ensure the game is accessible to all users
+3. **Test Coverage**: Maintain high test coverage for all components
+4. **Type Safety**: Use TypeScript effectively to prevent bugs
+5. **Performance**: Optimize rendering and state updates
 
-## TypeScript Error Management
+## TypeScript Best Practices
 
-- Run `npm run type-check` frequently during development
-- Fix TypeScript errors as soon as they appear
-- For test files, use `any` types judiciously when mocking complex objects
-- For source files, avoid using `any` types whenever possible
-- When fixing a large number of TypeScript errors:
-  1. Start with errors in core game files
-  2. Then fix errors in utility functions
-  3. Finally address errors in test files
+- Define interfaces for all props
+- Use discriminated unions for complex state
+- Avoid `any` types
+- Use generics for reusable components
+- Create type guards for runtime type checking
+
+```typescript
+// Example of good TypeScript usage
+interface RadioTunerProps {
+  initialFrequency: number;
+  minFrequency?: number;
+  maxFrequency?: number;
+  onFrequencyChange?: (frequency: number) => void;
+  onSignalFound?: (signal: Signal) => void;
+}
+
+interface Signal {
+  id: string;
+  type: 'message' | 'location';
+  strength: number;
+  content: string;
+}
+
+export function RadioTuner({
+  initialFrequency = 91.5,
+  minFrequency = 88.0,
+  maxFrequency = 108.0,
+  onFrequencyChange,
+  onSignalFound,
+}: RadioTunerProps) {
+  // Component implementation
+}
+```

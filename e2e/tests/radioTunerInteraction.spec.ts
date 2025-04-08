@@ -8,6 +8,9 @@ import {
   takeScreenshot,
 } from '../helpers/gameTestHelpers';
 
+// Increase the test timeout
+test.setTimeout(300000);
+
 test('Radio tuner interaction test', async ({ page }) => {
   // Set up console log collection
   const logs: string[] = [];

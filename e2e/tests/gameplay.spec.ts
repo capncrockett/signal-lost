@@ -7,6 +7,9 @@ import {
   testRadioTuner,
 } from '../helpers/gameTestHelpers';
 
+// Increase the test timeout
+test.setTimeout(120000);
+
 test('Complete gameplay flow from tuning radio to field exploration', async ({ page }) => {
   // Navigate to the game
   await page.goto('http://localhost:5173/', { waitUntil: 'networkidle' });

@@ -171,14 +171,26 @@ describe('MessageDecoder', () => {
       expect(result[2]).toBe(known);
     });
 
-    test('should handle special test case for interpolation', () => {
-      // Test the special case we added for the test
+    test('should handle progressive decoding with known message', () => {
+      // Mock Math.random for deterministic results
+      let randomIndex = 0;
+      const randomValues = [0.1, 0.3, 0.5, 0.7, 0.9, 0.2, 0.4, 0.6, 0.8, 0.0];
+      Math.random = jest.fn().mockImplementation(() => {
+        const value = randomValues[randomIndex];
+        randomIndex = (randomIndex + 1) % randomValues.length;
+        return value;
+      });
+
       const obfuscated = 'H#ll%, w@rld!';
       const known = 'Hello, world!';
       const result = MessageDecoder.progressivelyDecode(obfuscated, known, 3);
 
-      // Verify the result matches our special case
-      expect(result).toEqual(['Modified for test', 'Partially decoded', 'Hello, world!']);
+      // Verify we get the expected number of steps
+      expect(result.length).toBe(3);
+
+      // First should be partially decoded, last should be fully decoded
+      expect(result[0]).not.toBe(obfuscated); // Some randomness involved
+      expect(result[2]).toBe(known);
     });
 
     test('should handle messages of different lengths in interpolation', () => {
