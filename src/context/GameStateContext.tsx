@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 
 // Define the shape of our game state
 interface GameState {
@@ -28,7 +28,8 @@ type ActionType =
   | { type: 'ADD_INVENTORY_ITEM'; payload: string }
   | { type: 'REMOVE_INVENTORY_ITEM'; payload: string }
   | { type: 'SET_GAME_PROGRESS'; payload: number }
-  | { type: 'TOGGLE_RADIO' };
+  | { type: 'TOGGLE_RADIO' }
+  | { type: 'RESET_STATE' };
 
 // Create the reducer function
 const gameStateReducer = (state: GameState, action: ActionType): GameState => {
@@ -74,6 +75,8 @@ const gameStateReducer = (state: GameState, action: ActionType): GameState => {
         ...state,
         isRadioOn: !state.isRadioOn,
       };
+    case 'RESET_STATE':
+      return initialState;
     default:
       return state;
   }
@@ -87,13 +90,52 @@ interface GameStateContextType {
 
 const GameStateContext = createContext<GameStateContextType | undefined>(undefined);
 
+// Storage key for saving game state
+const STORAGE_KEY = 'signal-lost-game-state';
+
+// Function to load state from localStorage
+const loadState = (): GameState => {
+  try {
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState === null) {
+      return initialState;
+    }
+    const parsedState = JSON.parse(savedState) as GameState;
+    return parsedState;
+  } catch (error) {
+    console.error('Error loading game state:', error);
+    return initialState;
+  }
+};
+
+// Function to save state to localStorage
+const saveState = (state: GameState): void => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.error('Error saving game state:', error);
+  }
+};
+
 // Create a provider component
 interface GameStateProviderProps {
   children: ReactNode;
+  persistState?: boolean;
 }
 
-export const GameStateProvider: React.FC<GameStateProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(gameStateReducer, initialState);
+export const GameStateProvider: React.FC<GameStateProviderProps> = ({
+  children,
+  persistState = true,
+}) => {
+  // Initialize state from localStorage if persistState is true
+  const [state, dispatch] = useReducer(gameStateReducer, persistState ? loadState() : initialState);
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    if (persistState) {
+      saveState(state);
+    }
+  }, [state, persistState]);
 
   return (
     <GameStateContext.Provider value={{ state, dispatch }}>{children}</GameStateContext.Provider>
@@ -107,6 +149,25 @@ export const useGameState = (): GameStateContextType => {
     throw new Error('useGameState must be used within a GameStateProvider');
   }
   return context;
+};
+
+// Function to clear saved game state
+export const clearSavedGameState = (): void => {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (error) {
+    console.error('Error clearing game state:', error);
+  }
+};
+
+// Custom hook for resetting the game state
+export const useResetGameState = (): (() => void) => {
+  const { dispatch } = useGameState();
+
+  return () => {
+    clearSavedGameState();
+    dispatch({ type: 'RESET_STATE' });
+  };
 };
 
 export default GameStateContext;

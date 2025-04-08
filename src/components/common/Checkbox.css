@@ -1,0 +1,98 @@
+.checkbox-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkbox-label {
+  position: relative;
+  padding-left: 1.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #1a202c;
+  user-select: none;
+}
+
+.checkbox-label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  background-color: white;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.checkbox-label::after {
+  content: '';
+  position: absolute;
+  left: 0.25rem;
+  top: 0.25rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.checkbox:checked + .checkbox-label::before {
+  background-color: #3182ce;
+  border-color: #3182ce;
+}
+
+.checkbox:checked + .checkbox-label::after {
+  opacity: 1;
+}
+
+.checkbox:focus + .checkbox-label::before {
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
+}
+
+.checkbox-error + .checkbox-label::before {
+  border-color: #e53e3e;
+}
+
+.checkbox-error:checked + .checkbox-label::before {
+  background-color: #e53e3e;
+  border-color: #e53e3e;
+}
+
+.checkbox-error:focus + .checkbox-label::before {
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.3);
+}
+
+.checkbox:disabled + .checkbox-label {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.checkbox-message {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  margin-left: 1.75rem;
+}
+
+.checkbox-helper-text {
+  color: #718096;
+}
+
+.checkbox-error-message {
+  color: #e53e3e;
+}
