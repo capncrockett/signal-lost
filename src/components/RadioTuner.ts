@@ -1,8 +1,33 @@
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 import { AudioManager } from '../audio/AudioManager';
 import * as Tone from 'tone';
 import { createNoise } from '../audio/NoiseGenerator';
 import { NoiseType } from '../audio/NoiseType';
+
+// Define types for signal data
+interface RadioLocationSignalData {
+  locationId: string;
+  coordinates: { x: number; y: number };
+}
+
+interface RadioMessageSignalData {
+  message: string;
+}
+
+interface RadioItemSignalData {
+  itemId: string;
+  name: string;
+  description: string;
+}
+
+type RadioSignalData = RadioLocationSignalData | RadioMessageSignalData | RadioItemSignalData;
+
+interface RadioSignalInfo {
+  id: string;
+  frequency: number;
+  type: 'location' | 'message' | 'item';
+  data: RadioSignalData;
+}
 
 interface RadioTunerConfig {
   width?: number;
@@ -14,6 +39,8 @@ interface RadioTunerConfig {
   backgroundColor?: number;
   sliderColor?: number;
   knobColor?: number;
+  radioImageKey?: string;
+  radioImageKeyAlt?: string;
 }
 
 /**
@@ -49,11 +76,13 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       height: config.height || 100,
       minFrequency: config.minFrequency || 88.0,
       maxFrequency: config.maxFrequency || 108.0,
-      signalFrequencies: config.signalFrequencies || [91.5, 96.3, 103.7],
+      signalFrequencies: config.signalFrequencies || [91.5, 94.2, 96.3, 99.8, 103.7, 105.1],
       signalTolerance: config.signalTolerance || 0.3,
       backgroundColor: config.backgroundColor || 0x333333,
       sliderColor: config.sliderColor || 0x666666,
       knobColor: config.knobColor || 0xcccccc,
+      radioImageKey: config.radioImageKey || 'radio',
+      radioImageKeyAlt: config.radioImageKeyAlt || 'radio_alt',
     };
 
     // Get the audio manager
@@ -161,7 +190,12 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
   private setupInteraction(): void {
     // Make knob interactive
-    this.knob.setInteractive(new Phaser.Geom.Circle(0, 0, 15), Phaser.Geom.Circle.Contains);
+    this.knob.setInteractive(
+      new Phaser.Geom.Circle(0, 0, 15),
+      (hitArea: Phaser.Geom.Circle, x: number, y: number) => {
+        return Phaser.Geom.Circle.Contains(hitArea, x, y);
+      }
+    );
 
     // Setup drag events
     this.scene.input.setDraggable(this.knob);
@@ -222,7 +256,9 @@ export class RadioTuner extends Phaser.GameObjects.Container {
     // Click on slider to jump
     this.slider.setInteractive(
       new Phaser.Geom.Rectangle(-this.config.width / 2 + 20, -5, this.config.width - 40, 10),
-      Phaser.Geom.Rectangle.Contains
+      (hitArea: Phaser.Geom.Rectangle, x: number, y: number) => {
+        return Phaser.Geom.Rectangle.Contains(hitArea, x, y);
+      }
     );
 
     this.slider.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
@@ -396,8 +432,10 @@ export class RadioTuner extends Phaser.GameObjects.Container {
       this.staticSource.loop = true;
 
       // Connect to gain node with reduced volume (half of original)
-      this.staticGain!.gain.value = 0.25; // Half of the original 0.5
-      this.staticSource.connect(this.staticGain!);
+      if (this.staticGain) {
+        this.staticGain.gain.value = 0.25; // Half of the original 0.5
+        this.staticSource.connect(this.staticGain);
+      }
 
       // Start playback
       this.staticSource.start();
@@ -474,17 +512,89 @@ export class RadioTuner extends Phaser.GameObjects.Container {
 
     // If signal strength is above threshold, emit signal lock event
     if (signalStrength > 0.8) {
-      // Emit signal lock event with frequency and signal strength
+      // Find which signal was locked onto
+      const lockedSignal = this.findLockedSignal();
+
+      // Emit signal lock event with frequency, signal strength, and signal ID
       this.emit('signalLock', {
         frequency: this.currentFrequency,
         signalStrength: signalStrength,
+        signalId: lockedSignal?.id || 'unknown',
+        signalType: lockedSignal?.type || 'unknown',
+        signalData: lockedSignal?.data || null,
       });
 
       // Log the signal lock for testing purposes
       console.log(
-        `Signal locked at frequency: ${this.currentFrequency.toFixed(1)} MHz with strength ${signalStrength.toFixed(2)}`
+        `Signal locked at frequency: ${this.currentFrequency.toFixed(1)} MHz with strength ${signalStrength.toFixed(2)}, ` +
+          `signal ID: ${lockedSignal?.id || 'unknown'}, type: ${lockedSignal?.type || 'unknown'}`
       );
     }
+  }
+
+  /**
+   * Find which predefined signal was locked onto
+   * @returns The signal data or undefined if no match
+   */
+  private findLockedSignal(): RadioSignalInfo | undefined {
+    // Define signal data with IDs, types, and additional data
+    const signals = [
+      {
+        id: 'signal1',
+        frequency: 91.5,
+        type: 'location',
+        data: { locationId: 'tower1', coordinates: { x: 10, y: 8 } },
+      },
+      {
+        id: 'signal2',
+        frequency: 96.3,
+        type: 'message',
+        data: { message: 'Help us... coordinates... 15, 12...' },
+      },
+      {
+        id: 'signal3',
+        frequency: 103.7,
+        type: 'location',
+        data: { locationId: 'ruins1', coordinates: { x: 15, y: 12 } },
+      },
+      {
+        id: 'signal4',
+        frequency: 94.2,
+        type: 'location',
+        data: { locationId: 'bunker1', coordinates: { x: 5, y: 20 } },
+      },
+      {
+        id: 'signal5',
+        frequency: 99.8,
+        type: 'message',
+        data: { message: 'Security protocol... code 7-3-9-2... emergency override...' },
+      },
+      {
+        id: 'signal6',
+        frequency: 105.1,
+        type: 'item',
+        data: {
+          itemId: 'radio_enhancer',
+          name: 'Signal Enhancer',
+          description: 'Improves radio reception and range.',
+        },
+      },
+    ];
+
+    // Find the closest signal
+    let closestSignal;
+    let closestDistance = Number.MAX_VALUE;
+
+    for (const signal of signals) {
+      const distance = Math.abs(this.currentFrequency - signal.frequency);
+      if (distance < closestDistance && distance < this.config.signalTolerance) {
+        closestDistance = distance;
+        closestSignal = signal;
+      }
+    }
+
+    // Type assertion to ensure the signal type is correct
+    return closestSignal as RadioSignalInfo | undefined;
   }
 
   /**
@@ -577,7 +687,7 @@ export class RadioTuner extends Phaser.GameObjects.Container {
     // Close audio context
     if (this.audioContext && this.audioContext.state !== 'closed') {
       try {
-        this.audioContext.close();
+        void this.audioContext.close();
         this.audioContext = null;
       } catch (error) {
         console.error('Error closing audio context:', error);

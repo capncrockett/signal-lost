@@ -36,7 +36,7 @@ import { SoundscapeManager } from '../../src/audio/SoundscapeManager';
 jest.mock('../../src/components/RadioTuner', () => {
   return {
     RadioTuner: class MockRadioTuner {
-      constructor(scene: any, x: number, y: number, _config = {}) {
+      constructor(scene: any, _x: number, _y: number, _config = {}) {
         // Store the scene for later use
         this.scene = scene;
       }
@@ -143,9 +143,9 @@ describe('RadioTuner and SoundscapeManager Integration', () => {
   });
 
   test('RadioTuner signal strength affects SoundscapeManager audio layers', () => {
-    // Mock the getSignalStrength method
+    // Mock the getSignalStrength method (using type assertion to access private method)
     const mockSignalStrength = 0.75;
-    radioTuner.getSignalStrength = jest.fn().mockReturnValue(mockSignalStrength);
+    (radioTuner as any).getSignalStrength = jest.fn().mockReturnValue(mockSignalStrength);
 
     // Mock the updateLayers method
     soundscapeManager.updateLayers = jest.fn();
@@ -182,17 +182,17 @@ describe('RadioTuner and SoundscapeManager Integration', () => {
   });
 
   test('RadioTuner and SoundscapeManager work together during frequency change', () => {
-    // Mock the getSignalStrength method to return different values
+    // Mock the getSignalStrength method to return different values (using type assertion)
     let signalStrengthValue = 0.3;
-    radioTuner.getSignalStrength = jest.fn().mockImplementation(() => {
+    (radioTuner as any).getSignalStrength = jest.fn().mockImplementation(() => {
       return signalStrengthValue;
     });
 
     // Set up spy on SoundscapeManager.updateLayers
     const updateLayersSpy = jest.spyOn(soundscapeManager, 'updateLayers');
 
-    // Get the initial signal strength
-    const signalStrength = radioTuner.getSignalStrength();
+    // Get the initial signal strength (using type assertion)
+    const signalStrength = (radioTuner as any).getSignalStrength();
 
     // Update SoundscapeManager
     soundscapeManager.updateLayers(signalStrength);
@@ -203,8 +203,8 @@ describe('RadioTuner and SoundscapeManager Integration', () => {
     // Change the mock signal strength
     signalStrengthValue = 0.8;
 
-    // Get the new signal strength
-    const newSignalStrength = radioTuner.getSignalStrength();
+    // Get the new signal strength (using type assertion)
+    const newSignalStrength = (radioTuner as any).getSignalStrength();
 
     // Update SoundscapeManager again
     soundscapeManager.updateLayers(newSignalStrength);

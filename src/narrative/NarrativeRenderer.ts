@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 import { NarrativeEngine, NarrativeEvent } from './NarrativeEngine';
 
 /**
@@ -63,7 +63,7 @@ export class NarrativeRenderer extends Phaser.GameObjects.Container {
     this.setupEventListeners();
 
     // Hide initially
-    this.setVisible(false);
+    this.visible = false;
   }
 
   /**
@@ -165,14 +165,14 @@ export class NarrativeRenderer extends Phaser.GameObjects.Container {
     }
 
     // Show the renderer
-    this.setVisible(true);
+    this.visible = true;
   }
 
   /**
    * Hide the renderer
    */
   hide(): void {
-    this.setVisible(false);
+    this.visible = false;
     this.currentEvent = null;
   }
 

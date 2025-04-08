@@ -6,8 +6,7 @@ import Phaser from 'phaser';
  * Manages a grid-based system for movement and collision detection
  */
 export class GridSystem {
-  // Reference to the scene
-  private scene: Phaser.Scene;
+  // Grid properties
 
   // Grid dimensions
   private width: number;
@@ -26,16 +25,15 @@ export class GridSystem {
    * @param height Grid height in tiles
    * @param tileSize Tile size in pixels
    */
-  constructor(scene: Phaser.Scene, width: number, height: number, tileSize: number) {
-    this.scene = scene;
+  constructor(_scene: Phaser.Scene, width: number, height: number, tileSize: number) {
     this.width = width;
     this.height = height;
     this.tileSize = tileSize;
 
     // Initialize collision grid
-    this.collisionGrid = Array(height)
-      .fill(null)
-      .map(() => Array(width).fill(false));
+    this.collisionGrid = Array.from({ length: height }, () =>
+      Array.from({ length: width }, () => false)
+    );
   }
 
   /**
@@ -167,7 +165,13 @@ export class GridSystem {
       openSet.sort((a, b) => a.f - b.f);
 
       // Get the node with the lowest f value
-      const current = openSet.shift()!;
+      const current = openSet.shift();
+
+      // This should never happen since we check openSet.length > 0
+      // But we'll handle it just in case
+      if (!current) {
+        break;
+      }
 
       // Check if we reached the end
       if (current.x === endX && current.y === endY) {
@@ -182,13 +186,20 @@ export class GridSystem {
             x: number;
             y: number;
             parent: GridNode | null;
-            f?: number;
-            g?: number;
-            h?: number;
+            f: number;
+            g: number;
+            h: number;
           };
 
           // Create a new node without circular reference
-          node = { ...node.parent, parent: null } as GridNode;
+          // Use type assertion to ensure all required properties are present
+          node = {
+            ...node.parent,
+            parent: null,
+            f: 0, // Default values for required properties
+            g: 0,
+            h: 0,
+          } as GridNode;
         }
 
         return path;

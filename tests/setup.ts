@@ -95,11 +95,19 @@ global.Phaser = {
 class MockAudioContext {
   destination = {};
   sampleRate = 44100;
+  currentTime = 0;
+  state = 'running';
 
   createGain() {
     return {
       connect: jest.fn(),
-      gain: { value: 0 },
+      disconnect: jest.fn(),
+      gain: {
+        value: 0,
+        setTargetAtTime: jest.fn(),
+        linearRampToValueAtTime: jest.fn(),
+        exponentialRampToValueAtTime: jest.fn(),
+      },
     };
   }
 
@@ -123,14 +131,118 @@ class MockAudioContext {
   createBiquadFilter() {
     return {
       connect: jest.fn(),
-      frequency: { value: 0 },
+      disconnect: jest.fn(),
+      frequency: {
+        value: 0,
+        setTargetAtTime: jest.fn(),
+      },
       Q: { value: 0 },
       type: '',
     };
   }
+
+  createOscillator() {
+    return {
+      frequency: {
+        value: 0,
+        setTargetAtTime: jest.fn(),
+      },
+      type: 'sine',
+      connect: jest.fn(),
+      disconnect: jest.fn(),
+      start: jest.fn(),
+      stop: jest.fn(),
+    };
+  }
+
+  createStereoPanner() {
+    return {
+      pan: {
+        value: 0,
+        setTargetAtTime: jest.fn(),
+      },
+      connect: jest.fn(),
+      disconnect: jest.fn(),
+    };
+  }
+
+  createAnalyser() {
+    return {
+      fftSize: 2048,
+      frequencyBinCount: 1024,
+      getByteFrequencyData: jest.fn(),
+      getByteTimeDomainData: jest.fn(),
+      connect: jest.fn(),
+      disconnect: jest.fn(),
+    };
+  }
+
+  resume() {
+    return Promise.resolve();
+  }
+
+  suspend() {
+    return Promise.resolve();
+  }
+
+  close() {
+    return Promise.resolve();
+  }
 }
+
+// Add webkitAudioContext to Window interface in a separate file to avoid TypeScript error
+// This would normally go in a global.d.ts file
 
 global.AudioContext = MockAudioContext as any;
 global.window = global.window || {};
 global.window.AudioContext = MockAudioContext as any;
+// Use type assertion to avoid TypeScript error
 global.window.webkitAudioContext = MockAudioContext as any;
+
+// Mock document for TestOverlay tests
+class MockElement {
+  style: Record<string, string> = {};
+  parentElement: MockElement | null = null;
+  children: MockElement[] = [];
+  innerHTML: string = '';
+
+  setAttribute(name: string, value: string): void {
+    (this as any)[name] = value;
+  }
+
+  getAttribute(name: string): string | null {
+    return (this as any)[name] || null;
+  }
+
+  appendChild(child: MockElement): MockElement {
+    this.children.push(child);
+    child.parentElement = this;
+    return child;
+  }
+
+  removeChild(child: MockElement): MockElement {
+    const index = this.children.indexOf(child);
+    if (index !== -1) {
+      this.children.splice(index, 1);
+      child.parentElement = null;
+    }
+    return child;
+  }
+
+  addEventListener(_type: string, _listener: EventListener): void {}
+  dispatchEvent(_event: Event): boolean {
+    return true;
+  }
+}
+
+class MockDocument extends MockElement {
+  createElement(_tagName: string): MockElement {
+    return new MockElement();
+  }
+
+  querySelectorAll(_selector: string): MockElement[] {
+    return [];
+  }
+}
+
+global.document = new MockDocument() as any;

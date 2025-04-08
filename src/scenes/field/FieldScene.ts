@@ -6,6 +6,11 @@ import { SaveManager } from '../../utils/SaveManager';
 import { NarrativeEngine } from '../../narrative/NarrativeEngine';
 import { NarrativeRenderer } from '../../narrative/NarrativeRenderer';
 import { interactableData } from './InteractableConfig';
+import { Inventory } from '../../inventory/Inventory';
+import { InventoryUI } from '../../inventory/InventoryUI';
+import { itemsData } from '../../inventory/ItemsConfig';
+import { Item } from '../../inventory/Item';
+import { NarrativeEventData, NarrativeChoiceResultData } from '../../types/events';
 
 /**
  * FieldScene
@@ -34,6 +39,12 @@ export class FieldScene extends Phaser.Scene {
   // Narrative renderer
   private narrativeRenderer!: NarrativeRenderer;
 
+  // Inventory
+  private inventory!: Inventory;
+
+  // Inventory UI
+  private inventoryUI!: InventoryUI;
+
   constructor() {
     super({ key: 'FieldScene' });
     this.eventEmitter = new Phaser.Events.EventEmitter();
@@ -43,22 +54,51 @@ export class FieldScene extends Phaser.Scene {
    * Preload assets for the scene
    */
   preload(): void {
-    // Load tilemap
-    this.load.image('tiles', 'assets/images/tiles.png');
-    this.load.tilemapTiledJSON('field', 'assets/maps/field.json');
+    // Load tilemap with multiple path formats
+    this.load.image('tiles', '/assets/images/tiles.png');
+    this.load.tilemapTiledJSON('field', '/assets/maps/field.json');
+
+    // Alternative paths without leading slash
+    this.load.image('tiles_alt', 'assets/images/tiles.png');
+    this.load.tilemapTiledJSON('field_alt', 'assets/maps/field.json');
 
     // Load player sprite
-    this.load.spritesheet('player', 'assets/images/player.png', {
+    this.load.spritesheet('player', '/assets/images/player.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet('player_alt', 'assets/images/player.png', {
       frameWidth: 32,
       frameHeight: 32,
     });
 
     // Load interactable sprites
-    this.load.image('tower', 'assets/images/tower.png');
-    this.load.image('ruins', 'assets/images/ruins.png');
+    this.load.image('tower', '/assets/images/tower.png');
+    this.load.image('ruins', '/assets/images/ruins.png');
+    this.load.image('tower_alt', 'assets/images/tower.png');
+    this.load.image('ruins_alt', 'assets/images/ruins.png');
 
     // Load narrative events
-    this.load.json('narrative_events', 'assets/narrative/events.json');
+    this.load.json('narrative_events', '/assets/narrative/events.json');
+    this.load.json('narrative_events_alt', 'assets/narrative/events.json');
+
+    // Log asset loading events
+    this.load.on('filecomplete', (key: string, type: string) => {
+      console.log(`FieldScene asset loaded: ${key} (${type})`);
+    });
+
+    this.load.on('loaderror', (file: Phaser.Loader.File) => {
+      // Ensure url is a string
+      const url = typeof file.url === 'string' ? file.url : String(file.url);
+      console.error(`FieldScene error loading asset: ${file.key} from ${url}`);
+      // If this is not an alternative asset, try loading with the alternative path
+      if (!file.key.endsWith('_alt')) {
+        if (url.startsWith('/')) {
+          const newUrl = url.substring(1);
+          console.log(`FieldScene retrying with alternative path: ${newUrl}`);
+        }
+      }
+    });
   }
 
   /**
@@ -85,7 +125,11 @@ export class FieldScene extends Phaser.Scene {
       this.createInteractables();
 
       // Set up resize handler
-      this.scale.on('resize', this.handleResize, this);
+      this.scale.on(
+        'resize',
+        (width: number, height: number) => this.handleResize(width, height),
+        this
+      );
 
       // Initial resize to set correct positions
       this.handleResize(this.scale.width, this.scale.height);
@@ -98,6 +142,9 @@ export class FieldScene extends Phaser.Scene {
 
       // Initialize narrative engine
       this.initializeNarrativeEngine();
+
+      // Initialize inventory system
+      this.initializeInventorySystem();
     } catch (error) {
       console.error('Error creating field scene:', error);
     }
@@ -112,35 +159,59 @@ export class FieldScene extends Phaser.Scene {
     groundLayer: Phaser.Tilemaps.TilemapLayer;
     obstaclesLayer: Phaser.Tilemaps.TilemapLayer;
   } | null {
-    // Create tilemap
-    const map = this.make.tilemap({ key: 'field' });
+    try {
+      // Try to create tilemap with primary key
+      let map = this.make.tilemap({ key: 'field' });
 
-    // Add orientation property to fix the error
-    if (map.orientation === undefined) {
-      // @ts-expect-error - Adding missing property
-      map.orientation = 'orthogonal';
-    }
+      // If that fails, try the alternative key
+      if (!map) {
+        console.log('Trying alternative tilemap key');
+        map = this.make.tilemap({ key: 'field_alt' });
+      }
 
-    const tileset = map.addTilesetImage('tiles', 'tiles');
+      if (!map) {
+        console.error('Failed to create tilemap with both keys');
+        return null;
+      }
 
-    if (!tileset) {
-      console.error('Failed to load tileset');
+      // Add orientation property to fix the error
+      if (map.orientation === undefined) {
+        // Add missing property with type assertion
+        // Using unknown as an intermediate step to avoid any
+        (map as unknown as { orientation: string }).orientation = 'orthogonal';
+      }
+
+      // Try primary tileset key first
+      let tileset = map.addTilesetImage('tiles', 'tiles');
+
+      // If that fails, try the alternative key
+      if (!tileset) {
+        console.log('Trying alternative tileset key');
+        tileset = map.addTilesetImage('tiles', 'tiles_alt');
+      }
+
+      if (!tileset) {
+        console.error('Failed to load tileset with both keys');
+        return null;
+      }
+
+      // Create layers
+      const groundLayer = map.createLayer('Ground', tileset);
+      const obstaclesLayer = map.createLayer('Obstacles', tileset);
+
+      if (!groundLayer || !obstaclesLayer) {
+        console.error('Failed to create layers');
+        return null;
+      }
+
+      // Set collision on obstacles layer
+      obstaclesLayer.setCollisionByProperty({ collides: true });
+
+      return { map, groundLayer, obstaclesLayer };
+    } catch (error) {
+      console.error('Error creating tilemap:', error);
       return null;
     }
-
-    // Create layers
-    const groundLayer = map.createLayer('Ground', tileset);
-    const obstaclesLayer = map.createLayer('Obstacles', tileset);
-
-    if (!groundLayer || !obstaclesLayer) {
-      console.error('Failed to create layers');
-      return null;
-    }
-
-    // Set collision on obstacles layer
-    obstaclesLayer.setCollisionByProperty({ collides: true });
-
-    return { map, groundLayer, obstaclesLayer };
   }
 
   /**
@@ -162,7 +233,7 @@ export class FieldScene extends Phaser.Scene {
     for (let y = 0; y < gridHeight; y++) {
       for (let x = 0; x < gridWidth; x++) {
         const tile = obstaclesLayer.getTileAt(x, y);
-        if (tile && tile.properties.collides) {
+        if (tile && tile.properties && (tile.properties as { collides?: boolean }).collides) {
           this.gridSystem.setTileCollision(x, y, true);
         }
       }
@@ -194,18 +265,26 @@ export class FieldScene extends Phaser.Scene {
   private createInteractables(): void {
     // Create interactable objects from configuration
     for (const data of interactableData) {
-      // Skip if already discovered
-      if (SaveManager.getFlag(`found${data.id}`)) {
+      // Skip if already discovered and collected
+      if (SaveManager.getFlag(`collected${data.id}`)) {
         continue;
       }
 
       // Create interactable
       const interactable = this.createInteractable(data);
 
+      // If the location was discovered via radio signal, mark it as found
+      if (SaveManager.getFlag(`discovered_${data.id}`)) {
+        interactable.setDiscovered(true);
+      }
+
       // Add to interactables array and map
       this.interactables.push(interactable);
       this.interactableMap.set(data.id, interactable);
     }
+
+    // Check for signal-discovered locations
+    this.checkSignalDiscoveredLocations();
   }
 
   /**
@@ -230,8 +309,8 @@ export class FieldScene extends Phaser.Scene {
       data.triggerDistance
     );
 
-    // Add to scene
-    this.add.existing(interactable);
+    // Add to scene with type assertion
+    this.add.existing(interactable as unknown as Phaser.GameObjects.GameObject);
 
     return interactable;
   }
@@ -284,6 +363,10 @@ export class FieldScene extends Phaser.Scene {
       case 'KeyE':
         this.interact();
         break;
+      case 'KeyI': {
+        this.toggleInventory();
+        break;
+      }
     }
   }
 
@@ -361,6 +444,15 @@ export class FieldScene extends Phaser.Scene {
   }
 
   /**
+   * Toggle the inventory UI
+   */
+  private toggleInventory(): void {
+    if (this.inventoryUI) {
+      this.inventoryUI.toggle();
+    }
+  }
+
+  /**
    * Interact with the nearest interactable
    */
   private interact(): void {
@@ -397,6 +489,142 @@ export class FieldScene extends Phaser.Scene {
   }
 
   /**
+   * Initialize the inventory system
+   */
+  private initializeInventorySystem(): void {
+    // Create inventory
+    this.inventory = new Inventory(20);
+
+    // Load item definitions
+    this.inventory.loadItemDefinitions(itemsData);
+
+    // Load saved inventory
+    this.inventory.loadInventory();
+
+    // Create inventory UI
+    this.inventoryUI = new InventoryUI(this, this.inventory, {
+      x: this.cameras.main.width / 2,
+      y: this.cameras.main.height / 2,
+    });
+    this.add.existing(this.inventoryUI);
+
+    // Set up inventory event listeners
+    this.setupInventoryEventListeners();
+
+    // Add starting items if this is a new game
+    this.addStartingItems();
+  }
+
+  /**
+   * Add starting items to the inventory
+   */
+  private addStartingItems(): void {
+    // Check if this is the first time loading the scene
+    if (!SaveManager.getFlag('field_scene_visited')) {
+      // Add radio to inventory
+      const radioItem = itemsData.find((item) => item.id === 'radio');
+      if (radioItem) {
+        this.inventory.addItem(new Item(radioItem));
+      }
+
+      // Add journal to inventory
+      const journalItem = itemsData.find((item) => item.id === 'journal');
+      if (journalItem) {
+        this.inventory.addItem(new Item(journalItem));
+      }
+
+      // Mark scene as visited
+      SaveManager.setFlag('field_scene_visited', true);
+    }
+  }
+
+  /**
+   * Set up inventory event listeners
+   */
+  private setupInventoryEventListeners(): void {
+    // Listen for item use events
+    this.inventory.on('itemUsed', (...args: unknown[]) => {
+      const item = args[0] as Item;
+      console.log(`Item used: ${item.getName()}`);
+
+      // Handle item effects
+      const effects = item.getEffects();
+      const action = effects.action as string | undefined;
+
+      if (action) {
+        switch (action) {
+          case 'open_radio':
+            // Return to main scene to use radio
+            this.scene.start('MainScene');
+            break;
+
+          case 'open_map':
+            // Show map overlay
+            console.log('Opening map...');
+            // TODO: Implement map overlay
+            break;
+
+          case 'read_note': {
+            // Show note content
+            const content = effects.content as string | undefined;
+            if (content) {
+              // Trigger a narrative event to display the note content
+              this.narrativeEngine.addEvent({
+                id: `note_${Date.now()}`,
+                message: content,
+                choices: [
+                  {
+                    text: 'Close',
+                    outcome: '',
+                  },
+                ],
+              });
+              this.narrativeEngine.triggerEvent(`note_${Date.now()}`);
+            }
+            break;
+          }
+
+          default:
+            console.log(`Unknown action: ${action}`);
+            break;
+        }
+      }
+    });
+
+    // Listen for interactable events that give items
+    this.eventEmitter.on('interactableTriggered', (...args: unknown[]) => {
+      const id = args[0] as string;
+      const type = args[1] as string;
+      // Check if this interactable gives an item
+      if (type === 'item') {
+        // Find the corresponding item in the item definitions
+        const itemData = itemsData.find((item) => item.id === id);
+        if (itemData) {
+          // Add the item to the inventory
+          const item = new Item(itemData);
+          const added = this.inventory.addItem(item);
+
+          if (added) {
+            console.log(`Added item to inventory: ${item.getName()}`);
+
+            // Mark the item as collected
+            SaveManager.setFlag(`collected_${id}`, true);
+          } else {
+            console.log('Inventory is full!');
+            // TODO: Show inventory full message
+          }
+        }
+      }
+      // Handle narrative events for specific interactable types
+      else if (type === 'tower') {
+        this.narrativeEngine.triggerEvent('tower_discovery');
+      } else if (type === 'ruins') {
+        this.narrativeEngine.triggerEvent('ruins_discovery');
+      }
+    });
+  }
+
+  /**
    * Initialize the narrative engine
    */
   private initializeNarrativeEngine(): void {
@@ -418,7 +646,7 @@ export class FieldScene extends Phaser.Scene {
     this.narrativeEngine = new NarrativeEngine();
 
     // Load narrative events
-    const eventsData = this.cache.json.get('narrative_events');
+    const eventsData = this.cache.json.get('narrative_events') as Record<string, unknown>[];
     if (eventsData) {
       this.narrativeEngine.loadEvents(JSON.stringify(eventsData));
     }
@@ -443,23 +671,17 @@ export class FieldScene extends Phaser.Scene {
    */
   private setupNarrativeEventListeners(): void {
     // Listen for narrative events
-    this.narrativeEngine.on('narrativeEvent', (event) => {
+    this.narrativeEngine.on('narrativeEvent', (...args: unknown[]) => {
+      const event = args[0] as NarrativeEventData;
       console.log(`Narrative event triggered: ${event.id}`);
     });
 
-    this.narrativeEngine.on('narrativeChoice', (data) => {
+    this.narrativeEngine.on('narrativeChoice', (...args: unknown[]) => {
+      const data = args[0] as NarrativeChoiceResultData;
       console.log(`Choice made: ${data.choice.text}`);
     });
 
-    // Listen for interactable events
-    this.eventEmitter.on('interactableTriggered', (id: string, type: string) => {
-      // Trigger corresponding narrative event
-      if (type === 'tower') {
-        this.narrativeEngine.triggerEvent('tower_discovery');
-      } else if (type === 'ruins') {
-        this.narrativeEngine.triggerEvent('ruins_discovery');
-      }
-    });
+    // Note: interactableTriggered events are handled in setupInventoryEventListeners
   }
 
   /**
@@ -534,6 +756,80 @@ export class FieldScene extends Phaser.Scene {
   }
 
   /**
+   * Check for locations discovered via radio signals
+   */
+  private checkSignalDiscoveredLocations(): void {
+    // Get all discovered locations from SaveManager
+    const discoveredLocations: string[] = [];
+
+    // Check for tower1 location
+    if (SaveManager.getFlag('discovered_tower1')) {
+      discoveredLocations.push('tower1');
+    }
+
+    // Check for ruins1 location
+    if (SaveManager.getFlag('discovered_ruins1')) {
+      discoveredLocations.push('ruins1');
+    }
+
+    // Add visual indicators for discovered locations
+    for (const locationId of discoveredLocations) {
+      const locationData = SaveManager.getData(`location_${locationId}`);
+      if (
+        locationData &&
+        typeof locationData === 'object' &&
+        'x' in locationData &&
+        'y' in locationData &&
+        typeof locationData.x === 'number' &&
+        typeof locationData.y === 'number'
+      ) {
+        // Convert to numbers to ensure type safety
+        const x = Number(locationData.x);
+        const y = Number(locationData.y);
+        this.addLocationMarker(locationId, x, y);
+      }
+    }
+  }
+
+  /**
+   * Add a visual marker for a discovered location
+   * @param locationId The location ID
+   * @param gridX The grid X coordinate
+   * @param gridY The grid Y coordinate
+   */
+  private addLocationMarker(locationId: string, gridX: number, gridY: number): void {
+    // Convert grid coordinates to pixel coordinates
+    const pixelX = gridX * this.gridSystem.getTileSize() + this.gridSystem.getTileSize() / 2;
+    const pixelY = gridY * this.gridSystem.getTileSize() + this.gridSystem.getTileSize() / 2;
+
+    // Create a marker sprite
+    const marker = this.add.circle(pixelX, pixelY, 16, 0xffff00, 0.8);
+    marker.setDepth(10);
+
+    // Add a pulsing effect
+    this.tweens.add({
+      targets: marker,
+      scaleX: 1.5,
+      scaleY: 1.5,
+      alpha: 0.4,
+      duration: 1000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+
+    // Add a label
+    const label = this.add.text(pixelX, pixelY - 30, locationId.toUpperCase(), {
+      fontSize: '14px',
+      color: '#ffffff',
+      backgroundColor: '#000000',
+      padding: { x: 5, y: 3 },
+    });
+    label.setOrigin(0.5, 0.5);
+    label.setDepth(11);
+  }
+
+  /**
    * Handle resize events
    * @param width New width of the scene
    * @param height New height of the scene
@@ -542,8 +838,8 @@ export class FieldScene extends Phaser.Scene {
     // Adjust camera bounds if needed
     if (this.cameras.main && this.gridSystem) {
       // Get the map dimensions in pixels
-      const mapWidth = this.gridSystem.getMapWidth() * this.gridSystem.getTileSize();
-      const mapHeight = this.gridSystem.getMapHeight() * this.gridSystem.getTileSize();
+      const mapWidth = this.gridSystem.getWidth() * this.gridSystem.getTileSize();
+      const mapHeight = this.gridSystem.getHeight() * this.gridSystem.getTileSize();
 
       // Set camera bounds to ensure the map is fully visible
       this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
@@ -554,12 +850,13 @@ export class FieldScene extends Phaser.Scene {
       const zoom = Math.min(zoomX, zoomY) * 0.9; // 90% to leave some margin
 
       // Don't zoom out too far or in too close
-      const clampedZoom = Phaser.Math.Clamp(zoom, 0.5, 2);
+      const clampedZoom = Phaser.Math.Clamp(Number(zoom), 0.5, 2);
       this.cameras.main.setZoom(clampedZoom);
 
       // Make sure the camera is still following the player
       if (this.player) {
-        this.cameras.main.startFollow(this.player.getSprite());
+        // The player is already a sprite, so we can follow it directly
+        this.cameras.main.startFollow(this.player);
       }
     }
 

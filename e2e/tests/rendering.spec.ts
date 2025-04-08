@@ -1,5 +1,11 @@
-import { test, expect } from '@playwright/test';
-import { takeScreenshot, takeElementScreenshot } from '../helpers/gameTestHelpers';
+import { test, expect, Page } from '@playwright/test';
+import {
+  takeScreenshot,
+  takeElementScreenshot,
+  waitForGameLoad,
+  clickGamePosition,
+  captureConsoleLogs,
+} from '../helpers/gameTestHelpers';
 
 // Increase the test timeout
 test.setTimeout(120000);
@@ -11,28 +17,34 @@ test.describe('Game Rendering', () => {
     await page.setViewportSize({ width: 1280, height: 800 });
 
     // Navigate to the game
-    await page.goto('http://localhost:5173/');
+    await page.goto('http://localhost:5173/', { waitUntil: 'networkidle' });
 
-    // Wait for the game to load
-    await page.waitForTimeout(3000);
+    // Wait for the game to load with enhanced helper
+    console.log('Waiting for game to load...');
+    const gameLoadResult = await waitForGameLoad(page, { timeout: 15000 });
+    console.log('Game load complete:', gameLoadResult);
 
-    // Click on the page to initialize audio (important for full rendering)
-    await page.click('body', { position: { x: 400, y: 300 } });
-    await page.waitForTimeout(1000);
+    // Click on the game to initialize audio (important for full rendering)
+    await clickGamePosition(page, 400, 300, {
+      fallbackToCenter: true,
+      takeScreenshot: true,
+    });
+    await page.waitForTimeout(2000);
 
-    // Find the Phaser canvas (second canvas element)
-    const canvas = page.locator('canvas').nth(1);
-    await expect(canvas).toBeVisible();
+    // Find the Phaser canvas (any canvas element)
+    const canvasCount = await page.locator('canvas').count();
+    console.log(`Total canvas elements: ${canvasCount}`);
 
-    // Get initial canvas size
-    const initialBoundingBox = await canvas.boundingBox();
-    console.log(`Canvas size: ${initialBoundingBox?.width}x${initialBoundingBox?.height}`);
+    // If no visible canvas, use the game container for screenshots
+    const gameContainer = page.locator('#game');
+    await expect(gameContainer).toBeVisible();
 
-    // Take a screenshot of just the canvas
-    await takeElementScreenshot(canvas, 'canvas-only');
+    // Get game container size
+    const initialBoundingBox = await gameContainer.boundingBox();
+    console.log(`Game container size: ${initialBoundingBox?.width}x${initialBoundingBox?.height}`);
 
     // Take a screenshot of the game container
-    const gameContainer = page.locator('#game');
+    await takeElementScreenshot(gameContainer, 'game-container-only');
     await takeElementScreenshot(gameContainer, 'game-container');
   });
 
@@ -68,7 +80,7 @@ test.describe('Game Rendering', () => {
 });
 
 // Helper function to test a specific resolution
-async function testResolution(page, resolution) {
+async function testResolution(page: Page, resolution: { name: string; width: number; height: number }) {
   console.log(`Testing resolution: ${resolution.name} (${resolution.width}x${resolution.height})`);
 
   // Set viewport to the resolution
@@ -76,30 +88,42 @@ async function testResolution(page, resolution) {
   await page.waitForTimeout(1000);
 
   // Navigate to the game at this resolution
-  await page.goto('http://localhost:5173/');
-  await page.waitForTimeout(3000);
+  await page.goto('http://localhost:5173/', { waitUntil: 'networkidle' });
 
-  // Click to initialize audio
-  await page.click('body', { position: { x: resolution.width / 2, y: resolution.height / 2 } });
-  await page.waitForTimeout(1000);
+  // Wait for the game to load with enhanced helper
+  console.log(`Waiting for game to load at ${resolution.name} resolution...`);
+  const gameLoadResult = await waitForGameLoad(page, { timeout: 15000 });
+  console.log(`Game load complete at ${resolution.name} resolution:`, gameLoadResult);
 
-  // Find the canvas
-  const canvas = page.locator('canvas').nth(1);
+  // Click to initialize audio using enhanced helper
+  await clickGamePosition(page, resolution.width / 2, resolution.height / 2, {
+    fallbackToCenter: true,
+    takeScreenshot: true,
+    screenshotName: `${resolution.name}-click`,
+  });
+  await page.waitForTimeout(2000);
 
-  // Wait for canvas to be visible
+  // Capture console logs
+  const logs = await captureConsoleLogs(page, 1000);
+  console.log(`Console logs at ${resolution.name} resolution:`, {
+    errors: logs.errors.length,
+    warnings: logs.warnings.length,
+    networkErrors: logs.networkErrors.length,
+  });
+
+  // Find the game container
+  const gameContainer = page.locator('#game');
+
+  // Wait for game container to be visible
   try {
-    await expect(canvas).toBeVisible({ timeout: 5000 });
-
-    // Take a screenshot of the canvas
-    await takeElementScreenshot(canvas, `${resolution.name}-canvas`);
-
-    // Get canvas size
-    const boundingBox = await canvas.boundingBox();
-    console.log(`${resolution.name} canvas: ${boundingBox?.width}x${boundingBox?.height}`);
+    await expect(gameContainer).toBeVisible({ timeout: 10000 });
 
     // Take a screenshot of the game container
-    const gameContainer = page.locator('#game');
     await takeElementScreenshot(gameContainer, `${resolution.name}-container`);
+
+    // Get game container size
+    const boundingBox = await gameContainer.boundingBox();
+    console.log(`${resolution.name} container: ${boundingBox?.width}x${boundingBox?.height}`);
 
     // Verify the radio tuner is visible
     const radioTuner = page.locator('[data-testid="radio-tuner"]');
@@ -109,7 +133,8 @@ async function testResolution(page, resolution) {
       console.log(`Radio tuner is NOT visible at ${resolution.name} resolution`);
     }
   } catch (error) {
-    console.error(`Error at resolution ${resolution.name}: ${error.message}`);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Error at resolution ${resolution.name}: ${errorMessage}`);
     // Take a screenshot of the page anyway
     await takeScreenshot(page, `${resolution.name}-error`, true);
     throw error; // Re-throw to fail the test

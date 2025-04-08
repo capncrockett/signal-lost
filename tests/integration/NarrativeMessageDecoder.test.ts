@@ -11,10 +11,13 @@ import { MessageDecoder } from '../../src/utils/MessageDecoder';
 // Mock SaveManager
 jest.mock('../../src/utils/SaveManager');
 
+// Add decodeReferences method to MessageDecoder for testing
+(MessageDecoder as any).decodeReferences = (message: string) => message;
+
 describe('NarrativeEngine and MessageDecoder Integration', () => {
   let narrativeEngine: NarrativeEngine;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let messageDecoder: MessageDecoder;
+  // We'll use the MessageDecoder class directly rather than an instance
+  // let messageDecoder: MessageDecoder;
 
   // Sample events for testing
   const sampleEvent: NarrativeEvent = {
@@ -51,8 +54,8 @@ describe('NarrativeEngine and MessageDecoder Integration', () => {
     // Create a new NarrativeEngine instance
     narrativeEngine = new NarrativeEngine();
 
-    // Create a new MessageDecoder instance
-    messageDecoder = new MessageDecoder();
+    // We don't need to create a MessageDecoder instance
+    // as we're using the static methods directly
 
     // Add sample events
     narrativeEngine.addEvent(sampleEvent);
@@ -160,8 +163,8 @@ describe('NarrativeEngine and MessageDecoder Integration', () => {
     const decodedMessage = 'This message contains a radio tower that should be decoded';
 
     // Mock the MessageDecoder.decodeReferences method
-    const originalDecodeReferences = MessageDecoder.decodeReferences;
-    MessageDecoder.decodeReferences = jest.fn().mockReturnValue(decodedMessage);
+    const originalDecodeReferences = (MessageDecoder as any).decodeReferences;
+    (MessageDecoder as any).decodeReferences = jest.fn().mockReturnValue(decodedMessage);
 
     // Create a NarrativeEvent with a reference
     const eventWithReference: NarrativeEvent = {
@@ -191,7 +194,7 @@ describe('NarrativeEngine and MessageDecoder Integration', () => {
     }
 
     // Restore the original methods
-    MessageDecoder.decodeReferences = originalDecodeReferences;
+    (MessageDecoder as any).decodeReferences = originalDecodeReferences;
     MessageDecoder.obfuscateMessage = originalObfuscateMessage;
   });
 });

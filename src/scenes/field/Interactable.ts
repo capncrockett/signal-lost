@@ -10,7 +10,7 @@ export class Interactable extends Phaser.GameObjects.Sprite {
   private id: string;
 
   // Type of interactable (tower, ruins, etc.)
-  private type: string;
+  private interactableType: string;
 
   // Grid position
   private gridX: number;
@@ -21,6 +21,12 @@ export class Interactable extends Phaser.GameObjects.Sprite {
 
   // Whether the interactable has been triggered
   private triggered: boolean = false;
+
+  // Whether the interactable has been discovered via radio signal
+  private discovered: boolean = false;
+
+  // Visual indicator for discovered interactables
+  private discoveryMarker: Phaser.GameObjects.Graphics | null = null;
 
   /**
    * Create a new interactable
@@ -47,7 +53,7 @@ export class Interactable extends Phaser.GameObjects.Sprite {
     super(scene, worldX, worldY, type);
 
     this.id = id;
-    this.type = type;
+    this.interactableType = type;
     this.gridX = gridX;
     this.gridY = gridY;
     this.triggerDistance = triggerDistance;
@@ -57,6 +63,9 @@ export class Interactable extends Phaser.GameObjects.Sprite {
 
     // Add pulsing effect
     this.createPulseEffect();
+
+    // Set depth to ensure visibility
+    this.setDepth(5);
   }
 
   /**
@@ -94,11 +103,8 @@ export class Interactable extends Phaser.GameObjects.Sprite {
     });
 
     // Add particle effect
-    const particles = this.scene.add.particles(this.type);
-
-    particles.createEmitter({
-      x: this.x,
-      y: this.y,
+    // Use a string key for particles
+    const particles = this.scene.add.particles(this.x, this.y, 'particle', {
       speed: { min: 20, max: 50 },
       angle: { min: 0, max: 360 },
       scale: { start: 0.5, end: 0 },
@@ -131,7 +137,7 @@ export class Interactable extends Phaser.GameObjects.Sprite {
    * Get the interactable's type
    */
   getType(): string {
-    return this.type;
+    return this.interactableType;
   }
 
   /**
@@ -153,5 +159,55 @@ export class Interactable extends Phaser.GameObjects.Sprite {
    */
   getTriggerDistance(): number {
     return this.triggerDistance;
+  }
+
+  /**
+   * Set whether the interactable has been discovered via radio signal
+   * @param discovered Whether the interactable has been discovered
+   */
+  setDiscovered(discovered: boolean): void {
+    this.discovered = discovered;
+
+    if (discovered) {
+      this.createDiscoveryMarker();
+    } else if (this.discoveryMarker) {
+      this.discoveryMarker.destroy();
+      this.discoveryMarker = null;
+    }
+  }
+
+  /**
+   * Check if the interactable has been discovered via radio signal
+   */
+  isDiscovered(): boolean {
+    return this.discovered;
+  }
+
+  /**
+   * Create a visual marker to indicate that this location was discovered via radio signal
+   */
+  private createDiscoveryMarker(): void {
+    // Remove existing marker if any
+    if (this.discoveryMarker) {
+      this.discoveryMarker.destroy();
+    }
+
+    // Create a new marker
+    this.discoveryMarker = this.scene.add.graphics();
+    this.discoveryMarker.setDepth(4); // Below the interactable
+
+    // Draw a circle
+    this.discoveryMarker.lineStyle(2, 0xffff00, 1);
+    this.discoveryMarker.strokeCircle(this.x, this.y, 20);
+
+    // Add a pulsing effect
+    this.scene.tweens.add({
+      targets: this.discoveryMarker,
+      alpha: 0.5,
+      duration: 1000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
   }
 }

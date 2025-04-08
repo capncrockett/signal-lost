@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 import { SaveManager } from '../utils/SaveManager';
 import { MessageDecoder } from '../utils/MessageDecoder';
 
@@ -68,15 +68,26 @@ export class NarrativeEngine {
   loadEvents(data: string): boolean {
     try {
       // Parse the data
-      const events = JSON.parse(data);
+      const events = JSON.parse(data) as unknown[];
+
+      // Validate that events is an array
 
       // Validate and add events
       if (Array.isArray(events)) {
         for (const event of events) {
-          this.addEvent(event);
+          if (this.isValidNarrativeEvent(event)) {
+            this.addEvent(event);
+          } else {
+            console.error('Invalid narrative event format:', event);
+          }
         }
       } else if (typeof events === 'object' && events !== null) {
-        this.addEvent(events);
+        if (this.isValidNarrativeEvent(events)) {
+          this.addEvent(events);
+        } else {
+          console.error('Invalid narrative event format:', events);
+          return false;
+        }
       } else {
         console.error('Invalid event data format');
         return false;
@@ -87,6 +98,39 @@ export class NarrativeEngine {
       console.error('Failed to parse event data:', error);
       return false;
     }
+  }
+
+  /**
+   * Validate if an object is a valid NarrativeEvent
+   * @param event The object to validate
+   * @returns True if the object is a valid NarrativeEvent
+   */
+  private isValidNarrativeEvent(event: unknown): event is NarrativeEvent {
+    if (!event || typeof event !== 'object') return false;
+
+    const e = event as Record<string, unknown>;
+
+    // Check required properties
+    if (typeof e.id !== 'string') return false;
+    if (typeof e.message !== 'string') return false;
+    if (!Array.isArray(e.choices)) return false;
+
+    // Check choices
+    for (const choice of e.choices as unknown[]) {
+      if (!choice || typeof choice !== 'object') return false;
+      const c = choice as Record<string, unknown>;
+      if (typeof c.text !== 'string') return false;
+      if (typeof c.outcome !== 'string') return false;
+      if (c.condition !== undefined && typeof c.condition !== 'string') return false;
+    }
+
+    // Check optional properties
+    if (e.condition !== undefined && typeof e.condition !== 'string') return false;
+    if (e.image !== undefined && typeof e.image !== 'string') return false;
+    if (e.audio !== undefined && typeof e.audio !== 'string') return false;
+    if (e.interference !== undefined && typeof e.interference !== 'number') return false;
+
+    return true;
   }
 
   /**
@@ -271,6 +315,17 @@ export class NarrativeEngine {
     // Try to save the value if it's a boolean
     if (typeof value === 'boolean') {
       SaveManager.setFlag(`var_${name}_value`, value);
+    }
+
+    // Handle special variables
+    if (name === 'discovered_tower1' && value === 'true') {
+      SaveManager.setFlag('discovered_tower1', true);
+      SaveManager.setData('location_tower1', { x: 10, y: 8 });
+      this.eventEmitter.emit('locationDiscovered', { id: 'tower1', x: 10, y: 8 });
+    } else if (name === 'discovered_ruins1' && value === 'true') {
+      SaveManager.setFlag('discovered_ruins1', true);
+      SaveManager.setData('location_ruins1', { x: 15, y: 12 });
+      this.eventEmitter.emit('locationDiscovered', { id: 'ruins1', x: 15, y: 12 });
     }
   }
 

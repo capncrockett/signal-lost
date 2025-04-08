@@ -1,5 +1,6 @@
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 import { AudioManager } from '../audio/AudioManager';
+import { SaveManager } from '../utils/SaveManager';
 
 interface VolumeControlConfig {
   width?: number;
@@ -97,13 +98,17 @@ export class VolumeControl extends Phaser.GameObjects.Container {
         this.config.width,
         this.config.height
       ),
-      Phaser.Geom.Rectangle.Contains
+      (hitArea: Phaser.Geom.Rectangle, x: number, y: number) => {
+        return Phaser.Geom.Rectangle.Contains(hitArea, x, y);
+      }
     );
 
     // Make the knob interactive and draggable
     this.knob.setInteractive(
       new Phaser.Geom.Circle(0, 0, this.config.height / 2 - 5),
-      Phaser.Geom.Circle.Contains
+      (hitArea: Phaser.Geom.Circle, x: number, y: number) => {
+        return Phaser.Geom.Circle.Contains(hitArea, x, y);
+      }
     );
   }
 
@@ -241,11 +246,17 @@ export class VolumeControl extends Phaser.GameObjects.Container {
    * @param volume Value between 0 (silent) and 1 (full volume)
    */
   public setVolume(volume: number): void {
+    // Clamp volume between 0 and 1 before applying curve
+    const clampedVolume = Math.max(0, Math.min(1, volume));
+
     // Apply volume curve for more natural adjustment
-    const curvedVolume = this.applyVolumeCurve(volume);
+    const curvedVolume = this.applyVolumeCurve(clampedVolume);
 
     // Update audio manager
     this.audioManager.setMasterVolume(curvedVolume);
+
+    // Save volume setting to persistent storage
+    SaveManager.setData('volume', clampedVolume);
 
     // Update display
     this.updateDisplay();

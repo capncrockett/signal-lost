@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { takeScreenshot } from '../helpers/gameTestHelpers';
+import { takeScreenshot, waitForGameLoad, captureConsoleLogs } from '../helpers/gameTestHelpers';
 
 test('Basic page load test with detailed diagnostics', async ({ page }) => {
   // Set up console log collection before navigation
@@ -37,10 +37,10 @@ test('Basic page load test with detailed diagnostics', async ({ page }) => {
   await page.goto('http://localhost:5173/', { waitUntil: 'networkidle' });
   console.log('Navigation complete');
 
-  // Wait for the page to load
-  console.log('Waiting for page to load...');
-  await page.waitForTimeout(2000);
-  console.log('Wait complete');
+  // Wait for the page to load with enhanced helper
+  console.log('Waiting for game to load...');
+  const gameLoadResult = await waitForGameLoad(page, { timeout: 15000 });
+  console.log('Game load complete:', gameLoadResult);
 
   // Check if the page title is correct
   const title = await page.title();
@@ -62,9 +62,13 @@ test('Basic page load test with detailed diagnostics', async ({ page }) => {
   // Check if the fallback canvas exists
   console.log('Checking fallback canvas...');
   const fallbackCanvas = page.locator('#fallback-canvas');
-  const fallbackCanvasBox = await fallbackCanvas.boundingBox();
-  console.log(`Fallback canvas bounding box:`, fallbackCanvasBox);
-  // Don't assert visibility as it may be hidden in some modes
+  // Don't wait for the bounding box as it might not exist
+  try {
+    const fallbackCanvasBox = await fallbackCanvas.boundingBox({ timeout: 1000 });
+    console.log(`Fallback canvas bounding box:`, fallbackCanvasBox);
+  } catch (error) {
+    console.log('Fallback canvas not found or not visible');
+  }
 
   // Check for any Phaser canvas
   console.log('Checking for Phaser canvas...');
@@ -80,10 +84,19 @@ test('Basic page load test with detailed diagnostics', async ({ page }) => {
   const newCanvasCount = await page.locator('canvas').count();
   console.log(`Canvas count after wait: ${newCanvasCount}`);
 
+  // Use enhanced console log capture
+  console.log('Capturing detailed console logs...');
+  const detailedLogs = await captureConsoleLogs(page, 2000);
+
   // Log the collected console messages for debugging
   console.log('Console logs count:', logs.length);
   console.log('Console errors count:', errors.length);
   console.log('Console warnings count:', warnings.length);
+
+  // Log detailed categorized errors
+  console.log('Audio errors:', detailedLogs.audioErrors.length);
+  console.log('Network errors:', detailedLogs.networkErrors.length);
+  console.log('Uncaught errors:', detailedLogs.uncaughtErrors.length);
 
   // If there are errors, log them in detail
   if (errors.length > 0) {

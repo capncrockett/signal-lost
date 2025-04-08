@@ -1,5 +1,7 @@
 import { VolumeControl } from '../../src/components/VolumeControl';
 import { AudioManager } from '../../src/audio/AudioManager';
+import { SaveManager } from '../../src/utils/SaveManager';
+// No unused imports
 
 // Mock the AudioManager
 jest.mock('../../src/audio/AudioManager', () => {
@@ -11,6 +13,18 @@ jest.mock('../../src/audio/AudioManager', () => {
         addVolumeChangeListener: jest.fn(),
         removeVolumeChangeListener: jest.fn(),
       }),
+    },
+  };
+});
+
+// Mock the SaveManager
+jest.mock('../../src/utils/SaveManager', () => {
+  return {
+    SaveManager: {
+      setData: jest.fn(),
+      getData: jest.fn(),
+      setFlag: jest.fn(),
+      getFlag: jest.fn(),
     },
   };
 });
@@ -333,5 +347,34 @@ describe('VolumeControl', () => {
 
     // Check that all listeners were notified
     expect(mockAudioManager.setMasterVolume).toHaveBeenCalledWith(expect.any(Number));
+  });
+
+  test('should handle volume clamping correctly', () => {
+    volumeControl = new VolumeControl(mockScene as any, 100, 100);
+
+    // Test setting volume below minimum (0)
+    volumeControl.setVolume(-0.5);
+    expect(mockAudioManager.setMasterVolume).toHaveBeenCalledWith(0);
+    expect(SaveManager.setData).toHaveBeenCalledWith('volume', 0);
+
+    // Reset mocks
+    mockAudioManager.setMasterVolume.mockClear();
+    (SaveManager.setData as jest.Mock).mockClear();
+
+    // Test setting volume above maximum (1)
+    volumeControl.setVolume(1.5);
+    expect(mockAudioManager.setMasterVolume).toHaveBeenCalledWith(1);
+    expect(SaveManager.setData).toHaveBeenCalledWith('volume', 1);
+  });
+
+  // Skipping this test as toggleMute method is not implemented yet
+  test.skip('should handle mute/unmute correctly', () => {
+    volumeControl = new VolumeControl(mockScene as any, 100, 100);
+
+    // Mock the current volume
+    mockAudioManager.getMasterVolume.mockReturnValue(0.8);
+
+    // This test is skipped until the toggleMute method is implemented
+    // in the VolumeControl component
   });
 });

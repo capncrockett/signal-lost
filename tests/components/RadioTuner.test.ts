@@ -106,6 +106,10 @@ const mockScene = {
       fillRoundedRect: jest.fn().mockReturnThis(),
       fillRect: jest.fn().mockReturnThis(),
       fillCircle: jest.fn().mockReturnThis(),
+      lineStyle: jest.fn().mockReturnThis(),
+      strokeRoundedRect: jest.fn().mockReturnThis(),
+      strokeRect: jest.fn().mockReturnThis(),
+      strokeCircle: jest.fn().mockReturnThis(),
       setInteractive: jest.fn().mockReturnThis(),
       on: jest.fn(),
       x: 0,
@@ -256,7 +260,11 @@ describe('RadioTuner', () => {
     const sliderClickHandler = jest.fn();
 
     // Mock the slider object
-    const mockSlider = {
+    interface MockSlider {
+      on: jest.Mock;
+    }
+
+    const mockSlider: MockSlider = {
       on: jest.fn().mockImplementation((event, handler) => {
         if (event === 'pointerdown') {
           sliderClickHandler.mockImplementation(handler);

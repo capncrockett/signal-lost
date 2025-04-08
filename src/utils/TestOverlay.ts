@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import * as Phaser from 'phaser';
 
 // Define types for game objects to avoid 'any' warnings
 type PhaserGameObject = Phaser.GameObjects.GameObject;
@@ -19,7 +19,7 @@ export class TestOverlay {
    */
   static createOverlay(
     scene: Phaser.Scene,
-    gameObject: PhaserGameObject,
+    gameObject: PhaserGameObject | null,
     testId: string,
     clickHandler?: () => void
   ): HTMLElement {
@@ -28,6 +28,15 @@ export class TestOverlay {
     if (!canvas || !canvas.parentElement) {
       console.error('Canvas or parent element not found');
       return document.createElement('div');
+    }
+
+    // Handle null gameObject
+    if (!gameObject) {
+      console.warn(`Creating test overlay for null gameObject with testId: ${testId}`);
+      // Create a fallback element in the center of the screen
+      const fallbackObject = scene.add.rectangle(400, 300, 100, 50, 0x000000, 0);
+      fallbackObject.setName(`fallback-${testId}`);
+      gameObject = fallbackObject;
     }
 
     // Create overlay element
@@ -40,7 +49,9 @@ export class TestOverlay {
     overlay.style.pointerEvents = 'all';
     overlay.style.userSelect = 'none';
     overlay.style.touchAction = 'none';
-    overlay.style.webkitTapHighlightColor = 'transparent';
+    // Using unknown as an intermediate step to avoid any
+    const extendedStyle = overlay.style as unknown as { webkitTapHighlightColor: string };
+    extendedStyle.webkitTapHighlightColor = 'transparent';
 
     // Add a small indicator in development mode to show the test overlay
     if (process.env.NODE_ENV !== 'production') {
@@ -54,7 +65,7 @@ export class TestOverlay {
     this.updateOverlayPosition(scene, gameObject, overlay);
 
     // Add click handler with multiple event types for better reliability
-    const handleClick = (e: Event) => {
+    const handleClick = (e: Event): void => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -97,12 +108,12 @@ export class TestOverlay {
    */
   private static updateOverlayPosition(
     scene: Phaser.Scene,
-    gameObject: PhaserGameObject,
+    gameObject: PhaserGameObject | null,
     overlay: HTMLElement
   ): void {
     // Get the game canvas
     const canvas = scene.sys.game.canvas;
-    if (!canvas) return;
+    if (!canvas || !gameObject) return;
 
     // Get the bounds of the game object
     let bounds: Phaser.Geom.Rectangle;
@@ -130,13 +141,13 @@ export class TestOverlay {
       bounds = (gameObject as WithBounds).getBounds();
     } else if ('width' in gameObject && 'height' in gameObject) {
       // For objects with width and height properties
-      const obj = gameObject as WithDimensions;
+      const obj = gameObject as unknown as WithDimensions;
       const x = obj.x - obj.width * (obj.originX || 0);
       const y = obj.y - obj.height * (obj.originY || 0);
       bounds = new Phaser.Geom.Rectangle(x, y, obj.width, obj.height);
     } else {
       // Fallback for other objects - create a small clickable area
-      const obj = gameObject as WithPosition;
+      const obj = gameObject as unknown as WithPosition;
       const x = obj.x || 0;
       const y = obj.y || 0;
       bounds = new Phaser.Geom.Rectangle(x - 25, y - 25, 50, 50);
