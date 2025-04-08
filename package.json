@@ -13,6 +13,7 @@
     "test:e2e:ci": "cross-env CI=true playwright test",
     "test:e2e:report": "playwright test",
     "test:e2e:show-report": "playwright show-report",
+    "cleanup:screenshots": "powershell -File scripts/cleanup-screenshots.ps1",
     "test:visual": "playwright test --config=playwright.visual.config.ts",
     "test:visual:update": "cross-env UPDATE_SNAPSHOTS=true playwright test --config=playwright.visual.config.ts",
     "test:visual:report": "playwright test --config=playwright.visual.config.ts --reporter=html && playwright show-report",
@@ -27,7 +28,7 @@
     "type-check": "tsc --noEmit",
     "unused-check": "tsc --noEmit --noUnusedLocals --noUnusedParameters",
     "lint:tests": "eslint tests/**/*.ts e2e/**/*.ts --max-warnings=0",
-    "check-all": "npm run lint && npm run lint:tests && npm run type-check && npm run unused-check && npm run test && npm run test:e2e:ci"
+    "check-all": "npm run lint && npm run lint:tests && npm run type-check && npm run unused-check && npm run test && npm run cleanup:screenshots && npm run test:e2e:ci"
   },
   "keywords": [
     "game",
