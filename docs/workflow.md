@@ -4,7 +4,7 @@
 
 ## Pre-coding Checklist
 
-1. Pull latest changes from the `rewrite-dom-approach` branch
+1. Pull latest changes from the `develop` branch
 2. Install/update dependencies: `npm install`
 3. Start dev server: `npm run dev`
 4. Open separate terminal for continuous testing: `npm test -- --watch`
@@ -12,6 +12,7 @@
 ## Component Development Workflow
 
 1. **Plan the component**:
+   - Review the current sprint document for requirements
    - Define props and state requirements
    - Sketch the component structure
    - Identify potential reusable sub-components
@@ -37,6 +38,7 @@
    - Add JSDoc comments
    - Update component documentation
    - Add usage examples if needed
+   - Update sprint document with progress
 
 ## Testing Approach
 
@@ -171,11 +173,12 @@ export function useGameState() {
 
 ## Development Priorities
 
-1. **Component Architecture**: Focus on creating a clean, maintainable component structure
-2. **Accessibility**: Ensure the game is accessible to all users
-3. **Test Coverage**: Maintain high test coverage for all components
-4. **Type Safety**: Use TypeScript effectively to prevent bugs
-5. **Performance**: Optimize rendering and state updates
+1. **Sprint Goals**: Focus on completing the current sprint objectives
+2. **Component Architecture**: Create a clean, maintainable component structure
+3. **Accessibility**: Ensure the game is accessible to all users
+4. **Test Coverage**: Maintain high test coverage for all components
+5. **Type Safety**: Use TypeScript effectively to prevent bugs
+6. **Performance**: Optimize rendering and state updates
 
 ## TypeScript Best Practices
 
