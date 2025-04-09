@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
-import { Signal, SignalState, initialSignalState } from '../types/signal';
+import { initialSignalState } from '../types/signal';
+import { Signal, SignalState } from '../types/signal.d';
 
 // Define action types for signal state management
 type SignalActionType =
