@@ -8,6 +8,7 @@ import {
 } from '../../data/frequencies';
 import { getMessage } from '../../data/messages';
 import MessageDisplay from '../narrative/MessageDisplay';
+import { NoiseType } from '../../audio/NoiseType';
 import './RadioTuner.css';
 
 interface RadioTunerProps {
@@ -32,7 +33,9 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
   const [currentSignalId, setCurrentSignalId] = useState<string | null>(null);
   const [showMessage, setShowMessage] = useState<boolean>(false);
   const [staticIntensity, setStaticIntensity] = useState<number>(0.5);
+  const [isScanning, setIsScanning] = useState<boolean>(false);
   const staticCanvasRef = useRef<HTMLCanvasElement>(null);
+  const scanIntervalRef = useRef<number | null>(null);
 
   // Update frequency when dragging the dial
   const handleMouseDown = (): void => {
@@ -205,6 +208,38 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
     setShowMessage(!showMessage);
   };
 
+  // Toggle frequency scanning
+  const toggleScanning = (): void => {
+    if (isScanning) {
+      // Stop scanning
+      setIsScanning(false);
+      if (scanIntervalRef.current !== null) {
+        window.clearInterval(scanIntervalRef.current);
+        scanIntervalRef.current = null;
+      }
+    } else {
+      // Start scanning
+      setIsScanning(true);
+      scanIntervalRef.current = window.setInterval(() => {
+        // Increment frequency by 0.1 MHz
+        setFrequency((prev) => {
+          const newFreq = prev + 0.1;
+          // If we reach the max frequency, loop back to min
+          return newFreq > maxFrequency ? minFrequency : newFreq;
+        });
+      }, 300); // Scan speed in milliseconds
+    }
+  };
+
+  // Clean up interval on unmount
+  useEffect(() => {
+    return () => {
+      if (scanIntervalRef.current !== null) {
+        window.clearInterval(scanIntervalRef.current);
+      }
+    };
+  }, []);
+
   // Get the current message
   const currentMessage = currentSignalId ? getMessage(currentSignalId) : undefined;
 
@@ -214,16 +249,35 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
 
     switch (e.key) {
       case 'ArrowLeft':
-        setFrequency((prev): number => Math.max(minFrequency, prev - 0.1));
+        if (!isScanning) {
+          setFrequency((prev): number => Math.max(minFrequency, prev - 0.1));
+        }
         break;
       case 'ArrowRight':
-        setFrequency((prev): number => Math.min(maxFrequency, prev + 0.1));
+        if (!isScanning) {
+          setFrequency((prev): number => Math.min(maxFrequency, prev + 0.1));
+        }
         break;
       case 'ArrowDown':
-        setFrequency((prev): number => Math.max(minFrequency, prev - 1.0));
+        if (!isScanning) {
+          setFrequency((prev): number => Math.max(minFrequency, prev - 1.0));
+        }
         break;
       case 'ArrowUp':
-        setFrequency((prev): number => Math.min(maxFrequency, prev + 1.0));
+        if (!isScanning) {
+          setFrequency((prev): number => Math.min(maxFrequency, prev + 1.0));
+        }
+        break;
+      case 's':
+      case 'S':
+        // Toggle scanning with 's' key
+        toggleScanning();
+        break;
+      case 'Escape':
+        // Stop scanning with Escape key
+        if (isScanning) {
+          toggleScanning();
+        }
         break;
       default:
         break;
@@ -278,6 +332,21 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
             {audio.isMuted ? 'Unmute' : 'Mute'}
           </button>
         </div>
+
+        <div className="noise-type-control">
+          <label htmlFor="noise-type-select">Noise Type</label>
+          <select
+            id="noise-type-select"
+            value={audio.currentNoiseType}
+            onChange={(e) => audio.setNoiseType(e.target.value as NoiseType)}
+            disabled={!state.isRadioOn}
+            aria-label="Select noise type"
+          >
+            <option value={NoiseType.Pink}>Pink Noise</option>
+            <option value={NoiseType.White}>White Noise</option>
+            <option value={NoiseType.Brown}>Brown Noise</option>
+          </select>
+        </div>
       </div>
 
       {/* Static visualization canvas */}
@@ -330,7 +399,7 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
       <div className="tuner-controls">
         <button
           className="tune-button decrease"
-          disabled={!state.isRadioOn}
+          disabled={!state.isRadioOn || isScanning}
           onClick={() => setFrequency((prev) => Math.max(minFrequency, prev - 0.1))}
           aria-label="Decrease frequency by 0.1 MHz"
         >
@@ -338,11 +407,19 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
         </button>
         <button
           className="tune-button increase"
-          disabled={!state.isRadioOn}
+          disabled={!state.isRadioOn || isScanning}
           onClick={() => setFrequency((prev) => Math.min(maxFrequency, prev + 0.1))}
           aria-label="Increase frequency by 0.1 MHz"
         >
           +0.1
+        </button>
+        <button
+          className={`scan-button ${isScanning ? 'scanning' : ''}`}
+          disabled={!state.isRadioOn}
+          onClick={() => toggleScanning()}
+          aria-label={isScanning ? 'Stop scanning' : 'Start scanning for signals'}
+        >
+          {isScanning ? 'Stop Scan' : 'Scan'}
         </button>
       </div>
 

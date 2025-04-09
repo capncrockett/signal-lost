@@ -133,4 +133,98 @@ describe('RadioTuner Component', () => {
     fireEvent.click(muteButton);
     expect(screen.getByText('Unmute')).toBeInTheDocument();
   });
+
+  test('toggles scanning mode', () => {
+    // Mock window.setInterval and window.clearInterval
+    const originalSetInterval = window.setInterval;
+    const originalClearInterval = window.clearInterval;
+    window.setInterval = jest.fn().mockReturnValue(123);
+    window.clearInterval = jest.fn();
+
+    renderWithProviders(<RadioTuner initialFrequency={90.0} />);
+
+    // Turn on the radio first
+    const powerButton = screen.getByText('OFF');
+    fireEvent.click(powerButton);
+
+    // Find the scan button
+    const scanButton = screen.getByText('Scan');
+    expect(scanButton).toBeInTheDocument();
+
+    // Start scanning
+    fireEvent.click(scanButton);
+    expect(screen.getByText('Stop Scan')).toBeInTheDocument();
+    expect(window.setInterval).toHaveBeenCalled();
+
+    // Stop scanning
+    fireEvent.click(screen.getByText('Stop Scan'));
+    expect(screen.getByText('Scan')).toBeInTheDocument();
+    expect(window.clearInterval).toHaveBeenCalled();
+
+    // Restore original functions
+    window.setInterval = originalSetInterval;
+    window.clearInterval = originalClearInterval;
+  });
+
+  test('changes noise type', () => {
+    renderWithProviders(<RadioTuner />);
+
+    // Turn on the radio first
+    const powerButton = screen.getByText('OFF');
+    fireEvent.click(powerButton);
+
+    // Find the noise type selector
+    const noiseTypeSelect = screen.getByLabelText('Select noise type');
+    expect(noiseTypeSelect).toBeInTheDocument();
+
+    // Change noise type to White Noise
+    fireEvent.change(noiseTypeSelect, { target: { value: 'white' } });
+
+    // Change noise type to Brown Noise
+    fireEvent.change(noiseTypeSelect, { target: { value: 'brown' } });
+  });
+
+  test('keyboard controls work', () => {
+    // Mock window.setInterval and window.clearInterval
+    const originalSetInterval = window.setInterval;
+    const originalClearInterval = window.clearInterval;
+    window.setInterval = jest.fn().mockReturnValue(123);
+    window.clearInterval = jest.fn();
+
+    renderWithProviders(<RadioTuner initialFrequency={95.0} />);
+
+    // Turn on the radio first
+    const powerButton = screen.getByText('OFF');
+    fireEvent.click(powerButton);
+
+    // Get the radio tuner element
+    const radioTuner = screen.getByTestId('radio-tuner');
+
+    // Test arrow keys
+    fireEvent.keyDown(radioTuner, { key: 'ArrowRight' });
+    expect(screen.getByText('95.1')).toBeInTheDocument();
+
+    fireEvent.keyDown(radioTuner, { key: 'ArrowLeft' });
+    expect(screen.getByText('95.0')).toBeInTheDocument();
+
+    fireEvent.keyDown(radioTuner, { key: 'ArrowUp' });
+    expect(screen.getByText('96.0')).toBeInTheDocument();
+
+    fireEvent.keyDown(radioTuner, { key: 'ArrowDown' });
+    expect(screen.getByText('95.0')).toBeInTheDocument();
+
+    // Test 's' key for scanning
+    fireEvent.keyDown(radioTuner, { key: 's' });
+    expect(screen.getByText('Stop Scan')).toBeInTheDocument();
+    expect(window.setInterval).toHaveBeenCalled();
+
+    // Test Escape key to stop scanning
+    fireEvent.keyDown(radioTuner, { key: 'Escape' });
+    expect(screen.getByText('Scan')).toBeInTheDocument();
+    expect(window.clearInterval).toHaveBeenCalled();
+
+    // Restore original functions
+    window.setInterval = originalSetInterval;
+    window.clearInterval = originalClearInterval;
+  });
 });
