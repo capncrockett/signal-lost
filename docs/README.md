@@ -12,9 +12,11 @@ This directory contains documentation for the Signal Lost game project.
 
 ### Project Documentation
 - [Todo List](./todo.md): Overall project tasks and status
-- [Workflow](./workflow.md): Development workflow and practices
+- [Workflow](./workflow.md): Development workflow and agent collaboration practices
+- [Contributing](../CONTRIBUTING.md): Contribution guidelines and agent-specific workflows
+- [Sprint Planning](./sprint-planning.md): Sprint structure and agent coordination
 - [Tests](./tests.md): Testing approach and guidelines
-- [Audio System Architecture](./audio-system-architecture.md): Audio system design
+- [Contract Validation](./contract-validation.md): Interface contract validation between agents
 
 ### Technical Documentation
 - [Debugging Guide](./debugging-guide.md): Debugging tips and tools
@@ -27,6 +29,12 @@ The `archive` directory contains older documentation that is kept for reference:
 - Previous sprint documents
 - Deprecated design documents
 - Historical notes
+
+## Agent Collaboration
+- Alpha and Beta agents work in parallel
+- Interface contracts ensure smooth integration
+- Structured conflict resolution process
+- Daily synchronization with develop branch
 
 ## Documentation Conventions
 
@@ -44,3 +52,4 @@ When updating documentation:
 3. Update the README.md with any new documentation files
 4. Ensure all links remain valid
 5. Maintain consistent formatting and style
+

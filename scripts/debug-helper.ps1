@@ -82,6 +82,34 @@ function Start-DevEnvironment {
     Write-Host "- Tests are running in watch mode" -ForegroundColor Green
 }
 
+# Function to check other agent's work
+function Check-OtherAgentWork {
+    param (
+        [string]$agentType
+    )
+    
+    $otherAgent = if ($agentType -eq "alpha") { "beta" } else { "alpha" }
+    Write-Host "Checking $otherAgent agent's work..." -ForegroundColor Cyan
+    
+    # Fetch latest
+    git fetch origin
+    
+    # List other agent's branches
+    $branches = git branch -r | Select-String "feature/$otherAgent/"
+    
+    foreach ($branch in $branches) {
+        Write-Host "Checking branch: $branch" -ForegroundColor Yellow
+        git checkout $branch
+        npm run check-all
+    }
+}
+
+# Function to start contract validation
+function Start-ContractValidation {
+    Write-Host "Running contract validation..." -ForegroundColor Cyan
+    npm run dev:validate-contracts
+}
+
 # Display menu
 function Show-Menu {
     Clear-Host
@@ -96,6 +124,8 @@ function Show-Menu {
     Write-Host "7. Run linting" -ForegroundColor Cyan
     Write-Host "8. Run all checks" -ForegroundColor Cyan
     Write-Host "9. Start complete development environment" -ForegroundColor Green
+    Write-Host "10. Check other agent's work" -ForegroundColor Cyan
+    Write-Host "11. Start contract validation" -ForegroundColor Cyan
     Write-Host
     Write-Host "0. Exit" -ForegroundColor Red
     Write-Host
@@ -112,6 +142,13 @@ function Show-Menu {
         "7" { Run-Linting; pause; Show-Menu }
         "8" { Run-AllChecks; pause; Show-Menu }
         "9" { Start-DevEnvironment; pause; Show-Menu }
+        "10" {
+            $agentType = Read-Host "Enter agent type (alpha/beta):"
+            Check-OtherAgentWork -agentType $agentType
+            pause
+            Show-Menu
+        }
+        "11" { Start-ContractValidation; pause; Show-Menu }
         "0" { return }
         default { Write-Host "Invalid choice. Press any key to continue..."; pause; Show-Menu }
     }
