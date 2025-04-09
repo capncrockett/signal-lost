@@ -19,11 +19,21 @@ interface MouseClickOptions {
   screenshotName?: string;
 }
 
+// Configuration for screenshots
+const SCREENSHOT_CONFIG = {
+  enabled: process.env.TAKE_SCREENSHOTS !== 'false', // Enable screenshots by default, disable with TAKE_SCREENSHOTS=false
+  maxPerTest: 3, // Maximum screenshots per test
+  directory: path.join(process.cwd(), 'e2e', 'screenshots'),
+};
+
 // Ensure the screenshots directory exists
-const screenshotsDir = path.join(process.cwd(), 'e2e', 'screenshots');
+const screenshotsDir = SCREENSHOT_CONFIG.directory;
 if (!fs.existsSync(screenshotsDir)) {
   fs.mkdirSync(screenshotsDir, { recursive: true });
 }
+
+// Track screenshots taken per test
+const screenshotCounts: Record<string, number> = {};
 
 /**
  * Helper functions for testing games programmatically
@@ -40,9 +50,34 @@ export async function takeScreenshot(
   page: Page,
   name: string,
   fullPage: boolean = false
-): Promise<string> {
+): Promise<string | null> {
+  // Check if screenshots are enabled
+  if (!SCREENSHOT_CONFIG.enabled) {
+    console.log(`Screenshots disabled, skipping screenshot: ${name}`);
+    return null;
+  }
+
+  // Extract test name from the screenshot name (before the first hyphen)
+  const testName = name.split('-')[0];
+
+  // Initialize counter for this test if not exists
+  if (!screenshotCounts[testName]) {
+    screenshotCounts[testName] = 0;
+  }
+
+  // Increment counter
+  screenshotCounts[testName]++;
+
+  // Check if we've exceeded the maximum screenshots for this test
+  if (screenshotCounts[testName] > SCREENSHOT_CONFIG.maxPerTest) {
+    console.log(`Maximum screenshots reached for test ${testName}, skipping screenshot: ${name}`);
+    return null;
+  }
+
+  // Take the screenshot
   const screenshotPath = path.join(screenshotsDir, `${name}.png`);
   await page.screenshot({ path: screenshotPath, fullPage });
+  console.log(`Screenshot saved: ${screenshotPath}`);
   return screenshotPath;
 }
 
@@ -52,9 +87,36 @@ export async function takeScreenshot(
  * @param name Name of the screenshot (without extension)
  * @returns Path to the saved screenshot
  */
-export async function takeElementScreenshot(element: any, name: string): Promise<string> {
+export async function takeElementScreenshot(element: any, name: string): Promise<string | null> {
+  // Check if screenshots are enabled
+  if (!SCREENSHOT_CONFIG.enabled) {
+    console.log(`Screenshots disabled, skipping element screenshot: ${name}`);
+    return null;
+  }
+
+  // Extract test name from the screenshot name (before the first hyphen)
+  const testName = name.split('-')[0];
+
+  // Initialize counter for this test if not exists
+  if (!screenshotCounts[testName]) {
+    screenshotCounts[testName] = 0;
+  }
+
+  // Increment counter
+  screenshotCounts[testName]++;
+
+  // Check if we've exceeded the maximum screenshots for this test
+  if (screenshotCounts[testName] > SCREENSHOT_CONFIG.maxPerTest) {
+    console.log(
+      `Maximum screenshots reached for test ${testName}, skipping element screenshot: ${name}`
+    );
+    return null;
+  }
+
+  // Take the screenshot
   const screenshotPath = path.join(screenshotsDir, `${name}.png`);
   await element.screenshot({ path: screenshotPath });
+  console.log(`Element screenshot saved: ${screenshotPath}`);
   return screenshotPath;
 }
 
@@ -146,7 +208,7 @@ export async function clickGamePosition(
 
       // Take a screenshot if requested
       if (options?.takeScreenshot) {
-        await takeScreenshot(page, 'click-error', true);
+        await takeScreenshot(page, options?.screenshotName || 'click-error', true);
       }
 
       // Try clicking in the center of the page if fallback is enabled
@@ -175,7 +237,7 @@ export async function clickGamePosition(
 
     // Take a screenshot if requested
     if (options?.takeScreenshot) {
-      await takeScreenshot(page, 'click-error', true);
+      await takeScreenshot(page, options?.screenshotName || 'click-error', true);
     }
 
     return false;

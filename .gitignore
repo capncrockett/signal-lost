@@ -30,6 +30,9 @@ coverage
 /playwright-report/
 /playwright/.cache/
 
-# Keep screenshots
-!e2e-screenshots/
-!*.png
+# Screenshots
+e2e/screenshots/**/*.png
+e2e/screenshots/*.png
+
+# Screenshot backups
+e2e/screenshots-backup*/

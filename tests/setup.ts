@@ -1,248 +1,143 @@
-// Mock Phaser globally with more complete implementation
-global.Phaser = {
-  Scene: class Scene {
-    add = {
-      existing: jest.fn().mockReturnThis(),
-    };
-    input = {
-      setDraggable: jest.fn(),
-      on: jest.fn(),
-    };
-    cameras = {
-      main: {
-        scrollX: 0,
-      },
-    };
-  },
-  GameObjects: {
-    Container: class Container {
-      x = 0;
-      y = 0;
-      scene: any;
-
-      constructor(scene: any, x: number, y: number) {
-        this.scene = scene;
-        this.x = x;
-        this.y = y;
-      }
-
-      on = jest.fn().mockReturnThis();
-      emit = jest.fn().mockReturnThis();
-      add = jest.fn().mockReturnThis();
-      destroy = jest.fn();
-    },
-    Image: class Image {},
-    Graphics: class Graphics {
-      x = 0;
-      y = 0;
-      scene: any;
-
-      constructor(scene: any, _options?: any) {
-        this.scene = scene;
-      }
-
-      fillStyle = jest.fn().mockReturnThis();
-      fillRoundedRect = jest.fn().mockReturnThis();
-      fillRect = jest.fn().mockReturnThis();
-      fillCircle = jest.fn().mockReturnThis();
-      setInteractive = jest.fn().mockReturnThis();
-      on = jest.fn().mockReturnThis();
-    },
-    Text: class Text {
-      x = 0;
-      y = 0;
-      scene: any;
-      text: string;
-
-      constructor(scene: any, x: number, y: number, text: string, _style?: any) {
-        this.scene = scene;
-        this.x = x;
-        this.y = y;
-        this.text = text;
-      }
-
-      setOrigin = jest.fn().mockReturnThis();
-      setText = jest.fn().mockReturnThis();
-    },
-  },
-  Input: {
-    Keyboard: {
-      KeyCodes: {},
-    },
-  },
-  Events: {
-    EventEmitter: class EventEmitter {
-      on = jest.fn().mockReturnThis();
-      emit = jest.fn().mockReturnThis();
-    },
-  },
-  Math: {
-    Clamp: (value: number, min: number, max: number) => Math.min(Math.max(value, min), max),
-  },
-  Geom: {
-    Circle: class Circle {
-      constructor(_x?: number, _y?: number, _radius?: number) {}
-      static Contains = jest.fn().mockReturnValue(true);
-    },
-    Rectangle: class Rectangle {
-      constructor(_x?: number, _y?: number, _width?: number, _height?: number) {}
-      static Contains = jest.fn().mockReturnValue(true);
-    },
-  },
-} as any;
-
-// Mock Audio Context
-class MockAudioContext {
-  destination = {};
-  sampleRate = 44100;
-  currentTime = 0;
-  state = 'running';
-
-  createGain() {
-    return {
-      connect: jest.fn(),
-      disconnect: jest.fn(),
-      gain: {
+// Mock the Tone.js library
+jest.mock('tone', () => {
+  return {
+    Destination: {
+      volume: {
         value: 0,
-        setTargetAtTime: jest.fn(),
-        linearRampToValueAtTime: jest.fn(),
-        exponentialRampToValueAtTime: jest.fn(),
       },
-    };
-  }
+    },
+    Noise: jest.fn().mockImplementation(() => {
+      return {
+        connect: jest.fn().mockReturnThis(),
+        start: jest.fn(),
+        stop: jest.fn(),
+        dispose: jest.fn(),
+      };
+    }),
+    Oscillator: jest.fn().mockImplementation(() => {
+      return {
+        connect: jest.fn().mockReturnThis(),
+        start: jest.fn(),
+        stop: jest.fn(),
+        dispose: jest.fn(),
+      };
+    }),
+    Filter: jest.fn().mockImplementation(() => {
+      return {
+        toDestination: jest.fn().mockReturnThis(),
+        dispose: jest.fn(),
+      };
+    }),
+    gainToDb: jest.fn().mockImplementation((gain) => gain * 20),
+  };
+});
 
-  createBuffer(_numChannels: number, length: number, _sampleRate: number) {
-    return {
-      getChannelData: () => new Float32Array(length),
-    };
-  }
+// Mock the window.matchMedia
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // Deprecated
+    removeListener: jest.fn(), // Deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
 
-  createBufferSource() {
-    return {
-      connect: jest.fn(),
-      start: jest.fn(),
-      stop: jest.fn(),
-      disconnect: jest.fn(),
-      buffer: null,
-      loop: false,
-    };
-  }
+// Mock the ResizeObserver
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
 
-  createBiquadFilter() {
-    return {
-      connect: jest.fn(),
-      disconnect: jest.fn(),
-      frequency: {
-        value: 0,
-        setTargetAtTime: jest.fn(),
-      },
-      Q: { value: 0 },
-      type: '',
-    };
-  }
+// Mock the AudioContext
+window.AudioContext = jest.fn().mockImplementation(() => {
+  return {
+    createOscillator: jest.fn().mockImplementation(() => {
+      return {
+        connect: jest.fn(),
+        start: jest.fn(),
+        stop: jest.fn(),
+        frequency: {
+          setValueAtTime: jest.fn(),
+        },
+      };
+    }),
+    createGain: jest.fn().mockImplementation(() => {
+      return {
+        connect: jest.fn(),
+        gain: {
+          setValueAtTime: jest.fn(),
+        },
+      };
+    }),
+    destination: {},
+    currentTime: 0,
+  };
+});
 
-  createOscillator() {
-    return {
-      frequency: {
-        value: 0,
-        setTargetAtTime: jest.fn(),
-      },
-      type: 'sine',
-      connect: jest.fn(),
-      disconnect: jest.fn(),
-      start: jest.fn(),
-      stop: jest.fn(),
-    };
-  }
-
-  createStereoPanner() {
-    return {
-      pan: {
-        value: 0,
-        setTargetAtTime: jest.fn(),
-      },
-      connect: jest.fn(),
-      disconnect: jest.fn(),
-    };
-  }
-
-  createAnalyser() {
-    return {
-      fftSize: 2048,
-      frequencyBinCount: 1024,
-      getByteFrequencyData: jest.fn(),
-      getByteTimeDomainData: jest.fn(),
-      connect: jest.fn(),
-      disconnect: jest.fn(),
-    };
-  }
-
-  resume() {
-    return Promise.resolve();
-  }
-
-  suspend() {
-    return Promise.resolve();
-  }
-
-  close() {
-    return Promise.resolve();
-  }
-}
-
-// Add webkitAudioContext to Window interface in a separate file to avoid TypeScript error
-// This would normally go in a global.d.ts file
-
-global.AudioContext = MockAudioContext as any;
-global.window = global.window || {};
-global.window.AudioContext = MockAudioContext as any;
-// Use type assertion to avoid TypeScript error
-global.window.webkitAudioContext = MockAudioContext as any;
-
-// Mock document for TestOverlay tests
-class MockElement {
-  style: Record<string, string> = {};
-  parentElement: MockElement | null = null;
-  children: MockElement[] = [];
-  innerHTML: string = '';
-
-  setAttribute(name: string, value: string): void {
-    (this as any)[name] = value;
-  }
-
-  getAttribute(name: string): string | null {
-    return (this as any)[name] || null;
-  }
-
-  appendChild(child: MockElement): MockElement {
-    this.children.push(child);
-    child.parentElement = this;
-    return child;
-  }
-
-  removeChild(child: MockElement): MockElement {
-    const index = this.children.indexOf(child);
-    if (index !== -1) {
-      this.children.splice(index, 1);
-      child.parentElement = null;
-    }
-    return child;
-  }
-
-  addEventListener(_type: string, _listener: EventListener): void {}
-  dispatchEvent(_event: Event): boolean {
-    return true;
-  }
-}
-
-class MockDocument extends MockElement {
-  createElement(_tagName: string): MockElement {
-    return new MockElement();
-  }
-
-  querySelectorAll(_selector: string): MockElement[] {
-    return [];
-  }
-}
-
-global.document = new MockDocument() as any;
+// Mock the canvas context
+HTMLCanvasElement.prototype.getContext = jest.fn().mockImplementation(() => {
+  return {
+    fillRect: jest.fn(),
+    clearRect: jest.fn(),
+    getImageData: jest.fn().mockReturnValue({
+      data: new Array(4),
+    }),
+    putImageData: jest.fn(),
+    createImageData: jest.fn().mockReturnValue([]),
+    setTransform: jest.fn(),
+    drawImage: jest.fn(),
+    save: jest.fn(),
+    restore: jest.fn(),
+    scale: jest.fn(),
+    rotate: jest.fn(),
+    translate: jest.fn(),
+    transform: jest.fn(),
+    fillText: jest.fn(),
+    strokeText: jest.fn(),
+    measureText: jest.fn().mockReturnValue({ width: 0 }),
+    createLinearGradient: jest.fn().mockReturnValue({
+      addColorStop: jest.fn(),
+    }),
+    createRadialGradient: jest.fn().mockReturnValue({
+      addColorStop: jest.fn(),
+    }),
+    createPattern: jest.fn().mockReturnValue({}),
+    beginPath: jest.fn(),
+    closePath: jest.fn(),
+    moveTo: jest.fn(),
+    lineTo: jest.fn(),
+    bezierCurveTo: jest.fn(),
+    quadraticCurveTo: jest.fn(),
+    arc: jest.fn(),
+    arcTo: jest.fn(),
+    ellipse: jest.fn(),
+    rect: jest.fn(),
+    fill: jest.fn(),
+    stroke: jest.fn(),
+    clip: jest.fn(),
+    isPointInPath: jest.fn(),
+    isPointInStroke: jest.fn(),
+    fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 0,
+    lineCap: '',
+    lineJoin: '',
+    miterLimit: 0,
+    shadowOffsetX: 0,
+    shadowOffsetY: 0,
+    shadowBlur: 0,
+    shadowColor: '',
+    font: '',
+    textAlign: '',
+    textBaseline: '',
+    globalAlpha: 0,
+    globalCompositeOperation: '',
+    imageSmoothingEnabled: false,
+  };
+});

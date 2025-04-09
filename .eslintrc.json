@@ -4,9 +4,11 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
     "plugin:prettier/recommended"
   ],
-  "plugins": ["@typescript-eslint", "prettier"],
+  "plugins": ["@typescript-eslint", "react", "react-hooks", "prettier"],
   "env": {
     "browser": true,
     "es6": true,
@@ -41,12 +43,19 @@
     {
       "files": [
         "**/*.test.ts",
+        "**/*.test.tsx",
         "**/*.spec.ts",
+        "**/*.spec.tsx",
         "**/tests/**/*.ts",
+        "**/tests/**/*.tsx",
         "**/e2e/**/*.ts",
+        "**/e2e/**/*.tsx",
         "**/mocks/**/*.ts",
+        "**/mocks/**/*.tsx",
         "**/fixtures/**/*.ts",
-        "**/performance/**/*.ts"
+        "**/fixtures/**/*.tsx",
+        "**/performance/**/*.ts",
+        "**/performance/**/*.tsx"
       ],
       "rules": {
         "@typescript-eslint/no-explicit-any": "off",
@@ -57,14 +66,46 @@
         "@typescript-eslint/no-unsafe-argument": "off",
         "@typescript-eslint/unbound-method": "warn",
         "@typescript-eslint/no-base-to-string": "warn",
-        "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+        "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+        "@typescript-eslint/explicit-function-return-type": "off"
+      }
+    },
+    {
+      "files": ["**/FieldScene.ts"],
+      "rules": {
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-return": "off"
+      }
+    },
+    {
+      "files": ["src/main.tsx", "src/App.tsx"],
+      "rules": {
+        "@typescript-eslint/explicit-function-return-type": "off"
+      }
+    },
+    {
+      "files": ["**/dataFormatter.ts"],
+      "rules": {
+        "@typescript-eslint/no-unsafe-return": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off"
       }
     }
   ],
-  "ignorePatterns": ["dist", "node_modules", "coverage", "playwright-report"],
+  "ignorePatterns": ["dist", "node_modules", "coverage", "playwright-report", "src-react", "src/main.tsx"],
   "parserOptions": {
     "ecmaVersion": 2020,
     "sourceType": "module",
-    "project": "./tsconfig.json"
+    "project": "./tsconfig.json",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 }

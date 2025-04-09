@@ -80,7 +80,10 @@ test.describe('Game Rendering', () => {
 });
 
 // Helper function to test a specific resolution
-async function testResolution(page: Page, resolution: { name: string; width: number; height: number }) {
+async function testResolution(
+  page: Page,
+  resolution: { name: string; width: number; height: number }
+) {
   console.log(`Testing resolution: ${resolution.name} (${resolution.width}x${resolution.height})`);
 
   // Set viewport to the resolution
