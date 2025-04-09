@@ -61,7 +61,8 @@ const signalStateReducer = (state: SignalState, action: SignalActionType): Signa
           typeof loadedState.signals === 'object' &&
           Array.isArray(loadedState.discoveredSignalIds) &&
           (loadedState.activeSignalId === null || typeof loadedState.activeSignalId === 'string') &&
-          (loadedState.lastDiscoveredTimestamp === null || typeof loadedState.lastDiscoveredTimestamp === 'number')
+          (loadedState.lastDiscoveredTimestamp === null ||
+            typeof loadedState.lastDiscoveredTimestamp === 'number')
         ) {
           return loadedState;
         }

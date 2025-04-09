@@ -5,7 +5,7 @@ import './Pages.css';
 /**
  * Field exploration page component
  */
-const FieldExploration: React.FC = () => {
+const FieldExploration: React.ComponentType<unknown> = () => {
   return (
     <div className="page field-page" data-testid="field-page">
       <h1 className="page-title" data-testid="field-page-title">

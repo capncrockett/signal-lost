@@ -53,7 +53,7 @@ const SaveLoadManager: React.FC<SaveLoadManagerProps> = ({ isOpen, onClose }) =>
         signalState,
         eventState,
         progressState,
-        screenshot
+        screenshot || undefined
       );
 
       // Update the save files list
@@ -99,7 +99,7 @@ const SaveLoadManager: React.FC<SaveLoadManagerProps> = ({ isOpen, onClose }) =>
       progressDispatch({ type: 'LOAD_STATE', payload: saveFile.progressState });
 
       setMessage('Game loaded successfully!');
-      
+
       // Close the dialog after a short delay
       setTimeout(() => {
         onClose();
@@ -145,9 +145,9 @@ const SaveLoadManager: React.FC<SaveLoadManagerProps> = ({ isOpen, onClose }) =>
     <div className="save-load-overlay">
       <div className="save-load-container">
         <h2>Save / Load Game</h2>
-        
+
         {message && <div className="save-load-message">{message}</div>}
-        
+
         <div className="save-load-content">
           <div className="save-game-section">
             <h3>Save Game</h3>
@@ -159,12 +159,12 @@ const SaveLoadManager: React.FC<SaveLoadManagerProps> = ({ isOpen, onClose }) =>
                 placeholder="Enter save name"
                 disabled={isLoading}
               />
-              <button onClick={handleSave} disabled={isLoading || !newSaveName.trim()}>
+              <button onClick={() => void handleSave()} disabled={isLoading || !newSaveName.trim()}>
                 Save
               </button>
             </div>
           </div>
-          
+
           <div className="save-files-section">
             <h3>Load Game</h3>
             {saveFiles.length === 0 ? (
@@ -190,7 +190,7 @@ const SaveLoadManager: React.FC<SaveLoadManagerProps> = ({ isOpen, onClose }) =>
                 ))}
               </div>
             )}
-            
+
             <div className="save-file-actions">
               <button
                 onClick={handleLoad}
@@ -209,7 +209,7 @@ const SaveLoadManager: React.FC<SaveLoadManagerProps> = ({ isOpen, onClose }) =>
             </div>
           </div>
         </div>
-        
+
         <div className="save-load-footer">
           <button onClick={onClose} disabled={isLoading} className="close-button">
             Close

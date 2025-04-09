@@ -38,9 +38,10 @@ const MessageHistory: React.FC<MessageHistoryProps> = ({ isOpen, onClose }) => {
         const message = getMessage(signal.content);
         if (message) {
           // Use the decoded content if available based on game progress
-          const content = message.isDecoded || gameState.gameProgress >= (message.requiredProgress || 0)
-            ? message.decodedContent || message.content
-            : message.content;
+          const content =
+            message.isDecoded || gameState.gameProgress >= (message.requiredProgress || 0)
+              ? message.decodedContent || message.content
+              : message.content;
 
           setSelectedMessageContent(content);
         } else {

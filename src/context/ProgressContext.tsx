@@ -26,37 +26,44 @@ const progressStateReducer = (state: ProgressState, action: ProgressActionType):
         },
       };
     case 'COMPLETE_OBJECTIVE':
-      if (!state.objectives[action.payload] || state.completedObjectiveIds.includes(action.payload)) {
+      if (
+        !state.objectives[action.payload] ||
+        state.completedObjectiveIds.includes(action.payload)
+      ) {
         return state;
       }
 
-      // Check if this objective depends on others that aren't completed yet
-      const objective = state.objectives[action.payload];
-      if (objective.dependsOn && objective.dependsOn.length > 0) {
-        const allDependenciesCompleted = objective.dependsOn.every((dependencyId) =>
-          state.completedObjectiveIds.includes(dependencyId)
-        );
-        if (!allDependenciesCompleted) {
-          return state;
+      {
+        // Check if this objective depends on others that aren't completed yet
+        const objective = state.objectives[action.payload];
+        if (objective.dependsOn && objective.dependsOn.length > 0) {
+          const allDependenciesCompleted = objective.dependsOn.every((dependencyId) =>
+            state.completedObjectiveIds.includes(dependencyId)
+          );
+          if (!allDependenciesCompleted) {
+            return state;
+          }
         }
       }
 
-      // Mark the objective as completed
-      const now = Date.now();
-      return {
-        ...state,
-        objectives: {
-          ...state.objectives,
-          [action.payload]: {
-            ...state.objectives[action.payload],
-            isCompleted: true,
-            completedAt: now,
+      {
+        // Mark the objective as completed
+        const now = Date.now();
+        return {
+          ...state,
+          objectives: {
+            ...state.objectives,
+            [action.payload]: {
+              ...state.objectives[action.payload],
+              isCompleted: true,
+              completedAt: now,
+            },
           },
-        },
-        completedObjectiveIds: [...state.completedObjectiveIds, action.payload],
-        lastCompletedObjectiveId: action.payload,
-        lastCompletedTimestamp: now,
-      };
+          completedObjectiveIds: [...state.completedObjectiveIds, action.payload],
+          lastCompletedObjectiveId: action.payload,
+          lastCompletedTimestamp: now,
+        };
+      }
     case 'RESET_PROGRESS':
       return initialProgressState;
     case 'LOAD_STATE':
@@ -68,8 +75,10 @@ const progressStateReducer = (state: ProgressState, action: ProgressActionType):
           typeof loadedState.currentProgress === 'number' &&
           typeof loadedState.objectives === 'object' &&
           Array.isArray(loadedState.completedObjectiveIds) &&
-          (loadedState.lastCompletedObjectiveId === null || typeof loadedState.lastCompletedObjectiveId === 'string') &&
-          (loadedState.lastCompletedTimestamp === null || typeof loadedState.lastCompletedTimestamp === 'number')
+          (loadedState.lastCompletedObjectiveId === null ||
+            typeof loadedState.lastCompletedObjectiveId === 'string') &&
+          (loadedState.lastCompletedTimestamp === null ||
+            typeof loadedState.lastCompletedTimestamp === 'number')
         ) {
           return loadedState;
         }

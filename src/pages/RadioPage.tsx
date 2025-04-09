@@ -6,7 +6,7 @@ import './Pages.css';
 /**
  * Radio page component
  */
-const RadioPage: React.FC = () => {
+const RadioPage: React.ComponentType<unknown> = () => {
   return (
     <div className="page radio-page" data-testid="radio-page">
       <h1 className="page-title" data-testid="radio-page-title">

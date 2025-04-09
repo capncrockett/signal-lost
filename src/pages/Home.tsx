@@ -5,7 +5,7 @@ import './Pages.css';
 /**
  * Home page component
  */
-const Home: React.FC = () => {
+const Home: React.ComponentType<unknown> = () => {
   return (
     <div className="page home-page" data-testid="home-page">
       <h1 className="page-title" data-testid="home-page-title">
