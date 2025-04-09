@@ -57,7 +57,7 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
         newFilter.dispose();
       }
     };
-  }, [noiseNode, oscillator]);
+  }, [noiseNode, oscillator, filter]);
 
   // Update master volume when volume state changes
   useEffect(() => {

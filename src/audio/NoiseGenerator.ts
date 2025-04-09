@@ -16,7 +16,7 @@ export interface NoiseResult {
 export interface NoiseOptions {
   type?: NoiseType;
   volume?: number;
-  filterType?: Tone.BiquadFilterType;
+  filterType?: string;
   filterFrequency?: number;
   filterQ?: number;
   applyFilter?: boolean;
@@ -42,7 +42,7 @@ const defaultNoiseOptions: NoiseOptions = {
 export function createNoise(options?: NoiseOptions): NoiseResult | null {
   try {
     // Merge provided options with defaults
-    const config = { ...defaultNoiseOptions, ...options };
+    const config: NoiseOptions = { ...defaultNoiseOptions, ...options };
 
     // Create a noise generator
     const noise = new Tone.Noise(config.type).start();
@@ -58,7 +58,7 @@ export function createNoise(options?: NoiseOptions): NoiseResult | null {
         type: config.filterType,
         frequency: config.filterFrequency,
         Q: config.filterQ,
-      });
+      } as Tone.FilterOptions);
 
       // Connect the noise to the filter to the gain to the output
       noise.connect(filter);
@@ -92,10 +92,7 @@ export function createSignal(
 ): { oscillator: Tone.Oscillator; gain: Tone.Gain<'gain'> } | null {
   try {
     // Create an oscillator
-    const oscillator = new Tone.Oscillator({
-      frequency,
-      type: waveform,
-    }).start();
+    const oscillator = new Tone.Oscillator(frequency, waveform).start();
 
     // Create a gain node to control the volume
     const gain = new Tone.Gain(volume).toDestination();
