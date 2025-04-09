@@ -23,7 +23,7 @@ npm run check-all          # Run all checks (lint, type-check, tests, E2E tests)
 
 | Folder  | Description                               |
 | ------- | ----------------------------------------- |
-| src/    | Core TypeScript game source (Phaser 3)    |
+| src/    | Core TypeScript game source (React)       |
 | assets/ | Pixel art, audio files, tilemaps          |
 | tests/  | Jest unit/integration tests (ts-jest)     |
 | e2e/    | Playwright tests for browser interactions |

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAudio } from '../../context/AudioContext';
 import { useGameState } from '../../context/GameStateContext';
 import {
@@ -31,6 +31,8 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
   const [signalStrength, setSignalStrength] = useState<number>(0);
   const [currentSignalId, setCurrentSignalId] = useState<string | null>(null);
   const [showMessage, setShowMessage] = useState<boolean>(false);
+  const [staticIntensity, setStaticIntensity] = useState<number>(0.5);
+  const staticCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // Update frequency when dragging the dial
   const handleMouseDown = (): void => {
@@ -81,10 +83,14 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
       // Set the current signal ID for message display
       setCurrentSignalId(signal.messageId);
 
+      // Calculate static intensity based on signal strength
+      const intensity = signal.isStatic ? 1 - strength : (1 - strength) * 0.5;
+      setStaticIntensity(intensity);
+
       // Play appropriate audio
       if (signal.isStatic) {
         // Play static with the signal mixed in
-        audio.playStaticNoise(1 - strength);
+        audio.playStaticNoise(intensity);
         if (strength > 0.5) {
           audio.playSignal(signal.frequency * 10); // Scale up for audible range
         }
@@ -95,12 +101,13 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
       }
     } else {
       // No signal found, just play static
-      const staticIntensity = getStaticIntensity(frequency);
+      const intensity = getStaticIntensity(frequency);
+      setStaticIntensity(intensity);
       setSignalStrength(0.1); // Low signal strength
       setCurrentSignalId(null);
 
       audio.stopSignal();
-      audio.playStaticNoise(staticIntensity);
+      audio.playStaticNoise(intensity);
     }
 
     // Clean up audio when component unmounts or frequency changes
@@ -128,6 +135,71 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
     };
   }, [isDragging]);
 
+  // Draw static visualization
+  useEffect(() => {
+    if (!staticCanvasRef.current || !state.isRadioOn) return;
+
+    const canvas = staticCanvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas dimensions
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Only draw static if radio is on
+    if (state.isRadioOn) {
+      // Draw static noise
+      const intensity = staticIntensity * 255;
+      const imageData = ctx.createImageData(canvas.width, canvas.height);
+      const data = imageData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const noise = Math.random() * intensity;
+        data[i] = noise;     // R
+        data[i + 1] = noise; // G
+        data[i + 2] = noise; // B
+        data[i + 3] = Math.random() * 255 * staticIntensity; // A
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    // Animation loop for continuous static effect
+    let animationId: number;
+    const animate = () => {
+      if (!state.isRadioOn) return;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw static noise
+      const intensity = staticIntensity * 255;
+      const imageData = ctx.createImageData(canvas.width, canvas.height);
+      const data = imageData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const noise = Math.random() * intensity;
+        data[i] = noise;     // R
+        data[i + 1] = noise; // G
+        data[i + 2] = noise; // B
+        data[i + 3] = Math.random() * 255 * staticIntensity; // A
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animationId);
+    };
+  }, [staticIntensity, state.isRadioOn]);
+
   // Toggle message display
   const toggleMessage = (): void => {
     setShowMessage(!showMessage);
@@ -136,19 +208,48 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
   // Get the current message
   const currentMessage = currentSignalId ? getMessage(currentSignalId) : undefined;
 
+  // Handle keyboard controls for accessibility
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>): void => {
+    if (!state.isRadioOn) return;
+
+    switch (e.key) {
+      case 'ArrowLeft':
+        setFrequency((prev) => Math.max(minFrequency, prev - 0.1));
+        break;
+      case 'ArrowRight':
+        setFrequency((prev) => Math.min(maxFrequency, prev + 0.1));
+        break;
+      case 'ArrowDown':
+        setFrequency((prev) => Math.max(minFrequency, prev - 1.0));
+        break;
+      case 'ArrowUp':
+        setFrequency((prev) => Math.min(maxFrequency, prev + 1.0));
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
-    <div className="radio-tuner" data-testid="radio-tuner">
+    <div
+      className="radio-tuner"
+      data-testid="radio-tuner"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      aria-label="Radio Tuner. Use arrow keys to adjust frequency."
+    >
       <div className="radio-controls">
         <div className="power-button-container">
           <button
             className={`power-button ${state.isRadioOn ? 'on' : 'off'}`}
             onClick={() => dispatch({ type: 'TOGGLE_RADIO' })}
+            aria-label={state.isRadioOn ? 'Turn radio off' : 'Turn radio on'}
           >
             {state.isRadioOn ? 'ON' : 'OFF'}
           </button>
         </div>
 
-        <div className="frequency-display">
+        <div className="frequency-display" aria-live="polite" aria-label={`Current frequency ${frequency.toFixed(1)} MHz`}>
           <span className="frequency-value">{frequency.toFixed(1)}</span>
           <span className="frequency-unit">MHz</span>
         </div>
@@ -163,14 +264,29 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
             step="0.1"
             value={audio.volume}
             onChange={(e) => audio.setVolume(parseFloat(e.target.value))}
+            aria-label={`Volume control, current value ${audio.volume * 100}%`}
           />
           <button
             className={`mute-button ${audio.isMuted ? 'muted' : ''}`}
             onClick={audio.toggleMute}
+            aria-label={audio.isMuted ? 'Unmute audio' : 'Mute audio'}
           >
             {audio.isMuted ? 'Unmute' : 'Mute'}
           </button>
         </div>
+      </div>
+
+      {/* Static visualization canvas */}
+      <div className="static-visualization-container">
+        <canvas
+          ref={staticCanvasRef}
+          className="static-canvas"
+          style={{
+            opacity: state.isRadioOn ? staticIntensity : 0,
+            pointerEvents: 'none'
+          }}
+          aria-hidden="true"
+        />
       </div>
 
       <div
@@ -178,6 +294,12 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
         onMouseDown={state.isRadioOn ? handleMouseDown : undefined}
         onMouseUp={state.isRadioOn ? handleMouseUp : undefined}
         onMouseMove={state.isRadioOn ? handleMouseMove : undefined}
+        role="slider"
+        aria-valuemin={minFrequency}
+        aria-valuemax={maxFrequency}
+        aria-valuenow={frequency}
+        aria-valuetext={`${frequency.toFixed(1)} MHz`}
+        aria-label="Frequency dial"
       >
         <div className="tuner-dial-track">
           <div className="tuner-dial-knob" style={{ left: `${dialPosition}%` }} />
@@ -186,7 +308,14 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
 
       <div className={`signal-strength-container ${!state.isRadioOn ? 'disabled' : ''}`}>
         <div className="signal-strength-label">Signal Strength</div>
-        <div className="signal-strength-meter">
+        <div
+          className="signal-strength-meter"
+          role="progressbar"
+          aria-valuenow={signalStrength * 100}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`Signal strength ${Math.round(signalStrength * 100)}%`}
+        >
           <div
             className="signal-strength-fill"
             style={{ width: `${state.isRadioOn ? signalStrength * 100 : 0}%` }}
@@ -199,6 +328,7 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
           className="tune-button decrease"
           disabled={!state.isRadioOn}
           onClick={() => setFrequency((prev) => Math.max(minFrequency, prev - 0.1))}
+          aria-label="Decrease frequency by 0.1 MHz"
         >
           -0.1
         </button>
@@ -206,15 +336,20 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
           className="tune-button increase"
           disabled={!state.isRadioOn}
           onClick={() => setFrequency((prev) => Math.min(maxFrequency, prev + 0.1))}
+          aria-label="Increase frequency by 0.1 MHz"
         >
           +0.1
         </button>
       </div>
 
       {state.isRadioOn && currentSignalId && signalStrength > 0.5 && (
-        <div className="message-indicator">
+        <div className="message-indicator" aria-live="polite">
           <div className="signal-detected">Signal Detected</div>
-          <button className="view-message-button" onClick={toggleMessage}>
+          <button
+            className="view-message-button"
+            onClick={toggleMessage}
+            aria-label={showMessage ? 'Hide message content' : 'View message content'}
+          >
             {showMessage ? 'Hide Message' : 'View Message'}
           </button>
         </div>
