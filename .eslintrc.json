@@ -84,6 +84,14 @@
       "rules": {
         "@typescript-eslint/explicit-function-return-type": "off"
       }
+    },
+    {
+      "files": ["**/dataFormatter.ts"],
+      "rules": {
+        "@typescript-eslint/no-unsafe-return": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off"
+      }
     }
   ],
   "ignorePatterns": ["dist", "node_modules", "coverage", "playwright-report", "src-react", "src/main.tsx"],

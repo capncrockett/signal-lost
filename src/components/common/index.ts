@@ -30,3 +30,9 @@ export type { AssetLoaderProps } from './AssetLoader';
 
 export { default as SkipToContent } from './SkipToContent';
 export type { SkipToContentProps } from './SkipToContent';
+
+export { default as ResponsiveImage } from './ResponsiveImage';
+export type { ResponsiveImageProps } from './ResponsiveImage';
+
+export { default as OptimizedAudio } from './OptimizedAudio';
+export type { OptimizedAudioProps } from './OptimizedAudio';
