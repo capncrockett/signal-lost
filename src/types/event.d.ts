@@ -9,7 +9,7 @@
  * It serves as a communication mechanism between different components of the game,
  * particularly between Agent Alpha's radio/audio components and Agent Beta's narrative components.
  */
-export interface GameEvent {
+interface GameEvent {
   /** Unique identifier for the event */
   id: string;
   /** Type of event */
@@ -23,9 +23,11 @@ export interface GameEvent {
 /**
  * Event state for tracking events and their history
  */
-export interface EventState {
+interface EventState {
   events: Record<string, GameEvent>;
   eventHistory: string[]; // Array of event IDs in chronological order
   activeEventId: string | null;
   pendingEvents: string[]; // Events that need to be processed
 }
+
+export { GameEvent, EventState };

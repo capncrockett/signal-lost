@@ -1,7 +1,7 @@
 /**
  * Implementation for event data and state management
  */
-import { EventState } from './event.d';
+import { EventState } from './event';
 
 /**
  * Initial state for event tracking

@@ -1,7 +1,7 @@
 /**
  * Implementation for signal data and state management
  */
-import { SignalState } from './signal.d';
+import { SignalState } from './signal';
 
 /**
  * Initial state for signal tracking

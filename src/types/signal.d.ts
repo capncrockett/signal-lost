@@ -9,7 +9,7 @@
  * and processed by the narrative system. It serves as the primary communication channel
  * between Agent Alpha's radio components and Agent Beta's narrative components.
  */
-export interface Signal {
+interface Signal {
   /** Unique identifier for the signal */
   id: string;
   /** Frequency in MHz where the signal can be detected */
@@ -29,9 +29,11 @@ export interface Signal {
 /**
  * Signal state for tracking discovered signals and their status
  */
-export interface SignalState {
+interface SignalState {
   signals: Record<string, Signal>;
   activeSignalId: string | null;
   discoveredSignalIds: string[];
   lastDiscoveredTimestamp: number | null;
 }
+
+export { Signal, SignalState };
