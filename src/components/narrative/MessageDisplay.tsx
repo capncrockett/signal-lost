@@ -49,7 +49,7 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, isVisible }) =
       // Find words with [static] to replace
       const staticWordIndices = originalWords
         .map((word, index) => (word.includes('[static]') ? index : -1))
-        .filter(index => index !== -1);
+        .filter((index) => index !== -1);
 
       // Calculate how many words to decode based on game progress
       const decodeRatio = state.gameProgress / (message.requiredProgress || 1);
@@ -72,13 +72,16 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, isVisible }) =
         setDecodingProgress(currentStep / steps);
 
         // Replace a word periodically
-        if (replacedCount < maxReplacements && currentStep % Math.floor(steps / maxReplacements) === 0) {
+        if (
+          replacedCount < maxReplacements &&
+          currentStep % Math.floor(steps / maxReplacements) === 0
+        ) {
           const indexToReplace = shuffledIndices[replacedCount];
           const newWords = [...originalWords];
 
           // Replace the static word with the decoded version
           newWords[indexToReplace] = fullyDecodedWords[indexToReplace];
-          setDecodedWords(prev => [...prev, indexToReplace.toString()]);
+          setDecodedWords((prev) => [...prev, indexToReplace.toString()]);
 
           // Update displayed content
           setDisplayedContent(newWords.join(' '));

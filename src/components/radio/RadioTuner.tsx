@@ -159,7 +159,7 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
 
       for (let i = 0; i < data.length; i += 4) {
         const noise = Math.random() * intensity;
-        data[i] = noise;     // R
+        data[i] = noise; // R
         data[i + 1] = noise; // G
         data[i + 2] = noise; // B
         data[i + 3] = Math.random() * 255 * staticIntensity; // A
@@ -170,7 +170,7 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
 
     // Animation loop for continuous static effect
     let animationId: number;
-    const animate = () => {
+    const animate = (): void => {
       if (!state.isRadioOn) return;
 
       // Clear canvas
@@ -183,7 +183,7 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
 
       for (let i = 0; i < data.length; i += 4) {
         const noise = Math.random() * intensity;
-        data[i] = noise;     // R
+        data[i] = noise; // R
         data[i + 1] = noise; // G
         data[i + 2] = noise; // B
         data[i + 3] = Math.random() * 255 * staticIntensity; // A
@@ -214,16 +214,16 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
 
     switch (e.key) {
       case 'ArrowLeft':
-        setFrequency((prev) => Math.max(minFrequency, prev - 0.1));
+        setFrequency((prev): number => Math.max(minFrequency, prev - 0.1));
         break;
       case 'ArrowRight':
-        setFrequency((prev) => Math.min(maxFrequency, prev + 0.1));
+        setFrequency((prev): number => Math.min(maxFrequency, prev + 0.1));
         break;
       case 'ArrowDown':
-        setFrequency((prev) => Math.max(minFrequency, prev - 1.0));
+        setFrequency((prev): number => Math.max(minFrequency, prev - 1.0));
         break;
       case 'ArrowUp':
-        setFrequency((prev) => Math.min(maxFrequency, prev + 1.0));
+        setFrequency((prev): number => Math.min(maxFrequency, prev + 1.0));
         break;
       default:
         break;
@@ -249,7 +249,11 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
           </button>
         </div>
 
-        <div className="frequency-display" aria-live="polite" aria-label={`Current frequency ${frequency.toFixed(1)} MHz`}>
+        <div
+          className="frequency-display"
+          aria-live="polite"
+          aria-label={`Current frequency ${frequency.toFixed(1)} MHz`}
+        >
           <span className="frequency-value">{frequency.toFixed(1)}</span>
           <span className="frequency-unit">MHz</span>
         </div>
@@ -283,7 +287,7 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
           className="static-canvas"
           style={{
             opacity: state.isRadioOn ? staticIntensity : 0,
-            pointerEvents: 'none'
+            pointerEvents: 'none',
           }}
           aria-hidden="true"
         />
