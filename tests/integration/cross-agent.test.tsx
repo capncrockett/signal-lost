@@ -9,6 +9,7 @@ const mockGameState = {
   isRadioOn: false,
   currentFrequency: 90.0,
   discoveredFrequencies: [],
+  gameProgress: 1.0, // Add gameProgress for MessageDisplay
 };
 
 const mockDispatch = jest.fn().mockImplementation((action) => {
@@ -68,6 +69,21 @@ global.requestAnimationFrame = jest.fn().mockReturnValue(1);
 global.cancelAnimationFrame = jest.fn();
 
 // Mock the getMessage function
+jest.mock('../../src/data/messages', () => {
+  const mockMessage = {
+    id: 'test_signal',
+    title: 'Test Signal',
+    content: 'This is a test signal from the radio tuner.',
+    isDecoded: true,
+    requiredProgress: 0,
+  };
+  return {
+    getMessage: jest.fn().mockReturnValue(mockMessage),
+    getDecodedMessage: jest.fn().mockImplementation((message) => message.content),
+  };
+});
+
+// Define mockMessage for use in tests
 const mockMessage = {
   id: 'test_signal',
   title: 'Test Signal',
@@ -75,10 +91,6 @@ const mockMessage = {
   isDecoded: true,
   requiredProgress: 0,
 };
-
-jest.mock('../../src/data/messages', () => ({
-  getMessage: jest.fn().mockReturnValue(mockMessage),
-}));
 
 /**
  * Cross-Agent Integration Tests
