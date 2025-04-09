@@ -1,6 +1,6 @@
-# Development Workflow (React-Based Approach with Two Agent Architecture)
+# Development Workflow (React-Based Approach with Alpha/Beta Agent Development)
 
-> **Note**: This workflow document has been updated for the React-based rewrite of Signal Lost with Two Agent Architecture. The previous Phaser-based workflow can be found in `workflow-phaser.md`.
+> **Note**: This workflow document has been updated for the React-based rewrite of Signal Lost with Alpha/Beta Agent Development approach. The previous Phaser-based workflow can be found in `workflow-phaser.md`.
 
 ## Pre-coding Checklist
 
@@ -8,42 +8,50 @@
 2. Install/update dependencies: `npm install`
 3. Start dev server: `npm run dev`
 4. Open separate terminal for continuous testing: `npm test -- --watch`
-5. Initialize agent debug mode if needed: `npm run dev:agent-debug`
+5. Check the sprint document for your agent's responsibilities (Alpha or Beta)
+6. Review interface contracts between agents
+7. Initialize interface validation if needed: `npm run dev:validate-contracts`
 
-## Two Agent Architecture
+## Alpha/Beta Agent Development
 
 ### Overview
 
-Signal Lost now implements a Two Agent architecture where separate agents handle different aspects of the game:
+Signal Lost development now follows an Alpha/Beta Agent development approach where two AI agents collaborate on different aspects of the codebase:
 
-1. **Navigation Agent**: Responsible for player movement, environment interaction, and spatial awareness
-2. **Communication Agent**: Handles radio communication, signal processing, and message decoding
+1. **Agent Alpha**: Responsible for radio tuner component and audio system implementation
+2. **Agent Beta**: Responsible for narrative system and game state integration
 
-### Agent Communication
+### Agent Collaboration
 
-Agents communicate through a shared event system:
+The agents collaborate through a structured development process:
 
-- Use the `AgentEventBus` for inter-agent communication
-- Events should be typed and documented
-- Maintain clear boundaries between agent responsibilities
+- Each agent works on separate, well-defined areas of the codebase
+- Interface contracts are established to ensure smooth integration
+- Agents communicate through GitHub issues and PRs
+- Code reviews are performed across agent boundaries
 
 ```typescript
-// Example of agent communication
-import { AgentEventBus } from './agents/AgentEventBus';
+// Example of interface contract between agents
+// Shared interface used by both Alpha and Beta agents
+interface Signal {
+  id: string;
+  frequency: number;
+  strength: number;
+  type: 'message' | 'location' | 'event';
+  content: string;
+  discovered: boolean;
+  timestamp: number;
+}
 
-// Navigation agent discovers a radio
-AgentEventBus.emit('ITEM_DISCOVERED', {
-  type: 'radio',
-  location: { x: 120, y: 85 },
-  interactive: true
-});
+// Agent Alpha implements signal detection
+function detectSignal(frequency: number): Signal | null {
+  // Implementation by Agent Alpha
+}
 
-// Communication agent listens for discoveries
-AgentEventBus.on('ITEM_DISCOVERED', (item) => {
-  if (item.type === 'radio') {
-    // Enable radio functionality
-  }
-});
+// Agent Beta consumes signals for narrative progression
+function processSignal(signal: Signal): void {
+  // Implementation by Agent Beta
+}
 ```
 
 ## Component Development Workflow
@@ -106,41 +114,40 @@ test('adjusts frequency when dial is moved', () => {
 });
 ```
 
-### Agent Integration Tests
+### Cross-Agent Integration Tests
 
-- Test communication between agents
-- Verify event handling and state updates
-- Mock agent dependencies
-- Test boundary conditions
+- Test integration between Alpha and Beta agent components
+- Verify interface contracts are properly implemented
+- Test boundary conditions and edge cases
+- Ensure consistent behavior across agent boundaries
 
 ```typescript
-// Example Agent Integration test
+// Example Cross-Agent Integration test
 import { render, act } from '@testing-library/react';
-import { AgentEventBus } from './agents/AgentEventBus';
-import { NavigationAgent } from './agents/NavigationAgent';
-import { CommunicationAgent } from './agents/CommunicationAgent';
+import { RadioTuner } from './components/RadioTuner'; // Alpha agent component
+import { NarrativeDisplay } from './components/NarrativeDisplay'; // Beta agent component
 import { GameStateProvider } from './state/GameStateProvider';
 
-test('Navigation agent discovery triggers Communication agent response', () => {
+test('Radio tuner signal detection triggers narrative display update', () => {
   // Arrange
   const { getByTestId } = render(
     <GameStateProvider>
-      <NavigationAgent />
-      <CommunicationAgent />
+      <RadioTuner />
+      <NarrativeDisplay />
     </GameStateProvider>
   );
 
   // Act
   act(() => {
-    AgentEventBus.emit('ITEM_DISCOVERED', {
-      type: 'radio',
-      location: { x: 120, y: 85 },
-      interactive: true
-    });
+    // Simulate tuning to a specific frequency
+    const dial = getByTestId('frequency-dial');
+    fireEvent.mouseDown(dial);
+    fireEvent.mouseMove(dial, { clientX: 250 });
+    fireEvent.mouseUp(dial);
   });
 
   // Assert
-  expect(getByTestId('radio-interface')).toBeInTheDocument();
+  expect(getByTestId('message-content')).toHaveTextContent('Signal detected');
 });
 ```
 
@@ -182,7 +189,9 @@ npm run format
 
 # Run tests
 npm test
-npm run test:agent-integration  # Run agent integration tests
+npm run test:alpha  # Run Alpha agent tests
+npm run test:beta   # Run Beta agent tests
+npm run test:cross-agent  # Run cross-agent integration tests
 npm run test:e2e
 
 # Check coverage
@@ -198,10 +207,10 @@ npm run check-all
 - Check browser console for errors
 - Use Chrome DevTools for network and performance analysis
 - Leverage React's StrictMode for detecting potential problems
-- Monitor agent communication with AgentEventBus debug mode:
+- Monitor cross-agent integration with interface logging:
   ```typescript
-  // Enable debug mode to log all events
-  AgentEventBus.enableDebugMode();
+  // Enable debug mode to log all cross-agent interactions
+  Contracts.enableDebugMode();
   ```
 - Use the debug helper script for streamlined development:
   ```bash
@@ -213,12 +222,14 @@ npm run check-all
 
 - Start development server and open browser
 - Run tests in watch mode
-- Run agent integration tests
+- Run cross-agent integration tests
 - Run E2E tests and visual tests
 - Check for TypeScript errors
 - Run linting
-- Toggle agent debug mode
-- Visualize agent communication
+- Toggle interface contract validation
+- Visualize cross-agent interactions
+- Run Alpha-specific tests
+- Run Beta-specific tests
 - Start a complete development environment with all tools
 
 ## State Management
@@ -232,51 +243,51 @@ npm run check-all
 
 ### Agent-Specific State Management
 
-- Each agent maintains its own state slice
-- Use separate contexts for Navigation and Communication agents
-- Shared state should be managed through the AgentEventBus
-- Use TypeScript to enforce state boundaries
+- Alpha agent manages audio and radio tuner state
+- Beta agent manages narrative and game progression state
+- Shared state is managed through well-defined interfaces
+- Use TypeScript to enforce state boundaries between agents
 
 ```jsx
 // Example state management with agent-specific contexts
 import { createContext, useContext, useReducer } from 'react';
 
-// Navigation Agent Context
-const NavigationStateContext = createContext();
+// Alpha Agent Context (Radio & Audio)
+const RadioAudioStateContext = createContext();
 
-export function NavigationStateProvider({ children }) {
-  const [state, dispatch] = useReducer(navigationReducer, initialNavigationState);
+export function RadioAudioStateProvider({ children }) {
+  const [state, dispatch] = useReducer(radioAudioReducer, initialRadioAudioState);
   return (
-    <NavigationStateContext.Provider value={{ state, dispatch }}>
+    <RadioAudioStateContext.Provider value={{ state, dispatch }}>
       {children}
-    </NavigationStateContext.Provider>
+    </RadioAudioStateContext.Provider>
   );
 }
 
-export function useNavigationState() {
-  const context = useContext(NavigationStateContext);
+export function useRadioAudioState() {
+  const context = useContext(RadioAudioStateContext);
   if (!context) {
-    throw new Error('useNavigationState must be used within a NavigationStateProvider');
+    throw new Error('useRadioAudioState must be used within a RadioAudioStateProvider');
   }
   return context;
 }
 
-// Communication Agent Context
-const CommunicationStateContext = createContext();
+// Beta Agent Context (Narrative & Game State)
+const NarrativeStateContext = createContext();
 
-export function CommunicationStateProvider({ children }) {
-  const [state, dispatch] = useReducer(communicationReducer, initialCommunicationState);
+export function NarrativeStateProvider({ children }) {
+  const [state, dispatch] = useReducer(narrativeReducer, initialNarrativeState);
   return (
-    <CommunicationStateContext.Provider value={{ state, dispatch }}>
+    <NarrativeStateContext.Provider value={{ state, dispatch }}>
       {children}
-    </CommunicationStateContext.Provider>
+    </NarrativeStateContext.Provider>
   );
 }
 
-export function useCommunicationState() {
-  const context = useContext(CommunicationStateContext);
+export function useNarrativeState() {
+  const context = useContext(NarrativeStateContext);
   if (!context) {
-    throw new Error('useCommunicationState must be used within a CommunicationStateProvider');
+    throw new Error('useNarrativeState must be used within a NarrativeStateProvider');
   }
   return context;
 }
@@ -284,11 +295,11 @@ export function useCommunicationState() {
 // Combined provider for convenience
 export function GameStateProvider({ children }) {
   return (
-    <NavigationStateProvider>
-      <CommunicationStateProvider>
+    <RadioAudioStateProvider>
+      <NarrativeStateProvider>
         {children}
-      </CommunicationStateProvider>
-    </NavigationStateProvider>
+      </NarrativeStateProvider>
+    </RadioAudioStateProvider>
   );
 }
 ```
@@ -296,13 +307,14 @@ export function GameStateProvider({ children }) {
 ## Development Priorities
 
 1. **Sprint Goals**: Focus on completing the current sprint objectives
-2. **Agent Architecture**: Maintain clear separation of concerns between agents
-3. **Component Architecture**: Create a clean, maintainable component structure
-4. **Inter-Agent Communication**: Ensure robust and type-safe event handling
-5. **Accessibility**: Ensure the game is accessible to all users
-6. **Test Coverage**: Maintain high test coverage for all components and agent interactions
-7. **Type Safety**: Use TypeScript effectively to prevent bugs
-8. **Performance**: Optimize rendering and state updates
+2. **Agent Responsibilities**: Maintain clear separation of concerns between Alpha and Beta agents
+3. **Interface Contracts**: Ensure well-defined interfaces between agent components
+4. **Component Architecture**: Create a clean, maintainable component structure
+5. **Cross-Agent Integration**: Ensure smooth integration between Alpha and Beta components
+6. **Accessibility**: Ensure the game is accessible to all users
+7. **Test Coverage**: Maintain high test coverage for all components and cross-agent interactions
+8. **Type Safety**: Use TypeScript effectively to prevent bugs
+9. **Performance**: Optimize rendering and state updates
 
 ## TypeScript Best Practices
 
@@ -311,9 +323,10 @@ export function GameStateProvider({ children }) {
 - Avoid `any` types
 - Use generics for reusable components
 - Create type guards for runtime type checking
-- Define event types for agent communication
+- Define interface contracts between Alpha and Beta components
 - Use namespaces to organize agent-specific types
 - Create shared type definitions for cross-agent data
+- Document interface boundaries clearly
 
 ```typescript
 // Example of good TypeScript usage for components
@@ -342,47 +355,79 @@ export function RadioTuner({
   // Component implementation
 }
 
-// Example of agent event types
-namespace AgentEvents {
-  // Base event interface
-  export interface BaseEvent {
+// Example of interface contracts between Alpha and Beta agents
+namespace Contracts {
+  // Shared interfaces
+  export interface Signal {
+    id: string;
+    frequency: number;
+    strength: number;
+    type: 'message' | 'location' | 'event';
+    content: string;
+    discovered: boolean;
     timestamp: number;
-    source: 'navigation' | 'communication';
   }
 
-  // Navigation agent events
-  export interface ItemDiscoveredEvent extends BaseEvent {
-    type: 'ITEM_DISCOVERED';
-    payload: {
-      itemType: string;
-      location: { x: number; y: number };
-      interactive: boolean;
-    };
+  // Alpha agent interfaces (Radio & Audio)
+  export namespace Alpha {
+    export interface RadioTunerState {
+      currentFrequency: number;
+      isScanning: boolean;
+      signalStrength: number;
+      noiseLevel: number;
+    }
+
+    export interface AudioState {
+      volume: number;
+      isMuted: boolean;
+      effectsEnabled: boolean;
+    }
   }
 
-  // Communication agent events
-  export interface SignalDetectedEvent extends BaseEvent {
-    type: 'SIGNAL_DETECTED';
-    payload: {
-      frequency: number;
-      strength: number;
-      message?: string;
-    };
-  }
+  // Beta agent interfaces (Narrative & Game State)
+  export namespace Beta {
+    export interface NarrativeState {
+      messages: Array<{
+        id: string;
+        content: string;
+        decoded: boolean;
+        timestamp: number;
+      }>;
+      currentMessageId: string | null;
+    }
 
-  // Union type of all events
-  export type AgentEvent = ItemDiscoveredEvent | SignalDetectedEvent;
+    export interface GameProgressState {
+      discoveredSignals: string[];
+      completedObjectives: string[];
+      playerLocation: string;
+      gameTime: number;
+    }
+  }
 }
 
-// Type-safe event bus usage
-AgentEventBus.emit<AgentEvents.ItemDiscoveredEvent>('ITEM_DISCOVERED', {
-  timestamp: Date.now(),
-  source: 'navigation',
-  type: 'ITEM_DISCOVERED',
-  payload: {
-    itemType: 'radio',
-    location: { x: 120, y: 85 },
-    interactive: true
+// Alpha agent implementation (Radio Tuner)
+class RadioTuner {
+  // Implementation by Alpha agent
+  detectSignal(frequency: number): Contracts.Signal | null {
+    // Signal detection logic
+    return {
+      id: 'signal-1',
+      frequency: 91.5,
+      strength: 0.75,
+      type: 'message',
+      content: 'Encrypted message content',
+      discovered: true,
+      timestamp: Date.now()
+    };
   }
-});
+}
+
+// Beta agent implementation (Narrative System)
+class NarrativeSystem {
+  // Implementation by Beta agent
+  processSignal(signal: Contracts.Signal): void {
+    // Process the signal for narrative progression
+    console.log(`Processing signal: ${signal.id} at ${signal.frequency}MHz`);
+  }
+}
 ```
