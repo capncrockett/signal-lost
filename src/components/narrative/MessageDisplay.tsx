@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Message, getDecodedMessage } from '../../data/messages';
 import { useGameState } from '../../context/GameStateContext';
 import './MessageDisplay.css';
@@ -13,12 +13,15 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, isVisible }) =
   const [displayedContent, setDisplayedContent] = useState<string>('');
   const [isDecoding, setIsDecoding] = useState<boolean>(false);
   const [decodingProgress, setDecodingProgress] = useState<number>(0);
+  const [decodedWords, setDecodedWords] = useState<string[]>([]);
+  const contentRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     if (!message || !isVisible) {
       setDisplayedContent('');
       setIsDecoding(false);
       setDecodingProgress(0);
+      setDecodedWords([]);
       return;
     }
 
@@ -30,15 +33,57 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, isVisible }) =
       setIsDecoding(true);
       setDecodingProgress(0);
 
+      // Split content into words for progressive decoding
+      const originalWords = message.content.split(' ');
+      const fullyDecodedWords = message.decodedContent.split(' ');
+
+      // Initialize with original content (with [static] parts)
+      setDisplayedContent(message.content);
+      setDecodedWords([]);
+
       // Simulate decoding progress
-      const totalDecodingTime = 3000; // 3 seconds
-      const interval = 100; // Update every 100ms
+      const totalDecodingTime = 5000; // 5 seconds
+      const interval = 200; // Update every 200ms
       const steps = totalDecodingTime / interval;
 
+      // Find words with [static] to replace
+      const staticWordIndices = originalWords
+        .map((word, index) => (word.includes('[static]') ? index : -1))
+        .filter(index => index !== -1);
+
+      // Calculate how many words to decode based on game progress
+      const decodeRatio = state.gameProgress / (message.requiredProgress || 1);
+      const totalWordsToReplace = Math.min(
+        staticWordIndices.length,
+        Math.floor(staticWordIndices.length * decodeRatio)
+      );
+
+      // Shuffle the indices to make the decoding appear random
+      const shuffledIndices = [...staticWordIndices]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, totalWordsToReplace);
+
       let currentStep = 0;
+      let replacedCount = 0;
+      const maxReplacements = shuffledIndices.length;
+
       const timer = setInterval(() => {
         currentStep++;
         setDecodingProgress(currentStep / steps);
+
+        // Replace a word periodically
+        if (replacedCount < maxReplacements && currentStep % Math.floor(steps / maxReplacements) === 0) {
+          const indexToReplace = shuffledIndices[replacedCount];
+          const newWords = [...originalWords];
+
+          // Replace the static word with the decoded version
+          newWords[indexToReplace] = fullyDecodedWords[indexToReplace];
+          setDecodedWords(prev => [...prev, indexToReplace.toString()]);
+
+          // Update displayed content
+          setDisplayedContent(newWords.join(' '));
+          replacedCount++;
+        }
 
         if (currentStep >= steps) {
           clearInterval(timer);
@@ -51,6 +96,7 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, isVisible }) =
     } else {
       // If the message is already decoded, just display it
       setDisplayedContent(content);
+      setDecodedWords([]);
     }
   }, [message, isVisible, state.gameProgress]);
 
@@ -76,6 +122,20 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, isVisible }) =
                 style={{ width: `${decodingProgress * 100}%` }}
               />
             </div>
+            <p ref={contentRef} className="decoding-content">
+              {displayedContent.split(' ').map((word, index) => {
+                const isDecoded = decodedWords.includes(index.toString());
+                const isStatic = word.includes('[static]');
+                return (
+                  <span
+                    key={index}
+                    className={`message-word ${isDecoded ? 'decoded' : ''} ${isStatic ? 'static' : ''}`}
+                  >
+                    {word}{' '}
+                  </span>
+                );
+              })}
+            </p>
           </div>
         ) : (
           <p>{displayedContent}</p>

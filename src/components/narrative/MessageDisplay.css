@@ -55,12 +55,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 100px;
+  justify-content: flex-start;
+  min-height: 100px;
+  width: 100%;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
 }
 
 .decoding-text {
   margin-bottom: 10px;
+  color: #0f0;
+  font-weight: bold;
   animation: blink 1s infinite;
 }
 
@@ -70,12 +76,45 @@
   background-color: #222;
   border-radius: 5px;
   overflow: hidden;
+  margin-bottom: 15px;
 }
 
 .decoding-progress-fill {
   height: 100%;
   background-color: #0f0;
   transition: width 0.1s linear;
+}
+
+.decoding-content {
+  width: 100%;
+  text-align: left;
+  line-height: 1.6;
+  font-family: 'Courier New', monospace;
+  margin-top: 10px;
+}
+
+.message-word {
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.message-word.static {
+  color: #888;
+  background-color: rgba(255, 0, 0, 0.1);
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.message-word.decoded {
+  color: #0f0;
+  background-color: rgba(0, 255, 0, 0.1);
+  font-weight: bold;
+  animation: highlight 1s ease-out;
+}
+
+@keyframes highlight {
+  0% { background-color: rgba(0, 255, 0, 0.5); }
+  100% { background-color: rgba(0, 255, 0, 0.1); }
 }
 
 @keyframes blink {
