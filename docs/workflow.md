@@ -431,3 +431,58 @@ class NarrativeSystem {
   }
 }
 ```
+
+## Agent Synchronization Workflow
+
+### Daily Sync Process
+1. Start by updating develop:
+   ```bash
+   git checkout develop
+   git pull origin develop
+   ```
+
+2. Create feature branch:
+   ```bash
+   # For Alpha agent
+   git checkout -b feature/alpha/your-feature
+   # For Beta agent
+   git checkout -b feature/beta/your-feature
+   ```
+
+3. Before creating PR:
+   ```bash
+   git checkout your-feature-branch
+   git fetch origin
+   git rebase origin/develop
+   ```
+
+### Conflict Prevention
+1. Check other agent's work:
+   ```bash
+   git fetch origin
+   git checkout origin/feature/[alpha|beta]/*
+   npm run check-all
+   ```
+
+2. Use interface validation:
+   ```bash
+   npm run dev:validate-contracts
+   ```
+
+### Merge Conflict Resolution
+1. Both agents must use the contract validation tool
+2. Conflicts in shared interfaces must be resolved via contract branches
+3. Create a contract resolution branch:
+   ```bash
+   git checkout -b feature/contract/resolve-conflict
+   ```
+
+4. Both agents must approve contract resolution PRs
+
+### PR Requirements
+1. PR title format: `[Alpha|Beta] Feature description`
+2. Required checks before merge:
+   - All tests passing
+   - Contract validation passing
+   - Other agent's approval
+   - No conflicts with develop

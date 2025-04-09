@@ -69,18 +69,33 @@ Each sprint document follows a consistent structure:
 
 ## Development Workflow
 
-1. Create feature branches from `develop` for each major feature
-2. Implement features with tests
-3. Submit PRs for review
-4. Merge to `develop` branch
-5. At the end of each sprint, merge `develop` to `main` if stable
+1. Sync with develop branch
+2. Create feature branches following agent prefixes:
+   - Alpha agent: `feature/alpha/*`
+   - Beta agent: `feature/beta/*`
+   - Interface contracts: `feature/contract/*`
+3. Implement features with tests
+4. Validate against other agent's work
+5. Submit PRs for review
+6. Merge to `develop` branch after approval
+7. At sprint end, merge `develop` to `main` if stable
+
+## Cross-Agent Coordination
+
+1. Daily sync with develop branch
+2. Contract validation before PRs
+3. Cross-agent review requirements
+4. Interface contract management
+5. Conflict resolution protocol
 
 ## Sprint Review Process
 
 At the end of each sprint:
-1. Review completed tasks against the Definition of Done
-2. Document lessons learned
-3. Update the sprint document with actual progress
-4. Move completed sprint document to archive
-5. Prepare the next sprint document
-6. Create a PR to merge `develop` into `main`
+1. Review completed tasks against Definition of Done
+2. Validate all agent interfaces
+3. Document lessons learned
+4. Update sprint document with actual progress
+5. Move completed sprint document to archive
+6. Prepare next sprint document
+7. Create PR to merge `develop` into `main`
+
