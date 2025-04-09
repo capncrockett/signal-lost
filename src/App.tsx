@@ -1,24 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 import './styles/accessibility.css';
 import RadioTuner from './components/radio/RadioTuner';
 import { AssetLoader, SkipToContent } from './components/common';
+import { RouteTransition, LazyRoute } from './components/routing';
 import { ESSENTIAL_ASSETS } from './assets';
 
-// Placeholder components - will be replaced with actual components later
-const Home = () => (
+// Lazy load page components
+const Home = lazy(() => import('./pages/Home'));
+const RadioPage = lazy(() => import('./pages/RadioPage'));
+const FieldExploration = lazy(() => import('./pages/FieldExploration'));
+
+// Fallback components for development until pages are implemented
+const HomeFallback = () => (
   <div className="page home-page" data-testid="home-page">
     Home Page
   </div>
 );
-const RadioPage = () => (
+const RadioPageFallback = () => (
   <div className="page radio-tuner-page" data-testid="radio-page">
     <h2 data-testid="radio-page-title">Radio Tuner</h2>
     <RadioTuner data-testid="radio-tuner" />
   </div>
 );
-const FieldExploration = () => (
+const FieldExplorationFallback = () => (
   <div className="page field-exploration-page" data-testid="field-page">
     Field Exploration
   </div>
@@ -66,11 +72,27 @@ const App: React.FC = () => {
             </nav>
           </header>
           <main className="app-content" id="main-content" data-testid="app-content" tabIndex={-1}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/radio" element={<RadioPage />} />
-              <Route path="/field" element={<FieldExploration />} />
-            </Routes>
+            <RouteTransition>
+              <Routes>
+                <Route
+                  path="/"
+                  element={<LazyRoute component={Home} fallback={<HomeFallback />} />}
+                />
+                <Route
+                  path="/radio"
+                  element={<LazyRoute component={RadioPage} fallback={<RadioPageFallback />} />}
+                />
+                <Route
+                  path="/field"
+                  element={
+                    <LazyRoute
+                      component={FieldExploration}
+                      fallback={<FieldExplorationFallback />}
+                    />
+                  }
+                />
+              </Routes>
+            </RouteTransition>
           </main>
           <footer className="app-footer" data-testid="app-footer">
             <p>Signal Lost - A narrative exploration game</p>
