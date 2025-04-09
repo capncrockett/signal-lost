@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
-import { GameEvent, EventState, initialEventState } from '../types/event';
+import { initialEventState } from '../types/event';
+import { GameEvent, EventState } from '../types/event.d';
 
 // Define action types for event state management
 type EventActionType =

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSignalState } from '../../context/SignalStateContext';
 import { useGameState } from '../../context/GameStateContext';
 import { getMessage } from '../../data/messages';
-import { Signal } from '../../types/signal';
+import { Signal } from '../../types/signal.d';
 import './MessageHistory.css';
 
 interface MessageHistoryProps {
@@ -22,7 +22,7 @@ const MessageHistory: React.FC<MessageHistoryProps> = ({ isOpen, onClose }) => {
     if (isOpen) {
       const signals = getDiscoveredSignals();
       setDiscoveredSignals(signals);
-      
+
       // Select the first signal by default if available
       if (signals.length > 0 && !selectedSignalId) {
         setSelectedSignalId(signals[0].id);
@@ -41,7 +41,7 @@ const MessageHistory: React.FC<MessageHistoryProps> = ({ isOpen, onClose }) => {
           const content = message.isDecoded || gameState.gameProgress >= (message.requiredProgress || 0)
             ? message.decodedContent || message.content
             : message.content;
-          
+
           setSelectedMessageContent(content);
         } else {
           setSelectedMessageContent('Message not found');
@@ -69,7 +69,7 @@ const MessageHistory: React.FC<MessageHistoryProps> = ({ isOpen, onClose }) => {
     <div className="message-history-overlay">
       <div className="message-history-container">
         <h2>Message History</h2>
-        
+
         <div className="message-history-content">
           {discoveredSignals.length === 0 ? (
             <div className="no-messages">No messages discovered yet</div>
@@ -89,7 +89,7 @@ const MessageHistory: React.FC<MessageHistoryProps> = ({ isOpen, onClose }) => {
                   </div>
                 ))}
               </div>
-              
+
               <div className="message-content-view">
                 <h3>Message Content</h3>
                 {selectedSignalId ? (
@@ -103,7 +103,7 @@ const MessageHistory: React.FC<MessageHistoryProps> = ({ isOpen, onClose }) => {
             </div>
           )}
         </div>
-        
+
         <div className="message-history-footer">
           <button onClick={onClose} className="close-button">
             Close
