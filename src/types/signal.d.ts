@@ -25,3 +25,13 @@ export interface Signal {
   /** Timestamp when the signal was created or last updated */
   timestamp: number;
 }
+
+/**
+ * Signal state for tracking discovered signals and their status
+ */
+export interface SignalState {
+  signals: Record<string, Signal>;
+  activeSignalId: string | null;
+  discoveredSignalIds: string[];
+  lastDiscoveredTimestamp: number | null;
+}
