@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import * as NoiseGenerator from '../../src/audio/NoiseGenerator';
 import * as frequencies from '../../src/data/frequencies';
+import { GameStateProvider } from '../../src/context/GameStateContext';
 
 // Use our mocks instead of the real components
 import { AudioProvider } from '../mocks/AudioContextMock';
@@ -130,7 +131,7 @@ describe('RadioTuner and Audio Integration', () => {
       messageId: 'intro_signal',
       isStatic: false,
       tolerance: 0.1,
-      signalStrength: 0.8
+      signalStrength: 0.8,
     };
     jest.spyOn(frequencies, 'findSignalAtFrequency').mockReturnValue(mockSignal);
 
@@ -152,7 +153,7 @@ describe('RadioTuner and Audio Integration', () => {
       messageId: 'distress_call',
       isStatic: true,
       tolerance: 0.2,
-      signalStrength: 0.6
+      signalStrength: 0.6,
     };
     jest.spyOn(frequencies, 'findSignalAtFrequency').mockReturnValue(mockSignal);
 

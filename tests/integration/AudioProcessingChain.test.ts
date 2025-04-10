@@ -86,6 +86,7 @@ describe('Audio Processing Chain', () => {
 
       // Use the variables to avoid unused variable warnings
       expect(noise).toBeDefined();
+      expect(filter).toBeDefined();
       expect(gain).toBeDefined();
 
       // In a real scenario, noise would connect to filter

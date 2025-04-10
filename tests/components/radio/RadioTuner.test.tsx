@@ -20,7 +20,8 @@ const mockDispatch = jest.fn().mockImplementation((action) => {
     mockGameState.currentFrequency = action.payload;
   } else if (action.type === 'ADD_DISCOVERED_FREQUENCY') {
     // Type assertion to handle the 'never' type error
-    mockGameState.discoveredFrequencies.push(action.payload as number);
+    // @ts-expect-error - This is a mock implementation
+    mockGameState.discoveredFrequencies.push(action.payload);
   }
 });
 

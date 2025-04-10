@@ -223,7 +223,7 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
     return () => {
       cancelAnimationFrame(animationId);
     };
-  }, [staticIntensity, state.isRadioOn]);
+  }, [staticIntensity, state.isRadioOn, signalStrength]);
 
   // Toggle message display
   const toggleMessage = (): void => {
