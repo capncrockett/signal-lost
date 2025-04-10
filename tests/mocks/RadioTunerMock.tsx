@@ -6,8 +6,8 @@ import {
   calculateSignalStrength,
   getStaticIntensity,
 } from '../../src/data/frequencies';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { getMessage } from '../../src/data/messages';
+// We don't need this import since we're not using getMessage
+// import { getMessage } from '../../src/data/messages';
 import { NoiseType } from '../../src/audio/NoiseType';
 import { createNoise, createSignal } from '../../src/audio/NoiseGenerator';
 
@@ -30,11 +30,9 @@ const RadioTunerMock: React.FC<RadioTunerProps> = ({
   const audio = useAudio();
 
   const [frequency, setFrequency] = useState<number>(initialFrequency);
-  // We're not using this state in the mock, but it's part of the component logic
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [signalStrength, setSignalStrength] = useState<number>(0);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [currentSignalId, setCurrentSignalId] = useState<string | null>(null);
+  // We don't need these state variables since we're not using them
+  // const [signalStrength, setSignalStrength] = useState<number>(0);
+  // const [currentSignalId, setCurrentSignalId] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
 
   // Update frequency and handle audio changes
@@ -48,8 +46,9 @@ const RadioTunerMock: React.FC<RadioTunerProps> = ({
 
     if (signal) {
       const strength = calculateSignalStrength(frequency, signal);
-      setSignalStrength(strength);
-      setCurrentSignalId(signal.messageId);
+      // We've removed these state variables since they're not used elsewhere
+      // setSignalStrength(strength);
+      // setCurrentSignalId(signal.messageId);
 
       if (signal.isStatic) {
         // Create static noise
@@ -68,8 +67,9 @@ const RadioTunerMock: React.FC<RadioTunerProps> = ({
       }
     } else {
       const intensity = getStaticIntensity(frequency);
-      setSignalStrength(0.1);
-      setCurrentSignalId(null);
+      // We've removed these state variables since they're not used elsewhere
+      // setSignalStrength(0.1);
+      // setCurrentSignalId(null);
 
       // Create only static noise for frequencies without signals
       createNoise({
