@@ -26,11 +26,17 @@ Completed sprints are moved to the `docs/archive` directory for reference, while
 - Asset management
 - Accessibility features
 
-### Sprint 02: Core Mechanics (Current)
+### Sprint 02: Core Mechanics (Completed)
 - Radio tuner component
 - Audio system
 - Narrative system
 - Core gameplay mechanics
+
+### Sprint 2.5: Bug Fixes and Workflow Improvement (Current)
+- Fix critical bugs (audio loading, infinite render loops)
+- Improve test infrastructure
+- Clean up code and improve quality
+- Enhance agent workflow
 
 ### Sprint 03: Field Exploration
 - Grid-based movement
