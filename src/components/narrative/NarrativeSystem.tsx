@@ -38,13 +38,13 @@ const NarrativeSystem: React.FC<NarrativeSystemProps> = ({
   // Update narrative progress based on discovered signals and completed objectives
   useEffect(() => {
     // Calculate progress based on discovered signals
-    const discoveredSignals = signalState.discoveredSignalIds.length;
-    const totalSignals = Object.keys(signalState.signals).length;
+    const discoveredSignals = signalState?.discoveredSignalIds?.length || 0;
+    const totalSignals = Object.keys(signalState?.signals || {}).length;
 
     // Calculate progress based on completed objectives
-    const completedObjectives = progressState.completedObjectiveIds.length;
-    const totalObjectives =
-      completedObjectives + Object.keys(progressState.state.objectives || {}).length;
+    const completedObjectives = progressState?.completedObjectiveIds?.length || 0;
+    const objectives = progressState?.state?.objectives || {};
+    const totalObjectives = completedObjectives + Object.keys(objectives).length;
 
     // Combine both factors to calculate narrative progress
     let newProgress = 0;
@@ -59,18 +59,18 @@ const NarrativeSystem: React.FC<NarrativeSystemProps> = ({
 
     setNarrativeProgress(newProgress);
   }, [
-    signalState.discoveredSignalIds,
-    signalState.signals,
-    progressState.completedObjectiveIds,
-    progressState.state.objectives,
+    signalState?.discoveredSignalIds,
+    signalState?.signals,
+    progressState?.completedObjectiveIds,
+    progressState?.state?.objectives,
   ]);
 
   // Update selected message when selectedSignalId changes
   useEffect(() => {
     if (selectedSignalId) {
-      const signal = getSignalById(selectedSignalId);
+      const signal = getSignalById ? getSignalById(selectedSignalId) : null;
       if (signal && signal.type === 'message') {
-        const message = getMessage(signal.content);
+        const message = getMessage ? getMessage(signal.content) : null;
         setSelectedMessage(message);
 
         // Mark message as read
@@ -78,12 +78,14 @@ const NarrativeSystem: React.FC<NarrativeSystemProps> = ({
           setUnreadMessages((prev) => prev.filter((id) => id !== selectedSignalId));
 
           // Dispatch event for reading a message
-          dispatchEvent('narrative', {
-            type: 'message_read',
-            signalId: selectedSignalId,
-            messageId: message.id,
-            timestamp: Date.now(),
-          });
+          if (dispatchEvent) {
+            dispatchEvent('narrative', {
+              type: 'message_read',
+              signalId: selectedSignalId,
+              messageId: message.id,
+              timestamp: Date.now(),
+            });
+          }
         }
 
         // Show message display
@@ -143,7 +145,9 @@ const NarrativeSystem: React.FC<NarrativeSystemProps> = ({
 
   // Get all message signals
   const getMessageSignals = (): Signal[] => {
-    return getDiscoveredSignals().filter((signal) => signal.type === 'message');
+    return getDiscoveredSignals
+      ? getDiscoveredSignals().filter((signal) => signal.type === 'message')
+      : [];
   };
 
   if (!isVisible) {

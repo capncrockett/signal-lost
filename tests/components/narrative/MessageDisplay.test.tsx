@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import MessageDisplay from '../../../src/components/narrative/MessageDisplay';
 import { Message } from '../../../src/data/messages';
-import { GameStateProvider } from '../../../src/context/GameStateContext';
+import GameStateProvider from '../../../src/context/GameStateContext';
 
 // Mock message for testing
 const mockMessage: Message = {

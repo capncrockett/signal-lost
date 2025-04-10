@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import * as NoiseGenerator from '../../src/audio/NoiseGenerator';
 import * as frequencies from '../../src/data/frequencies';
-import { GameStateProvider } from '../../src/context/GameStateContext';
+import GameStateProvider from '../../src/context/GameStateContext';
 
 // Use our mocks instead of the real components
 import { AudioProvider } from '../mocks/AudioContextMock';

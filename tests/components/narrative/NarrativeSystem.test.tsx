@@ -110,10 +110,10 @@ jest.mock('../../../src/context/ProgressContext', () => ({
           isCompleted: false,
         },
       },
-      completedObjectiveIds: ['objective-1'],
-      lastCompletedObjectiveId: 'objective-1',
-      lastCompletedTimestamp: Date.now(),
     },
+    completedObjectiveIds: ['objective-1'],
+    lastCompletedObjectiveId: 'objective-1',
+    lastCompletedTimestamp: Date.now(),
   }),
 }));
 
