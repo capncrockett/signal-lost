@@ -45,32 +45,31 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      - name: Start dev server
+      - name: Start dev server and run E2E tests
+        timeout-minutes: 10
         run: |
+          # Start the dev server in the background
           npm run dev &
           # Store the process ID to kill it later
           echo "DEV_SERVER_PID=$!" >> $GITHUB_ENV
-          # Wait for the server to be available with a timeout
-          npx wait-on http://localhost:5173 --timeout 60000 || {
-            echo "::error::Dev server failed to start within the timeout period"
+          # Give the server a moment to start
+          sleep 10
+          # Run the E2E tests
+          npm run test:e2e:ci || {
+            echo "::error::E2E tests failed"
+            kill $! || true
             exit 1
           }
+          # Run visual regression tests
+          npx playwright test --config=playwright.visual.config.ts || {
+            echo "::error::Visual regression tests failed"
+            kill $! || true
+            exit 1
+          }
+          # Stop the dev server
+          kill $! || true
 
-      - name: Run E2E tests
-        run: npm run test:e2e:ci
-        timeout-minutes: 5
-
-      - name: Run visual regression tests
-        run: npx playwright test --config=playwright.visual.config.ts
-        timeout-minutes: 5
-
-      - name: Stop dev server
-        if: always()
-        run: |
-          if [ -n "$DEV_SERVER_PID" ]; then
-            echo "Stopping dev server (PID: $DEV_SERVER_PID)"
-            kill $DEV_SERVER_PID || true
-          fi
+      # E2E tests and visual regression tests are now run in the "Start dev server and run E2E tests" step
 
       - name: Upload visual test artifacts
         if: always()
