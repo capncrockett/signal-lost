@@ -1,29 +1,33 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { CombinedGameProvider } from '../../src/context/CombinedGameProvider';
+import CombinedGameProvider from '../../src/context/CombinedGameProvider';
 
 // Mock the child components
 jest.mock('../../src/context/GameStateContext', () => ({
-  GameStateProvider: ({ children }: { children: React.ReactNode }) => (
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="game-state-provider">{children}</div>
   ),
 }));
 
 jest.mock('../../src/context/SignalStateContext', () => ({
-  SignalStateProvider: ({ children }: { children: React.ReactNode }) => (
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="signal-state-provider">{children}</div>
   ),
 }));
 
 jest.mock('../../src/context/EventContext', () => ({
-  EventProvider: ({ children }: { children: React.ReactNode }) => (
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="event-provider">{children}</div>
   ),
 }));
 
 jest.mock('../../src/context/ProgressContext', () => ({
-  ProgressProvider: ({ children }: { children: React.ReactNode }) => (
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="progress-provider">{children}</div>
   ),
 }));
@@ -35,7 +39,8 @@ jest.mock('../../src/context/TriggerContext', () => ({
 }));
 
 jest.mock('../../src/context/AudioContext', () => ({
-  AudioProvider: ({ children }: { children: React.ReactNode }) => (
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="audio-provider">{children}</div>
   ),
 }));
@@ -45,6 +50,11 @@ jest.mock('../../src/components/system/TriggerSystem', () => ({
   default: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="trigger-system">{children}</div>
   ),
+}));
+
+jest.mock('../../src/components/system/GameStateIntegration', () => ({
+  __esModule: true,
+  default: () => <div data-testid="game-state-integration" />,
 }));
 
 // Mock fetch for trigger config loading

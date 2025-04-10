@@ -1,6 +1,6 @@
 import React from 'react';
 import { act, renderHook } from '@testing-library/react';
-import { EventProvider, useEvent } from '../../src/context/EventContext';
+import EventProvider, { useEvent } from '../../src/context/EventContext';
 import { GameEvent } from '../../src/types/event.d';
 
 // Mock localStorage
