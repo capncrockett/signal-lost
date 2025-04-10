@@ -164,7 +164,7 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
       const signalColor = {
         r: signalStrength > 0.7 ? 0 : 255 * (1 - signalStrength),
         g: signalStrength > 0.3 ? 255 * signalStrength : 0,
-        b: signalStrength < 0.3 ? 255 * (1 - signalStrength) : 0
+        b: signalStrength < 0.3 ? 255 * (1 - signalStrength) : 0,
       };
 
       for (let i = 0; i < data.length; i += 4) {
@@ -173,9 +173,9 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
         const colorVariation = Math.random() * 0.3;
 
         // Apply color tint based on signal strength
-        data[i] = noisePattern + (signalColor.r * colorVariation); // R
-        data[i + 1] = noisePattern + (signalColor.g * colorVariation); // G
-        data[i + 2] = noisePattern + (signalColor.b * colorVariation); // B
+        data[i] = noisePattern + signalColor.r * colorVariation; // R
+        data[i + 1] = noisePattern + signalColor.g * colorVariation; // G
+        data[i + 2] = noisePattern + signalColor.b * colorVariation; // B
         data[i + 3] = (Math.random() * 200 + 55) * staticIntensity; // A - more varied opacity
       }
 
@@ -199,7 +199,7 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
       const signalColor = {
         r: signalStrength > 0.7 ? 0 : 255 * (1 - signalStrength),
         g: signalStrength > 0.3 ? 255 * signalStrength : 0,
-        b: signalStrength < 0.3 ? 255 * (1 - signalStrength) : 0
+        b: signalStrength < 0.3 ? 255 * (1 - signalStrength) : 0,
       };
 
       for (let i = 0; i < data.length; i += 4) {
@@ -208,9 +208,9 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
         const colorVariation = Math.random() * 0.3;
 
         // Apply color tint based on signal strength
-        data[i] = noisePattern + (signalColor.r * colorVariation); // R
-        data[i + 1] = noisePattern + (signalColor.g * colorVariation); // G
-        data[i + 2] = noisePattern + (signalColor.b * colorVariation); // B
+        data[i] = noisePattern + signalColor.r * colorVariation; // R
+        data[i + 1] = noisePattern + signalColor.g * colorVariation; // G
+        data[i + 2] = noisePattern + signalColor.b * colorVariation; // B
         data[i + 3] = (Math.random() * 200 + 55) * staticIntensity; // A - more varied opacity
       }
 

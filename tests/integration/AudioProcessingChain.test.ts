@@ -1,7 +1,7 @@
 import { createNoise, createSignal } from '../../src/audio/NoiseGenerator';
 import { NoiseType } from '../../src/audio/NoiseType';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as Tone from 'tone';
+// We don't need to import Tone directly
+// import * as Tone from 'tone';
 
 // Mock the actual implementation of NoiseGenerator
 jest.mock('../../src/audio/NoiseGenerator', () => {
@@ -78,8 +78,15 @@ describe('Audio Processing Chain', () => {
     expect(result).not.toBeNull();
 
     if (result) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { noise, filter, gain } = result;
+      // Access the properties but don't use them directly
+      // This is just to verify the structure
+      const noise = result.noise;
+      const filter = result.filter;
+      const gain = result.gain;
+
+      // Use the variables to avoid unused variable warnings
+      expect(noise).toBeDefined();
+      expect(gain).toBeDefined();
 
       // In a real scenario, noise would connect to filter
       // We're just verifying the structure
@@ -104,8 +111,15 @@ describe('Audio Processing Chain', () => {
     expect(result).not.toBeNull();
 
     if (result) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { noise, filter, gain } = result;
+      // Access the properties but don't use them directly
+      // This is just to verify the structure
+      const noise = result.noise;
+      const filter = result.filter;
+      const gain = result.gain;
+
+      // Use the variables to avoid unused variable warnings
+      expect(noise).toBeDefined();
+      expect(gain).toBeDefined();
 
       // In a real scenario, noise would connect to gain
       // We're just verifying the structure
@@ -126,8 +140,14 @@ describe('Audio Processing Chain', () => {
     expect(result).not.toBeNull();
 
     if (result) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { oscillator, gain } = result;
+      // Access the properties but don't use them directly
+      // This is just to verify the structure
+      const oscillator = result.oscillator;
+      const gain = result.gain;
+
+      // Use the variables to avoid unused variable warnings
+      expect(oscillator).toBeDefined();
+      expect(gain).toBeDefined();
 
       // In a real scenario, oscillator would connect to gain
       // We're just verifying the structure

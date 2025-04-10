@@ -2,11 +2,9 @@ import React from 'react';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import RadioTuner from '../../../src/components/radio/RadioTuner';
-// These imports are needed for the type definitions
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { GameStateProvider } from '../../../src/context/GameStateContext';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { AudioProvider } from '../../../src/context/AudioContext';
+// We don't need to import these anymore as we're mocking them
+// import { GameStateProvider } from '../../../src/context/GameStateContext';
+// import { AudioProvider } from '../../../src/context/AudioContext';
 
 // Mock the hooks and canvas functionality
 const mockGameState = {
@@ -21,7 +19,8 @@ const mockDispatch = jest.fn().mockImplementation((action) => {
   } else if (action.type === 'SET_FREQUENCY') {
     mockGameState.currentFrequency = action.payload;
   } else if (action.type === 'ADD_DISCOVERED_FREQUENCY') {
-    mockGameState.discoveredFrequencies.push(action.payload);
+    // Type assertion to handle the 'never' type error
+    mockGameState.discoveredFrequencies.push(action.payload as number);
   }
 });
 
@@ -80,13 +79,12 @@ describe('RadioTuner Component', () => {
     return render(ui);
   };
 
-  // Helper function to render with providers
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const renderWithProviders = (ui: React.ReactElement) => {
-    // Clear previous renders
-    cleanup();
-    return render(ui);
-  };
+  // We don't need this function anymore as we're using renderComponent
+  // const renderWithProviders = (ui: React.ReactElement) => {
+  //   // Clear previous renders
+  //   cleanup();
+  //   return render(ui);
+  // };
 
   // Clean up after each test
   afterEach(() => {

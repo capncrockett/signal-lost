@@ -1,13 +1,7 @@
 import React from 'react';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { GameStateProvider } from '../../src/context/GameStateContext';
 import * as NoiseGenerator from '../../src/audio/NoiseGenerator';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { NoiseType } from '../../src/audio/NoiseType';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as Tone from 'tone';
 import * as frequencies from '../../src/data/frequencies';
 
 // Use our mocks instead of the real components
@@ -131,7 +125,13 @@ describe('RadioTuner and Audio Integration', () => {
 
   test('tuning to a signal frequency triggers audio changes', () => {
     // Mock the findSignalAtFrequency function to return a non-static signal
-    const mockSignal = { frequency: 91.1, messageId: 'intro_signal', isStatic: false };
+    const mockSignal: frequencies.SignalFrequency = {
+      frequency: 91.1,
+      messageId: 'intro_signal',
+      isStatic: false,
+      tolerance: 0.1,
+      signalStrength: 0.8
+    };
     jest.spyOn(frequencies, 'findSignalAtFrequency').mockReturnValue(mockSignal);
 
     // Directly render with a frequency that has a clear signal
@@ -147,7 +147,13 @@ describe('RadioTuner and Audio Integration', () => {
 
   test('tuning to a static signal frequency plays both signal and static', () => {
     // Mock the findSignalAtFrequency function to return a static signal
-    const mockSignal = { frequency: 94.2, messageId: 'distress_call', isStatic: true };
+    const mockSignal: frequencies.SignalFrequency = {
+      frequency: 94.2,
+      messageId: 'distress_call',
+      isStatic: true,
+      tolerance: 0.2,
+      signalStrength: 0.6
+    };
     jest.spyOn(frequencies, 'findSignalAtFrequency').mockReturnValue(mockSignal);
 
     // Clear mocks before the test
