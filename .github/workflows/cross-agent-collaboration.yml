@@ -8,13 +8,18 @@ on:
   issue_comment:
     types: [created]
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   check-collaboration:
     runs-on: ubuntu-latest
     if: ${{ github.event.pull_request || contains(github.event.issue.html_url, '/pull/') }}
-    
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Determine PR number and agent type
         id: pr-info
@@ -26,13 +31,13 @@ jobs:
             # For issue_comment events, extract PR number from issue URL
             PR_NUMBER=$(echo "${{ github.event.issue.html_url }}" | grep -o '[0-9]\+$')
             echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-            
+
             # Need to fetch PR details to get the head ref
             PR_DETAILS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER")
             PR_HEAD_REF=$(echo "$PR_DETAILS" | jq -r .head.ref)
           fi
-          
+
           # Determine agent type based on branch name
           if [[ "$PR_HEAD_REF" == feature/alpha/* ]]; then
             echo "agent=alpha" >> $GITHUB_OUTPUT
@@ -54,7 +59,7 @@ jobs:
         run: |
           # Get the reviewer's login
           REVIEWER="${{ github.event.review.user.login }}"
-          
+
           # Check if the reviewer is from the other agent
           # This is a simplified check - in a real scenario, you'd have a more robust way to identify agents
           if [[ "${{ steps.pr-info.outputs.agent }}" == "alpha" && "$REVIEWER" == "CSL-Beta" ]]; then
@@ -74,7 +79,7 @@ jobs:
         run: |
           # Get the commenter's login
           COMMENTER="${{ github.event.comment.user.login }}"
-          
+
           # Check if the comment is from the other agent
           if [[ "${{ steps.pr-info.outputs.agent }}" == "alpha" && "$COMMENTER" == "CSL-Beta" ]]; then
             echo "comment_by_other_agent=true" >> $GITHUB_OUTPUT
@@ -91,12 +96,12 @@ jobs:
         run: |
           echo "# Cross-Agent Collaboration Report" > collaboration-report.md
           echo "" >> collaboration-report.md
-          
+
           echo "## PR Information" >> collaboration-report.md
           echo "- PR #${{ steps.pr-info.outputs.pr_number }}" >> collaboration-report.md
           echo "- Agent: ${{ steps.pr-info.outputs.agent }}" >> collaboration-report.md
           echo "" >> collaboration-report.md
-          
+
           if [[ "${{ github.event_name }}" == "pull_request_review" && "${{ github.event.review.state }}" == "approved" ]]; then
             if [[ "${{ steps.check-approval.outputs.approved_by_other_agent }}" == "true" ]]; then
               echo "## Approval Status" >> collaboration-report.md
@@ -120,15 +125,15 @@ jobs:
 
       - name: Comment on PR
         if: ${{ (github.event_name == 'pull_request_review' && steps.check-approval.outputs.approved_by_other_agent == 'true') || (github.event_name == 'issue_comment' && steps.check-comments.outputs.comment_by_other_agent == 'true') || github.event_name == 'pull_request' }}
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             const report = fs.readFileSync('collaboration-report.md', 'utf8');
-            
+
             const prNumber = ${{ steps.pr-info.outputs.pr_number }};
-            
+
             github.rest.issues.createComment({
               issue_number: prNumber,
               owner: context.repo.owner,
