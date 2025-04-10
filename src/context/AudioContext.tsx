@@ -57,7 +57,7 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
         newFilter.dispose();
       }
     };
-  }, [noiseNode, oscillator, filter]);
+  }, []); // Empty dependency array to run only on mount/unmount
 
   // Update master volume when volume state changes
   useEffect(() => {
