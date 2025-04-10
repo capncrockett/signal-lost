@@ -27,7 +27,9 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
   const [volume, setVolumeState] = useState<number>(0.5);
   const [noiseNode, setNoiseNode] = useState<Tone.Noise | null>(null);
   const [oscillator, setOscillator] = useState<Tone.Oscillator | null>(null);
-  const [filter, setFilter] = useState<Tone.Filter | null>(null);
+  // We need to track the filter state even though it's not directly used in the component
+  // It's used in the playStaticNoise function when a new filter is created
+  const [, setFilter] = useState<Tone.Filter | null>(null);
   const [noiseType, setNoiseType] = useState<NoiseType>(NoiseType.Pink);
   const [noiseGain, setNoiseGain] = useState<Tone.Gain<'gain'> | null>(null);
   const [signalGain, setSignalGain] = useState<Tone.Gain<'gain'> | null>(null);
@@ -57,7 +59,8 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
         newFilter.dispose();
       }
     };
-  }, [noiseNode, oscillator, filter]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array to run only on mount/unmount
 
   // Update master volume when volume state changes
   useEffect(() => {
