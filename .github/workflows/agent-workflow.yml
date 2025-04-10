@@ -68,6 +68,8 @@ jobs:
               viewport: { width: 1280, height: 800 },
               actionTimeout: 15000,
               navigationTimeout: 15000,
+              // Only capture screenshots on failure
+              screenshot: 'only-on-failure',
             },
             projects: [
               {
@@ -95,8 +97,8 @@ jobs:
       - name: Run E2E tests
         timeout-minutes: 10
         run: |
-          # Run the E2E tests with the modified config
-          npx playwright test --config=playwright.ci.config.ts || {
+          # Run the E2E tests with the modified config and minimal logging
+          npx playwright test --config=playwright.ci.config.ts --reporter=dot || {
             echo "::error::E2E tests failed"
             exit 1
           }
@@ -154,8 +156,8 @@ jobs:
       - name: Run visual regression tests
         timeout-minutes: 5
         run: |
-          # Run visual regression tests with the modified config
-          npx playwright test --config=playwright.visual.ci.config.ts || {
+          # Run visual regression tests with the modified config and minimal logging
+          npx playwright test --config=playwright.visual.ci.config.ts --reporter=dot || {
             echo "::error::Visual regression tests failed"
             exit 1
           }
@@ -169,7 +171,7 @@ jobs:
           fi
 
       - name: Upload visual test artifacts
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: visual-test-results
@@ -180,7 +182,7 @@ jobs:
 
       - name: Upload E2E test screenshots
         uses: actions/upload-artifact@v4
-        if: always()
+        if: failure()
         with:
           name: e2e-screenshots
           path: e2e-screenshots/
@@ -188,7 +190,7 @@ jobs:
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
-        if: always()
+        if: failure()
         with:
           name: test-reports
           path: |
@@ -222,6 +224,7 @@ jobs:
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
+        if: failure()
         with:
           name: build-artifacts
           path: dist/
