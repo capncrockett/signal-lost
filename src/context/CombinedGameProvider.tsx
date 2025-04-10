@@ -4,12 +4,13 @@ import { SignalStateProvider } from './SignalStateContext';
 import { EventProvider } from './EventContext';
 import { ProgressProvider } from './ProgressContext';
 import { AudioProvider } from './AudioContext';
-
-// Make sure all providers are properly exported
+import GameStateIntegration from '../components/system/GameStateIntegration';
 
 interface CombinedGameProviderProps {
   children: ReactNode;
   persistState?: boolean;
+  enableGameStateIntegration?: boolean;
+  autoSaveInterval?: number;
 }
 
 /**
@@ -19,13 +20,23 @@ interface CombinedGameProviderProps {
 export const CombinedGameProvider: React.FC<CombinedGameProviderProps> = ({
   children,
   persistState = true,
+  enableGameStateIntegration = true,
+  autoSaveInterval = 5 * 60 * 1000, // 5 minutes
 }) => {
   return (
     <GameStateProvider persistState={persistState}>
       <SignalStateProvider persistState={persistState}>
         <EventProvider persistState={persistState}>
           <ProgressProvider persistState={persistState}>
-            <AudioProvider>{children}</AudioProvider>
+            <AudioProvider>
+              {enableGameStateIntegration && (
+                <GameStateIntegration
+                  triggerUrls={['/assets/narrative/events.json']}
+                  autoSaveInterval={autoSaveInterval}
+                />
+              )}
+              {children}
+            </AudioProvider>
           </ProgressProvider>
         </EventProvider>
       </SignalStateProvider>

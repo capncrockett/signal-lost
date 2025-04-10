@@ -1,0 +1,139 @@
+[
+  {
+    "id": "signal_discovery_trigger",
+    "conditions": [
+      {
+        "type": "has_signal",
+        "target": "signal-1"
+      }
+    ],
+    "action": "dispatch_event:narrative",
+    "parameters": {
+      "type": "signal_discovered",
+      "message": "You've discovered a new signal!"
+    }
+  },
+  {
+    "id": "progress_milestone_trigger",
+    "conditions": [
+      {
+        "type": "progress_min",
+        "target": "progress",
+        "value": 0.25
+      }
+    ],
+    "action": "dispatch_event:narrative",
+    "parameters": {
+      "type": "progress_milestone",
+      "message": "You've made significant progress in your investigation."
+    }
+  },
+  {
+    "id": "objective_completion_trigger",
+    "conditions": [
+      {
+        "type": "objective_completed",
+        "target": "find_radio"
+      }
+    ],
+    "action": "set_variable:has_radio",
+    "parameters": {
+      "value": true
+    }
+  },
+  {
+    "id": "radio_access_trigger",
+    "conditions": [
+      {
+        "type": "variable_equals",
+        "target": "has_radio",
+        "value": true
+      }
+    ],
+    "action": "dispatch_event:narrative",
+    "parameters": {
+      "type": "radio_access",
+      "message": "You now have access to the radio tuner."
+    }
+  },
+  {
+    "id": "bunker_key_trigger",
+    "conditions": [
+      {
+        "type": "has_item",
+        "target": "bunker_key"
+      }
+    ],
+    "action": "dispatch_event:narrative",
+    "parameters": {
+      "type": "bunker_access",
+      "message": "You can now access the bunker with your key."
+    }
+  },
+  {
+    "id": "multiple_signals_trigger",
+    "conditions": [
+      {
+        "type": "has_signal",
+        "target": "signal-1"
+      },
+      {
+        "type": "has_signal",
+        "target": "signal-2"
+      },
+      {
+        "type": "has_signal",
+        "target": "signal-3"
+      }
+    ],
+    "action": "complete_objective:triangulate_source",
+    "parameters": {}
+  },
+  {
+    "id": "story_progression_trigger",
+    "conditions": [
+      {
+        "type": "objective_completed",
+        "target": "triangulate_source"
+      },
+      {
+        "type": "progress_min",
+        "target": "progress",
+        "value": 0.5
+      }
+    ],
+    "action": "dispatch_event:narrative",
+    "parameters": {
+      "type": "story_progression",
+      "message": "You've triangulated the source of the signals. A new area is now available for exploration."
+    }
+  },
+  {
+    "id": "unlock_new_area_trigger",
+    "conditions": [
+      {
+        "type": "objective_completed",
+        "target": "triangulate_source"
+      }
+    ],
+    "action": "set_variable:new_area_unlocked",
+    "parameters": {
+      "value": true
+    }
+  },
+  {
+    "id": "game_completion_trigger",
+    "conditions": [
+      {
+        "type": "progress_min",
+        "target": "progress",
+        "value": 0.9
+      }
+    ],
+    "action": "dispatch_event:system",
+    "parameters": {
+      "type": "game_completion",
+      "message": "You're nearing the end of your investigation. Prepare for the final revelations."
+    }
+  }
+]
