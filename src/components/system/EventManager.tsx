@@ -18,27 +18,23 @@ const EventManager: React.FC<EventManagerProps> = ({
   onEventProcessed,
   autoProcessPending = true,
 }) => {
-  const { getEventById, getPendingEvents } = useEvent();
-  const {
-    loadTriggers,
-    processEvent,
-    processPendingEvents,
-  } = useEventHandler(false); // We'll handle processing manually
-  
+  const { getPendingEvents } = useEvent();
+  const { loadTriggers, processEvent } = useEventHandler(false); // We'll handle processing manually
+
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Load triggers from provided URLs
   useEffect(() => {
-    const loadAllTriggers = async () => {
+    const loadAllTriggers = async (): Promise<void> => {
       try {
-        await Promise.all(triggerUrls.map(url => loadTriggers(url)));
+        await Promise.all(triggerUrls.map((url) => loadTriggers(url)));
         setIsInitialized(true);
       } catch (error) {
         console.error('Error loading event triggers:', error);
       }
     };
 
-    loadAllTriggers();
+    void loadAllTriggers();
   }, [loadTriggers, triggerUrls]);
 
   // Process pending events when they change
@@ -49,7 +45,7 @@ const EventManager: React.FC<EventManagerProps> = ({
     if (pendingEvents.length === 0) return;
 
     // Process each pending event
-    pendingEvents.forEach(event => {
+    pendingEvents.forEach((event) => {
       const executedTriggers = processEvent(event.id);
       if (onEventProcessed) {
         onEventProcessed(event, executedTriggers);

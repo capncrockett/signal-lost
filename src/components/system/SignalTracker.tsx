@@ -27,14 +27,14 @@ const SignalTracker: React.FC<SignalTrackerProps> = ({
     updateSignal,
     discoverSignal,
   } = useSignalState();
-  
+
   const { state: gameState } = useGameState();
   const { dispatchEvent } = useEvent();
 
   // Track active signal changes
   useEffect(() => {
     const activeSignal = getActiveSignal();
-    
+
     if (onActiveSignalChanged && activeSignal) {
       onActiveSignalChanged(activeSignal);
     }
@@ -43,19 +43,20 @@ const SignalTracker: React.FC<SignalTrackerProps> = ({
   // Track newly discovered signals
   useEffect(() => {
     if (signalState.lastDiscoveredTimestamp === null) return;
-    
+
     // Find the most recently discovered signal
-    const lastDiscoveredId = signalState.discoveredSignalIds[signalState.discoveredSignalIds.length - 1];
+    const lastDiscoveredId =
+      signalState.discoveredSignalIds[signalState.discoveredSignalIds.length - 1];
     if (!lastDiscoveredId) return;
-    
+
     const signal = getSignalById(lastDiscoveredId);
     if (!signal) return;
-    
+
     // Notify about the discovered signal
     if (onSignalDiscovered) {
       onSignalDiscovered(signal);
     }
-    
+
     // Dispatch an event for the discovered signal
     dispatchEvent('signal', {
       type: 'signal_discovered',
@@ -64,7 +65,7 @@ const SignalTracker: React.FC<SignalTrackerProps> = ({
       signalType: signal.type,
       timestamp: Date.now(),
     });
-    
+
     // If this is a message signal, also dispatch a message event
     if (signal.type === 'message') {
       dispatchEvent('signal', {
@@ -86,21 +87,21 @@ const SignalTracker: React.FC<SignalTrackerProps> = ({
   useEffect(() => {
     // Get all signals
     const allSignals = Object.values(signalState.signals);
-    
+
     // Update signal strength based on proximity to current frequency
-    allSignals.forEach(signal => {
+    allSignals.forEach((signal) => {
       const frequencyDiff = Math.abs(signal.frequency - gameState.currentFrequency);
       const proximityThreshold = 0.5; // MHz
-      
+
       if (frequencyDiff <= proximityThreshold) {
         // Calculate strength based on proximity (closer = stronger)
         const normalizedDiff = frequencyDiff / proximityThreshold;
         const newStrength = 1 - normalizedDiff;
-        
+
         // Only update if strength has changed significantly
         if (Math.abs(newStrength - signal.strength) > 0.1) {
           updateSignal(signal.id, { strength: newStrength });
-          
+
           // Notify about the updated signal
           if (onSignalUpdated) {
             onSignalUpdated({
@@ -108,7 +109,7 @@ const SignalTracker: React.FC<SignalTrackerProps> = ({
               strength: newStrength,
             });
           }
-          
+
           // If signal is strong enough and not yet discovered, discover it
           if (newStrength > 0.8 && !signal.discovered) {
             discoverSignal(signal.id);

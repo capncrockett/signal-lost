@@ -1,4 +1,5 @@
 import { EventHandler, EventTrigger, EventCondition } from '../../src/utils/EventHandler';
+import { GameEvent } from '../../src/types/event.d';
 
 // Mock the context hooks
 const mockGameState = {
@@ -31,7 +32,7 @@ const mockEventState = {
     events: {
       'test-event-1': {
         id: 'test-event-1',
-        type: 'signal',
+        type: 'signal' as const,
         payload: { signalId: 'signal-3' },
         timestamp: Date.now(),
       },
@@ -43,7 +44,7 @@ const mockEventState = {
   getPendingEvents: jest.fn().mockReturnValue([
     {
       id: 'test-event-1',
-      type: 'signal',
+      type: 'signal' as const,
       payload: { signalId: 'signal-3' },
       timestamp: Date.now(),
     },
@@ -52,7 +53,7 @@ const mockEventState = {
     if (id === 'test-event-1') {
       return {
         id: 'test-event-1',
-        type: 'signal',
+        type: 'signal' as const,
         payload: { signalId: 'signal-3' },
         timestamp: Date.now(),
       };
@@ -242,9 +243,9 @@ describe('EventHandler', () => {
 
     eventHandler.registerTrigger(trigger);
 
-    const event = {
+    const event: GameEvent = {
       id: 'test-event-1',
-      type: 'signal',
+      type: 'signal' as const,
       payload: { signalId: 'signal-3' },
       timestamp: Date.now(),
     };

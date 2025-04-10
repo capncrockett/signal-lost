@@ -36,8 +36,8 @@ const MessageHistoryManager: React.FC<MessageHistoryManagerProps> = ({
   const { getDiscoveredSignals } = useSignalState();
   const { state: gameState } = useGameState();
   const { state: eventState, dispatchEvent } = useEvent();
-  const [messageHistory, setMessageHistory] = useState<MessageHistoryEntry[]>([]);
-  
+  const [, setMessageHistory] = useState<MessageHistoryEntry[]>([]);
+
   // Storage key for message history
   const MESSAGE_HISTORY_KEY = 'signal-lost-message-history';
 
@@ -63,94 +63,76 @@ const MessageHistoryManager: React.FC<MessageHistoryManagerProps> = ({
     }
   };
 
-  // Convert a signal to a message history entry
-  const signalToHistoryEntry = (signal: Signal): MessageHistoryEntry | null => {
-    if (signal.type !== 'message') return null;
-
-    const message = getMessage(signal.content);
-    if (!message) return null;
-
-    const isDecoded = message.isDecoded || gameState.gameProgress >= (message.requiredProgress || 0);
-    
-    return {
-      id: `message_${signal.id}`,
-      signalId: signal.id,
-      title: message.title,
-      content: message.content,
-      decodedContent: message.decodedContent,
-      sender: message.sender,
-      timestamp: signal.timestamp,
-      frequency: signal.frequency,
-      isDecoded,
-      isRead: false,
-    };
-  };
-
   // Update message history when signals change
   useEffect(() => {
+    // Convert a signal to a message history entry
+    const signalToHistoryEntry = (signal: Signal): MessageHistoryEntry | null => {
+      if (signal.type !== 'message') return null;
+
+      const message = getMessage(signal.content);
+      if (!message) return null;
+
+      const isDecoded =
+        message.isDecoded || gameState.gameProgress >= (message.requiredProgress || 0);
+
+      return {
+        id: `message_${signal.id}`,
+        signalId: signal.id,
+        title: message.title,
+        content: message.content,
+        decodedContent: message.decodedContent,
+        sender: message.sender,
+        timestamp: signal.timestamp,
+        frequency: signal.frequency,
+        isDecoded,
+        isRead: false,
+      };
+    };
+
     // Load existing history
     const existingHistory = loadMessageHistory();
-    
+
     // Get all discovered signals
     const signals = getDiscoveredSignals();
-    
+
     // Convert signals to history entries
     const newEntries = signals
       .map(signalToHistoryEntry)
       .filter((entry): entry is MessageHistoryEntry => entry !== null);
-    
+
     // Merge with existing history, preserving read status
-    const mergedHistory = newEntries.map(newEntry => {
-      const existingEntry = existingHistory.find(entry => entry.signalId === newEntry.signalId);
+    const mergedHistory = newEntries.map((newEntry) => {
+      const existingEntry = existingHistory.find((entry) => entry.signalId === newEntry.signalId);
       return existingEntry ? { ...newEntry, isRead: existingEntry.isRead } : newEntry;
     });
-    
+
     // Update state
     setMessageHistory(mergedHistory);
-    
+
     // Save to localStorage if autoSave is enabled
     if (autoSave) {
       saveMessageHistory(mergedHistory);
     }
-    
+
     // Notify parent component if callback is provided
     if (onHistoryUpdated) {
       onHistoryUpdated(mergedHistory);
     }
   }, [getDiscoveredSignals, gameState.gameProgress, autoSave, onHistoryUpdated]);
 
-  // Mark a message as read
-  const markMessageAsRead = (id: string): void => {
-    setMessageHistory(prevHistory => {
-      const updatedHistory = prevHistory.map(entry => 
-        entry.id === id ? { ...entry, isRead: true } : entry
-      );
-      
-      // Save to localStorage if autoSave is enabled
-      if (autoSave) {
-        saveMessageHistory(updatedHistory);
-      }
-      
-      // Notify parent component if callback is provided
-      if (onHistoryUpdated) {
-        onHistoryUpdated(updatedHistory);
-      }
-      
-      return updatedHistory;
-    });
-  };
+  // Note: A markMessageAsRead function could be implemented here if needed in the future
 
   // Listen for new message events
   useEffect(() => {
     const pendingEvents = eventState.pendingEvents;
-    
-    pendingEvents.forEach(eventId => {
+
+    pendingEvents.forEach((eventId) => {
       const event = eventState.events[eventId];
-      
+
       if (event && event.type === 'signal') {
         // Check if this is a new message signal
         const payload = event.payload as { signalId?: string } | undefined;
-        
+
         if (payload && payload.signalId) {
           // Dispatch a narrative event to notify about the new message
           dispatchEvent('narrative', {

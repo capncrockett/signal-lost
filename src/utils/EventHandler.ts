@@ -208,7 +208,7 @@ export class EventHandler {
   public async loadTriggersFromJson(url: string): Promise<void> {
     try {
       const response = await fetch(url);
-      const triggers = await response.json();
+      const triggers = (await response.json()) as EventTrigger[];
       this.registerTriggers(triggers);
     } catch (error) {
       console.error('Error loading triggers:', error);

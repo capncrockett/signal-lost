@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import GameStateIntegration from '../../../src/components/system/GameStateIntegration';
@@ -8,7 +8,7 @@ global.fetch = jest.fn().mockImplementation(() =>
   Promise.resolve({
     json: () => Promise.resolve([]),
   })
-) as jest.Mock;
+);
 
 // Mock the context hooks
 jest.mock('../../../src/context/GameStateContext', () => ({
@@ -85,7 +85,7 @@ describe('GameStateIntegration', () => {
     jest.clearAllMocks();
   });
 
-  test('renders without crashing', async () => {
+  test('renders without crashing', () => {
     render(
       <>
         <GameStateIntegration autoSaveInterval={0} />
@@ -109,8 +109,11 @@ describe('GameStateIntegration', () => {
   });
 
   test('handles signal discovery', async () => {
-    const mockSignalState = require('../../../src/context/SignalStateContext').useSignalState;
-    const mockEventState = require('../../../src/context/EventContext').useEvent;
+    // Import the mocked modules
+    const { useSignalState: mockSignalState } = jest.requireMock(
+      '../../../src/context/SignalStateContext'
+    );
+    const { useEvent: mockEventState } = jest.requireMock('../../../src/context/EventContext');
 
     // Mock a discovered signal
     const mockSignal = {

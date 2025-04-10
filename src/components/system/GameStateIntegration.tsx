@@ -31,22 +31,25 @@ const GameStateIntegration: React.FC<GameStateIntegrationProps> = ({
   onSignalDiscovered,
   onObjectiveCompleted,
   onMessageHistoryUpdated,
-  onAutoSave,
+  // onAutoSave callback is reserved for future use
 }) => {
   const gameState = useGameState();
   const signalState = useSignalState();
   const progressState = useProgress();
   const eventState = useEvent();
-  
-  const [saveManager] = useState(() => new SaveManager({
-    autoSaveInterval,
-    maxSaveSlots: 5,
-  }));
+
+  const [saveManager] = useState(
+    () =>
+      new SaveManager({
+        autoSaveInterval,
+        maxSaveSlots: 5,
+      })
+  );
 
   // Set up auto-save
   useEffect(() => {
     if (autoSaveInterval <= 0) return;
-    
+
     saveManager.startAutoSave(() => {
       const saveData = {
         gameState: gameState.state,
@@ -54,10 +57,10 @@ const GameStateIntegration: React.FC<GameStateIntegrationProps> = ({
         eventState: eventState.state,
         progressState: progressState.state,
       };
-      
+
       return saveData;
     });
-    
+
     // Clean up auto-save on unmount
     return () => {
       saveManager.stopAutoSave();
@@ -72,25 +75,25 @@ const GameStateIntegration: React.FC<GameStateIntegrationProps> = ({
   ]);
 
   // Handle signal discovery notifications
-  const handleSignalDiscovered = (signal: Signal) => {
+  const handleSignalDiscovered = (signal: Signal): void => {
     console.log(`Signal discovered: ${signal.id} at ${signal.frequency} MHz`);
-    
+
     if (onSignalDiscovered) {
       onSignalDiscovered(signal);
     }
   };
 
   // Handle objective completion notifications
-  const handleObjectiveCompleted = (objective: Objective) => {
+  const handleObjectiveCompleted = (objective: Objective): void => {
     console.log(`Objective completed: ${objective.title}`);
-    
+
     if (onObjectiveCompleted) {
       onObjectiveCompleted(objective);
     }
   };
 
   // Handle message history updates
-  const handleMessageHistoryUpdated = (messages: MessageHistoryEntry[]) => {
+  const handleMessageHistoryUpdated = (messages: MessageHistoryEntry[]): void => {
     if (onMessageHistoryUpdated) {
       onMessageHistoryUpdated(messages);
     }
@@ -99,27 +102,16 @@ const GameStateIntegration: React.FC<GameStateIntegrationProps> = ({
   return (
     <>
       {/* Event system integration */}
-      <EventManager
-        triggerUrls={triggerUrls}
-        autoProcessPending={true}
-      />
-      
+      <EventManager triggerUrls={triggerUrls} autoProcessPending={true} />
+
       {/* Signal tracking integration */}
-      <SignalTracker
-        onSignalDiscovered={handleSignalDiscovered}
-      />
-      
+      <SignalTracker onSignalDiscovered={handleSignalDiscovered} />
+
       {/* Progress tracking integration */}
-      <ProgressTracker
-        onObjectiveCompleted={handleObjectiveCompleted}
-        autoUpdateProgress={true}
-      />
-      
+      <ProgressTracker onObjectiveCompleted={handleObjectiveCompleted} autoUpdateProgress={true} />
+
       {/* Message history integration */}
-      <MessageHistoryManager
-        onHistoryUpdated={handleMessageHistoryUpdated}
-        autoSave={true}
-      />
+      <MessageHistoryManager onHistoryUpdated={handleMessageHistoryUpdated} autoSave={true} />
     </>
   );
 };

@@ -26,9 +26,9 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
     getObjectiveById,
     getCompletedObjectives,
     getPendingObjectives,
-    completeObjective,
+    // completeObjective is available but not used in this component
   } = useProgress();
-  
+
   const { state: signalState } = useSignalState();
   const { dispatchEvent } = useEvent();
 
@@ -42,15 +42,15 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
   // Track completed objectives
   useEffect(() => {
     if (!progressState.lastCompletedObjectiveId) return;
-    
+
     const objective = getObjectiveById(progressState.lastCompletedObjectiveId);
     if (!objective) return;
-    
+
     // Notify about the completed objective
     if (onObjectiveCompleted) {
       onObjectiveCompleted(objective);
     }
-    
+
     // Dispatch an event for the completed objective
     dispatchEvent('narrative', {
       type: 'objective_completed',
@@ -69,27 +69,27 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
   // Automatically update progress based on completed objectives and discovered signals
   useEffect(() => {
     if (!autoUpdateProgress) return;
-    
+
     // Calculate progress based on completed objectives
     const completedObjectives = getCompletedObjectives();
     const pendingObjectives = getPendingObjectives();
     const totalObjectives = completedObjectives.length + pendingObjectives.length;
-    
+
     // Calculate progress based on discovered signals
     const discoveredSignals = signalState.discoveredSignalIds.length;
     const totalSignals = Object.keys(signalState.signals).length;
-    
+
     // Combine both factors to calculate overall progress
     let newProgress = 0;
-    
+
     if (totalObjectives > 0) {
       newProgress += (completedObjectives.length / totalObjectives) * 0.7; // 70% weight for objectives
     }
-    
+
     if (totalSignals > 0) {
       newProgress += (discoveredSignals / totalSignals) * 0.3; // 30% weight for signals
     }
-    
+
     // Only update if progress has changed significantly
     if (Math.abs(newProgress - progressState.currentProgress) > 0.01) {
       setProgress(newProgress);
