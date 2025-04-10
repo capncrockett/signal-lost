@@ -6,9 +6,9 @@ This sprint focuses on implementing the core game mechanics for the Signal Lost 
 
 ## Agent Assignments
 
-### Agent Alpha: Radio & Audio Systems
+### Agent Alpha: Senior Developer
 
-Responsible for the radio tuner component and audio system implementation.
+Responsible for primary code development, including radio tuner component, audio system implementation, and overall code quality.
 
 1. ✅ Implement radio tuner component
 
@@ -23,9 +23,9 @@ Responsible for the radio tuner component and audio system implementation.
    - ✅ Add signal processing
    - ✅ Implement volume control
 
-### Agent Beta: Narrative & Game State
+### Agent Beta: QA Developer
 
-Responsible for the narrative system and game state integration.
+Responsible for quality assurance, E2E testing, code cleanup, and optimization, with focus on narrative system and game state integration.
 
 1. ✅ Develop narrative system
 
@@ -174,29 +174,39 @@ interface GameEvent {
 
 ### Agent Alpha Testing
 
-- ⬜ Unit tests
+- ✅ Unit tests
 
-  - ⬜ Test radio tuner component
-  - ⬜ Test audio system
-  - ⬜ Test signal processing
+  - ✅ Test radio tuner component
+  - ✅ Test audio system
+  - ✅ Test signal processing
 
-- ⬜ Integration tests
-  - ⬜ Test radio tuner with audio system
-  - ⬜ Test audio processing chain
-  - ⬜ Test user interactions
+- ✅ Integration tests
+  - ✅ Test radio tuner with audio system
+  - ✅ Test audio processing chain
+  - ✅ Test user interactions
+
+- ✅ Code Quality
+  - ✅ Fix TypeScript errors
+  - ✅ Fix lint errors
+  - ✅ Add data-testid attributes for E2E testing
 
 ### Agent Beta Testing
 
-- ✅ Unit tests
+- ✅ E2E Tests
 
-  - ✅ Test narrative system
-  - ✅ Test game state management
-  - ✅ Test event system
+  - ✅ Test complete user flows
+  - ✅ Test browser compatibility
+  - ✅ Capture screenshots for visual verification
 
-- ✅ Integration tests
-  - ✅ Test narrative with game state
-  - ✅ Test event handling
-  - ✅ Test state persistence
+- ✅ Code Cleanup
+  - ✅ Remove unused code and variables
+  - ✅ Improve code organization
+  - ✅ Ensure consistent code style
+
+- ✅ Quality Assurance
+  - ✅ Review Agent Alpha's code
+  - ✅ Verify data-testid attributes
+  - ✅ Check for memory leaks
 
 ### Cross-Agent Testing
 
@@ -228,18 +238,21 @@ This sprint builds on Sprint 01's foundation:
 - Radio tuner component is fully functional
 - Audio system generates appropriate sounds
 - All audio components are integrated
-- Unit and integration tests pass
-- TypeScript types are complete
+- Unit and integration tests pass with at least 80% coverage
+- TypeScript types are complete and no 'any' types used
+- All lint and TypeScript errors are fixed
+- All components have data-testid attributes for E2E testing
 - Documentation is updated
 
 ### Agent Beta DoD
 
-- Narrative system displays and decodes messages
-- Game state management is complete
-- Event system is functional
-- Unit and integration tests pass
-- TypeScript types are complete
+- E2E tests are complete and passing
+- Code is clean with no unused variables or code
+- Code style is consistent throughout the codebase
+- All memory leaks are identified and fixed
+- All components have proper data-testid attributes
 - Documentation is updated
+- Agent Alpha's code has been reviewed for quality
 
 ## Communication Protocol
 
