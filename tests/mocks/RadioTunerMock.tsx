@@ -22,15 +22,15 @@ const RadioTunerMock: React.FC<RadioTunerProps> = ({
   initialFrequency = 90.0,
   minFrequency = 88.0,
   maxFrequency = 108.0,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onFrequencyChange,
+  // We're not using this prop in the mock, but it's part of the interface
+  // onFrequencyChange,
 }) => {
   const { state, dispatch } = useGameState();
   const audio = useAudio();
 
   const [frequency, setFrequency] = useState<number>(initialFrequency);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [signalStrength, setSignalStrength] = useState<number>(0);
+  // We're not using this state in the mock, but it's part of the component logic
+  // const [signalStrength, setSignalStrength] = useState<number>(0);
   const [currentSignalId, setCurrentSignalId] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
 
@@ -94,8 +94,8 @@ const RadioTunerMock: React.FC<RadioTunerProps> = ({
   };
 
   // Get current message
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const currentMessage = currentSignalId ? getMessage(currentSignalId) : undefined;
+  // We're not using this in the mock, but it's part of the component logic
+  // const currentMessage = currentSignalId ? getMessage(currentSignalId) : undefined;
 
   return (
     <div className="radio-tuner" data-testid="radio-tuner">

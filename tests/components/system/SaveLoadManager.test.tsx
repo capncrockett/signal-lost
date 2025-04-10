@@ -30,7 +30,8 @@ jest.mock('../../../src/context/ProgressContext', () => ({
     dispatch: jest.fn(),
   }),
 }));
-import { SaveManager } from '../../../src/utils/SaveManager';
+// We don't need to import SaveManager directly since we're mocking it
+// import { SaveManager } from '../../../src/utils/SaveManager';
 
 // Mock the SaveManager class
 jest.mock('../../../src/utils/SaveManager', () => {
