@@ -123,7 +123,7 @@ interface EventProviderProps {
   persistState?: boolean;
 }
 
-export const EventProvider: React.FC<EventProviderProps> = ({ children, persistState = true }) => {
+const EventProvider: React.FC<EventProviderProps> = ({ children, persistState = true }) => {
   // Initialize state from localStorage if persistState is true
   const [state, dispatch] = useReducer(
     eventStateReducer,
@@ -225,4 +225,4 @@ export const useEvent = (): EventContextType => {
   return context;
 };
 
-export default EventContext;
+export default EventProvider;

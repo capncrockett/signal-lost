@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
-import { GameStateProvider } from './GameStateContext';
-import { SignalStateProvider } from './SignalStateContext';
-import { EventProvider } from './EventContext';
-import { ProgressProvider } from './ProgressContext';
-import { AudioProvider } from './AudioContext';
+import GameStateProvider from './GameStateContext';
+import SignalStateProvider from './SignalStateContext';
+import EventProvider from './EventContext';
+import ProgressProvider from './ProgressContext';
+import AudioProvider from './AudioContext';
 import GameStateIntegration from '../components/system/GameStateIntegration';
 
 interface CombinedGameProviderProps {

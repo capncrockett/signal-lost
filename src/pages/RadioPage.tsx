@@ -27,6 +27,9 @@ const RadioPage: React.ComponentType<unknown> = () => {
           <Link to="/" className="page-button secondary" data-testid="radio-to-home-button">
             Back to Home
           </Link>
+          <Link to="/narrative" className="page-button" data-testid="radio-to-narrative-button">
+            Signal Archive
+          </Link>
           <Link to="/field" className="page-button" data-testid="radio-to-field-button">
             Explore Field
           </Link>

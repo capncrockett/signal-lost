@@ -12,6 +12,7 @@ import { ESSENTIAL_ASSETS } from './assets';
 const Home = lazy(() => import('./pages/Home'));
 const RadioPage = lazy(() => import('./pages/RadioPage'));
 const FieldExploration = lazy(() => import('./pages/FieldExploration'));
+const NarrativePage = lazy(() => import('./pages/NarrativePage'));
 
 // Fallback components for development until pages are implemented
 const HomeFallback = () => (
@@ -28,6 +29,12 @@ const RadioPageFallback = () => (
 const FieldExplorationFallback = () => (
   <div className="page field-exploration-page" data-testid="field-page">
     Field Exploration
+  </div>
+);
+const NarrativePageFallback = () => (
+  <div className="page narrative-page" data-testid="narrative-page">
+    <h2 data-testid="narrative-page-title">Signal Archive</h2>
+    <p>Loading narrative system...</p>
   </div>
 );
 
@@ -66,6 +73,11 @@ const App: React.FC = () => {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/narrative" data-testid="nav-narrative">
+                    Archive
+                  </Link>
+                </li>
+                <li>
                   <Link to="/field" data-testid="nav-field">
                     Field
                   </Link>
@@ -83,6 +95,12 @@ const App: React.FC = () => {
                 <Route
                   path="/radio"
                   element={<LazyRoute component={RadioPage} fallback={<RadioPageFallback />} />}
+                />
+                <Route
+                  path="/narrative"
+                  element={
+                    <LazyRoute component={NarrativePage} fallback={<NarrativePageFallback />} />
+                  }
                 />
                 <Route
                   path="/field"

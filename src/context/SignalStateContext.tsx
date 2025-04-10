@@ -127,7 +127,7 @@ interface SignalStateProviderProps {
   persistState?: boolean;
 }
 
-export const SignalStateProvider: React.FC<SignalStateProviderProps> = ({
+const SignalStateProvider: React.FC<SignalStateProviderProps> = ({
   children,
   persistState = true,
 }) => {
@@ -213,4 +213,4 @@ export const useSignalState = (): SignalStateContextType => {
   return context;
 };
 
-export default SignalStateContext;
+export default SignalStateProvider;

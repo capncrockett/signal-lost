@@ -22,6 +22,13 @@ const Home: React.ComponentType<unknown> = () => {
           <Link to="/radio" className="page-button" data-testid="home-to-radio-button">
             Start Tuning
           </Link>
+          <Link
+            to="/narrative"
+            className="page-button secondary"
+            data-testid="home-to-narrative-button"
+          >
+            View Archive
+          </Link>
         </div>
       </div>
     </div>

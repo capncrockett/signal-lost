@@ -1,6 +1,6 @@
 import React from 'react';
 import { act, renderHook } from '@testing-library/react';
-import { AudioProvider, useAudio } from '../../src/context/AudioContext';
+import AudioProvider, { useAudio } from '../../src/context/AudioContext';
 import * as NoiseGenerator from '../../src/audio/NoiseGenerator';
 import { NoiseType } from '../../src/audio/NoiseType';
 import * as Tone from 'tone';

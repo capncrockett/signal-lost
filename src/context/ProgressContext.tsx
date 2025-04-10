@@ -145,10 +145,7 @@ interface ProgressProviderProps {
   persistState?: boolean;
 }
 
-export const ProgressProvider: React.FC<ProgressProviderProps> = ({
-  children,
-  persistState = true,
-}) => {
+const ProgressProvider: React.FC<ProgressProviderProps> = ({ children, persistState = true }) => {
   // Initialize state from localStorage if persistState is true
   const [state, dispatch] = useReducer(
     progressStateReducer,
@@ -273,4 +270,4 @@ export const useProgress = (): ProgressContextType => {
   return context;
 };
 
-export default ProgressContext;
+export default ProgressProvider;

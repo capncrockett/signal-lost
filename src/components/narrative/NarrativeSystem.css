@@ -1,0 +1,139 @@
+.narrative-system {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #0a0a0a;
+  color: #e0e0e0;
+  font-family: 'Courier New', monospace;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.narrative-header {
+  padding: 15px;
+  background-color: #1a1a1a;
+  border-bottom: 1px solid #333;
+}
+
+.narrative-header h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.5rem;
+  color: #0f0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.narrative-progress {
+  margin-top: 10px;
+}
+
+.progress-label {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  color: #aaa;
+}
+
+.progress-bar {
+  height: 8px;
+  background-color: #222;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #0f0;
+  transition: width 0.5s ease-in-out;
+}
+
+.narrative-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.message-history-container {
+  width: 30%;
+  min-width: 250px;
+  border-right: 1px solid #333;
+  overflow-y: auto;
+}
+
+.message-display-container {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.no-message-selected {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #888;
+  text-align: center;
+  padding: 20px;
+}
+
+.unread-notification {
+  margin-top: 15px;
+  color: #ff9900;
+  font-weight: bold;
+}
+
+.message-actions {
+  padding: 10px 15px;
+  background-color: #1a1a1a;
+  border-top: 1px solid #333;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.close-button {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 15px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  transition: background-color 0.2s;
+}
+
+.close-button:hover {
+  background-color: #444;
+}
+
+.close-button:active {
+  background-color: #555;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .narrative-content {
+    flex-direction: column;
+  }
+
+  .message-history-container {
+    width: 100%;
+    height: 40%;
+    min-width: unset;
+    border-right: none;
+    border-bottom: 1px solid #333;
+  }
+}
+
+/* Animation for new messages */
+@keyframes pulse {
+  0% { background-color: rgba(15, 255, 15, 0.1); }
+  50% { background-color: rgba(15, 255, 15, 0.3); }
+  100% { background-color: rgba(15, 255, 15, 0.1); }
+}
+
+.new-message {
+  animation: pulse 2s infinite;
+}

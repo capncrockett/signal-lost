@@ -145,10 +145,7 @@ interface GameStateProviderProps {
   persistState?: boolean;
 }
 
-export const GameStateProvider: React.FC<GameStateProviderProps> = ({
-  children,
-  persistState = true,
-}) => {
+const GameStateProvider: React.FC<GameStateProviderProps> = ({ children, persistState = true }) => {
   // Initialize state from localStorage if persistState is true
   const [state, dispatch] = useReducer(gameStateReducer, persistState ? loadState() : initialState);
 
@@ -192,4 +189,4 @@ export const useResetGameState = (): (() => void) => {
   };
 };
 
-export default GameStateContext;
+export default GameStateProvider;

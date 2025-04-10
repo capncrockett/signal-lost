@@ -22,7 +22,7 @@ interface AudioProviderProps {
   children: ReactNode;
 }
 
-export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
+const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [volume, setVolumeState] = useState<number>(0.5);
   const [noiseNode, setNoiseNode] = useState<Tone.Noise | null>(null);
@@ -181,4 +181,4 @@ export const useAudio = (): AudioContextType => {
   return context;
 };
 
-export default AudioContext;
+export default AudioProvider;
