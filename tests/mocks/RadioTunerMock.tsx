@@ -6,6 +6,7 @@ import {
   calculateSignalStrength,
   getStaticIntensity,
 } from '../../src/data/frequencies';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { getMessage } from '../../src/data/messages';
 import { NoiseType } from '../../src/audio/NoiseType';
 import { createNoise, createSignal } from '../../src/audio/NoiseGenerator';
@@ -30,7 +31,9 @@ const RadioTunerMock: React.FC<RadioTunerProps> = ({
 
   const [frequency, setFrequency] = useState<number>(initialFrequency);
   // We're not using this state in the mock, but it's part of the component logic
-  // const [signalStrength, setSignalStrength] = useState<number>(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [signalStrength, setSignalStrength] = useState<number>(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentSignalId, setCurrentSignalId] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
 
