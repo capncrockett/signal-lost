@@ -6,8 +6,10 @@ This directory contains documentation for the Signal Lost game project.
 
 ### Sprint Documents
 - `sprint-XX-name.md`: Sprint planning and tracking documents
-- Current sprint: [Sprint 02: Core Game Mechanics](./sprint-02-core-mechanics.md)
-- Previous sprint: [Sprint 01: Foundation](./sprint-01-foundation.md)
+- Current sprint: [Sprint 2.5: Bug Fixes, Code Cleanup, and Agent Workflow Improvement](./sprint-2.5-bugfixes-workflow.md)
+- Previous sprints:
+  - [Sprint 02: Core Game Mechanics](./sprint-02-core-mechanics.md)
+  - [Sprint 01: Foundation](./sprint-01-foundation.md)
 - Sprint planning overview: [Sprint Planning](./sprint-planning.md)
 
 ### Project Documentation

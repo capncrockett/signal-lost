@@ -80,19 +80,35 @@ signal-lost/
 8. ✅ Set up asset management
 9. ✅ Add accessibility features
 
-### Sprint 02: Core Game Mechanics (Current)
+### Sprint 02: Core Game Mechanics (Completed)
 
-1. ⬜ Implement radio tuner component
-   - ⬜ Frequency dial interaction
-   - ⬜ Signal detection
-   - ⬜ Static/noise visualization
-2. ⬜ Create audio system
-   - ⬜ Web Audio API integration
-   - ⬜ Noise generation
-   - ⬜ Signal processing
-3. ⬜ Implement basic narrative system
-   - ⬜ Message display
-   - ⬜ Progressive decoding
+1. ✅ Implement radio tuner component
+   - ✅ Frequency dial interaction
+   - ✅ Signal detection
+   - ✅ Static/noise visualization
+2. ✅ Create audio system
+   - ✅ Web Audio API integration
+   - ✅ Noise generation
+   - ✅ Signal processing
+3. ✅ Implement basic narrative system
+   - ✅ Message display
+   - ✅ Progressive decoding
+
+### Sprint 2.5: Bug Fixes and Workflow Improvement (Current)
+
+1. ⬜ Fix critical bugs in the application
+   - ⬜ Resolve asset loading errors for audio files
+   - ⬜ Fix infinite render loop in RadioTuner component
+   - ⬜ Address memory leaks
+2. ⬜ Improve test infrastructure and coverage
+   - ⬜ Fix failing unit tests
+   - ⬜ Improve test mocks for audio components
+3. ⬜ Clean up code and improve quality
+   - ⬜ Remove unused code and imports
+   - ⬜ Fix TypeScript errors and warnings
+4. ⬜ Enhance agent workflow
+   - ⬜ Clarify responsibilities between Alpha and Beta
+   - ⬜ Improve communication protocols
 
 ### Sprint 03: Field Exploration and Inventory (Upcoming)
 
