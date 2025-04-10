@@ -42,7 +42,7 @@ export class SaveManager {
    */
   public getSaveFiles(): SaveFile[] {
     const saveFiles: SaveFile[] = [];
-    
+
     // Iterate through localStorage to find save files
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -58,7 +58,7 @@ export class SaveManager {
         }
       }
     }
-    
+
     // Sort by timestamp (newest first)
     return saveFiles.sort((a, b) => b.timestamp - a.timestamp);
   }
@@ -83,7 +83,7 @@ export class SaveManager {
   ): string {
     // Generate a unique ID for this save
     const id = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    
+
     // Create the save file
     const saveFile: SaveFile = {
       id,
@@ -95,13 +95,13 @@ export class SaveManager {
       progressState,
       screenshot,
     };
-    
+
     // Save to localStorage
     localStorage.setItem(`${this.config.savePrefix}-${id}`, JSON.stringify(saveFile));
-    
+
     // Check if we need to remove old saves
     this.enforceMaxSaveSlots();
-    
+
     return id;
   }
 
@@ -152,20 +152,14 @@ export class SaveManager {
     if (this.config.autoSaveInterval <= 0) {
       return;
     }
-    
+
     // Clear any existing timer
     this.stopAutoSave();
-    
+
     // Start a new timer
     this.autoSaveTimer = window.setInterval(() => {
       const { gameState, signalState, eventState, progressState } = callback();
-      this.saveGame(
-        'Auto Save',
-        gameState,
-        signalState,
-        eventState,
-        progressState
-      );
+      this.saveGame('Auto Save', gameState, signalState, eventState, progressState);
     }, this.config.autoSaveInterval);
   }
 
