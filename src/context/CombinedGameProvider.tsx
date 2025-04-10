@@ -4,12 +4,15 @@ import { SignalStateProvider } from './SignalStateContext';
 import { EventProvider } from './EventContext';
 import { ProgressProvider } from './ProgressContext';
 import { AudioProvider } from './AudioContext';
+import { TriggerProvider } from './TriggerContext';
+import TriggerSystem from '../components/system/TriggerSystem';
 
 // Make sure all providers are properly exported
 
 interface CombinedGameProviderProps {
   children: ReactNode;
   persistState?: boolean;
+  triggerConfigUrl?: string;
 }
 
 /**
@@ -19,13 +22,18 @@ interface CombinedGameProviderProps {
 export const CombinedGameProvider: React.FC<CombinedGameProviderProps> = ({
   children,
   persistState = true,
+  triggerConfigUrl = '/assets/config/triggers.json',
 }) => {
   return (
     <GameStateProvider persistState={persistState}>
       <SignalStateProvider persistState={persistState}>
         <EventProvider persistState={persistState}>
           <ProgressProvider persistState={persistState}>
-            <AudioProvider>{children}</AudioProvider>
+            <TriggerProvider persistState={persistState}>
+              <AudioProvider>
+                <TriggerSystem triggerConfigUrl={triggerConfigUrl}>{children}</TriggerSystem>
+              </AudioProvider>
+            </TriggerProvider>
           </ProgressProvider>
         </EventProvider>
       </SignalStateProvider>
