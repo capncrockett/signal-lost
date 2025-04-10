@@ -45,8 +45,45 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      - name: Start dev server and run E2E tests
-        timeout-minutes: 10
+      - name: Create modified Playwright config for CI
+        run: |
+          # Create a temporary Playwright config that reuses existing servers in CI
+          cat > playwright.ci.config.ts << 'EOL'
+          import { defineConfig, devices } from '@playwright/test';
+
+          export default defineConfig({
+            testDir: './e2e/tests',
+            fullyParallel: true,
+            forbidOnly: !!process.env.CI,
+            retries: process.env.CI ? 2 : 0,
+            workers: process.env.CI ? 1 : undefined,
+            reporter: process.env.CI ? 'dot' : [['html', { open: 'never' }], ['list']],
+            use: {
+              baseURL: 'http://localhost:5173',
+              trace: 'on-first-retry',
+              headless: true,
+              launchOptions: {
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+              },
+              viewport: { width: 1280, height: 800 },
+              actionTimeout: 15000,
+              navigationTimeout: 15000,
+            },
+            projects: [
+              {
+                name: 'chromium',
+                use: { ...devices['Desktop Chrome'] },
+              },
+            ],
+            webServer: {
+              command: 'npm run dev',
+              url: 'http://localhost:5173',
+              reuseExistingServer: true, // Always reuse existing server
+            },
+          });
+          EOL
+
+      - name: Start dev server
         run: |
           # Start the dev server in the background
           npm run dev &
@@ -54,22 +91,82 @@ jobs:
           echo "DEV_SERVER_PID=$!" >> $GITHUB_ENV
           # Give the server a moment to start
           sleep 10
-          # Run the E2E tests
-          npm run test:e2e:ci || {
-            echo "::error::E2E tests failed"
-            kill $! || true
-            exit 1
-          }
-          # Run visual regression tests
-          npx playwright test --config=playwright.visual.config.ts || {
-            echo "::error::Visual regression tests failed"
-            kill $! || true
-            exit 1
-          }
-          # Stop the dev server
-          kill $! || true
 
-      # E2E tests and visual regression tests are now run in the "Start dev server and run E2E tests" step
+      - name: Run E2E tests
+        timeout-minutes: 10
+        run: |
+          # Run the E2E tests with the modified config
+          npx playwright test --config=playwright.ci.config.ts || {
+            echo "::error::E2E tests failed"
+            exit 1
+          }
+
+      - name: Create modified visual regression config for CI
+        run: |
+          # Create a temporary visual regression config that reuses existing servers in CI
+          cat > playwright.visual.ci.config.ts << 'EOL'
+          import { defineConfig, devices } from '@playwright/test';
+          import path from 'path';
+
+          export default defineConfig({
+            testDir: './e2e/visual-tests',
+            fullyParallel: false,
+            forbidOnly: !!process.env.CI,
+            retries: process.env.CI ? 1 : 0,
+            workers: 1,
+            reporter: process.env.CI ? 'dot' : [['html', { open: 'never' }], ['list']],
+            expect: {
+              toMatchSnapshot: {
+                maxDiffPixels: 100,
+                threshold: 0.2,
+              },
+            },
+            use: {
+              baseURL: 'http://localhost:5173',
+              trace: 'on-first-retry',
+              headless: true,
+              launchOptions: {
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+              },
+              viewport: { width: 1280, height: 800 },
+              actionTimeout: 15000,
+              navigationTimeout: 15000,
+              screenshot: 'only-on-failure',
+            },
+            projects: [
+              {
+                name: 'chromium',
+                use: {
+                  ...devices['Desktop Chrome'],
+                },
+              },
+            ],
+            snapshotPathTemplate: '{testDir}/{testFileDir}/{testFileName}-{arg}{ext}',
+            webServer: {
+              command: 'npm run dev',
+              url: 'http://localhost:5173',
+              reuseExistingServer: true, // Always reuse existing server
+            },
+            outputDir: path.join(__dirname, 'e2e/visual-tests/results'),
+          });
+          EOL
+
+      - name: Run visual regression tests
+        timeout-minutes: 5
+        run: |
+          # Run visual regression tests with the modified config
+          npx playwright test --config=playwright.visual.ci.config.ts || {
+            echo "::error::Visual regression tests failed"
+            exit 1
+          }
+
+      - name: Stop dev server
+        if: always()
+        run: |
+          if [ -n "$DEV_SERVER_PID" ]; then
+            echo "Stopping dev server (PID: $DEV_SERVER_PID)"
+            kill $DEV_SERVER_PID || true
+          fi
 
       - name: Upload visual test artifacts
         if: always()
