@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import GameStateIntegration from '../../../src/components/system/GameStateIntegration';
-import { CombinedGameProvider } from '../../../src/context/CombinedGameProvider';
 
 // Mock fetch for loading triggers
 global.fetch = jest.fn().mockImplementation(() =>
@@ -88,10 +87,10 @@ describe('GameStateIntegration', () => {
 
   test('renders without crashing', async () => {
     render(
-      <CombinedGameProvider persistState={false} enableGameStateIntegration={false}>
+      <>
         <GameStateIntegration autoSaveInterval={0} />
         <div data-testid="test-content">Test Content</div>
-      </CombinedGameProvider>
+      </>
     );
 
     // The component doesn't render anything visible, so we check if the test content is rendered
@@ -100,15 +99,8 @@ describe('GameStateIntegration', () => {
 
   test('loads triggers from provided URLs', async () => {
     const mockFetch = global.fetch as jest.Mock;
-    
-    render(
-      <CombinedGameProvider persistState={false} enableGameStateIntegration={false}>
-        <GameStateIntegration 
-          triggerUrls={['/test-triggers.json']} 
-          autoSaveInterval={0} 
-        />
-      </CombinedGameProvider>
-    );
+
+    render(<GameStateIntegration triggerUrls={['/test-triggers.json']} autoSaveInterval={0} />);
 
     // Wait for the fetch to be called
     await waitFor(() => {
@@ -119,7 +111,7 @@ describe('GameStateIntegration', () => {
   test('handles signal discovery', async () => {
     const mockSignalState = require('../../../src/context/SignalStateContext').useSignalState;
     const mockEventState = require('../../../src/context/EventContext').useEvent;
-    
+
     // Mock a discovered signal
     const mockSignal = {
       id: 'test-signal',
@@ -130,7 +122,7 @@ describe('GameStateIntegration', () => {
       discovered: true,
       timestamp: Date.now(),
     };
-    
+
     mockSignalState.mockReturnValue({
       ...mockSignalState(),
       state: {
@@ -140,24 +132,17 @@ describe('GameStateIntegration', () => {
       },
       getSignalById: jest.fn().mockReturnValue(mockSignal),
     });
-    
+
     const mockDispatchEvent = jest.fn();
     mockEventState.mockReturnValue({
       ...mockEventState(),
       dispatchEvent: mockDispatchEvent,
     });
-    
+
     const onSignalDiscovered = jest.fn();
-    
-    render(
-      <CombinedGameProvider persistState={false} enableGameStateIntegration={false}>
-        <GameStateIntegration 
-          onSignalDiscovered={onSignalDiscovered}
-          autoSaveInterval={0} 
-        />
-      </CombinedGameProvider>
-    );
-    
+
+    render(<GameStateIntegration onSignalDiscovered={onSignalDiscovered} autoSaveInterval={0} />);
+
     // Wait for the signal discovery to be processed
     await waitFor(() => {
       expect(onSignalDiscovered).toHaveBeenCalledWith(mockSignal);
