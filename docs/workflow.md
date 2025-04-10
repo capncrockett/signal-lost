@@ -16,19 +16,33 @@
 
 ### Overview
 
-Signal Lost development now follows an Alpha/Beta Agent development approach where two AI agents collaborate on different aspects of the codebase:
+Signal Lost development follows an Alpha/Beta Agent development approach where two AI agents collaborate with distinct roles and responsibilities:
 
-1. **Agent Alpha**: Responsible for radio tuner component and audio system implementation
-2. **Agent Beta**: Responsible for narrative system and game state integration
+1. **Agent Alpha**: Senior developer responsible for primary code development, including:
+   - Writing and implementing new features
+   - Unit and integration testing
+   - Ensuring TypeScript type safety
+   - Fixing lint and TypeScript errors
+   - Adding data-testid attributes for E2E testing
+   - Maintaining code quality and documentation
+
+2. **Agent Beta**: QA developer responsible for quality assurance, including:
+   - End-to-end (E2E) testing
+   - Code cleanup and optimization
+   - Removing unused code and variables
+   - Improving code organization
+   - Ensuring consistent code style
 
 ### Agent Collaboration
 
 The agents collaborate through a structured development process:
 
-- Each agent works on separate, well-defined areas of the codebase
+- Agent Alpha leads development and implements new features
+- Agent Beta focuses on testing and code quality
 - Interface contracts are established to ensure smooth integration
 - Agents communicate through GitHub issues and PRs
-- Code reviews are performed across agent boundaries
+- Agent Beta reviews Agent Alpha's code for quality and test coverage
+- Agent Alpha implements fixes based on Agent Beta's feedback
 
 ```typescript
 // Example of interface contract between agents
@@ -87,12 +101,13 @@ function processSignal(signal: Signal): void {
 
 ## Testing Approach
 
-### Unit Tests (Jest + React Testing Library)
+### Unit Tests (Jest + React Testing Library) - Agent Alpha Responsibility
 
 - Test each component in isolation
 - Focus on behavior, not implementation details
 - Use `data-testid` attributes for element selection
 - Mock external dependencies
+- Maintain at least 80% test coverage
 
 ```jsx
 // Example component test
@@ -114,12 +129,13 @@ test('adjusts frequency when dial is moved', () => {
 });
 ```
 
-### Cross-Agent Integration Tests
+### Cross-Agent Integration Tests - Shared Responsibility
 
-- Test integration between Alpha and Beta agent components
+- Agent Alpha: Write integration tests for new features
+- Agent Beta: Verify tests cover all edge cases
 - Verify interface contracts are properly implemented
 - Test boundary conditions and edge cases
-- Ensure consistent behavior across agent boundaries
+- Ensure consistent behavior across components
 
 ```typescript
 // Example Cross-Agent Integration test
@@ -151,12 +167,15 @@ test('Radio tuner signal detection triggers narrative display update', () => {
 });
 ```
 
-### E2E Tests (Playwright)
+### E2E Tests (Playwright) - Agent Beta Responsibility
 
 - Test critical user flows
 - Verify interactions between components
 - Test in multiple browsers
 - Capture screenshots for visual verification
+- Ensure all components have proper data-testid attributes
+- Run tests in headed mode for canvas elements
+- Capture browser console logs for debugging
 
 ```typescript
 // Example E2E test
@@ -241,6 +260,26 @@ npm run check-all
 - Use custom hooks to encapsulate state logic
 - Follow unidirectional data flow
 
+### Agent-Specific Responsibilities
+
+#### Agent Alpha (Senior Developer)
+- Implement new features and components
+- Write unit and integration tests
+- Fix TypeScript and lint errors
+- Add data-testid attributes for E2E testing
+- Maintain code quality and documentation
+- Ensure type safety (avoid 'any' types except in tests)
+- Create PRs for feature implementation
+
+#### Agent Beta (QA Developer)
+- Write and maintain E2E tests
+- Clean up unused code and variables
+- Improve code organization
+- Ensure consistent code style
+- Review Agent Alpha's PRs for quality
+- Report issues and suggest improvements
+- Create PRs for code cleanup and optimization
+
 ### Agent-Specific State Management
 
 - Alpha agent manages audio and radio tuner state
@@ -307,14 +346,16 @@ export function GameStateProvider({ children }) {
 ## Development Priorities
 
 1. **Sprint Goals**: Focus on completing the current sprint objectives
-2. **Agent Responsibilities**: Maintain clear separation of concerns between Alpha and Beta agents
-3. **Interface Contracts**: Ensure well-defined interfaces between agent components
-4. **Component Architecture**: Create a clean, maintainable component structure
-5. **Cross-Agent Integration**: Ensure smooth integration between Alpha and Beta components
+2. **Agent Responsibilities**:
+   - Agent Alpha: Feature development, unit testing, and code quality
+   - Agent Beta: E2E testing, code cleanup, and quality assurance
+3. **Test Coverage**: Maintain at least 80% test coverage across all test domains
+4. **Type Safety**: Use TypeScript effectively to prevent bugs (avoid 'any' types except in tests)
+5. **Component Architecture**: Create a clean, maintainable component structure
 6. **Accessibility**: Ensure the game is accessible to all users
-7. **Test Coverage**: Maintain high test coverage for all components and cross-agent interactions
-8. **Type Safety**: Use TypeScript effectively to prevent bugs
-9. **Performance**: Optimize rendering and state updates
+7. **Code Quality**: Follow ESLint rules and maintain consistent code style
+8. **Performance**: Optimize rendering and state updates
+9. **Documentation**: Keep documentation up-to-date with implementation changes
 
 ## TypeScript Best Practices
 
@@ -481,8 +522,15 @@ class NarrativeSystem {
 
 ### PR Requirements
 1. PR title format: `[Alpha|Beta] Feature description`
-2. Required checks before merge:
-   - All tests passing
-   - Contract validation passing
-   - Other agent's approval
+2. Required checks for Agent Alpha PRs:
+   - All unit and integration tests passing
+   - TypeScript type checking passing
+   - ESLint checks passing
+   - Proper data-testid attributes for E2E testing
+   - No conflicts with develop
+3. Required checks for Agent Beta PRs:
+   - All E2E tests passing
+   - Code cleanup and optimization complete
+   - No unused variables or code
+   - Consistent code style
    - No conflicts with develop

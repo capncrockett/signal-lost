@@ -59,7 +59,7 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
         newFilter.dispose();
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array to run only on mount/unmount
 
   // Update master volume when volume state changes
