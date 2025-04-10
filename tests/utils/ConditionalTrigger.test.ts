@@ -542,6 +542,7 @@ describe('ConditionalTrigger', () => {
         'freq-91.5',
         91.5,
         {
+          frequency: 91.5, // Add the required frequency property
           strength: 0.8,
           type: 'message',
           content: 'Signal detected at 91.5 MHz',

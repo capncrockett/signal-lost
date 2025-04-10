@@ -2,7 +2,7 @@
  * Utility for handling conditional event triggers based on game state
  */
 import { GameEvent } from '../types/event.d';
-import { Signal } from '../types/signal';
+import { Signal } from '../types/signal.d';
 
 /**
  * Condition type for evaluating game state

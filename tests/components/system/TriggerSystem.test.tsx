@@ -1,4 +1,6 @@
-import React from 'react';
+// React is used implicitly by the JSX in this file
+// @ts-expect-error - React is used implicitly by JSX
+import * as React from 'react';
 import { render, waitFor, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TriggerSystem from '../../../src/components/system/TriggerSystem';
