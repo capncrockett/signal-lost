@@ -30,6 +30,7 @@ jest.mock('../../../src/context/ProgressContext', () => ({
     dispatch: jest.fn(),
   }),
 }));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { SaveManager } from '../../../src/utils/SaveManager';
 
 // Mock the SaveManager class

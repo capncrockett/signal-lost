@@ -19,7 +19,7 @@ const GameMenuButton: React.FC = () => {
         <span className="menu-icon"></span>
         <span className="menu-text">Menu</span>
       </button>
-      
+
       <GameMenu isOpen={isMenuOpen} onClose={handleCloseMenu} />
     </>
   );

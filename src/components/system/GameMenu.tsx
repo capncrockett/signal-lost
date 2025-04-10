@@ -44,7 +44,7 @@ const GameMenu: React.FC<GameMenuProps> = ({ isOpen, onClose }) => {
       <div className="game-menu-overlay">
         <div className="game-menu-container">
           <h2>Game Menu</h2>
-          
+
           <div className="game-menu-options">
             <button className="menu-option" onClick={handleSaveLoadClick}>
               Save / Load Game
@@ -58,7 +58,7 @@ const GameMenu: React.FC<GameMenuProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
       </div>
-      
+
       <SaveLoadManager isOpen={showSaveLoad} onClose={handleCloseSaveLoad} />
       <MessageHistory isOpen={showMessageHistory} onClose={handleCloseMessageHistory} />
     </>
