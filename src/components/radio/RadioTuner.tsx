@@ -8,6 +8,7 @@ import {
 } from '../../data/frequencies';
 import { getMessage } from '../../data/messages';
 import MessageDisplay from '../narrative/MessageDisplay';
+import { NoiseType } from '../../audio/NoiseType';
 import './RadioTuner.css';
 
 interface RadioTunerProps {
@@ -32,7 +33,9 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
   const [currentSignalId, setCurrentSignalId] = useState<string | null>(null);
   const [showMessage, setShowMessage] = useState<boolean>(false);
   const [staticIntensity, setStaticIntensity] = useState<number>(0.5);
+  const [isScanning, setIsScanning] = useState<boolean>(false);
   const staticCanvasRef = useRef<HTMLCanvasElement>(null);
+  const scanIntervalRef = useRef<number | null>(null);
 
   // Update frequency when dragging the dial
   const handleMouseDown = (): void => {
@@ -152,17 +155,28 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
 
     // Only draw static if radio is on
     if (state.isRadioOn) {
-      // Draw static noise
+      // Draw static noise with color variations based on signal strength
       const intensity = staticIntensity * 255;
       const imageData = ctx.createImageData(canvas.width, canvas.height);
       const data = imageData.data;
 
+      // Add color tint based on signal strength
+      const signalColor = {
+        r: signalStrength > 0.7 ? 0 : 255 * (1 - signalStrength),
+        g: signalStrength > 0.3 ? 255 * signalStrength : 0,
+        b: signalStrength < 0.3 ? 255 * (1 - signalStrength) : 0,
+      };
+
       for (let i = 0; i < data.length; i += 4) {
-        const noise = Math.random() * intensity;
-        data[i] = noise;     // R
-        data[i + 1] = noise; // G
-        data[i + 2] = noise; // B
-        data[i + 3] = Math.random() * 255 * staticIntensity; // A
+        // Create more varied noise pattern
+        const noisePattern = Math.random() < 0.3 ? 0 : Math.random() * intensity;
+        const colorVariation = Math.random() * 0.3;
+
+        // Apply color tint based on signal strength
+        data[i] = noisePattern + signalColor.r * colorVariation; // R
+        data[i + 1] = noisePattern + signalColor.g * colorVariation; // G
+        data[i + 2] = noisePattern + signalColor.b * colorVariation; // B
+        data[i + 3] = (Math.random() * 200 + 55) * staticIntensity; // A - more varied opacity
       }
 
       ctx.putImageData(imageData, 0, 0);
@@ -170,23 +184,34 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
 
     // Animation loop for continuous static effect
     let animationId: number;
-    const animate = () => {
+    const animate = (): void => {
       if (!state.isRadioOn) return;
 
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw static noise
+      // Draw static noise with color variations based on signal strength
       const intensity = staticIntensity * 255;
       const imageData = ctx.createImageData(canvas.width, canvas.height);
       const data = imageData.data;
 
+      // Add color tint based on signal strength
+      const signalColor = {
+        r: signalStrength > 0.7 ? 0 : 255 * (1 - signalStrength),
+        g: signalStrength > 0.3 ? 255 * signalStrength : 0,
+        b: signalStrength < 0.3 ? 255 * (1 - signalStrength) : 0,
+      };
+
       for (let i = 0; i < data.length; i += 4) {
-        const noise = Math.random() * intensity;
-        data[i] = noise;     // R
-        data[i + 1] = noise; // G
-        data[i + 2] = noise; // B
-        data[i + 3] = Math.random() * 255 * staticIntensity; // A
+        // Create more varied noise pattern
+        const noisePattern = Math.random() < 0.3 ? 0 : Math.random() * intensity;
+        const colorVariation = Math.random() * 0.3;
+
+        // Apply color tint based on signal strength
+        data[i] = noisePattern + signalColor.r * colorVariation; // R
+        data[i + 1] = noisePattern + signalColor.g * colorVariation; // G
+        data[i + 2] = noisePattern + signalColor.b * colorVariation; // B
+        data[i + 3] = (Math.random() * 200 + 55) * staticIntensity; // A - more varied opacity
       }
 
       ctx.putImageData(imageData, 0, 0);
@@ -198,12 +223,44 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
     return () => {
       cancelAnimationFrame(animationId);
     };
-  }, [staticIntensity, state.isRadioOn]);
+  }, [staticIntensity, state.isRadioOn, signalStrength]);
 
   // Toggle message display
   const toggleMessage = (): void => {
     setShowMessage(!showMessage);
   };
+
+  // Toggle frequency scanning
+  const toggleScanning = (): void => {
+    if (isScanning) {
+      // Stop scanning
+      setIsScanning(false);
+      if (scanIntervalRef.current !== null) {
+        window.clearInterval(scanIntervalRef.current);
+        scanIntervalRef.current = null;
+      }
+    } else {
+      // Start scanning
+      setIsScanning(true);
+      scanIntervalRef.current = window.setInterval(() => {
+        // Increment frequency by 0.1 MHz
+        setFrequency((prev) => {
+          const newFreq = prev + 0.1;
+          // If we reach the max frequency, loop back to min
+          return newFreq > maxFrequency ? minFrequency : newFreq;
+        });
+      }, 300); // Scan speed in milliseconds
+    }
+  };
+
+  // Clean up interval on unmount
+  useEffect(() => {
+    return () => {
+      if (scanIntervalRef.current !== null) {
+        window.clearInterval(scanIntervalRef.current);
+      }
+    };
+  }, []);
 
   // Get the current message
   const currentMessage = currentSignalId ? getMessage(currentSignalId) : undefined;
@@ -214,16 +271,35 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
 
     switch (e.key) {
       case 'ArrowLeft':
-        setFrequency((prev) => Math.max(minFrequency, prev - 0.1));
+        if (!isScanning) {
+          setFrequency((prev): number => Math.max(minFrequency, prev - 0.1));
+        }
         break;
       case 'ArrowRight':
-        setFrequency((prev) => Math.min(maxFrequency, prev + 0.1));
+        if (!isScanning) {
+          setFrequency((prev): number => Math.min(maxFrequency, prev + 0.1));
+        }
         break;
       case 'ArrowDown':
-        setFrequency((prev) => Math.max(minFrequency, prev - 1.0));
+        if (!isScanning) {
+          setFrequency((prev): number => Math.max(minFrequency, prev - 1.0));
+        }
         break;
       case 'ArrowUp':
-        setFrequency((prev) => Math.min(maxFrequency, prev + 1.0));
+        if (!isScanning) {
+          setFrequency((prev): number => Math.min(maxFrequency, prev + 1.0));
+        }
+        break;
+      case 's':
+      case 'S':
+        // Toggle scanning with 's' key
+        toggleScanning();
+        break;
+      case 'Escape':
+        // Stop scanning with Escape key
+        if (isScanning) {
+          toggleScanning();
+        }
         break;
       default:
         break;
@@ -249,7 +325,11 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
           </button>
         </div>
 
-        <div className="frequency-display" aria-live="polite" aria-label={`Current frequency ${frequency.toFixed(1)} MHz`}>
+        <div
+          className="frequency-display"
+          aria-live="polite"
+          aria-label={`Current frequency ${frequency.toFixed(1)} MHz`}
+        >
           <span className="frequency-value">{frequency.toFixed(1)}</span>
           <span className="frequency-unit">MHz</span>
         </div>
@@ -274,6 +354,21 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
             {audio.isMuted ? 'Unmute' : 'Mute'}
           </button>
         </div>
+
+        <div className="noise-type-control">
+          <label htmlFor="noise-type-select">Noise Type</label>
+          <select
+            id="noise-type-select"
+            value={audio.currentNoiseType}
+            onChange={(e) => audio.setNoiseType(e.target.value as NoiseType)}
+            disabled={!state.isRadioOn}
+            aria-label="Select noise type"
+          >
+            <option value={NoiseType.Pink}>Pink Noise</option>
+            <option value={NoiseType.White}>White Noise</option>
+            <option value={NoiseType.Brown}>Brown Noise</option>
+          </select>
+        </div>
       </div>
 
       {/* Static visualization canvas */}
@@ -283,9 +378,15 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
           className="static-canvas"
           style={{
             opacity: state.isRadioOn ? staticIntensity : 0,
-            pointerEvents: 'none'
+            pointerEvents: 'none',
           }}
           aria-hidden="true"
+        />
+        <div
+          className="static-overlay"
+          style={{
+            opacity: state.isRadioOn ? 0.7 : 0,
+          }}
         />
       </div>
 
@@ -304,10 +405,30 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
         <div className="tuner-dial-track">
           <div className="tuner-dial-knob" style={{ left: `${dialPosition}%` }} />
         </div>
+        <div className="frequency-markers">
+          {Array.from({ length: 11 }, (_, i) => {
+            const markerFrequency = minFrequency + (i * (maxFrequency - minFrequency)) / 10;
+            const isMajor = i % 2 === 0;
+            return (
+              <div
+                key={i}
+                className={`frequency-marker ${isMajor ? 'major' : ''}`}
+                style={{ left: `${i * 10}%` }}
+              >
+                {isMajor && markerFrequency.toFixed(1)}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className={`signal-strength-container ${!state.isRadioOn ? 'disabled' : ''}`}>
-        <div className="signal-strength-label">Signal Strength</div>
+        <div className="signal-strength-label">
+          <span>Signal Strength</span>
+          <span className="signal-strength-value">
+            {state.isRadioOn ? `${Math.round(signalStrength * 100)}%` : '0%'}
+          </span>
+        </div>
         <div
           className="signal-strength-meter"
           role="progressbar"
@@ -320,13 +441,22 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
             className="signal-strength-fill"
             style={{ width: `${state.isRadioOn ? signalStrength * 100 : 0}%` }}
           />
+          <div className="signal-strength-ticks">
+            {Array.from({ length: 10 }, (_, i) => (
+              <div key={i} className="signal-strength-tick" />
+            ))}
+          </div>
+          <div
+            className="signal-strength-pulse"
+            style={{ opacity: currentSignalId && signalStrength > 0.5 ? 1 : 0 }}
+          />
         </div>
       </div>
 
       <div className="tuner-controls">
         <button
           className="tune-button decrease"
-          disabled={!state.isRadioOn}
+          disabled={!state.isRadioOn || isScanning}
           onClick={() => setFrequency((prev) => Math.max(minFrequency, prev - 0.1))}
           aria-label="Decrease frequency by 0.1 MHz"
         >
@@ -334,11 +464,19 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
         </button>
         <button
           className="tune-button increase"
-          disabled={!state.isRadioOn}
+          disabled={!state.isRadioOn || isScanning}
           onClick={() => setFrequency((prev) => Math.min(maxFrequency, prev + 0.1))}
           aria-label="Increase frequency by 0.1 MHz"
         >
           +0.1
+        </button>
+        <button
+          className={`scan-button ${isScanning ? 'scanning' : ''}`}
+          disabled={!state.isRadioOn}
+          onClick={() => toggleScanning()}
+          aria-label={isScanning ? 'Stop scanning' : 'Start scanning for signals'}
+        >
+          {isScanning ? 'Stop Scan' : 'Scan'}
         </button>
       </div>
 

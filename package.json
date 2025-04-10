@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "postinstall": "npx playwright install",
     "test": "jest",
+    "test:integration": "jest tests/integration",
     "test:e2e": "playwright test --reporter=list",
     "test:e2e:ci": "cross-env CI=true playwright test",
     "test:e2e:report": "playwright test",
@@ -30,7 +31,8 @@
     "type-check": "tsc --noEmit",
     "unused-check": "tsc --noEmit --noUnusedLocals --noUnusedParameters",
     "lint:tests": "eslint tests/**/*.ts e2e/**/*.ts --max-warnings=0",
-    "check-all": "npm run lint && npm run lint:tests && npm run type-check && npm run unused-check && npm run test && npm run cleanup:screenshots && npm run test:e2e:ci"
+    "check-all": "npm run lint && npm run lint:tests && npm run type-check && npm run unused-check && npm run test && npm run test:integration && npm run cleanup:screenshots && npm run test:e2e:ci",
+    "validate-contracts": "node scripts/validate-contracts.js"
   },
   "keywords": [
     "game",
@@ -41,8 +43,8 @@
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.51.1",
-    "@testing-library/jest-dom": "^6.4.2",
-    "@testing-library/react": "^14.2.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^14.3.1",
     "@testing-library/user-event": "^14.5.2",
     "@types/jest": "^29.5.5",
     "@types/node": "^20.8.2",

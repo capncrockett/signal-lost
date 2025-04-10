@@ -21,6 +21,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .power-button-container {
@@ -89,6 +91,38 @@
   border-radius: 4px;
   top: 50%;
   transform: translateY(-50%);
+  overflow: visible;
+}
+
+.tuner-dial-track::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent 0%, transparent 9.9%,
+    #555 10%, #555 10.1%,
+    transparent 10.1%, transparent 19.9%,
+    #555 20%, #555 20.1%,
+    transparent 20.1%, transparent 29.9%,
+    #555 30%, #555 30.1%,
+    transparent 30.1%, transparent 39.9%,
+    #555 40%, #555 40.1%,
+    transparent 40.1%, transparent 49.9%,
+    #555 50%, #555 50.1%,
+    transparent 50.1%, transparent 59.9%,
+    #555 60%, #555 60.1%,
+    transparent 60.1%, transparent 69.9%,
+    #555 70%, #555 70.1%,
+    transparent 70.1%, transparent 79.9%,
+    #555 80%, #555 80.1%,
+    transparent 80.1%, transparent 89.9%,
+    #555 90%, #555 90.1%,
+    transparent 90.1%, transparent 99.9%,
+    #555 100%, #555 100%
+  );
+  border-radius: 4px;
+  opacity: 0.7;
 }
 
 .tuner-dial-knob {
@@ -156,12 +190,20 @@
 
 .signal-strength-container {
   margin: 20px 0;
+  position: relative;
 }
 
 .signal-strength-label {
   font-size: 0.9rem;
   color: #aaa;
   margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.signal-strength-value {
+  color: #0f0;
+  font-weight: bold;
 }
 
 .signal-strength-meter {
@@ -170,18 +212,69 @@
   background-color: #333;
   border-radius: 4px;
   overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .signal-strength-fill {
   height: 100%;
   background: linear-gradient(90deg, #f00, #ff0, #0f0);
   transition: width 0.3s ease;
+  position: relative;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.signal-strength-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(0, 0, 0, 0.1) 51%,
+    rgba(0, 0, 0, 0.2) 100%);
+}
+
+.signal-strength-ticks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2px;
+  pointer-events: none;
+}
+
+.signal-strength-tick {
+  width: 1px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.signal-strength-pulse {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  bottom: -2px;
+  width: 4px;
+  background-color: #0f0;
+  border-radius: 2px;
+  box-shadow: 0 0 8px #0f0;
+  animation: pulse 1s infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .tuner-controls {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
+  gap: 10px;
 }
 
 .disabled {
@@ -247,15 +340,165 @@
   transform: scale(0.95);
 }
 
-/* Add some frequency markers */
-.tuner-dial-container::before {
+.scan-button {
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #0f0;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.scan-button:hover {
+  background-color: #0f0;
+  color: #000;
+}
+
+.scan-button:active {
+  transform: scale(0.95);
+}
+
+.scan-button.scanning {
+  background-color: #f00;
+  color: #fff;
+  border-color: #f00;
+  animation: pulse 1s infinite;
+}
+
+.scan-button.scanning::before {
   content: '';
   position: absolute;
+  top: 0;
+  left: -100%;
   width: 100%;
-  height: 10px;
-  bottom: -20px;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: scanning 2s infinite;
+}
+
+@keyframes scanning {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.noise-type-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  position: relative;
+}
+
+.noise-type-control label {
+  font-size: 0.8rem;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.noise-type-control select {
+  background-color: #222;
+  color: #0f0;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 6px 24px 6px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #0f0 50%),
+                    linear-gradient(135deg, #0f0 50%, transparent 50%);
+  background-position: calc(100% - 13px) 50%, calc(100% - 8px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  transition: all 0.2s;
+}
+
+.noise-type-control select:focus {
+  border-color: #0f0;
+  box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.2);
+}
+
+.noise-type-control select:hover {
+  background-color: #2a2a2a;
+}
+
+.noise-type-control select option {
+  background-color: #222;
+  color: #fff;
+  padding: 8px;
+}
+
+.noise-type-control::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background-color: #0f0;
+  transition: width 0.3s ease;
+}
+
+.noise-type-control:hover::after {
+  width: 80%;
+}
+
+/* Frequency markers */
+.frequency-markers {
   display: flex;
   justify-content: space-between;
+  width: 100%;
+  margin-top: 5px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.frequency-marker {
+  font-size: 0.7rem;
+  color: #888;
+  position: relative;
+  width: 1px;
+}
+
+.frequency-marker::before {
+  content: '';
+  position: absolute;
+  height: 8px;
+  width: 1px;
+  background-color: #555;
+  top: -12px;
+  left: 0;
+}
+
+.frequency-marker.major {
+  color: #aaa;
+  font-weight: bold;
+}
+
+.frequency-marker.major::before {
+  height: 12px;
+  width: 2px;
+  background-color: #777;
+  top: -16px;
 }
 
 /* Static visualization */
@@ -280,6 +523,19 @@
   opacity: 0.5;
   mix-blend-mode: screen;
   transition: opacity 0.3s ease;
+  filter: contrast(1.2) brightness(1.1);
+}
+
+.static-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.3) 100%);
+  pointer-events: none;
+  z-index: 11;
+  mix-blend-mode: overlay;
 }
 
 /* Add some static/noise effect when signal is weak */

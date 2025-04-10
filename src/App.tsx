@@ -4,6 +4,7 @@ import './App.css';
 import './styles/accessibility.css';
 import RadioTuner from './components/radio/RadioTuner';
 import { AssetLoader, SkipToContent } from './components/common';
+import GameMenuButton from './components/system/GameMenuButton';
 import { RouteTransition, LazyRoute } from './components/routing';
 import { ESSENTIAL_ASSETS } from './assets';
 
@@ -48,7 +49,8 @@ const App: React.FC = () => {
     >
       <Router>
         <div className="app-container" data-testid="app-container">
-          <SkipToContent contentId="main-content" />
+          <SkipToContent contentId="game" />
+          <GameMenuButton />
           <header className="app-header" data-testid="app-header">
             <h1 data-testid="app-title">Signal Lost</h1>
             <nav data-testid="app-nav">
@@ -71,7 +73,7 @@ const App: React.FC = () => {
               </ul>
             </nav>
           </header>
-          <main className="app-content" id="main-content" data-testid="app-content" tabIndex={-1}>
+          <main className="app-content" id="game" data-testid="app-content" tabIndex={-1}>
             <RouteTransition>
               <Routes>
                 <Route

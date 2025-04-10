@@ -2,8 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
-import { GameStateProvider } from './context/GameStateContext';
-import { AudioProvider } from './context/AudioContext';
+import { CombinedGameProvider } from './context/CombinedGameProvider';
 
 // Create root element if it doesn't exist
 const rootElement =
@@ -18,10 +17,8 @@ const rootElement =
 // Render the React application
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <GameStateProvider>
-      <AudioProvider>
-        <App />
-      </AudioProvider>
-    </GameStateProvider>
+    <CombinedGameProvider>
+      <App />
+    </CombinedGameProvider>
   </React.StrictMode>
 );

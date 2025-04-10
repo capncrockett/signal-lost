@@ -45,46 +45,48 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
 ## Development Workflow
 
-1. Create a new branch for your feature or bugfix:
+### Agent-Specific Workflow
 
+This project uses a dual-agent (Alpha/Beta) development approach. Follow these steps:
+
+1. Sync with develop branch:
    ```bash
-   git checkout -b feature/your-feature-name
+   git checkout develop
+   git pull origin develop
    ```
 
-   or
-
+2. Create your feature branch using the correct prefix:
    ```bash
-   git checkout -b fix/issue-description
+   # For Alpha agent
+   git checkout -b feature/alpha/your-feature
+   # For Beta agent
+   git checkout -b feature/beta/your-feature
+   # For interface contracts
+   git checkout -b feature/contract/your-change
    ```
 
-2. Make your changes, following the [coding standards](#coding-standards)
+3. Before submitting PR:
+   - Sync with develop: `git rebase origin/develop`
+   - Check other agent's work: `./scripts/debug-helper.ps1`
+   - Run contract validation: `npm run dev:validate-contracts`
+   - Run all checks: `npm run check-all`
 
-3. Run tests to ensure your changes don't break existing functionality:
+4. Submit PR following the naming convention:
+   - Title format: `[Alpha|Beta] Feature description`
+   - Required reviewers: Other agent + tech lead
+   - Must pass all CI checks and contract validation
 
-   ```bash
-   npm run test
-   npm run test:e2e:ci
-   ```
+### Conflict Resolution
 
-4. Commit your changes with a descriptive message:
+1. Interface conflicts:
+   - Create contract resolution branch: `feature/contract/resolve-conflict`
+   - Requires approval from both agents
+   - Must pass contract validation
 
-   ```bash
-   git commit -m "feat: Add new feature X"
-   ```
-
-   or
-
-   ```bash
-   git commit -m "fix: Resolve issue with Y"
-   ```
-
-5. Push your branch to your fork:
-
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-6. Create a Pull Request from your fork to the main repository
+2. Implementation conflicts:
+   - Resolve through contract validation
+   - Update interface documentation
+   - Both agents must approve changes
 
 ## Coding Standards
 

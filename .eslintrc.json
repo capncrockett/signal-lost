@@ -41,6 +41,13 @@
   },
   "overrides": [
     {
+      "files": ["**/*.d.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/explicit-function-return-type": "off"
+      }
+    },
+    {
       "files": [
         "**/*.test.ts",
         "**/*.test.tsx",
@@ -94,7 +101,7 @@
       }
     }
   ],
-  "ignorePatterns": ["dist", "node_modules", "coverage", "playwright-report", "src-react", "src/main.tsx"],
+  "ignorePatterns": ["dist", "node_modules", "coverage", "playwright-report", "src-react", "src/main.tsx", "**/*.d.ts"],
   "parserOptions": {
     "ecmaVersion": 2020,
     "sourceType": "module",

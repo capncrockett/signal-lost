@@ -23,6 +23,7 @@
   },
   "include": [
     "src",
+    "src/**/*.d.ts",
     "tests",
     "e2e",
     "*.ts",

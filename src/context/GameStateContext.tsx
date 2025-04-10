@@ -29,7 +29,8 @@ type ActionType =
   | { type: 'REMOVE_INVENTORY_ITEM'; payload: string }
   | { type: 'SET_GAME_PROGRESS'; payload: number }
   | { type: 'TOGGLE_RADIO' }
-  | { type: 'RESET_STATE' };
+  | { type: 'RESET_STATE' }
+  | { type: 'LOAD_STATE'; payload: unknown };
 
 // Create the reducer function
 const gameStateReducer = (state: GameState, action: ActionType): GameState => {
@@ -77,6 +78,27 @@ const gameStateReducer = (state: GameState, action: ActionType): GameState => {
       };
     case 'RESET_STATE':
       return initialState;
+    case 'LOAD_STATE':
+      // Validate and type-check the loaded state
+      try {
+        const loadedState = action.payload as GameState;
+        // Ensure all required properties exist
+        if (
+          typeof loadedState.currentFrequency === 'number' &&
+          Array.isArray(loadedState.discoveredFrequencies) &&
+          typeof loadedState.currentLocation === 'string' &&
+          Array.isArray(loadedState.inventory) &&
+          typeof loadedState.gameProgress === 'number' &&
+          typeof loadedState.isRadioOn === 'boolean'
+        ) {
+          return loadedState;
+        }
+        console.error('Invalid state format when loading game state');
+        return state;
+      } catch (error) {
+        console.error('Error loading game state:', error);
+        return state;
+      }
     default:
       return state;
   }

@@ -1,0 +1,242 @@
+name: Cross-Agent Validation
+
+on:
+  pull_request:
+    branches: [develop]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'src/components/radio/**'
+      - 'src/components/narrative/**'
+      - 'src/audio/**'
+      - 'src/context/**'
+      - 'src/types/**'
+      - 'src/data/**'
+      - 'tests/integration/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  validate-contracts:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Determine agent type
+        id: agent-type
+        run: |
+          if [[ "${{ github.head_ref }}" == feature/alpha/* ]]; then
+            echo "agent=alpha" >> $GITHUB_OUTPUT
+            echo "This is an Alpha agent PR"
+          elif [[ "${{ github.head_ref }}" == feature/beta/* ]]; then
+            echo "agent=beta" >> $GITHUB_OUTPUT
+            echo "This is a Beta agent PR"
+          elif [[ "${{ github.head_ref }}" == feature/contract/* ]]; then
+            echo "agent=contract" >> $GITHUB_OUTPUT
+            echo "This is a contract update PR"
+          else
+            echo "agent=unknown" >> $GITHUB_OUTPUT
+            echo "Unknown agent type"
+          fi
+
+      - name: Validate interface contracts
+        id: validate-contracts
+        run: |
+          echo "Running contract validation..."
+          # Create a validation report file
+          touch validation-report.md
+          echo "# Interface Contract Validation Report" >> validation-report.md
+          echo "" >> validation-report.md
+
+          # Run TypeScript compiler in strict mode for interface files
+          echo "## Type Checking" >> validation-report.md
+          if npx tsc --noEmit --strict src/types/*.d.ts; then
+            echo "✅ Type definitions are valid" >> validation-report.md
+          else
+            echo "❌ Type definition errors found" >> validation-report.md
+            echo "Please fix the type errors in the interface contracts" >> validation-report.md
+            exit 1
+          fi
+
+          # Check for Alpha/Beta interface compatibility
+          echo "" >> validation-report.md
+          echo "## Interface Compatibility" >> validation-report.md
+
+          # Run the contract validation script if it exists
+          if [ -f "scripts/validate-contracts.js" ]; then
+            if node scripts/validate-contracts.js >> validation-report.md; then
+              echo "✅ Interface contracts are compatible" >> validation-report.md
+            else
+              echo "❌ Interface compatibility issues found" >> validation-report.md
+              echo "Please ensure Alpha and Beta components use compatible interfaces" >> validation-report.md
+              exit 1
+            fi
+          else
+            echo "⚠️ Contract validation script not found" >> validation-report.md
+            echo "Creating a basic validation check..." >> validation-report.md
+
+            # Basic validation: check if required interfaces exist
+            if grep -q "interface Signal" src/types/*.d.ts; then
+              echo "✅ Signal interface found" >> validation-report.md
+            else
+              echo "❌ Signal interface not found" >> validation-report.md
+              echo "The Signal interface is required for Alpha/Beta integration" >> validation-report.md
+              exit 1
+            fi
+
+            if grep -q "interface GameEvent" src/types/*.d.ts; then
+              echo "✅ GameEvent interface found" >> validation-report.md
+            else
+              echo "❌ GameEvent interface not found" >> validation-report.md
+              echo "The GameEvent interface is required for Alpha/Beta integration" >> validation-report.md
+              exit 1
+            fi
+          fi
+
+      - name: Run cross-agent integration tests
+        id: integration-tests
+        run: |
+          echo "Running cross-agent integration tests..."
+          # Create a test report file
+          touch integration-test-report.md
+          echo "# Cross-Agent Integration Test Report" >> integration-test-report.md
+          echo "" >> integration-test-report.md
+
+          # Run integration tests if they exist
+          if [ -d "tests/integration" ]; then
+            if npm run test:integration >> integration-test-report.md 2>&1; then
+              echo "✅ Integration tests passed" >> integration-test-report.md
+            else
+              echo "❌ Integration tests failed" >> integration-test-report.md
+              echo "Please fix the integration issues between Alpha and Beta components" >> integration-test-report.md
+              exit 1
+            fi
+          else
+            echo "⚠️ No integration tests found" >> integration-test-report.md
+            echo "Consider adding integration tests for Alpha/Beta components" >> integration-test-report.md
+          fi
+
+      - name: Generate agent-specific feedback
+        id: agent-feedback
+        run: |
+          echo "Generating agent-specific feedback..."
+          # Create a feedback file
+          touch agent-feedback.md
+          echo "# Agent-Specific Feedback" >> agent-feedback.md
+          echo "" >> agent-feedback.md
+
+          if [[ "${{ steps.agent-type.outputs.agent }}" == "alpha" ]]; then
+            echo "## Feedback for Agent Alpha" >> agent-feedback.md
+            echo "" >> agent-feedback.md
+            echo "### Radio Tuner Component" >> agent-feedback.md
+            echo "- Ensure signal detection maintains compatibility with narrative system" >> agent-feedback.md
+            echo "- Verify audio system changes don't affect narrative event handling" >> agent-feedback.md
+            echo "" >> agent-feedback.md
+            echo "### Audio System" >> agent-feedback.md
+            echo "- Check that audio changes maintain proper event dispatching" >> agent-feedback.md
+            echo "- Ensure volume controls don't interfere with narrative audio cues" >> agent-feedback.md
+          elif [[ "${{ steps.agent-type.outputs.agent }}" == "beta" ]]; then
+            echo "## Feedback for Agent Beta" >> agent-feedback.md
+            echo "" >> agent-feedback.md
+            echo "### Narrative System" >> agent-feedback.md
+            echo "- Ensure narrative components properly consume signals from the radio tuner" >> agent-feedback.md
+            echo "- Verify message display works with all signal types" >> agent-feedback.md
+            echo "" >> agent-feedback.md
+            echo "### Game State" >> agent-feedback.md
+            echo "- Check that game state changes don't affect radio tuner functionality" >> agent-feedback.md
+            echo "- Ensure event system properly handles audio events" >> agent-feedback.md
+          elif [[ "${{ steps.agent-type.outputs.agent }}" == "contract" ]]; then
+            echo "## Feedback for Contract Changes" >> agent-feedback.md
+            echo "" >> agent-feedback.md
+            echo "### Interface Contracts" >> agent-feedback.md
+            echo "- Ensure changes are backward compatible when possible" >> agent-feedback.md
+            echo "- Verify both Alpha and Beta components can adapt to the new contracts" >> agent-feedback.md
+            echo "- Consider adding migration guides for significant changes" >> agent-feedback.md
+          else
+            echo "## General Feedback" >> agent-feedback.md
+            echo "" >> agent-feedback.md
+            echo "- Please use the proper branch naming convention:" >> agent-feedback.md
+            echo "  - `feature/alpha/*` for Agent Alpha changes" >> agent-feedback.md
+            echo "  - `feature/beta/*` for Agent Beta changes" >> agent-feedback.md
+            echo "  - `feature/contract/*` for interface contract changes" >> agent-feedback.md
+          fi
+
+      - name: Check for other agent's approval
+        id: check-approval
+        run: |
+          # Get the PR details
+          PR_DETAILS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews")
+
+          # Check if the PR has been approved by the other agent
+          if [[ "${{ steps.agent-type.outputs.agent }}" == "alpha" ]]; then
+            # Check for Beta agent approval
+            if echo "$PR_DETAILS" | jq -e '.[] | select(.user.login=="CSL-Beta" and .state=="APPROVED")' > /dev/null; then
+              echo "approved_by_beta=true" >> $GITHUB_OUTPUT
+              echo "PR approved by Beta agent"
+            else
+              echo "approved_by_beta=false" >> $GITHUB_OUTPUT
+              echo "PR not yet approved by Beta agent"
+            fi
+          elif [[ "${{ steps.agent-type.outputs.agent }}" == "beta" ]]; then
+            # Check for Alpha agent approval
+            if echo "$PR_DETAILS" | jq -e '.[] | select(.user.login=="capncrockett" and .state=="APPROVED")' > /dev/null; then
+              echo "approved_by_alpha=true" >> $GITHUB_OUTPUT
+              echo "PR approved by Alpha agent"
+            else
+              echo "approved_by_alpha=false" >> $GITHUB_OUTPUT
+              echo "PR not yet approved by Alpha agent"
+            fi
+          fi
+
+      - name: Create combined report
+        run: |
+          cat validation-report.md integration-test-report.md agent-feedback.md > combined-report.md
+
+          # Add approval status to the report
+          echo "" >> combined-report.md
+          echo "## Approval Status" >> combined-report.md
+          if [[ "${{ steps.agent-type.outputs.agent }}" == "alpha" ]]; then
+            if [[ "${{ steps.check-approval.outputs.approved_by_beta }}" == "true" ]]; then
+              echo "✅ This PR has been approved by the Beta agent" >> combined-report.md
+            else
+              echo "⏳ Waiting for approval from the Beta agent" >> combined-report.md
+            fi
+          elif [[ "${{ steps.agent-type.outputs.agent }}" == "beta" ]]; then
+            if [[ "${{ steps.check-approval.outputs.approved_by_alpha }}" == "true" ]]; then
+              echo "✅ This PR has been approved by the Alpha agent" >> combined-report.md
+            else
+              echo "⏳ Waiting for approval from the Alpha agent" >> combined-report.md
+            fi
+          fi
+
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('combined-report.md', 'utf8');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });
