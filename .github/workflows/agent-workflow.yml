@@ -33,6 +33,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install additional dependencies
+        run: npm install rc-slider zustand
+
       - name: Run linting
         run: npm run lint
 
