@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 interface RadioState {
   // Radio state properties
@@ -67,7 +67,7 @@ export const RadioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     resetState,
   };
 
-  return <RadioContext.Provider value={value}>{children}</RadioContext.Provider>;
+  return React.createElement(RadioContext.Provider, { value }, children);
 };
 
 // Hook to use the radio context
