@@ -1,0 +1,91 @@
+/* Custom styles for the RC Slider Radio Tuner */
+
+.rc-slider-container {
+  margin: 20px 0;
+  padding: 10px 20px;
+  background-color: #222;
+  border-radius: 8px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Override rc-slider styles */
+.rc-slider {
+  height: 30px;
+  padding: 10px 0;
+}
+
+.rc-slider-rail {
+  background-color: #333 !important;
+  height: 10px !important;
+}
+
+.rc-slider-track {
+  background-color: #666 !important;
+  height: 10px !important;
+}
+
+.rc-slider-handle {
+  border-color: #007bff !important;
+  height: 28px !important;
+  width: 28px !important;
+  margin-top: -9px !important;
+  background-color: #fff !important;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5) !important;
+  opacity: 1 !important;
+}
+
+.rc-slider-handle:hover {
+  border-color: #0056b3 !important;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.7) !important;
+}
+
+.rc-slider-handle:active {
+  border-color: #0056b3 !important;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.9) !important;
+}
+
+.rc-slider-dot {
+  border-color: #666 !important;
+  height: 12px !important;
+  width: 2px !important;
+  margin-left: -1px !important;
+  bottom: -6px !important;
+  border-radius: 0 !important;
+}
+
+.rc-slider-dot-active {
+  border-color: #007bff !important;
+}
+
+.rc-slider-mark-text {
+  color: #aaa !important;
+  font-size: 12px !important;
+  margin-top: 10px !important;
+}
+
+.rc-slider-mark-text-active {
+  color: #fff !important;
+}
+
+/* Disabled state */
+.rc-slider-disabled {
+  background-color: transparent !important;
+}
+
+.rc-slider-disabled .rc-slider-track {
+  background-color: #444 !important;
+}
+
+.rc-slider-disabled .rc-slider-handle {
+  border-color: #555 !important;
+  background-color: #333 !important;
+  box-shadow: none !important;
+}
+
+.rc-slider-disabled .rc-slider-dot {
+  border-color: #444 !important;
+}
+
+.rc-slider-disabled .rc-slider-mark-text {
+  color: #555 !important;
+}
