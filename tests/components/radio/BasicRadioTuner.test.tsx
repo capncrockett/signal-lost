@@ -1,3 +1,4 @@
+// @ts-expect-error - React is required for JSX
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -139,7 +140,7 @@ describe('BasicRadioTuner Component', () => {
     const canvas = screen.getByTestId('static-canvas');
 
     // Check if canvas context was requested
-    expect(canvas.getContext).toHaveBeenCalledWith('2d');
+    expect((canvas as unknown as { getContext: jest.Mock }).getContext).toHaveBeenCalledWith('2d');
 
     // Allow time for the animation frame to be called
     act(() => {

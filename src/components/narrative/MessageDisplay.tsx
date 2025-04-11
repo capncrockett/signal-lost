@@ -5,10 +5,11 @@ import './MessageDisplay.css';
 
 interface MessageDisplayProps {
   message?: Message;
-  isVisible: boolean;
+  isVisible?: boolean;
+  onClose?: () => void;
 }
 
-const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, isVisible }) => {
+const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, isVisible = true, onClose }) => {
   const { state } = useGameState();
   const [displayedContent, setDisplayedContent] = useState<string>('');
   const [isDecoding, setIsDecoding] = useState<boolean>(false);
@@ -113,6 +114,11 @@ const MessageDisplay: React.FC<MessageDisplayProps> = ({ message, isVisible }) =
         <h3 className="message-title">{message.title}</h3>
         {message.sender && <div className="message-sender">From: {message.sender}</div>}
         {message.timestamp && <div className="message-timestamp">Time: {message.timestamp}</div>}
+        {onClose && (
+          <button className="message-close" onClick={onClose} aria-label="Close message">
+            ×
+          </button>
+        )}
       </div>
 
       <div className="message-content">

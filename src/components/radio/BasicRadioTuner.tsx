@@ -40,6 +40,10 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
   const isMountedRef = useRef<boolean>(true);
   const staticCanvasRef = useRef<HTMLCanvasElement>(null);
 
+  // Force a re-render without using state
+  const [, updateState] = React.useState<object>({});
+  const forceRender = React.useCallback(() => updateState({}), []);
+
   // Initialize on mount
   useEffect(() => {
     // Set the mounted flag
@@ -138,6 +142,7 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
 
     // Force a re-render to update the UI
     forceRender();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.isRadioOn, state.discoveredFrequencies, audio, dispatch]);
 
   // Draw static visualization with performance optimizations
@@ -189,10 +194,6 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
       }
     };
   }, [state.isRadioOn, forceRender]);
-
-  // Force a re-render without using state
-  const [, updateState] = React.useState<object>({});
-  const forceRender = React.useCallback(() => updateState({}), []);
 
   // Toggle message display
   const toggleMessage = (): void => {

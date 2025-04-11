@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { create } from 'zustand';
 
 interface RadioState {
@@ -24,7 +27,7 @@ interface RadioState {
   resetState: () => void;
 }
 
-export const useRadioStore = create<RadioState>((set) => ({
+export const useRadioStore = create<RadioState>((set: any) => ({
   // Initial state
   frequency: 90.0,
   signalStrength: 0,
@@ -41,7 +44,7 @@ export const useRadioStore = create<RadioState>((set) => ({
   setStaticIntensity: (intensity: number) => set({ staticIntensity: intensity }),
   setIsScanning: (isScanning: boolean) => set({ isScanning }),
   setShowMessage: (show: boolean) => set({ showMessage: show }),
-  toggleShowMessage: () => set((state) => ({ showMessage: !state.showMessage })),
+  toggleShowMessage: () => set((state: RadioState) => ({ showMessage: !state.showMessage })),
   setIsDragging: (isDragging: boolean) => set({ isDragging }),
 
   // Reset state (for cleanup)

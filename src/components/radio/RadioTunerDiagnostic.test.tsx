@@ -1,3 +1,4 @@
+// @ts-expect-error - React is required for JSX
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import RadioTuner from './RadioTuner';
@@ -70,7 +71,10 @@ describe('RadioTuner Diagnostic Test', () => {
     const dial = screen.getByRole('slider', { name: /frequency dial/i });
 
     // Log initial state
-    console.log('Initial dial position:', dial.querySelector('.tuner-dial-knob')?.style.left);
+    console.log(
+      'Initial dial position:',
+      (dial.querySelector('.tuner-dial-knob') as HTMLElement)?.style.left
+    );
 
     // Turn on the radio
     const powerButton = screen.getByRole('button', { name: /turn radio on/i });
@@ -79,7 +83,7 @@ describe('RadioTuner Diagnostic Test', () => {
     // Log state after turning on
     console.log(
       'Dial position after turning on:',
-      dial.querySelector('.tuner-dial-knob')?.style.left
+      (dial.querySelector('.tuner-dial-knob') as HTMLElement)?.style.left
     );
 
     // Simulate mouse events on the dial
@@ -94,14 +98,17 @@ describe('RadioTuner Diagnostic Test', () => {
     // Log state after mouse move
     console.log(
       'Dial position after mouse move:',
-      dial.querySelector('.tuner-dial-knob')?.style.left
+      (dial.querySelector('.tuner-dial-knob') as HTMLElement)?.style.left
     );
 
     // Simulate mouse up
     fireEvent.mouseUp(dial);
 
     // Log final state
-    console.log('Final dial position:', dial.querySelector('.tuner-dial-knob')?.style.left);
+    console.log(
+      'Final dial position:',
+      (dial.querySelector('.tuner-dial-knob') as HTMLElement)?.style.left
+    );
     console.log('isDragging after mouseUp:', (window as any).isDragging);
   });
 });
