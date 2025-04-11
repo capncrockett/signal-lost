@@ -36,9 +36,9 @@ export const RadioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
   // Method implementations
-  const toggleShowMessage = () => setShowMessage(!showMessage);
+  const toggleShowMessage = (): void => setShowMessage(!showMessage);
 
-  const resetState = () => {
+  const resetState = (): void => {
     setFrequency(90.0);
     setSignalStrength(0);
     setCurrentSignalId(null);
