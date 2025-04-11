@@ -57,13 +57,21 @@ body {
   margin-left: 20px;
 }
 
-.app-header nav ul li a {
+.app-header nav ul li a,
+.app-header nav ul li button.notebook-button {
   color: var(--text-color);
   text-decoration: none;
   transition: color 0.3s;
+  background: none;
+  border: none;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
 }
 
-.app-header nav ul li a:hover {
+.app-header nav ul li a:hover,
+.app-header nav ul li button.notebook-button:hover {
   color: var(--accent-color);
 }
 

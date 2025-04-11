@@ -6,6 +6,7 @@ import RadioTuner from './components/radio/RadioTuner';
 import { AssetLoader, SkipToContent } from './components/common';
 import GameMenuButton from './components/system/GameMenuButton';
 import { RouteTransition, LazyRoute } from './components/routing';
+import PlayerNotebook from './components/narrative/PlayerNotebook';
 import { ESSENTIAL_ASSETS } from './assets';
 
 // Lazy load page components
@@ -34,10 +35,15 @@ const FieldExplorationFallback = () => (
 const App: React.FC = () => {
   // Track loading state for future enhancements
   const [, setAssetsLoaded] = useState(false);
+  const [isNotebookOpen, setIsNotebookOpen] = useState(false);
 
   const handleLoadComplete = (): void => {
     setAssetsLoaded(true);
     console.log('Assets loaded successfully');
+  };
+
+  const toggleNotebook = (): void => {
+    setIsNotebookOpen(!isNotebookOpen);
   };
 
   return (
@@ -70,9 +76,19 @@ const App: React.FC = () => {
                     Field
                   </Link>
                 </li>
+                <li>
+                  <button
+                    onClick={toggleNotebook}
+                    className="notebook-button"
+                    data-testid="nav-notebook"
+                  >
+                    Notebook
+                  </button>
+                </li>
               </ul>
             </nav>
           </header>
+          <PlayerNotebook isOpen={isNotebookOpen} onClose={() => setIsNotebookOpen(false)} />
           <main className="app-content" id="game" data-testid="app-content" tabIndex={-1}>
             <RouteTransition>
               <Routes>

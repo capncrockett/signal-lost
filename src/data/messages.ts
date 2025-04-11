@@ -71,6 +71,66 @@ export const messages: Record<string, Message> = {
       "This is Dr. Chen. I've discovered what they were hiding. The experiment wasn't just about signal amplification. It was about opening a gateway. I've downloaded the data to my personal device. Find me at the old radio tower.",
     requiredProgress: 4,
   },
+  // New messages for Sprint 3
+  research_log: {
+    id: 'research_log',
+    title: 'Research Log Entry #42',
+    content:
+      "Research Log, Entry 42. The [static] experiments have shown promising results. We've managed to [static] the signal by nearly 300%. Dr. Chen believes we can [static] even further with the new [static] we've developed.",
+    sender: 'Dr. Marcus Wei',
+    timestamp: '2023-06-14 15:22',
+    isDecoded: false,
+    decodedContent:
+      "Research Log, Entry 42. The resonance experiments have shown promising results. We've managed to amplify the signal by nearly 300%. Dr. Chen believes we can push the boundaries even further with the new quantum receiver we've developed.",
+    requiredProgress: 2,
+  },
+  encrypted_coordinates: {
+    id: 'encrypted_coordinates',
+    title: 'Encrypted Coordinates',
+    content:
+      '01001110 00110111 01010111 00110001 00110010 00110011 00101110 00110100 00110101 00110110 00101100 01010111 00110001 00110010 00110011 00101110 00110100 00110101 00110110',
+    sender: 'Unknown',
+    timestamp: '2023-06-15 02:37',
+    isDecoded: false,
+    decodedContent: 'N37°12.456,W122°34.567',
+    requiredProgress: 5,
+  },
+  survivors_log: {
+    id: 'survivors_log',
+    title: "Survivor's Log",
+    content:
+      "Day 3 after the [static]. Food supplies are [static]. We've barricaded ourselves in the [static] lab, but I don't know how long we can [static]. If anyone finds this, the [static] is in the lower levels. Don't [static] it.",
+    sender: 'Dr. Emily Nakamura',
+    timestamp: '2023-06-16 07:19',
+    isDecoded: false,
+    decodedContent:
+      "Day 3 after the incident. Food supplies are running low. We've barricaded ourselves in the secondary lab, but I don't know how long we can hold out. If anyone finds this, the containment breach is in the lower levels. Don't approach it.",
+    requiredProgress: 3,
+  },
+  military_transmission: {
+    id: 'military_transmission',
+    title: 'Military Transmission',
+    content:
+      "This is Captain [static] of the Special [static] Unit. We've been ordered to [static] the facility and [static] all evidence of the [static]. All civilian personnel are to be [static] immediately. Authorization code: [static].",
+    sender: 'Captain [Redacted]',
+    timestamp: '2023-06-16 13:05',
+    isDecoded: false,
+    decodedContent:
+      "This is Captain Reynolds of the Special Containment Unit. We've been ordered to secure the facility and destroy all evidence of the experiment. All civilian personnel are to be evacuated immediately. Authorization code: BLACKLIGHT-7.",
+    requiredProgress: 4,
+  },
+  personal_note: {
+    id: 'personal_note',
+    title: 'Personal Note',
+    content:
+      "If you're reading this, I might already be [static]. I've hidden the [static] in my personal locker. The code is [static]. Whatever you do, don't let them [static] what we've discovered. It could change [static] forever.",
+    sender: 'Dr. Sarah Chen',
+    timestamp: '2023-06-16 18:42',
+    isDecoded: false,
+    decodedContent:
+      "If you're reading this, I might already be gone. I've hidden the data drive in my personal locker. The code is 4-9-2-7. Whatever you do, don't let them weaponize what we've discovered. It could change humanity forever.",
+    requiredProgress: 5,
+  },
 };
 
 // Function to get a message by ID
@@ -78,8 +138,18 @@ export const getMessage = (id: string): Message | undefined => {
   return messages[id];
 };
 
-// Function to get a partially decoded message based on game progress
-export const getDecodedMessage = (message: Message, gameProgress: number): string => {
+/**
+ * Get a decoded message based on the game progress
+ * @param idOrMessage The message ID or Message object
+ * @param gameProgress The current game progress
+ * @returns The decoded message content if available, otherwise the original content
+ */
+export const getDecodedMessage = (idOrMessage: string | Message, gameProgress: number): string => {
+  // If idOrMessage is a string (message ID), get the message object
+  const message = typeof idOrMessage === 'string' ? getMessage(idOrMessage) : idOrMessage;
+  if (!message) return '';
+
+  // If the message is already decoded or has no decoded content, return the original content
   if (message.isDecoded || !message.decodedContent) {
     return message.content;
   }
@@ -95,21 +165,21 @@ export const getDecodedMessage = (message: Message, gameProgress: number): strin
 
   // Calculate how much of the message to decode based on progress
   const decodeRatio = gameProgress / (message.requiredProgress || 1);
-  const decodedWordCount = Math.floor(decodedWords.length * decodeRatio);
+  const staticWords = originalWords.filter((word) => word.includes('[static]'));
+  const wordsToReplace = Math.floor(staticWords.length * decodeRatio);
 
-  // Replace some static with decoded words
+  // Create a map of which indices contain static
+  const staticIndices = originalWords
+    .map((word, index) => (word.includes('[static]') ? index : -1))
+    .filter((index) => index !== -1);
+
+  // Randomly select indices to decode
+  const indicesToDecode = staticIndices
+    .sort(() => Math.random() - 0.5)
+    .slice(0, Math.min(wordsToReplace, staticIndices.length));
+
+  // Replace selected words with decoded versions
   const result = [...originalWords];
-
-  // Randomly select words to decode
-  const indicesToDecode = new Set<number>();
-  while (indicesToDecode.size < decodedWordCount) {
-    const randomIndex = Math.floor(Math.random() * originalWords.length);
-    if (originalWords[randomIndex].includes('[static]')) {
-      indicesToDecode.add(randomIndex);
-    }
-  }
-
-  // Replace the selected words with decoded versions
   indicesToDecode.forEach((index) => {
     result[index] = decodedWords[index];
   });
