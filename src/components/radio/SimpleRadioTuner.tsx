@@ -8,7 +8,7 @@ import {
 } from '../../data/frequencies';
 import { getMessage } from '../../data/messages';
 import MessageDisplay from '../narrative/MessageDisplay';
-import { NoiseType } from '../../audio/NoiseType';
+
 import './RadioTuner.css';
 
 interface RadioTunerProps {
@@ -37,7 +37,7 @@ const SimpleRadioTuner: React.FC<RadioTunerProps> = ({
   const [showMessage, setShowMessage] = useState<boolean>(false);
   const [staticIntensity, setStaticIntensity] = useState<number>(0.5);
   const [isScanning, setIsScanning] = useState<boolean>(false);
-  
+
   const staticCanvasRef = useRef<HTMLCanvasElement>(null);
   const scanIntervalRef = useRef<number | null>(null);
 
@@ -51,7 +51,7 @@ const SimpleRadioTuner: React.FC<RadioTunerProps> = ({
   // Update game state when local frequency changes
   useEffect(() => {
     dispatch({ type: 'SET_FREQUENCY', payload: frequency });
-    
+
     if (onFrequencyChange) {
       onFrequencyChange(frequency);
     }
@@ -89,16 +89,16 @@ const SimpleRadioTuner: React.FC<RadioTunerProps> = ({
 
     const handleGlobalMouseMove = (e: MouseEvent): void => {
       if (!isDragging || !state.isRadioOn) return;
-      
+
       // Get the dial container element
       const dialContainer = document.querySelector('.tuner-dial-container');
       if (!dialContainer) return;
-      
+
       const rect = dialContainer.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const width = rect.width;
       const percentage = Math.max(0, Math.min(1, x / width));
-      
+
       const newFrequency = minFrequency + percentage * (maxFrequency - minFrequency);
       setFrequency(parseFloat(newFrequency.toFixed(1)));
     };
@@ -211,16 +211,19 @@ const SimpleRadioTuner: React.FC<RadioTunerProps> = ({
 
         // Draw static noise with color variations based on signal strength
         const intensity = staticIntensity * 255;
-        const signalColor = signalStrength > 0.5 ? 
-          `rgba(${100 + signalStrength * 155}, ${100 + signalStrength * 155}, 255, 0.5)` : 
-          'rgba(255, 255, 255, 0.5)';
+        const signalColor =
+          signalStrength > 0.5
+            ? `rgba(${100 + signalStrength * 155}, ${100 + signalStrength * 155}, 255, 0.5)`
+            : 'rgba(255, 255, 255, 0.5)';
 
         for (let i = 0; i < canvas.width; i += 2) {
           for (let j = 0; j < canvas.height; j += 2) {
             const noiseValue = Math.random() * intensity;
             const useSignalColor = signalStrength > 0.3 && Math.random() < signalStrength * 0.3;
-            
-            ctx.fillStyle = useSignalColor ? signalColor : `rgba(${noiseValue}, ${noiseValue}, ${noiseValue}, 0.5)`;
+
+            ctx.fillStyle = useSignalColor
+              ? signalColor
+              : `rgba(${noiseValue}, ${noiseValue}, ${noiseValue}, 0.5)`;
             ctx.fillRect(i, j, 2, 2);
           }
         }

@@ -1,4 +1,4 @@
-import React from 'react';
+// React is used implicitly by JSX
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import SimpleSliderRadioTuner from '../../../src/components/radio/SimpleSliderRadioTuner';
@@ -103,7 +103,7 @@ describe('SimpleSliderRadioTuner Component', () => {
     // Check if dispatch was called with the correct action
     expect(mockDispatch).toHaveBeenCalledWith({
       type: 'SET_FREQUENCY',
-      payload: 90.1
+      payload: 90.1,
     });
   });
 

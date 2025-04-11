@@ -10,7 +10,7 @@ import {
 } from '../../data/frequencies';
 import { getMessage } from '../../data/messages';
 import MessageDisplay from '../narrative/MessageDisplay';
-import { NoiseType } from '../../audio/NoiseType';
+
 import './RadioTuner.css';
 import './RcSliderRadioTuner.css'; // We'll create this file for custom styling
 
@@ -165,16 +165,19 @@ const RcSliderRadioTuner: React.FC<RadioTunerProps> = ({
 
         // Draw static noise with color variations based on signal strength
         const intensity = staticIntensity * 255;
-        const signalColor = signalStrength > 0.5 ?
-          `rgba(${100 + signalStrength * 155}, ${100 + signalStrength * 155}, 255, 0.5)` :
-          'rgba(255, 255, 255, 0.5)';
+        const signalColor =
+          signalStrength > 0.5
+            ? `rgba(${100 + signalStrength * 155}, ${100 + signalStrength * 155}, 255, 0.5)`
+            : 'rgba(255, 255, 255, 0.5)';
 
         for (let i = 0; i < canvas.width; i += 2) {
           for (let j = 0; j < canvas.height; j += 2) {
             const noiseValue = Math.random() * intensity;
             const useSignalColor = signalStrength > 0.3 && Math.random() < signalStrength * 0.3;
 
-            ctx.fillStyle = useSignalColor ? signalColor : `rgba(${noiseValue}, ${noiseValue}, ${noiseValue}, 0.5)`;
+            ctx.fillStyle = useSignalColor
+              ? signalColor
+              : `rgba(${noiseValue}, ${noiseValue}, ${noiseValue}, 0.5)`;
             ctx.fillRect(i, j, 2, 2);
           }
         }
@@ -197,8 +200,7 @@ const RcSliderRadioTuner: React.FC<RadioTunerProps> = ({
     setShowMessage(!showMessage);
   };
 
-  // Calculate dial position based on current frequency
-  const dialPosition = ((frequency - minFrequency) / (maxFrequency - minFrequency)) * 100;
+  // We don't need to calculate dial position since we're using rc-slider
 
   // Toggle frequency scanning
   const toggleScanning = (): void => {

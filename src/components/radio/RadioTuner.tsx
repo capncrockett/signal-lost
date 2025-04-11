@@ -8,7 +8,7 @@ import {
 } from '../../data/frequencies';
 import { getMessage } from '../../data/messages';
 import MessageDisplay from '../narrative/MessageDisplay';
-import { NoiseType } from '../../audio/NoiseType';
+
 import './RadioTuner.css';
 
 interface RadioTunerProps {

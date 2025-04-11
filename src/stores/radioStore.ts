@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { NoiseType } from '../audio/NoiseType';
 
 interface RadioState {
   // Radio state
@@ -10,7 +9,7 @@ interface RadioState {
   isScanning: boolean;
   showMessage: boolean;
   isDragging: boolean;
-  
+
   // Actions
   setFrequency: (frequency: number) => void;
   setSignalStrength: (strength: number) => void;
@@ -20,7 +19,7 @@ interface RadioState {
   setShowMessage: (show: boolean) => void;
   toggleShowMessage: () => void;
   setIsDragging: (isDragging: boolean) => void;
-  
+
   // Reset state (for cleanup)
   resetState: () => void;
 }
@@ -34,24 +33,25 @@ export const useRadioStore = create<RadioState>((set) => ({
   isScanning: false,
   showMessage: false,
   isDragging: false,
-  
+
   // Actions
-  setFrequency: (frequency) => set({ frequency }),
-  setSignalStrength: (strength) => set({ signalStrength: strength }),
-  setCurrentSignalId: (id) => set({ currentSignalId: id }),
-  setStaticIntensity: (intensity) => set({ staticIntensity: intensity }),
-  setIsScanning: (isScanning) => set({ isScanning }),
-  setShowMessage: (show) => set({ showMessage: show }),
+  setFrequency: (frequency: number) => set({ frequency }),
+  setSignalStrength: (strength: number) => set({ signalStrength: strength }),
+  setCurrentSignalId: (id: string | null) => set({ currentSignalId: id }),
+  setStaticIntensity: (intensity: number) => set({ staticIntensity: intensity }),
+  setIsScanning: (isScanning: boolean) => set({ isScanning }),
+  setShowMessage: (show: boolean) => set({ showMessage: show }),
   toggleShowMessage: () => set((state) => ({ showMessage: !state.showMessage })),
-  setIsDragging: (isDragging) => set({ isDragging }),
-  
+  setIsDragging: (isDragging: boolean) => set({ isDragging }),
+
   // Reset state (for cleanup)
-  resetState: () => set({
-    signalStrength: 0,
-    currentSignalId: null,
-    staticIntensity: 0.5,
-    isScanning: false,
-    showMessage: false,
-    isDragging: false,
-  }),
+  resetState: () =>
+    set({
+      signalStrength: 0,
+      currentSignalId: null,
+      staticIntensity: 0.5,
+      isScanning: false,
+      showMessage: false,
+      isDragging: false,
+    }),
 }));
