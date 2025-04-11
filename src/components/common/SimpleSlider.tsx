@@ -20,7 +20,7 @@ const SimpleSlider: React.FC<SimpleSliderProps> = ({
   disabled = false,
   className = '',
 }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     onChange(parseFloat(e.target.value));
   };
 
