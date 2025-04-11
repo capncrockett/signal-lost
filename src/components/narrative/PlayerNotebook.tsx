@@ -20,7 +20,7 @@ const PlayerNotebook: React.FC<PlayerNotebookProps> = ({ isOpen, onClose }) => {
   const [editMode, setEditMode] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
-  
+
   // Form state for editing or creating notes
   const [noteTitle, setNoteTitle] = useState<string>('');
   const [noteContent, setNoteContent] = useState<string>('');
@@ -186,11 +186,7 @@ const PlayerNotebook: React.FC<PlayerNotebookProps> = ({ isOpen, onClose }) => {
 
         <div className="notebook-content">
           <div className="notebook-sidebar">
-            <button
-              className="new-note-button"
-              onClick={createNewNote}
-              disabled={editMode}
-            >
+            <button className="new-note-button" onClick={createNewNote} disabled={editMode}>
               + New Note
             </button>
             <div className="note-list">

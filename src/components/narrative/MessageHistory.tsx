@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSignalState } from '../../context/SignalStateContext';
 import { useGameState } from '../../context/GameStateContext';
-import { getMessage, getDecodedMessage } from '../../data/messages';
+import { getMessage, Message } from '../../data/messages';
 import { Signal } from '../../types/signal.d';
 import './MessageHistory.css';
 
@@ -70,7 +70,7 @@ const MessageHistory: React.FC<MessageHistoryProps> = ({ isOpen, onClose }) => {
   };
 
   // Attempt to manually decode a message
-  const attemptDecode = () => {
+  const attemptDecode = (): void => {
     const signal = discoveredSignals.find((s) => s.id === selectedSignalId);
     if (!signal || signal.type !== 'message') return;
 
@@ -120,7 +120,7 @@ const MessageHistory: React.FC<MessageHistoryProps> = ({ isOpen, onClose }) => {
   };
 
   // Get a partially decoded message based on progress
-  const getPartiallyDecodedMessage = (message: any, progress: number): string => {
+  const getPartiallyDecodedMessage = (message: Message, progress: number): string => {
     if (!message.decodedContent) return message.content;
 
     const originalWords = message.content.split(' ');
