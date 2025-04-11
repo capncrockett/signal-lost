@@ -137,6 +137,7 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
         scanIntervalRef.current = null;
       }
     };
+    // Only run this effect once on mount and cleanup on unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -217,8 +218,9 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
       audio.stopSignal();
       audio.playStaticNoise(intensity);
     }
+    // Include state.currentFrequency in the dependency array to properly track frequency changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.isRadioOn, state.discoveredFrequencies, audio, gameDispatch, localFrequency]);
+  }, [state.isRadioOn, state.discoveredFrequencies, audio, gameDispatch, state.currentFrequency]);
 
   // Handle frequency change from the slider
   const handleSliderChange = (value: number | number[]): void => {

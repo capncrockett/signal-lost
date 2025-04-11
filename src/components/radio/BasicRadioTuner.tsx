@@ -71,7 +71,9 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
         scanIntervalRef.current = null;
       }
     };
-  }, [audio, dispatch, initialFrequency, state.currentFrequency]);
+    // Only run this effect once on mount and cleanup on unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Sync with game state when it changes externally
   useEffect(() => {
@@ -140,10 +142,9 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
       audio.playStaticNoise(intensity);
     }
 
-    // Force a re-render to update the UI
-    forceRender();
+    // DO NOT force a re-render here - this is what causes the infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.isRadioOn, state.discoveredFrequencies, audio, dispatch]);
+  }, [state.isRadioOn, state.discoveredFrequencies, audio, dispatch, state.currentFrequency]);
 
   // Draw static visualization with performance optimizations
   useEffect(() => {
@@ -193,7 +194,7 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
         cancelAnimationFrame(animationId);
       }
     };
-  }, [state.isRadioOn, forceRender]);
+  }, [state.isRadioOn]); // Remove forceRender from dependencies
 
   // Toggle message display
   const toggleMessage = (): void => {
