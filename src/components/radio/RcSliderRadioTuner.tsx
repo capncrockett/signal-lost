@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Slider from 'rc-slider';
-import 'rc-slider/assets/index.css';
+import SimpleSlider from '../common/SimpleSlider';
 import { useAudio } from '../../context/AudioContext';
 import { useGameState } from '../../context/GameStateContext';
 import {
@@ -11,6 +10,7 @@ import {
 import { getMessage } from '../../data/messages';
 import MessageDisplay from '../narrative/MessageDisplay';
 import { NoiseType } from '../../audio/NoiseType';
+
 import './RadioTuner.css';
 import './RcSliderRadioTuner.css'; // We'll create this file for custom styling
 
@@ -51,10 +51,11 @@ const RcSliderRadioTuner: React.FC<RadioTunerProps> = ({
       // If game state doesn't have a frequency yet, initialize it
       dispatch({ type: 'SET_FREQUENCY', payload: initialFrequency });
     }
-  }, []); // Only run on mount
+    // We only want this to run once on mount, but including all dependencies to satisfy linting
+  }, [dispatch, initialFrequency, state.currentFrequency]); // Include all dependencies
 
   // Handle frequency change from the slider
-  const handleSliderChange = (value: number | number[]) => {
+  const handleSliderChange = (value: number | number[]): void => {
     if (typeof value === 'number') {
       const roundedFreq = parseFloat(value.toFixed(1));
 
@@ -165,16 +166,19 @@ const RcSliderRadioTuner: React.FC<RadioTunerProps> = ({
 
         // Draw static noise with color variations based on signal strength
         const intensity = staticIntensity * 255;
-        const signalColor = signalStrength > 0.5 ?
-          `rgba(${100 + signalStrength * 155}, ${100 + signalStrength * 155}, 255, 0.5)` :
-          'rgba(255, 255, 255, 0.5)';
+        const signalColor =
+          signalStrength > 0.5
+            ? `rgba(${100 + signalStrength * 155}, ${100 + signalStrength * 155}, 255, 0.5)`
+            : 'rgba(255, 255, 255, 0.5)';
 
         for (let i = 0; i < canvas.width; i += 2) {
           for (let j = 0; j < canvas.height; j += 2) {
             const noiseValue = Math.random() * intensity;
             const useSignalColor = signalStrength > 0.3 && Math.random() < signalStrength * 0.3;
 
-            ctx.fillStyle = useSignalColor ? signalColor : `rgba(${noiseValue}, ${noiseValue}, ${noiseValue}, 0.5)`;
+            ctx.fillStyle = useSignalColor
+              ? signalColor
+              : `rgba(${noiseValue}, ${noiseValue}, ${noiseValue}, 0.5)`;
             ctx.fillRect(i, j, 2, 2);
           }
         }
@@ -197,8 +201,7 @@ const RcSliderRadioTuner: React.FC<RadioTunerProps> = ({
     setShowMessage(!showMessage);
   };
 
-  // Calculate dial position based on current frequency
-  const dialPosition = ((frequency - minFrequency) / (maxFrequency - minFrequency)) * 100;
+  // We don't need to calculate dial position since we're using rc-slider
 
   // Toggle frequency scanning
   const toggleScanning = (): void => {
@@ -320,7 +323,11 @@ const RcSliderRadioTuner: React.FC<RadioTunerProps> = ({
           <select
             id="noise-type-select"
             value={audio.currentNoiseType}
-            onChange={(e) => audio.setNoiseType(e.target.value as NoiseType)}
+            onChange={(e) =>
+              audio.setNoiseType(
+                e.target.value as NoiseType.Pink | NoiseType.White | NoiseType.Brown
+              )
+            }
             disabled={!state.isRadioOn}
             aria-label="Select noise type"
           >
@@ -350,36 +357,16 @@ const RcSliderRadioTuner: React.FC<RadioTunerProps> = ({
         />
       </div>
 
-      {/* RC Slider for frequency tuning */}
-      <div className="rc-slider-container">
-        <Slider
+      {/* Simple Slider for frequency tuning */}
+      <div className="slider-container">
+        <SimpleSlider
           min={minFrequency}
           max={maxFrequency}
           step={0.1}
           value={frequency}
           onChange={handleSliderChange}
           disabled={!state.isRadioOn || isScanning}
-          marks={marks}
-          railStyle={{ backgroundColor: '#333', height: 10 }}
-          trackStyle={{ backgroundColor: '#666', height: 10 }}
-          handleStyle={{
-            borderColor: '#007bff',
-            height: 28,
-            width: 28,
-            marginTop: -9,
-            backgroundColor: '#fff',
-            boxShadow: '0 0 5px rgba(0, 123, 255, 0.5)',
-          }}
-          dotStyle={{
-            borderColor: '#666',
-            height: 12,
-            width: 2,
-            marginLeft: -1,
-            bottom: -6,
-          }}
-          activeDotStyle={{
-            borderColor: '#007bff',
-          }}
+          className="frequency-slider"
         />
       </div>
 

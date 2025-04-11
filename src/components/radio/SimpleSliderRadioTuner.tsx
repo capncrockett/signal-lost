@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useReducer } from 'react';
-import Slider from 'rc-slider';
-import 'rc-slider/assets/index.css';
+import SimpleSlider from '../common/SimpleSlider';
 import { useAudio } from '../../context/AudioContext';
 import { useGameState } from '../../context/GameStateContext';
 import {
@@ -11,6 +10,7 @@ import {
 import { getMessage } from '../../data/messages';
 import MessageDisplay from '../narrative/MessageDisplay';
 import { NoiseType } from '../../audio/NoiseType';
+
 import './RadioTuner.css';
 import './RcSliderRadioTuner.css';
 
@@ -32,7 +32,10 @@ type RadioTunerAction =
   | { type: 'TOGGLE_MESSAGE' }
   | { type: 'SET_STATIC_INTENSITY'; payload: number }
   | { type: 'SET_SCANNING'; payload: boolean }
-  | { type: 'UPDATE_SIGNAL_INFO'; payload: { strength: number; signalId: string | null; intensity: number } };
+  | {
+      type: 'UPDATE_SIGNAL_INFO';
+      payload: { strength: number; signalId: string | null; intensity: number };
+    };
 
 // Create a reducer function for local state management
 function radioTunerReducer(state: RadioTunerState, action: RadioTunerAction): RadioTunerState {
@@ -93,7 +96,14 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
   };
 
   const [radioState, dispatch] = useReducer(radioTunerReducer, initialRadioState);
-  const { localFrequency, signalStrength, currentSignalId, showMessage, staticIntensity, isScanning } = radioState;
+  const {
+    localFrequency,
+    signalStrength,
+    currentSignalId,
+    showMessage,
+    staticIntensity,
+    isScanning,
+  } = radioState;
 
   const staticCanvasRef = useRef<HTMLCanvasElement>(null);
   const scanIntervalRef = useRef<number | null>(null);
@@ -127,12 +137,15 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
         scanIntervalRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Sync with game state when it changes externally
   useEffect(() => {
-    if (state.currentFrequency !== undefined &&
-        Math.abs(state.currentFrequency - frequencyRef.current) > 0.01) {
+    if (
+      state.currentFrequency !== undefined &&
+      Math.abs(state.currentFrequency - frequencyRef.current) > 0.01
+    ) {
       frequencyRef.current = state.currentFrequency;
       if (isMountedRef.current) {
         dispatch({ type: 'SET_LOCAL_FREQUENCY', payload: state.currentFrequency });
@@ -204,10 +217,11 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
       audio.stopSignal();
       audio.playStaticNoise(intensity);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.isRadioOn, state.discoveredFrequencies, audio, gameDispatch, localFrequency]);
 
   // Handle frequency change from the slider
-  const handleSliderChange = (value: number | number[]) => {
+  const handleSliderChange = (value: number | number[]): void => {
     if (typeof value === 'number') {
       const roundedFreq = parseFloat(value.toFixed(1));
 
@@ -287,7 +301,7 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
     // Simple animation function that doesn't cause re-renders
     let animationId: number;
 
-    const drawStatic = () => {
+    const drawStatic = (): void => {
       if (!isMountedRef.current || !state.isRadioOn) return;
 
       // Clear canvas
@@ -317,6 +331,7 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
         cancelAnimationFrame(animationId);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.isRadioOn]); // Only re-run when radio state changes
 
   // Get the current message
@@ -388,7 +403,11 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
           <select
             id="noise-type-select"
             value={audio.currentNoiseType}
-            onChange={(e) => audio.setNoiseType(e.target.value as NoiseType)}
+            onChange={(e) =>
+              audio.setNoiseType(
+                e.target.value as NoiseType.Pink | NoiseType.White | NoiseType.Brown
+              )
+            }
             disabled={!state.isRadioOn}
             aria-label="Select noise type"
           >
@@ -418,38 +437,16 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
         />
       </div>
 
-      {/* RC Slider for frequency tuning */}
-      <div className="rc-slider-container">
-        <Slider
+      {/* Simple Slider for frequency tuning */}
+      <div className="slider-container">
+        <SimpleSlider
           min={minFrequency}
           max={maxFrequency}
           step={0.1}
           value={localFrequency}
           onChange={handleSliderChange}
           disabled={!state.isRadioOn || isScanning}
-          marks={marks}
-          styles={{
-            rail: { backgroundColor: '#333', height: 10 },
-            track: { backgroundColor: '#666', height: 10 },
-            handle: {
-              borderColor: '#007bff',
-              height: 28,
-              width: 28,
-              marginTop: -9,
-              backgroundColor: '#fff',
-              boxShadow: '0 0 5px rgba(0, 123, 255, 0.5)',
-            }
-          }}
-          dotStyle={{
-            borderColor: '#666',
-            height: 12,
-            width: 2,
-            marginLeft: -1,
-            bottom: -6,
-          }}
-          activeDotStyle={{
-            borderColor: '#007bff',
-          }}
+          className="frequency-slider"
         />
       </div>
 
@@ -489,7 +486,10 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
           className="tune-button decrease"
           disabled={!state.isRadioOn || isScanning}
           onClick={() => {
-            const newFreq = Math.max(minFrequency, parseFloat((frequencyRef.current - 0.1).toFixed(1)));
+            const newFreq = Math.max(
+              minFrequency,
+              parseFloat((frequencyRef.current - 0.1).toFixed(1))
+            );
             frequencyRef.current = newFreq;
             dispatch({ type: 'SET_LOCAL_FREQUENCY', payload: newFreq });
             gameDispatch({ type: 'SET_FREQUENCY', payload: newFreq });
@@ -505,7 +505,10 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
           className="tune-button increase"
           disabled={!state.isRadioOn || isScanning}
           onClick={() => {
-            const newFreq = Math.min(maxFrequency, parseFloat((frequencyRef.current + 0.1).toFixed(1)));
+            const newFreq = Math.min(
+              maxFrequency,
+              parseFloat((frequencyRef.current + 0.1).toFixed(1))
+            );
             frequencyRef.current = newFreq;
             dispatch({ type: 'SET_LOCAL_FREQUENCY', payload: newFreq });
             gameDispatch({ type: 'SET_FREQUENCY', payload: newFreq });

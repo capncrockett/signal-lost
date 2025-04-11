@@ -111,3 +111,8 @@ Refer to:
 - docs/prompts.md
 - docs/tests.md
 - docs/todo.md
+- docs/workflow.md
+- docs/agent-roles.md
+- docs/cross-agent-communication.md
+- docs/cross-agent-workflow.md
+- docs/documentation-consolidation-plan.md
