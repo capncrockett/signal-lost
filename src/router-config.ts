@@ -16,7 +16,7 @@ declare global {
 window.__reactRouterVersion = '6.4.0';
 window.__reactRouterFuture = {
   v7_startTransition: true,
-  v7_relativeSplatPath: true
+  v7_relativeSplatPath: true,
 };
 
 export {};

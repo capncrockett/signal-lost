@@ -219,7 +219,7 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
   }, [state.isRadioOn, state.discoveredFrequencies, audio, gameDispatch, localFrequency]);
 
   // Handle frequency change from the slider
-  const handleSliderChange = (value: number | number[]) => {
+  const handleSliderChange = (value: number | number[]): void => {
     if (typeof value === 'number') {
       const roundedFreq = parseFloat(value.toFixed(1));
 
@@ -299,7 +299,7 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
     // Simple animation function that doesn't cause re-renders
     let animationId: number;
 
-    const drawStatic = () => {
+    const drawStatic = (): void => {
       if (!isMountedRef.current || !state.isRadioOn) return;
 
       // Clear canvas

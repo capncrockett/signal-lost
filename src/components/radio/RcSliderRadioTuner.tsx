@@ -54,7 +54,7 @@ const RcSliderRadioTuner: React.FC<RadioTunerProps> = ({
   }, []); // Only run on mount
 
   // Handle frequency change from the slider
-  const handleSliderChange = (value: number | number[]) => {
+  const handleSliderChange = (value: number | number[]): void => {
     if (typeof value === 'number') {
       const roundedFreq = parseFloat(value.toFixed(1));
 

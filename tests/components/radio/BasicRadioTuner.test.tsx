@@ -1,4 +1,4 @@
-// React is used implicitly by JSX
+import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import BasicRadioTuner from '../../../src/components/radio/BasicRadioTuner';
