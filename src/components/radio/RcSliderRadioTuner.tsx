@@ -10,6 +10,7 @@ import {
 } from '../../data/frequencies';
 import { getMessage } from '../../data/messages';
 import MessageDisplay from '../narrative/MessageDisplay';
+import { NoiseType } from '../../audio/NoiseType';
 
 import './RadioTuner.css';
 import './RcSliderRadioTuner.css'; // We'll create this file for custom styling
@@ -51,7 +52,8 @@ const RcSliderRadioTuner: React.FC<RadioTunerProps> = ({
       // If game state doesn't have a frequency yet, initialize it
       dispatch({ type: 'SET_FREQUENCY', payload: initialFrequency });
     }
-  }, []); // Only run on mount
+    // We only want this to run once on mount, but including all dependencies to satisfy linting
+  }, [dispatch, initialFrequency, state.currentFrequency]); // Include all dependencies
 
   // Handle frequency change from the slider
   const handleSliderChange = (value: number | number[]): void => {
@@ -322,7 +324,11 @@ const RcSliderRadioTuner: React.FC<RadioTunerProps> = ({
           <select
             id="noise-type-select"
             value={audio.currentNoiseType}
-            onChange={(e) => audio.setNoiseType(e.target.value as NoiseType)}
+            onChange={(e) =>
+              audio.setNoiseType(
+                e.target.value as NoiseType.Pink | NoiseType.White | NoiseType.Brown
+              )
+            }
             disabled={!state.isRadioOn}
             aria-label="Select noise type"
           >

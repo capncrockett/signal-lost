@@ -8,6 +8,7 @@ import {
 } from '../../data/frequencies';
 import { getMessage } from '../../data/messages';
 import MessageDisplay from '../narrative/MessageDisplay';
+import { NoiseType } from '../../audio/NoiseType';
 
 import './RadioTuner.css';
 
@@ -360,7 +361,11 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
           <select
             id="noise-type-select"
             value={audio.currentNoiseType}
-            onChange={(e) => audio.setNoiseType(e.target.value as NoiseType)}
+            onChange={(e) =>
+              audio.setNoiseType(
+                e.target.value as NoiseType.Pink | NoiseType.White | NoiseType.Brown
+              )
+            }
             disabled={!state.isRadioOn}
             aria-label="Select noise type"
           >

@@ -10,6 +10,7 @@ import {
 } from '../../data/frequencies';
 import { getMessage } from '../../data/messages';
 import MessageDisplay from '../narrative/MessageDisplay';
+import { NoiseType } from '../../audio/NoiseType';
 
 import './RadioTuner.css';
 import './RcSliderRadioTuner.css';
@@ -137,6 +138,7 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
         scanIntervalRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Sync with game state when it changes externally
@@ -216,6 +218,7 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
       audio.stopSignal();
       audio.playStaticNoise(intensity);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.isRadioOn, state.discoveredFrequencies, audio, gameDispatch, localFrequency]);
 
   // Handle frequency change from the slider
@@ -329,6 +332,7 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
         cancelAnimationFrame(animationId);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.isRadioOn]); // Only re-run when radio state changes
 
   // Get the current message
@@ -400,7 +404,11 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
           <select
             id="noise-type-select"
             value={audio.currentNoiseType}
-            onChange={(e) => audio.setNoiseType(e.target.value as NoiseType)}
+            onChange={(e) =>
+              audio.setNoiseType(
+                e.target.value as NoiseType.Pink | NoiseType.White | NoiseType.Brown
+              )
+            }
             disabled={!state.isRadioOn}
             aria-label="Select noise type"
           >
