@@ -1,4 +1,4 @@
-// @ts-expect-error - React is required for JSX
+// @ts-expect-error - React is needed for JSX
 import React from 'react';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';

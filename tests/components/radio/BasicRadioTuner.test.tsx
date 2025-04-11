@@ -1,4 +1,3 @@
-// @ts-expect-error - React is required for JSX
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -209,7 +208,7 @@ describe('BasicRadioTuner Component', () => {
     mockGameState.isRadioOn = true;
 
     // Mock the component to simulate scanning behavior
-    BasicRadioTuner.mockImplementation(() => {
+    (BasicRadioTuner as jest.MockedFunction<typeof BasicRadioTuner>).mockImplementation(() => {
       const [isScanning, setIsScanning] = React.useState(false);
 
       // When scanning is toggled, call the dispatch with the expected value
@@ -256,7 +255,7 @@ describe('BasicRadioTuner Component', () => {
     mockGameState.currentFrequency = 91.1;
 
     // Mock the component to show/hide message
-    BasicRadioTuner.mockImplementation(() => {
+    (BasicRadioTuner as jest.MockedFunction<typeof BasicRadioTuner>).mockImplementation(() => {
       const [showMessage, setShowMessage] = React.useState(false);
       return (
         <div>
@@ -300,7 +299,7 @@ describe('BasicRadioTuner Component', () => {
     window.cancelAnimationFrame = mockCancelAnimationFrame;
 
     // Mock component cleanup
-    BasicRadioTuner.mockImplementation(() => {
+    (BasicRadioTuner as jest.MockedFunction<typeof BasicRadioTuner>).mockImplementation(() => {
       React.useEffect(() => {
         return () => {
           mockCancelAnimationFrame(123);
