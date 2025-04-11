@@ -1,11 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { create } from 'zustand';
+import { createContext, useContext, useState } from 'react';
 
 interface RadioState {
-  // Radio state
+  // Radio state properties
   frequency: number;
   signalStrength: number;
   currentSignalId: string | null;
@@ -14,7 +10,7 @@ interface RadioState {
   showMessage: boolean;
   isDragging: boolean;
 
-  // Actions
+  // Methods
   setFrequency: (frequency: number) => void;
   setSignalStrength: (strength: number) => void;
   setCurrentSignalId: (id: string | null) => void;
@@ -23,39 +19,62 @@ interface RadioState {
   setShowMessage: (show: boolean) => void;
   toggleShowMessage: () => void;
   setIsDragging: (isDragging: boolean) => void;
-
-  // Reset state (for cleanup)
   resetState: () => void;
 }
 
-export const useRadioStore = create<RadioState>((set: any) => ({
-  // Initial state
-  frequency: 90.0,
-  signalStrength: 0,
-  currentSignalId: null,
-  staticIntensity: 0.5,
-  isScanning: false,
-  showMessage: false,
-  isDragging: false,
+// Create context with a default undefined value
+const RadioContext = createContext<RadioState | undefined>(undefined);
 
-  // Actions
-  setFrequency: (frequency: number) => set({ frequency }),
-  setSignalStrength: (strength: number) => set({ signalStrength: strength }),
-  setCurrentSignalId: (id: string | null) => set({ currentSignalId: id }),
-  setStaticIntensity: (intensity: number) => set({ staticIntensity: intensity }),
-  setIsScanning: (isScanning: boolean) => set({ isScanning }),
-  setShowMessage: (show: boolean) => set({ showMessage: show }),
-  toggleShowMessage: () => set((state: RadioState) => ({ showMessage: !state.showMessage })),
-  setIsDragging: (isDragging: boolean) => set({ isDragging }),
+// Provider component
+export const RadioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [frequency, setFrequency] = useState<number>(90.0);
+  const [signalStrength, setSignalStrength] = useState<number>(0);
+  const [currentSignalId, setCurrentSignalId] = useState<string | null>(null);
+  const [staticIntensity, setStaticIntensity] = useState<number>(0.5);
+  const [isScanning, setIsScanning] = useState<boolean>(false);
+  const [showMessage, setShowMessage] = useState<boolean>(false);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
 
-  // Reset state (for cleanup)
-  resetState: () =>
-    set({
-      signalStrength: 0,
-      currentSignalId: null,
-      staticIntensity: 0.5,
-      isScanning: false,
-      showMessage: false,
-      isDragging: false,
-    }),
-}));
+  // Method implementations
+  const toggleShowMessage = () => setShowMessage(!showMessage);
+
+  const resetState = () => {
+    setFrequency(90.0);
+    setSignalStrength(0);
+    setCurrentSignalId(null);
+    setStaticIntensity(0.5);
+    setIsScanning(false);
+    setShowMessage(false);
+    setIsDragging(false);
+  };
+
+  const value: RadioState = {
+    frequency,
+    signalStrength,
+    currentSignalId,
+    staticIntensity,
+    isScanning,
+    showMessage,
+    isDragging,
+    setFrequency,
+    setSignalStrength,
+    setCurrentSignalId,
+    setStaticIntensity,
+    setIsScanning,
+    setShowMessage,
+    toggleShowMessage,
+    setIsDragging,
+    resetState,
+  };
+
+  return <RadioContext.Provider value={value}>{children}</RadioContext.Provider>;
+};
+
+// Hook to use the radio context
+export const useRadioStore = (): RadioState => {
+  const context = useContext(RadioContext);
+  if (context === undefined) {
+    throw new Error('useRadioStore must be used within a RadioProvider');
+  }
+  return context;
+};

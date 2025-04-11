@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useReducer } from 'react';
-import Slider from 'rc-slider';
-import 'rc-slider/assets/index.css';
+import SimpleSlider from '../common/SimpleSlider';
 import { useAudio } from '../../context/AudioContext';
 import { useGameState } from '../../context/GameStateContext';
 import {
@@ -438,38 +437,16 @@ const SimpleSliderRadioTuner: React.FC<RadioTunerProps> = ({
         />
       </div>
 
-      {/* RC Slider for frequency tuning */}
-      <div className="rc-slider-container">
-        <Slider
+      {/* Simple Slider for frequency tuning */}
+      <div className="slider-container">
+        <SimpleSlider
           min={minFrequency}
           max={maxFrequency}
           step={0.1}
           value={localFrequency}
           onChange={handleSliderChange}
           disabled={!state.isRadioOn || isScanning}
-          marks={marks}
-          styles={{
-            rail: { backgroundColor: '#333', height: 10 },
-            track: { backgroundColor: '#666', height: 10 },
-            handle: {
-              borderColor: '#007bff',
-              height: 28,
-              width: 28,
-              marginTop: -9,
-              backgroundColor: '#fff',
-              boxShadow: '0 0 5px rgba(0, 123, 255, 0.5)',
-            },
-          }}
-          dotStyle={{
-            borderColor: '#666',
-            height: 12,
-            width: 2,
-            marginLeft: -1,
-            bottom: -6,
-          }}
-          activeDotStyle={{
-            borderColor: '#007bff',
-          }}
+          className="frequency-slider"
         />
       </div>
 
