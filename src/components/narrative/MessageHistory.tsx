@@ -70,7 +70,7 @@ const MessageHistory: React.FC<MessageHistoryProps> = ({ isOpen, onClose }) => {
   };
 
   // Attempt to manually decode a message
-  const attemptDecode = (): void => {
+  const attemptDecode = () => {
     const signal = discoveredSignals.find((s) => s.id === selectedSignalId);
     if (!signal || signal.type !== 'message') return;
 
@@ -116,7 +116,10 @@ const MessageHistory: React.FC<MessageHistoryProps> = ({ isOpen, onClose }) => {
       }
     }, interval);
 
-    return () => clearInterval(timer);
+    // Clean up the interval when the component unmounts or when the function is called again
+    return () => {
+      clearInterval(timer);
+    };
   };
 
   // Get a partially decoded message based on progress
