@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import RadioTuner from '../components/radio/RadioTuner';
+import BasicRadioTuner from '../components/radio/BasicRadioTuner';
 import './Pages.css';
 
 /**
@@ -20,7 +20,7 @@ const RadioPage: React.ComponentType<unknown> = () => {
         </p>
 
         <div className="radio-tuner-container" data-testid="radio-tuner-container">
-          <RadioTuner data-testid="radio-tuner" />
+          <BasicRadioTuner data-testid="radio-tuner" />
         </div>
 
         <div className="page-actions" data-testid="radio-page-actions">

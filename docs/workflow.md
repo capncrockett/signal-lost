@@ -1,6 +1,6 @@
-# Development Workflow (React-Based Approach with Alpha/Beta Agent Development)
+# Development Workflow (Hybrid DOM + Canvas Approach with Alpha/Beta Agent Development)
 
-> **Note**: This workflow document has been updated for the React-based rewrite of Signal Lost with Alpha/Beta Agent Development approach. The previous Phaser-based workflow can be found in `workflow-phaser.md`.
+> **Note**: This workflow document has been updated for the hybrid DOM + Canvas approach of Signal Lost with Alpha/Beta Agent Development. The previous Phaser-based workflow can be found in `workflow-phaser.md`.
 
 ## Pre-coding Checklist
 
@@ -68,6 +68,97 @@ function processSignal(signal: Signal): void {
 }
 ```
 
+## Hybrid DOM + Canvas Approach
+
+Signal Lost uses a hybrid approach that combines DOM elements for interactive components with Canvas for visual effects. This approach provides the best balance of testability, performance, and maintainability.
+
+### Key Principles
+
+1. **DOM Elements for Interactive Parts**
+   - Buttons, sliders, and displays as standard HTML elements
+   - Fully testable with Playwright
+   - Accessible and keyboard navigable
+   - Styled with CSS for consistent appearance
+
+2. **Canvas for Visual Effects**
+   - Static visualization using canvas
+   - Audio waveform display
+   - Non-interactive visual elements
+   - Performance-optimized rendering
+
+3. **State Management**
+   - React context or reducer for game state
+   - Update DOM elements based on state
+   - Canvas visualizations read from state but don't update it
+   - Clear separation between UI logic and visual effects
+
+### Example Implementation
+
+```jsx
+function RadioTuner() {
+  // State managed outside rendering cycle
+  const [frequency, setFrequency] = useState(90.0);
+  const [isOn, setIsOn] = useState(false);
+  const canvasRef = useRef(null);
+
+  // Canvas for visual effects only
+  useEffect(() => {
+    if (!canvasRef.current || !isOn) return;
+
+    const ctx = canvasRef.current.getContext('2d');
+
+    // Draw static visualization
+    const drawStatic = () => {
+      // Visual-only code that doesn't affect state
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Draw static based on frequency...
+
+      if (isOn) {
+        requestAnimationFrame(drawStatic);
+      }
+    };
+
+    requestAnimationFrame(drawStatic);
+
+    return () => {
+      // Cleanup
+    };
+  }, [isOn]);
+
+  // DOM elements for interaction
+  return (
+    <div className="radio-tuner" data-testid="radio-tuner">
+      <div className="frequency-display" data-testid="frequency-display">
+        {frequency.toFixed(1)} MHz
+      </div>
+
+      <button
+        data-testid="power-button"
+        onClick={() => setIsOn(!isOn)}
+      >
+        {isOn ? 'ON' : 'OFF'}
+      </button>
+
+      <input
+        type="range"
+        min="88.0"
+        max="108.0"
+        step="0.1"
+        value={frequency}
+        onChange={e => setFrequency(parseFloat(e.target.value))}
+        data-testid="frequency-slider"
+      />
+
+      <canvas
+        ref={canvasRef}
+        className="static-visualization"
+        data-testid="static-canvas"
+      />
+    </div>
+  );
+}
+```
+
 ## Component Development Workflow
 
 1. **Plan the component**:
@@ -75,14 +166,18 @@ function processSignal(signal: Signal): void {
    - Define props and state requirements
    - Sketch the component structure
    - Identify potential reusable sub-components
+   - Determine which parts should use DOM vs. Canvas
 
 2. **Write tests first**:
    - Create test file with the same name as the component
    - Write tests for all expected behaviors
    - Include accessibility tests where appropriate
+   - Add tests for both DOM elements and Canvas effects
 
 3. **Implement the component**:
    - Create the component file
+   - Implement DOM elements for interactive parts
+   - Add Canvas for visual effects
    - Implement the component logic
    - Add styling
    - Ensure accessibility
@@ -92,6 +187,7 @@ function processSignal(signal: Signal): void {
    - Check TypeScript: `npm run type-check`
    - Run linter: `npm run lint`
    - Manually test in the browser
+   - Verify Canvas rendering
 
 5. **Document**:
    - Add JSDoc comments
@@ -177,19 +273,37 @@ test('Radio tuner signal detection triggers narrative display update', () => {
 - Run tests in headed mode for canvas elements
 - Capture browser console logs for debugging
 
+#### Testing Canvas Elements
+
+- Use screenshots to verify canvas rendering
+- Test DOM elements that control canvas behavior
+- Verify state changes that affect canvas
+- Use data-testid attributes on parent elements
+- Run tests in headed mode for visual verification
+
 ```typescript
-// Example E2E test
+// Example E2E test for hybrid DOM + Canvas component
 test('user can tune radio and receive signal', async ({ page }) => {
   // Navigate to the game
-  await page.goto('http://localhost:5173');
+  await page.goto('http://localhost:5173/radio');
 
-  // Interact with the radio
-  await page.getByTestId('frequency-dial').click();
-  await page.mouse.move(300, 300);
-  await page.mouse.up();
+  // Turn on radio (DOM element)
+  await page.getByTestId('power-button').click();
 
-  // Verify signal received
-  await expect(page.getByTestId('signal-indicator')).toBeVisible();
+  // Interact with frequency slider (DOM element)
+  await page.getByTestId('frequency-slider').click();
+
+  // Use tune buttons (DOM elements)
+  await page.getByTestId('tune-up-button').click();
+
+  // Verify frequency display (DOM element)
+  await expect(page.getByTestId('frequency-display')).toHaveText('90.1 MHz');
+
+  // Verify signal strength indicator (DOM element)
+  await expect(page.getByTestId('signal-strength')).toHaveAttribute('style', /width: \d+%/);
+
+  // Take screenshot to verify canvas rendering
+  await page.screenshot({ path: 'e2e/screenshots/radio-tuner.png' });
 });
 ```
 
