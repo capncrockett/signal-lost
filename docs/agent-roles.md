@@ -29,7 +29,7 @@ Agent Alpha is the primary developer responsible for implementing new features a
 
 ## Agent Beta (QA Developer)
 
-Agent Beta is responsible for quality assurance, testing, and code optimization.
+Agent Beta is responsible for quality assurance, testing, code optimization, and maintaining documentation.
 
 ### Responsibilities
 
@@ -40,6 +40,11 @@ Agent Beta is responsible for quality assurance, testing, and code optimization.
 - **PR Review**: Review Agent Alpha's PRs for quality
 - **Issue Reporting**: Report issues and suggest improvements
 - **Pull Requests**: Create PRs for code cleanup and optimization
+- **Documentation**: Update and maintain documentation
+- **TypeScript Errors**: Fix TypeScript errors in non-feature code
+- **Test Infrastructure**: Improve test infrastructure and mocks
+- **Memory Leak Detection**: Identify and document memory leaks
+- **Performance Monitoring**: Add performance monitoring tools
 
 ### Workflow
 
@@ -48,9 +53,21 @@ Agent Beta is responsible for quality assurance, testing, and code optimization.
 3. Write E2E tests for new features
 4. Clean up unused code and variables
 5. Ensure consistent code style
-6. Create PR for review by Agent Alpha
-7. Address feedback from Agent Alpha
-8. Merge PR to develop branch
+6. Fix TypeScript errors in non-feature code
+7. Update documentation to reflect current state
+8. Create PR for review by Agent Alpha
+9. Address feedback from Agent Alpha
+10. Merge PR to develop branch
+
+### Sprint 2.5 Focus Areas
+
+- Verify bug fixes with comprehensive testing
+- Improve test infrastructure and mocks
+- Clean up unused code and optimize component architecture
+- Document best practices for cross-agent development
+- Fix TypeScript errors in non-feature code
+- Identify and document memory leaks
+- Improve documentation for agent workflow
 
 ## Collaboration Guidelines
 

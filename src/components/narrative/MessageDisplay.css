@@ -16,6 +16,24 @@
   border-bottom: 1px solid #333;
   padding-bottom: 10px;
   margin-bottom: 15px;
+  position: relative;
+}
+
+.message-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  color: #0f0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+}
+
+.message-close:hover {
+  color: #fff;
 }
 
 .message-title {
@@ -113,13 +131,22 @@
 }
 
 @keyframes highlight {
-  0% { background-color: rgba(0, 255, 0, 0.5); }
-  100% { background-color: rgba(0, 255, 0, 0.1); }
+  0% {
+    background-color: rgba(0, 255, 0, 0.5);
+  }
+  100% {
+    background-color: rgba(0, 255, 0, 0.1);
+  }
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* Static effect for undecoded content */
@@ -146,15 +173,37 @@
 }
 
 @keyframes static {
-  0% { opacity: 0.1; }
-  10% { opacity: 0.3; }
-  20% { opacity: 0.1; }
-  30% { opacity: 0.5; }
-  40% { opacity: 0.2; }
-  50% { opacity: 0.7; }
-  60% { opacity: 0.3; }
-  70% { opacity: 0.2; }
-  80% { opacity: 0.5; }
-  90% { opacity: 0.1; }
-  100% { opacity: 0.4; }
+  0% {
+    opacity: 0.1;
+  }
+  10% {
+    opacity: 0.3;
+  }
+  20% {
+    opacity: 0.1;
+  }
+  30% {
+    opacity: 0.5;
+  }
+  40% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  60% {
+    opacity: 0.3;
+  }
+  70% {
+    opacity: 0.2;
+  }
+  80% {
+    opacity: 0.5;
+  }
+  90% {
+    opacity: 0.1;
+  }
+  100% {
+    opacity: 0.4;
+  }
 }

@@ -19,7 +19,7 @@ interface RadioTunerProps {
   onFrequencyChange?: (frequency: number) => void;
 }
 
-const RadioTuner: React.FC<RadioTunerProps> = ({
+const SimpleRadioTuner: React.FC<RadioTunerProps> = ({
   initialFrequency = 90.0,
   minFrequency = 88.0,
   maxFrequency = 108.0,
@@ -28,27 +28,49 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
   const { state, dispatch } = useGameState();
   const audio = useAudio();
 
-  const [frequency, setFrequency] = useState<number>(initialFrequency);
+  // Use local state for everything
+  const [frequency, setFrequency] = useState<number>(
+    state.currentFrequency !== undefined ? state.currentFrequency : initialFrequency
+  );
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [signalStrength, setSignalStrength] = useState<number>(0);
   const [currentSignalId, setCurrentSignalId] = useState<string | null>(null);
   const [showMessage, setShowMessage] = useState<boolean>(false);
   const [staticIntensity, setStaticIntensity] = useState<number>(0.5);
   const [isScanning, setIsScanning] = useState<boolean>(false);
+
   const staticCanvasRef = useRef<HTMLCanvasElement>(null);
   const scanIntervalRef = useRef<number | null>(null);
 
-  // Update frequency when dragging the dial
+  // Sync local frequency with game state
+  useEffect(() => {
+    if (state.currentFrequency !== undefined && state.currentFrequency !== frequency) {
+      setFrequency(state.currentFrequency);
+    }
+  }, [state.currentFrequency, frequency]);
+
+  // Update game state when local frequency changes
+  useEffect(() => {
+    dispatch({ type: 'SET_FREQUENCY', payload: frequency });
+
+    if (onFrequencyChange) {
+      onFrequencyChange(frequency);
+    }
+  }, [frequency, dispatch, onFrequencyChange]);
+
+  // Handle mouse down on the dial
   const handleMouseDown = (): void => {
     setIsDragging(true);
   };
 
+  // Handle mouse up
   const handleMouseUp = (): void => {
     setIsDragging(false);
   };
 
+  // Handle mouse move on the dial
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>): void => {
-    if (!isDragging) return;
+    if (!isDragging || !state.isRadioOn) return;
 
     const container = e.currentTarget;
     const rect = container.getBoundingClientRect();
@@ -60,19 +82,44 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
     setFrequency(parseFloat(newFrequency.toFixed(1)));
   };
 
-  // Update the frequency in the game state
+  // Add global mouse event listeners for dragging
   useEffect(() => {
-    dispatch({ type: 'SET_FREQUENCY', payload: frequency });
+    const handleGlobalMouseUp = (): void => {
+      setIsDragging(false);
+    };
 
-    if (onFrequencyChange) {
-      onFrequencyChange(frequency);
+    const handleGlobalMouseMove = (e: MouseEvent): void => {
+      if (!isDragging || !state.isRadioOn) return;
+
+      // Get the dial container element
+      const dialContainer = document.querySelector('.tuner-dial-container');
+      if (!dialContainer) return;
+
+      const rect = dialContainer.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const width = rect.width;
+      const percentage = Math.max(0, Math.min(1, x / width));
+
+      const newFrequency = minFrequency + percentage * (maxFrequency - minFrequency);
+      setFrequency(parseFloat(newFrequency.toFixed(1)));
+    };
+
+    if (isDragging) {
+      window.addEventListener('mouseup', handleGlobalMouseUp);
+      window.addEventListener('mousemove', handleGlobalMouseMove);
     }
-  }, [frequency, dispatch, onFrequencyChange]);
+
+    return () => {
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+    };
+  }, [isDragging, state.isRadioOn, minFrequency, maxFrequency]);
 
   // Detect signals and update audio based on frequency
   useEffect(() => {
     // Only process if the radio is on
     if (!state.isRadioOn) {
+      // Stop all audio when radio is off
       audio.stopSignal();
       audio.stopStaticNoise();
       return;
@@ -102,9 +149,7 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
       if (signal.isStatic) {
         // Play static with the signal mixed in
         audio.playStaticNoise(intensity);
-        if (strength > 0.5) {
-          audio.playSignal(signal.frequency * 10); // Scale up for audible range
-        }
+        audio.playSignal(signal.frequency * 10, strength * 0.5); // Scale up for audible range
       } else {
         // Play a clear signal
         audio.stopStaticNoise();
@@ -123,30 +168,14 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
 
     // Clean up audio when component unmounts or frequency changes
     return () => {
-      // Don't stop audio here, as it would cause interruptions during tuning
-      // We'll just update it in the next effect run
+      // We'll handle cleanup in the component unmount effect
     };
   }, [frequency, dispatch, audio, state.discoveredFrequencies, state.isRadioOn]);
 
   // Calculate dial position based on current frequency
   const dialPosition = ((frequency - minFrequency) / (maxFrequency - minFrequency)) * 100;
 
-  // Add global mouse event listeners for dragging
-  useEffect(() => {
-    const handleGlobalMouseUp = (): void => {
-      setIsDragging(false);
-    };
-
-    if (isDragging) {
-      window.addEventListener('mouseup', handleGlobalMouseUp);
-    }
-
-    return () => {
-      window.removeEventListener('mouseup', handleGlobalMouseUp);
-    };
-  }, [isDragging]);
-
-  // Draw static visualization
+  // Draw static visualization with performance optimizations
   useEffect(() => {
     if (!staticCanvasRef.current || !state.isRadioOn) return;
 
@@ -154,71 +183,64 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas dimensions
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+    // Set canvas dimensions only if they've changed
+    if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+    }
 
     // Animation loop for continuous static effect
     let animationId: number;
-    let isActive = true; // Flag to track if this effect is still active
+    let lastFrameTime = 0;
+    const frameRate = 30; // Limit to 30 FPS for better performance
+    const frameInterval = 1000 / frameRate;
 
-    const animate = (): void => {
-      if (!isActive || !state.isRadioOn) return;
+    const animate = (timestamp: number): void => {
+      if (!state.isRadioOn) {
+        // If radio is turned off during animation, cancel the frame
+        return;
+      }
 
-      // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const elapsed = timestamp - lastFrameTime;
 
-      // Draw static noise with color variations based on signal strength
-      const intensity = staticIntensity * 255;
-      const imageData = ctx.createImageData(canvas.width, canvas.height);
-      const data = imageData.data;
+      // Only render if enough time has passed (frame rate limiting)
+      if (elapsed > frameInterval) {
+        lastFrameTime = timestamp - (elapsed % frameInterval);
 
-      // Add color tint based on signal strength
-      const signalColor = {
-        r: signalStrength > 0.7 ? 0 : 255 * (1 - signalStrength),
-        g: signalStrength > 0.3 ? 255 * signalStrength : 0,
-        b: signalStrength < 0.3 ? 255 * (1 - signalStrength) : 0,
-      };
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Optimize by only drawing every 4 pixels (2x2 blocks)
-      for (let y = 0; y < canvas.height; y += 2) {
-        for (let x = 0; x < canvas.width; x += 2) {
-          // Create more varied noise pattern
-          const noisePattern = Math.random() < 0.3 ? 0 : Math.random() * intensity;
-          const colorVariation = Math.random() * 0.3;
+        // Draw static noise with color variations based on signal strength
+        const intensity = staticIntensity * 255;
+        const signalColor =
+          signalStrength > 0.5
+            ? `rgba(${100 + signalStrength * 155}, ${100 + signalStrength * 155}, 255, 0.5)`
+            : 'rgba(255, 255, 255, 0.5)';
 
-          // Calculate pixel values
-          const r = noisePattern + signalColor.r * colorVariation;
-          const g = noisePattern + signalColor.g * colorVariation;
-          const b = noisePattern + signalColor.b * colorVariation;
-          const a = (Math.random() * 200 + 55) * staticIntensity;
+        for (let i = 0; i < canvas.width; i += 2) {
+          for (let j = 0; j < canvas.height; j += 2) {
+            const noiseValue = Math.random() * intensity;
+            const useSignalColor = signalStrength > 0.3 && Math.random() < signalStrength * 0.3;
 
-          // Apply to a 2x2 block of pixels for better performance
-          for (let dy = 0; dy < 2 && y + dy < canvas.height; dy++) {
-            for (let dx = 0; dx < 2 && x + dx < canvas.width; dx++) {
-              const idx = ((y + dy) * canvas.width + (x + dx)) * 4;
-              data[idx] = r; // R
-              data[idx + 1] = g; // G
-              data[idx + 2] = b; // B
-              data[idx + 3] = a; // A
-            }
+            ctx.fillStyle = useSignalColor
+              ? signalColor
+              : `rgba(${noiseValue}, ${noiseValue}, ${noiseValue}, 0.5)`;
+            ctx.fillRect(i, j, 2, 2);
           }
         }
       }
 
-      ctx.putImageData(imageData, 0, 0);
       animationId = requestAnimationFrame(animate);
     };
 
-    animate();
+    animationId = requestAnimationFrame(animate);
 
     return () => {
-      isActive = false; // Mark this effect as inactive
       if (animationId) {
         cancelAnimationFrame(animationId);
       }
     };
-  }, [state.isRadioOn, signalStrength, staticIntensity]); // Include all dependencies
+  }, [staticIntensity, state.isRadioOn, signalStrength]);
 
   // Toggle message display
   const toggleMessage = (): void => {
@@ -242,7 +264,7 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
         setFrequency((prev) => {
           const newFreq = prev + 0.1;
           // If we reach the max frequency, loop back to min
-          return newFreq > maxFrequency ? minFrequency : newFreq;
+          return newFreq > maxFrequency ? minFrequency : parseFloat(newFreq.toFixed(1));
         });
       }, 300); // Scan speed in milliseconds
     }
@@ -260,6 +282,21 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
   // Get the current message
   const currentMessage = currentSignalId ? getMessage(currentSignalId) : undefined;
 
+  // Add a cleanup effect for when the component unmounts
+  useEffect(() => {
+    return () => {
+      // Clean up all audio resources when component unmounts
+      audio.stopSignal();
+      audio.stopStaticNoise();
+
+      // Clear any remaining intervals
+      if (scanIntervalRef.current !== null) {
+        window.clearInterval(scanIntervalRef.current);
+        scanIntervalRef.current = null;
+      }
+    };
+  }, [audio]);
+
   // Handle keyboard controls for accessibility
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>): void => {
     if (!state.isRadioOn) return;
@@ -267,22 +304,22 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
     switch (e.key) {
       case 'ArrowLeft':
         if (!isScanning) {
-          setFrequency((prev): number => Math.max(minFrequency, prev - 0.1));
+          setFrequency((prev) => Math.max(minFrequency, prev - 0.1));
         }
         break;
       case 'ArrowRight':
         if (!isScanning) {
-          setFrequency((prev): number => Math.min(maxFrequency, prev + 0.1));
+          setFrequency((prev) => Math.min(maxFrequency, prev + 0.1));
         }
         break;
       case 'ArrowDown':
         if (!isScanning) {
-          setFrequency((prev): number => Math.max(minFrequency, prev - 1.0));
+          setFrequency((prev) => Math.max(minFrequency, prev - 1.0));
         }
         break;
       case 'ArrowUp':
         if (!isScanning) {
-          setFrequency((prev): number => Math.min(maxFrequency, prev + 1.0));
+          setFrequency((prev) => Math.min(maxFrequency, prev + 1.0));
         }
         break;
       case 's':
@@ -470,36 +507,33 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
           +0.1
         </button>
         <button
-          className={`scan-button ${isScanning ? 'scanning' : ''}`}
+          className="scan-button"
           disabled={!state.isRadioOn}
-          onClick={() => toggleScanning()}
-          aria-label={isScanning ? 'Stop scanning' : 'Start scanning for signals'}
+          onClick={toggleScanning}
+          aria-label={isScanning ? 'Stop scanning' : 'Start scanning'}
         >
           {isScanning ? 'Stop Scan' : 'Scan'}
         </button>
       </div>
 
-      {state.isRadioOn && currentSignalId && signalStrength > 0.5 && (
-        <div className="message-indicator" aria-live="polite">
-          <div className="signal-detected">Signal Detected</div>
-          <button
-            className="view-message-button"
-            onClick={toggleMessage}
-            aria-label={showMessage ? 'Hide message content' : 'View message content'}
-          >
-            {showMessage ? 'Hide Message' : 'View Message'}
-          </button>
-        </div>
-      )}
-
+      {/* Message display */}
       {currentMessage && (
-        <MessageDisplay
-          message={currentMessage}
-          isVisible={showMessage && state.isRadioOn && signalStrength > 0.5}
-        />
+        <div className="message-container">
+          <button
+            className="message-button"
+            onClick={toggleMessage}
+            disabled={!state.isRadioOn || !currentMessage}
+            aria-label={showMessage ? 'Hide message' : 'Show message'}
+          >
+            {showMessage ? 'Hide Message' : 'Show Message'}
+          </button>
+          {showMessage && currentMessage && (
+            <MessageDisplay message={currentMessage} onClose={toggleMessage} />
+          )}
+        </div>
       )}
     </div>
   );
 };
 
-export default RadioTuner;
+export default SimpleRadioTuner;
