@@ -17,6 +17,12 @@ set "DIR=%~dp0"
 
 echo Project path: %DIR%
 
+REM Check if GUT is installed
+if not exist "%DIR%addons\gut" (
+    echo GUT is not installed. Installing...
+    call "%DIR%install_gut.bat"
+)
+
 REM Run the test runner script
 godot --path "%DIR%" --script Tests/TestRunner.cs
 

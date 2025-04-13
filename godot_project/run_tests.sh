@@ -16,6 +16,12 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo "Running tests for Signal Lost Godot project..."
 echo "Project path: $DIR"
 
+# Check if GUT is installed
+if [ ! -d "$DIR/addons/gut" ]; then
+    echo "GUT is not installed. Installing..."
+    "$DIR/install_gut.sh"
+fi
+
 # Run the test runner script
 godot --path "$DIR" --script Tests/TestRunner.cs
 
