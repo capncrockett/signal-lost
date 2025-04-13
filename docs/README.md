@@ -12,7 +12,6 @@ This directory contains documentation for the Signal Lost game project, which ha
 - **godot-workflow.md**: Detailed workflow for Godot development.
 - **sprint-godot-migration.md**: Sprint plan for the Godot migration.
 - **todo.md**: Current and upcoming tasks for the project.
-- **workflow.md**: General development workflow for the project.
 
 ## Godot Project
 
