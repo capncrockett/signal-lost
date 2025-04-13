@@ -1,6 +1,8 @@
 using Godot;
 using System;
-using System.Threading.Tasks;
+using System.Reflection;
+using System.Collections.Generic;
+using GUT;
 
 namespace SignalLost.Tests
 {
@@ -11,48 +13,99 @@ namespace SignalLost.Tests
 
         public override void _Initialize()
         {
-            GD.Print("Starting test runner...");
-            
-            // Check if GUT is installed
-            var gutDir = new DirAccess();
-            if (!DirAccess.DirExistsAbsolute("res://addons/gut"))
+            GD.Print("Starting C# test runner...");
+
+            // Find all test classes
+            var testClasses = FindTestClasses();
+            GD.Print($"Found {testClasses.Count} test classes");
+
+            int totalTests = 0;
+            int passedTests = 0;
+            int failedTests = 0;
+
+            // Run tests in each class
+            foreach (var testClass in testClasses)
             {
-                GD.Print("ERROR: GUT addon not found. Please install it from the Asset Library.");
-                Quit(1);
-                return;
+                GD.Print($"\nRunning tests in {testClass.Name}");
+
+                // Create an instance of the test class
+                var testInstance = (Test)Activator.CreateInstance(testClass);
+                GetRoot().AddChild(testInstance);
+
+                // Find all test methods
+                var testMethods = FindTestMethods(testClass);
+                GD.Print($"Found {testMethods.Count} test methods");
+
+                // Run each test method
+                foreach (var method in testMethods)
+                {
+                    GD.Print($"\nRunning test: {method.Name}");
+                    totalTests++;
+
+                    try
+                    {
+                        // Call Before method
+                        testInstance.Before();
+
+                        // Call the test method
+                        method.Invoke(testInstance, null);
+
+                        // Call After method
+                        testInstance.After();
+
+                        GD.Print($"Test {method.Name} PASSED");
+                        passedTests++;
+                    }
+                    catch (Exception ex)
+                    {
+                        GD.Print($"Test {method.Name} FAILED: {ex.InnerException?.Message ?? ex.Message}");
+                        failedTests++;
+                    }
+                }
+
+                // Clean up
+                testInstance.QueueFree();
             }
-            
-            // Create GUT instance
-            var gutScript = GD.Load<Script>("res://addons/gut/gut.gd");
-            var gut = (Node)gutScript.New();
-            GetRoot().AddChild(gut);
-            
-            // Configure GUT
-            gut.Call("set_yield_between_tests", true);
-            gut.Call("set_log_level", 1);  // GUT.LOG_LEVEL_ALL_ASSERTS
-            gut.Call("set_inner_class_name_prefix", "Test_");
-            
-            // Add test directory
-            gut.Call("add_directory", "res://tests");
-            
-            // Run the tests
-            GD.Print("Running tests...");
-            gut.Call("test_scripts");
-            
-            // Wait for tests to complete
-            gut.Connect("tests_finished", Callable.From(() => 
+
+            // Print summary
+            GD.Print($"\n===== TEST SUMMARY =====");
+            GD.Print($"Total tests: {totalTests}");
+            GD.Print($"Passed: {passedTests}");
+            GD.Print($"Failed: {failedTests}");
+
+            // Exit with appropriate code
+            Quit(failedTests > 0 ? 1 : 0);
+        }
+
+        private static List<Type> FindTestClasses()
+        {
+            var testClasses = new List<Type>();
+            var assembly = Assembly.GetExecutingAssembly();
+
+            foreach (var type in assembly.GetTypes())
             {
-                // Get results
-                int failed = (int)gut.Call("get_fail_count");
-                int passed = (int)gut.Call("get_pass_count");
-                int pending = (int)gut.Call("get_pending_count");
-                int total = failed + passed + pending;
-                
-                GD.Print($"Tests completed: {passed} passed, {failed} failed, {pending} pending");
-                
-                // Exit with appropriate code
-                Quit(failed > 0 ? 1 : 0);
-            }));
+                if (type.GetCustomAttribute<TestClassAttribute>() != null)
+                {
+                    testClasses.Add(type);
+                }
+            }
+
+            return testClasses;
+        }
+
+        private static List<MethodInfo> FindTestMethods(Type testClass)
+        {
+            var testMethods = new List<MethodInfo>();
+
+            foreach (var method in testClass.GetMethods())
+            {
+                if (method.GetCustomAttribute<TestAttribute>() != null)
+                {
+                    testMethods.Add(method);
+                }
+            }
+
+            return testMethods;
         }
     }
 }
