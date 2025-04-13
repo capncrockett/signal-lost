@@ -33,7 +33,7 @@ namespace SignalLost.Tests
             gut.Call("set_inner_class_name_prefix", "Test_");
             
             // Add test directory
-            gut.Call("add_directory", "res://Tests");
+            gut.Call("add_directory", "res://tests");
             
             // Run the tests
             GD.Print("Running tests...");
