@@ -1,6 +1,6 @@
 # Development Workflow (Godot Engine with Alpha/Beta Agent Development)
 
-> **Note**: This workflow document has been updated for the Godot Engine implementation of Signal Lost with Alpha/Beta Agent Development. The previous DOM + Canvas approach workflow can be found in `workflow-dom-canvas.md`.
+> **Note**: This workflow document outlines the development process for the Godot Engine implementation of Signal Lost with Alpha/Beta Agent Development.
 
 ## Pre-coding Checklist
 
