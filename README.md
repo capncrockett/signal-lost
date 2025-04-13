@@ -6,40 +6,60 @@
 
 ## 🚀 Quick Start
 
+### Prerequisites
+
+- [Godot Engine](https://godotengine.org/download) (4.x)
+- [Git](https://git-scm.com/downloads)
+
+### Running the Game
+
 ```bash
-npm install
-npm run dev                # Start local dev server
-npm run test               # Run all Jest tests
-npm run test:e2e:ci        # Run E2E tests without opening reports
-npm run test:e2e:report    # Run E2E tests and generate HTML report
-npm run test:e2e:show-report # Show the HTML report from previous E2E test run
-npm run coverage           # Output coverage report
-npm run lint               # Run ESLint
-npm run type-check         # Run TypeScript compiler check
-npm run check-all          # Run all checks (lint, type-check, tests, E2E tests)
+# Clone the repository
+git clone https://github.com/capncrockett/signal-lost.git
+cd signal-lost
+
+# Open the project in Godot
+godot --path godot_project
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+./godot_project/run_tests.sh  # Linux/macOS
+.\godot_project\run_tests.bat  # Windows
+
+# Run specific tests
+godot --path godot_project --script tests/test_runner.gd
 ```
 
 ## 📂 Project Structure
 
-| Folder  | Description                               |
-| ------- | ----------------------------------------- |
-| src/    | Core TypeScript game source (React)       |
-| assets/ | Pixel art, audio files, tilemaps          |
-| tests/  | Jest unit/integration tests (ts-jest)     |
-| e2e/    | Playwright tests for browser interactions |
-| docs/   | Feature specs, prompt definitions, tasks  |
+| Folder                | Description                               |
+| --------------------- | ----------------------------------------- |
+| godot_project/        | Godot project files                       |
+| godot_project/scenes/ | Game scenes                               |
+| godot_project/scripts/| GDScript source files                     |
+| godot_project/assets/ | Pixel art, audio files, tilemaps          |
+| godot_project/tests/  | Test scripts                              |
+| docs/                 | Documentation and migration plans         |
 
 ## ✅ Development Rules
 
-- TypeScript must be used throughout
-- Tests must cover ≥ 80% of code (unit + integration + E2E)
+- GDScript must be used for game logic
+- Tests must cover ≥ 80% of code
+- Follow the [Godot style guide](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_styleguide.html)
 
 ## 🎮 Gameplay Instructions
 
 ### Main Controls
 
-- **Radio Tuning**: Use the mouse to tune the radio frequency
-- **Interact**: Press `E` or `Space` to interact with objects
+- **Radio Tuning**: Use the mouse or keyboard to tune the radio frequency
+  - **Tune Up**: Press `D` or right arrow key
+  - **Tune Down**: Press `A` or left arrow key
+  - **Toggle Power**: Press `Space`
+  - **Scan**: Press `S` to start/stop automatic scanning
+- **Interact**: Press `E` to interact with objects
 - **Movement**: Use `W`, `A`, `S`, `D` or arrow keys to move in the field
 - **Inventory**: Press `I` to open/close the inventory
 

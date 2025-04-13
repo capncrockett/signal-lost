@@ -21,9 +21,9 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- npm (v7 or higher)
-- A modern web browser (Chrome, Firefox, Edge)
+- [Godot Engine](https://godotengine.org/download) (4.x)
+- Git
+- A text editor with GDScript support (VSCode with Godot extension recommended)
 
 ### Setup
 
@@ -33,15 +33,11 @@ By participating in this project, you agree to maintain a respectful and inclusi
    git clone https://github.com/YOUR-USERNAME/signal-lost.git
    cd signal-lost
    ```
-3. Install dependencies:
+3. Open the project in Godot:
    ```bash
-   npm install
+   godot --path godot_project
    ```
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-5. Open your browser to `http://localhost:5173`
+   Or simply open Godot and select "Import" to navigate to the godot_project folder
 
 ## Development Workflow
 
@@ -90,24 +86,21 @@ This project uses a dual-agent (Alpha/Beta) development approach. Follow these s
 
 ## Coding Standards
 
-### TypeScript
+### GDScript
 
-- Use TypeScript for all code
-- Maintain strict type safety (avoid using `any` except in tests)
-- Follow the existing code style and structure
-- Use interfaces for object shapes and types for unions/aliases
+- Follow the [Godot style guide](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_styleguide.html)
+- Use static typing where possible (`var x: int = 5`)
+- Keep functions small and focused on a single task
+- Use clear, descriptive variable and function names
+- Add comments for complex logic
 
-### ESLint and Prettier
+### Code Organization
 
-The project uses ESLint and Prettier for code formatting and linting:
-
-```bash
-# Run linting
-npm run lint
-
-# Fix auto-fixable issues
-npm run lint -- --fix
-```
+- Use Godot's node system appropriately
+- Prefer composition over inheritance
+- Keep scenes modular and reusable
+- Use signals for communication between nodes
+- Organize scripts into logical folders
 
 ### Naming Conventions
 
@@ -124,37 +117,33 @@ npm run lint -- --fix
 
 ## Testing Guidelines
 
-### Unit and Integration Tests
+### Unit Tests
 
 - Write tests for all new functionality
 - Maintain at least 80% test coverage
-- Use Jest for unit and integration tests
-- Mock external dependencies appropriately
+- Use GUT (Godot Unit Testing) for unit tests
+- Test each script's functionality independently
 
 ```bash
-# Run Jest tests
-npm run test
+# Run all tests from the terminal
+./godot_project/run_tests.sh  # Linux/macOS
+.\godot_project\run_tests.bat  # Windows
 
-# Run tests with coverage
-npm run coverage
+# Run specific tests
+godot --path godot_project --script tests/test_runner.gd
 ```
 
-### E2E Tests
+### Integration Tests
 
-- Write E2E tests for critical user flows
-- Use Playwright for E2E testing
-- Include screenshots for visual verification
+- Test interactions between different game systems
+- Verify signal connections and node communication
+- Test game state transitions
 
-```bash
-# Run E2E tests
-npm run test:e2e:ci
+### Manual Testing
 
-# Run E2E tests with HTML report
-npm run test:e2e:report
-
-# Show the HTML report
-npm run test:e2e:show-report
-```
+- Test gameplay mechanics in the Godot editor
+- Verify audio and visual effects
+- Check performance on target platforms
 
 ## Pull Request Process
 

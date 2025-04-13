@@ -1,5 +1,0 @@
-# Run lint-staged to check staged files
-npx lint-staged
-
-# Run full ESLint check to catch any errors that might have been missed
-npm run lint
