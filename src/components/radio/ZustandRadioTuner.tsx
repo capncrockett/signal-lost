@@ -326,8 +326,6 @@ const ZustandRadioTuner: React.FC<RadioTunerProps> = memo(({
       )}
     </div>
   );
-};
-
-});  // Close the memo() call
+}));  // Close the memo() call
 
 export default ZustandRadioTuner;
