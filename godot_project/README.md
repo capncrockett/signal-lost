@@ -1,16 +1,16 @@
-# Signal Lost - Godot Implementation
+# Signal Lost - Godot C# Implementation
 
-This is the Godot implementation of the Signal Lost game, migrated from the original browser-based React application.
+This is the Godot C# implementation of the Signal Lost game, migrated from the original browser-based React application.
 
 ## Project Structure
 
 - `scenes/` - Contains all game scenes
   - `radio/` - Radio tuner and related scenes
-- `scripts/` - Contains all GDScript files
+- `Scripts/` - Contains all C# script files
 - `assets/` - Contains all game assets
   - `audio/` - Audio files
   - `images/` - Image files
-- `tests/` - Contains all test scripts
+- `Tests/` - Contains all C# test scripts
 
 ## Key Components
 

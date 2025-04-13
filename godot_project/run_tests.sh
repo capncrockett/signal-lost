@@ -17,7 +17,7 @@ echo "Running tests for Signal Lost Godot project..."
 echo "Project path: $DIR"
 
 # Run the test runner script
-godot --path "$DIR" --script tests/test_runner.gd
+godot --path "$DIR" --script Tests/TestRunner.cs
 
 # Get the exit code
 EXIT_CODE=$?

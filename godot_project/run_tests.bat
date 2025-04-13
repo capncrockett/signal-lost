@@ -18,7 +18,7 @@ set "DIR=%~dp0"
 echo Project path: %DIR%
 
 REM Run the test runner script
-godot --path "%DIR%" --script tests/test_runner.gd
+godot --path "%DIR%" --script Tests/TestRunner.cs
 
 REM Get the exit code
 set EXIT_CODE=%ERRORLEVEL%
