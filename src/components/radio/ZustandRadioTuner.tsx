@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, memo, useCallback } from 'react';
 import { useGameState } from '../../context/GameStateContext';
 import { useAudio } from '../../context/AudioContext';
 import { getMessage } from '../../data/messages';
@@ -15,14 +15,16 @@ interface RadioTunerProps {
   onFrequencyChange?: (frequency: number) => void;
 }
 
-const ZustandRadioTuner: React.FC<RadioTunerProps> = ({
+const ZustandRadioTuner: React.FC<RadioTunerProps> = memo(({
   initialFrequency = 90.0,
   minFrequency = 88.0,
   maxFrequency = 108.0,
   onFrequencyChange,
 }) => {
-  // For debugging
-  console.log('ZustandRadioTuner rendering', new Date().toISOString());
+  // For debugging - only in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log('ZustandRadioTuner rendering', new Date().toISOString());
+  }
 
   // Context
   const { state, dispatch } = useGameState();
@@ -73,6 +75,13 @@ const ZustandRadioTuner: React.FC<RadioTunerProps> = ({
 
   // Process frequency changes and update audio
   useEffect(() => {
+    // Only process if the radio is on
+    if (!state.isRadioOn) {
+      audio.stopSignal();
+      audio.stopStaticNoise();
+      return;
+    }
+
     const addDiscoveredFrequency = (freq: number) => {
       dispatch({ type: 'ADD_DISCOVERED_FREQUENCY', payload: freq });
     };
@@ -84,7 +93,11 @@ const ZustandRadioTuner: React.FC<RadioTunerProps> = ({
       state.discoveredFrequencies,
       addDiscoveredFrequency
     );
-  }, [state.isRadioOn, state.currentFrequency, state.discoveredFrequencies, audio, dispatch]);
+
+    // We don't need to include state.discoveredFrequencies in the dependency array
+    // because it's only used inside the processFrequency function to check if a frequency
+    // has been discovered, and we're already handling that with the addDiscoveredFrequency callback
+  }, [state.isRadioOn, state.currentFrequency, audio, dispatch]);
 
   // Draw static visualization
   useEffect(() => {
@@ -105,6 +118,9 @@ const ZustandRadioTuner: React.FC<RadioTunerProps> = ({
 
     let isActive = true;
 
+    // Store the current static intensity in a ref to avoid re-renders
+    const currentIntensity = staticIntensity;
+
     const drawStatic = () => {
       if (!isActive || !state.isRadioOn) return;
 
@@ -112,7 +128,7 @@ const ZustandRadioTuner: React.FC<RadioTunerProps> = ({
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Draw static noise
-      const intensity = staticIntensity * 255;
+      const intensity = currentIntensity * 255;
 
       // Optimize by drawing larger blocks
       for (let i = 0; i < canvas.width; i += 4) {
@@ -138,11 +154,18 @@ const ZustandRadioTuner: React.FC<RadioTunerProps> = ({
         animationFrameRef.current = null;
       }
     };
-  }, [state.isRadioOn, staticIntensity]);
+
+    // Only re-run this effect when the radio is turned on/off
+    // We don't need to include staticIntensity in the dependency array
+    // because we're using the currentIntensity variable to capture its value
+  }, [state.isRadioOn]);
 
   // Handle scanning
   useEffect(() => {
-    if (isScanning && state.isRadioOn) {
+    // Only start scanning if both conditions are met
+    const shouldScan = isScanning && state.isRadioOn;
+
+    if (shouldScan) {
       // Start scanning
       scanIntervalRef.current = window.setInterval(() => {
         // Increment frequency by 0.1 MHz
@@ -158,15 +181,9 @@ const ZustandRadioTuner: React.FC<RadioTunerProps> = ({
           onFrequencyChange(nextFreq);
         }
       }, 300); // Scan speed in milliseconds
-    } else {
-      // Stop scanning
-      if (scanIntervalRef.current !== null) {
-        window.clearInterval(scanIntervalRef.current);
-        scanIntervalRef.current = null;
-      }
     }
 
-    // Cleanup
+    // Cleanup function that runs when the component unmounts or when dependencies change
     return () => {
       if (scanIntervalRef.current !== null) {
         window.clearInterval(scanIntervalRef.current);
@@ -175,13 +192,13 @@ const ZustandRadioTuner: React.FC<RadioTunerProps> = ({
     };
   }, [isScanning, state.isRadioOn, state.currentFrequency, dispatch, maxFrequency, minFrequency, onFrequencyChange]);
 
-  // Toggle frequency scanning
-  const toggleScanning = () => {
+  // Toggle frequency scanning - memoized to prevent unnecessary re-renders
+  const toggleScanning = useCallback(() => {
     setIsScanning(!isScanning);
-  };
+  }, [isScanning, setIsScanning]);
 
-  // Change frequency by a specific amount
-  const changeFrequency = (amount: number) => {
+  // Change frequency by a specific amount - memoized to prevent unnecessary re-renders
+  const changeFrequency = useCallback((amount: number) => {
     const currentFreq = state.currentFrequency;
     const newFreq = Math.max(
       minFrequency,
@@ -195,7 +212,7 @@ const ZustandRadioTuner: React.FC<RadioTunerProps> = ({
     if (onFrequencyChange) {
       onFrequencyChange(newFreq);
     }
-  };
+  }, [state.currentFrequency, minFrequency, maxFrequency, dispatch, onFrequencyChange]);
 
   // Get the current message
   const currentMessage = currentSignalId ? getMessage(currentSignalId) : undefined;
@@ -310,5 +327,7 @@ const ZustandRadioTuner: React.FC<RadioTunerProps> = ({
     </div>
   );
 };
+
+});  // Close the memo() call
 
 export default ZustandRadioTuner;
