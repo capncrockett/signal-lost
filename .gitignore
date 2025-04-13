@@ -46,3 +46,6 @@ builds/
 
 # Godot-specific project settings backup
 .godot/project_metadata.cfg.bak
+
+# Godot-specific UID files
+*.uid
