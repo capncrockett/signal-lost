@@ -5,6 +5,16 @@
 
 # Function to find Godot executable
 find_godot() {
+    # Check if GODOT_EXECUTABLE environment variable is set
+    if [ ! -z "$GODOT_EXECUTABLE" ]; then
+        if [ -f "$GODOT_EXECUTABLE" ]; then
+            echo "$GODOT_EXECUTABLE"
+            return 0
+        else
+            echo "Warning: GODOT_EXECUTABLE is set but the file does not exist: $GODOT_EXECUTABLE"
+        fi
+    fi
+
     # Check if Godot is in PATH
     if command -v godot &> /dev/null; then
         echo "godot"
@@ -56,7 +66,8 @@ GODOT_EXECUTABLE=$(find_godot)
 if [ -z "$GODOT_EXECUTABLE" ]; then
     echo "Error: Godot executable not found"
     echo "Please install Godot from https://godotengine.org/download"
-    echo "or specify the path to the Godot executable in the GODOT_EXECUTABLE variable"
+    echo "or specify the path to the Godot executable in the GODOT_EXECUTABLE environment variable"
+    echo "Example: GODOT_EXECUTABLE=/path/to/godot ./run_tests.sh"
     exit 1
 fi
 
