@@ -1,57 +1,44 @@
 # Signal Lost Documentation
 
-This directory contains documentation for the Signal Lost game project.
+This directory contains documentation for the Signal Lost game project, which has been migrated to the Godot Engine.
 
 ## Documentation Structure
 
-### Sprint Documents
-- `sprint-XX-name.md`: Sprint planning and tracking documents
-- Current sprint: [Sprint 2.5: Bug Fixes, Code Cleanup, and Agent Workflow Improvement](./sprint-2.5-bugfixes-workflow.md)
-- Previous sprints:
-  - [Sprint 02: Core Game Mechanics](./sprint-02-core-mechanics.md)
-  - [Sprint 01: Foundation](./sprint-01-foundation.md)
-- Sprint planning overview: [Sprint Planning](./sprint-planning.md)
+### Godot Implementation
+
+- [Godot Migration](./godot-migration.md): Migration plan from browser-based to Godot implementation
+- [Godot Workflow](./godot-workflow.md): Development workflow for Godot
+- [Godot Testing](./godot-testing.md): Testing approach for Godot
+- [Godot Audio System](./godot-audio-system.md): Audio system implementation in Godot
+- [Godot Cleanup Plan](./godot-cleanup-plan.md): Cleanup plan for the Godot migration
 
 ### Project Documentation
+
 - [Todo List](./todo.md): Overall project tasks and status
-- [Workflow](./workflow.md): Development workflow and agent collaboration practices
-- [Contributing](../CONTRIBUTING.md): Contribution guidelines and agent-specific workflows
-- [Sprint Planning](./sprint-planning.md): Sprint structure and agent coordination
-- [Tests](./tests.md): Testing approach and guidelines
-- [Contract Validation](./contract-validation.md): Interface contract validation between agents
-
-### Technical Documentation
-- [Debugging Guide](./debugging-guide.md): Debugging tips and tools
-- [Performance Benchmarks](./performance-benchmarks.md): Performance metrics
-- [Test Fixtures](./test-fixtures.md): Test data and fixtures
-- [Visual Regression Testing](./visual-regression-testing.md): Visual testing approach
-
-### Archive
-The `archive` directory contains older documentation that is kept for reference:
-- Previous sprint documents
-- Deprecated design documents
-- Historical notes
+- [Agent Roles](./agent-roles.md): Roles and responsibilities for Alpha and Beta agents
+- [Sprint Godot Migration](./sprint-godot-migration.md): Sprint plan for the Godot migration
 
 ## Agent Collaboration
-- Alpha and Beta agents work in parallel
-- Interface contracts ensure smooth integration
-- Structured conflict resolution process
+
+- Alpha and Beta agents work in parallel on the Godot implementation
+- Alpha agent focuses on core systems and audio implementation
+- Beta agent focuses on narrative and game state integration
 - Daily synchronization with develop branch
 
 ## Documentation Conventions
 
-1. **Sprint Documents**: Follow the naming convention `sprint-XX-name.md`
+1. **Godot Documents**: Follow the naming convention `godot-feature.md`
 2. **Checkmarks**: Use ✅ for completed items and ⬜ for pending items
-3. **Code Examples**: Include relevant code examples with proper syntax highlighting
+3. **Code Examples**: Include relevant C# code examples with proper syntax highlighting
 4. **Screenshots**: Include screenshots where helpful, stored in the `assets` directory
 5. **Links**: Use relative links to reference other documents or code files
 
 ## Updating Documentation
 
 When updating documentation:
-1. Keep the sprint documents up to date with current progress
-2. Move completed sprint documents to the archive
-3. Update the README.md with any new documentation files
-4. Ensure all links remain valid
-5. Maintain consistent formatting and style
 
+1. Keep the documentation up to date with current progress
+2. Update the README.md with any new documentation files
+3. Ensure all links remain valid
+4. Maintain consistent formatting and style
+5. Focus on Godot-specific implementation details
