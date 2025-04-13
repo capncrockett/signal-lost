@@ -71,6 +71,13 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
 
   // Detect signals and update audio based on frequency
   useEffect(() => {
+    // Only process if the radio is on
+    if (!state.isRadioOn) {
+      audio.stopSignal();
+      audio.stopStaticNoise();
+      return;
+    }
+
     // Check if there's a signal at this frequency
     const signal = findSignalAtFrequency(frequency);
 
@@ -119,7 +126,7 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
       // Don't stop audio here, as it would cause interruptions during tuning
       // We'll just update it in the next effect run
     };
-  }, [frequency, dispatch, audio, state.discoveredFrequencies]);
+  }, [frequency, dispatch, audio, state.discoveredFrequencies, state.isRadioOn]);
 
   // Calculate dial position based on current frequency
   const dialPosition = ((frequency - minFrequency) / (maxFrequency - minFrequency)) * 100;
@@ -151,42 +158,12 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Only draw static if radio is on
-    if (state.isRadioOn) {
-      // Draw static noise with color variations based on signal strength
-      const intensity = staticIntensity * 255;
-      const imageData = ctx.createImageData(canvas.width, canvas.height);
-      const data = imageData.data;
-
-      // Add color tint based on signal strength
-      const signalColor = {
-        r: signalStrength > 0.7 ? 0 : 255 * (1 - signalStrength),
-        g: signalStrength > 0.3 ? 255 * signalStrength : 0,
-        b: signalStrength < 0.3 ? 255 * (1 - signalStrength) : 0,
-      };
-
-      for (let i = 0; i < data.length; i += 4) {
-        // Create more varied noise pattern
-        const noisePattern = Math.random() < 0.3 ? 0 : Math.random() * intensity;
-        const colorVariation = Math.random() * 0.3;
-
-        // Apply color tint based on signal strength
-        data[i] = noisePattern + signalColor.r * colorVariation; // R
-        data[i + 1] = noisePattern + signalColor.g * colorVariation; // G
-        data[i + 2] = noisePattern + signalColor.b * colorVariation; // B
-        data[i + 3] = (Math.random() * 200 + 55) * staticIntensity; // A - more varied opacity
-      }
-
-      ctx.putImageData(imageData, 0, 0);
-    }
-
     // Animation loop for continuous static effect
     let animationId: number;
+    let isActive = true; // Flag to track if this effect is still active
+
     const animate = (): void => {
-      if (!state.isRadioOn) return;
+      if (!isActive || !state.isRadioOn) return;
 
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -203,16 +180,30 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
         b: signalStrength < 0.3 ? 255 * (1 - signalStrength) : 0,
       };
 
-      for (let i = 0; i < data.length; i += 4) {
-        // Create more varied noise pattern
-        const noisePattern = Math.random() < 0.3 ? 0 : Math.random() * intensity;
-        const colorVariation = Math.random() * 0.3;
+      // Optimize by only drawing every 4 pixels (2x2 blocks)
+      for (let y = 0; y < canvas.height; y += 2) {
+        for (let x = 0; x < canvas.width; x += 2) {
+          // Create more varied noise pattern
+          const noisePattern = Math.random() < 0.3 ? 0 : Math.random() * intensity;
+          const colorVariation = Math.random() * 0.3;
 
-        // Apply color tint based on signal strength
-        data[i] = noisePattern + signalColor.r * colorVariation; // R
-        data[i + 1] = noisePattern + signalColor.g * colorVariation; // G
-        data[i + 2] = noisePattern + signalColor.b * colorVariation; // B
-        data[i + 3] = (Math.random() * 200 + 55) * staticIntensity; // A - more varied opacity
+          // Calculate pixel values
+          const r = noisePattern + signalColor.r * colorVariation;
+          const g = noisePattern + signalColor.g * colorVariation;
+          const b = noisePattern + signalColor.b * colorVariation;
+          const a = (Math.random() * 200 + 55) * staticIntensity;
+
+          // Apply to a 2x2 block of pixels for better performance
+          for (let dy = 0; dy < 2 && y + dy < canvas.height; dy++) {
+            for (let dx = 0; dx < 2 && x + dx < canvas.width; dx++) {
+              const idx = ((y + dy) * canvas.width + (x + dx)) * 4;
+              data[idx] = r; // R
+              data[idx + 1] = g; // G
+              data[idx + 2] = b; // B
+              data[idx + 3] = a; // A
+            }
+          }
+        }
       }
 
       ctx.putImageData(imageData, 0, 0);
@@ -222,9 +213,12 @@ const RadioTuner: React.FC<RadioTunerProps> = ({
     animate();
 
     return () => {
-      cancelAnimationFrame(animationId);
+      isActive = false; // Mark this effect as inactive
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
     };
-  }, [staticIntensity, state.isRadioOn, signalStrength]);
+  }, [state.isRadioOn, signalStrength, staticIntensity]); // Include all dependencies
 
   // Toggle message display
   const toggleMessage = (): void => {
