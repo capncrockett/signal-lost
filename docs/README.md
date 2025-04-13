@@ -2,21 +2,20 @@
 
 This directory contains documentation for the Signal Lost game project, which has been migrated to the Godot Engine.
 
-## Documentation Structure
+## Documentation Files
 
-### Godot Implementation
+- **agent-roles.md**: Defines the roles and responsibilities of Agent Alpha and Beta agents in the development process.
+- **godot-audio-system.md**: Details the audio system implementation in Godot, including radio static and signal processing.
+- **godot-cleanup-plan.md**: The plan for cleaning up the repository during the migration to Godot (completed).
+- **godot-migration.md**: Overview of the migration process from React to Godot.
+- **godot-testing.md**: Guidelines for testing the Godot implementation.
+- **godot-workflow.md**: Detailed workflow for Godot development.
+- **sprint-godot-migration.md**: Sprint plan for the Godot migration.
+- **todo.md**: Current and upcoming tasks for the project.
 
-- [Godot Migration](./godot-migration.md): Migration plan from browser-based to Godot implementation
-- [Godot Workflow](./godot-workflow.md): Development workflow for Godot
-- [Godot Testing](./godot-testing.md): Testing approach for Godot
-- [Godot Audio System](./godot-audio-system.md): Audio system implementation in Godot
-- [Godot Cleanup Plan](./godot-cleanup-plan.md): Cleanup plan for the Godot migration
+## Godot Project
 
-### Project Documentation
-
-- [Todo List](./todo.md): Overall project tasks and status
-- [Agent Roles](./agent-roles.md): Roles and responsibilities for Alpha and Beta agents
-- [Sprint Godot Migration](./sprint-godot-migration.md): Sprint plan for the Godot migration
+The Godot project is located in the `godot_project` directory at the root of the repository. See the README.md file in that directory for more information about the Godot implementation.
 
 ## Agent Collaboration
 
