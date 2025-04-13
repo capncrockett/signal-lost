@@ -16,9 +16,10 @@
 Signal Lost development follows an Alpha/Beta Agent development approach where two AI agents collaborate with distinct roles and responsibilities:
 
 1. **Agent Alpha**: Senior developer responsible for primary code development, including:
+
    - Writing and implementing new features
    - Unit and integration testing
-   - Ensuring GDScript type safety
+   - Ensuring C# type safety
    - Fixing bugs and errors
    - Maintaining code quality and documentation
 
@@ -72,15 +73,17 @@ Signal Lost uses the Godot Engine for game development, providing a robust frame
 ### Key Principles
 
 1. **Godot Nodes for Game Objects**
+
    - Use Godot's node system for game objects
    - Leverage the scene system for reusable components
    - Use signals for communication between nodes
    - Follow Godot's design patterns
 
-2. **GDScript for Game Logic**
-   - Use GDScript for all game logic
-   - Leverage static typing for better code quality
-   - Follow the Godot style guide
+2. **C# for Game Logic**
+
+   - Use C# for all game logic
+   - Leverage strong typing for better code quality
+   - Follow C# coding conventions and the Godot C# style guide
    - Keep scripts focused and modular
 
 3. **State Management**
@@ -114,7 +117,7 @@ var current_frequency: float = 90.0
 func _ready() -> void:
     # Initialize UI
     update_ui()
-    
+
     # Connect signals
     power_button.connect("pressed", self, "_on_power_button_pressed")
     frequency_slider.connect("value_changed", self, "_on_frequency_slider_changed")
@@ -127,7 +130,7 @@ func _process(delta: float) -> void:
             change_frequency(frequency_step)
         elif Input.is_action_just_pressed("tune_down"):
             change_frequency(-frequency_step)
-        
+
         # Update visualization
         update_static_visualization(delta)
 
@@ -146,10 +149,10 @@ func toggle_power() -> void:
 func update_ui() -> void:
     # Update frequency display
     frequency_display.text = "%.1f MHz" % current_frequency
-    
+
     # Update power button
     power_button.text = "ON" if is_on else "OFF"
-    
+
     # Update frequency slider
     var percentage = (current_frequency - min_frequency) / (max_frequency - min_frequency)
     frequency_slider.value = percentage * 100
@@ -158,6 +161,7 @@ func update_ui() -> void:
 ## Component Development Workflow
 
 1. **Plan the component**:
+
    - Review the current sprint document for requirements
    - Define properties and state requirements
    - Sketch the component structure
@@ -165,12 +169,14 @@ func update_ui() -> void:
    - Determine which Godot nodes to use
 
 2. **Write tests first**:
+
    - Create test file with the same name as the component
    - Write tests for all expected behaviors
    - Include tests for edge cases
    - Add tests for both UI elements and game logic
 
 3. **Implement the component**:
+
    - Create the scene file
    - Add necessary nodes
    - Implement the component logic
@@ -178,6 +184,7 @@ func update_ui() -> void:
    - Ensure proper signal connections
 
 4. **Verify**:
+
    - Run tests: `./godot_project/run_tests.sh`
    - Manually test in the Godot editor
    - Check for errors in the Godot console
@@ -198,30 +205,48 @@ func update_ui() -> void:
 - Mock external dependencies
 - Maintain at least 80% test coverage
 
-```gdscript
-# Example unit test
-extends "res://addons/gut/test.gd"
+```csharp
+// Example unit test
+using Godot;
+using System;
+using GUT;
 
-var RadioTunerScene = load("res://scenes/radio/RadioTuner.tscn")
-var radio_tuner = null
+namespace SignalLost.Tests
+{
+    [TestClass]
+    public class RadioTunerTests : Test
+    {
+        private PackedScene _radioTunerScene;
+        private RadioTuner _radioTuner = null;
 
-func before_each():
-    radio_tuner = RadioTunerScene.instance()
-    add_child(radio_tuner)
+        public override void Before()
+        {
+            _radioTunerScene = GD.Load<PackedScene>("res://scenes/radio/RadioTuner.tscn");
+            _radioTuner = _radioTunerScene.Instantiate<RadioTuner>();
+            AddChild(_radioTuner);
+        }
 
-func after_each():
-    radio_tuner.queue_free()
-    radio_tuner = null
+        public override void After()
+        {
+            _radioTuner.QueueFree();
+            _radioTuner = null;
+        }
 
-func test_frequency_change():
-    # Arrange
-    radio_tuner.current_frequency = 90.0
-    
-    # Act
-    radio_tuner.change_frequency(0.1)
-    
-    # Assert
-    assert_eq(radio_tuner.current_frequency, 90.1, "Frequency should be 90.1 after increasing by 0.1")
+        [Test]
+        public void TestFrequencyChange()
+        {
+            // Arrange
+            _radioTuner.Call("SetFrequency", 90.0f);
+
+            // Act
+            _radioTuner.Call("ChangeFrequency", 0.1f);
+
+            // Assert
+            AssertEqual((float)_radioTuner.Get("_currentFrequency"), 90.1f,
+                "Frequency should be 90.1 after increasing by 0.1");
+        }
+    }
+}
 ```
 
 ### Cross-Agent Integration Tests - Shared Responsibility
@@ -232,31 +257,48 @@ func test_frequency_change():
 - Test boundary conditions and edge cases
 - Ensure consistent behavior across components
 
-```gdscript
-# Example Cross-Agent Integration test
-extends "res://addons/gut/test.gd"
+```csharp
+// Example Cross-Agent Integration test
+using Godot;
+using System;
+using GUT;
 
-var RadioTuner = load("res://scenes/radio/RadioTuner.tscn")  # Alpha agent component
-var NarrativeDisplay = load("res://scenes/narrative/NarrativeDisplay.tscn")  # Beta agent component
+namespace SignalLost.Tests
+{
+    [TestClass]
+    public class CrossAgentIntegrationTests : Test
+    {
+        private PackedScene _radioTunerScene; // Alpha agent component
+        private PackedScene _narrativeDisplayScene; // Beta agent component
 
-func test_radio_tuner_signal_detection_triggers_narrative_display_update():
-    # Arrange
-    var radio_tuner = RadioTuner.instance()
-    var narrative_display = NarrativeDisplay.instance()
-    add_child(radio_tuner)
-    add_child(narrative_display)
-    
-    # Act
-    radio_tuner.current_frequency = 91.5  # Known signal frequency
-    radio_tuner.process_frequency()
-    
-    # Assert
-    assert_true(narrative_display.has_message, "Narrative display should have a message")
-    assert_string_contains(narrative_display.message_text, "Signal detected")
-    
-    # Cleanup
-    radio_tuner.queue_free()
-    narrative_display.queue_free()
+        [Test]
+        public void TestRadioTunerSignalDetectionTriggersNarrativeDisplayUpdate()
+        {
+            // Arrange
+            _radioTunerScene = GD.Load<PackedScene>("res://scenes/radio/RadioTuner.tscn");
+            _narrativeDisplayScene = GD.Load<PackedScene>("res://scenes/narrative/NarrativeDisplay.tscn");
+
+            var radioTuner = _radioTunerScene.Instantiate<RadioTuner>();
+            var narrativeDisplay = _narrativeDisplayScene.Instantiate<Control>();
+            AddChild(radioTuner);
+            AddChild(narrativeDisplay);
+
+            // Act
+            radioTuner.Call("SetFrequency", 91.5f); // Known signal frequency
+            radioTuner.Call("ProcessFrequency");
+
+            // Assert
+            AssertTrue((bool)narrativeDisplay.Get("has_message"),
+                "Narrative display should have a message");
+            AssertStringContains((string)narrativeDisplay.Get("message_text"),
+                "Signal detected");
+
+            // Cleanup
+            radioTuner.QueueFree();
+            narrativeDisplay.QueueFree();
+        }
+    }
+}
 ```
 
 ### Manual Testing - Agent Beta Responsibility
@@ -273,8 +315,8 @@ func test_radio_tuner_signal_detection_triggers_narrative_display_update():
 # Run tests
 ./godot_project/run_tests.sh
 
-# Check for GDScript errors
-godot --path godot_project --check-only
+# Check for C# compilation errors
+dotnet build godot_project/SignalLost.sln
 
 # Run static analysis
 godot --path godot_project --script addons/gdlint/gdlint.gd
@@ -290,9 +332,9 @@ godot --path godot_project --script addons/gdlint/gdlint.gd
 - Use the Remote tab for runtime inspection
 - Leverage Godot's profiler for performance issues
 - Monitor cross-agent integration with interface logging:
-  ```gdscript
-  # Enable debug mode to log all cross-agent interactions
-  Contracts.enable_debug_mode()
+  ```csharp
+  // Enable debug mode to log all cross-agent interactions
+  Contracts.EnableDebugMode();
   ```
 
 ## State Management
@@ -307,6 +349,7 @@ godot --path godot_project --script addons/gdlint/gdlint.gd
 ### Agent-Specific Responsibilities
 
 #### Agent Alpha (Senior Developer)
+
 - Implement new features and components
 - Write unit and integration tests
 - Fix bugs and errors
@@ -315,6 +358,7 @@ godot --path godot_project --script addons/gdlint/gdlint.gd
 - Create PRs for feature implementation
 
 #### Agent Beta (QA Developer)
+
 - Write and maintain manual tests
 - Clean up unused code and variables
 - Improve code organization
@@ -328,62 +372,86 @@ godot --path godot_project --script addons/gdlint/gdlint.gd
 - Alpha agent manages audio and radio tuner state
 - Beta agent manages narrative and game progression state
 - Shared state is managed through well-defined interfaces
-- Use GDScript's type hints to enforce state boundaries between agents
+- Use C# strong typing to enforce state boundaries between agents
 
-```gdscript
-# Example state management with agent-specific singletons
-# Alpha Agent Singleton (Radio & Audio)
-extends Node
+```csharp
+// Example state management with agent-specific singletons
+// Alpha Agent Singleton (Radio & Audio)
+using Godot;
+using System;
 
-# Radio state
-var current_frequency: float = 90.0
-var is_radio_on: bool = false
-var signal_strength: float = 0.0
-var static_intensity: float = 0.5
+namespace SignalLost
+{
+    public partial class AudioManager : Node
+    {
+        // Radio state
+        public float CurrentFrequency { get; private set; } = 90.0f;
+        public bool IsRadioOn { get; private set; } = false;
+        public float SignalStrength { get; private set; } = 0.0f;
+        public float StaticIntensity { get; private set; } = 0.5f;
 
-# Audio state
-var volume: float = 0.8
-var is_muted: bool = false
+        // Audio state
+        public float Volume { get; private set; } = 0.8f;
+        public bool IsMuted { get; private set; } = false;
 
-# Signals
-signal frequency_changed(new_frequency)
-signal radio_toggled(is_on)
+        // Signals
+        [Signal]
+        public delegate void FrequencyChangedEventHandler(float newFrequency);
 
-# Functions
-func set_frequency(freq: float) -> void:
-    current_frequency = clamp(freq, 88.0, 108.0)
-    emit_signal("frequency_changed", current_frequency)
+        [Signal]
+        public delegate void RadioToggledEventHandler(bool isOn);
 
-func toggle_radio() -> void:
-    is_radio_on = !is_radio_on
-    emit_signal("radio_toggled", is_radio_on)
+        // Functions
+        public void SetFrequency(float freq)
+        {
+            CurrentFrequency = Mathf.Clamp(freq, 88.0f, 108.0f);
+            EmitSignal(SignalName.FrequencyChanged, CurrentFrequency);
+        }
 
-# Beta Agent Singleton (Narrative & Game State)
-extends Node
+        public void ToggleRadio()
+        {
+            IsRadioOn = !IsRadioOn;
+            EmitSignal(SignalName.RadioToggled, IsRadioOn);
+        }
+    }
 
-# Narrative state
-var messages = {}
-var current_message_id = null
+    // Beta Agent Singleton (Narrative & Game State)
+    public partial class NarrativeManager : Node
+    {
+        // Narrative state
+        public Dictionary<string, object> Messages { get; private set; } = new Dictionary<string, object>();
+        public string CurrentMessageId { get; private set; } = null;
 
-# Game progress state
-var discovered_signals = []
-var completed_objectives = []
-var player_location = "bunker"
-var game_time = 0
+        // Game progress state
+        public List<string> DiscoveredSignals { get; private set; } = new List<string>();
+        public List<string> CompletedObjectives { get; private set; } = new List<string>();
+        public string PlayerLocation { get; private set; } = "bunker";
+        public int GameTime { get; private set; } = 0;
 
-# Signals
-signal message_received(message_id)
-signal objective_completed(objective_id)
+        // Signals
+        [Signal]
+        public delegate void MessageReceivedEventHandler(string messageId);
 
-# Functions
-func receive_message(message_id: String) -> void:
-    current_message_id = message_id
-    emit_signal("message_received", message_id)
+        [Signal]
+        public delegate void ObjectiveCompletedEventHandler(string objectiveId);
 
-func complete_objective(objective_id: String) -> void:
-    if not objective_id in completed_objectives:
-        completed_objectives.append(objective_id)
-        emit_signal("objective_completed", objective_id)
+        // Functions
+        public void ReceiveMessage(string messageId)
+        {
+            CurrentMessageId = messageId;
+            EmitSignal(SignalName.MessageReceived, messageId);
+        }
+
+        public void CompleteObjective(string objectiveId)
+        {
+            if (!CompletedObjectives.Contains(objectiveId))
+            {
+                CompletedObjectives.Add(objectiveId);
+                EmitSignal(SignalName.ObjectiveCompleted, objectiveId);
+            }
+        }
+    }
+}
 ```
 
 ## Development Priorities
@@ -393,80 +461,110 @@ func complete_objective(objective_id: String) -> void:
    - Agent Alpha: Feature development, unit testing, and code quality
    - Agent Beta: Manual testing, code cleanup, and quality assurance
 3. **Test Coverage**: Maintain at least 80% test coverage
-4. **Type Safety**: Use GDScript's type hints effectively to prevent bugs
+4. **Type Safety**: Use C#'s strong typing effectively to prevent bugs
 5. **Component Architecture**: Create a clean, maintainable node structure
 6. **Accessibility**: Ensure the game is accessible to all users
 7. **Code Quality**: Follow Godot style guide and maintain consistent code style
 8. **Performance**: Optimize rendering and state updates
 9. **Documentation**: Keep documentation up-to-date with implementation changes
 
-## GDScript Best Practices
+## C# Best Practices
 
-- Use static typing for all variables and functions
+- Use strong typing for all variables and functions
 - Keep functions small and focused
 - Use clear, descriptive variable and function names
 - Add comments for complex logic
-- Follow the Godot style guide
+- Follow C# coding conventions and the Godot C# style guide
 - Use signals for communication between nodes
 - Leverage Godot's built-in features
 - Create reusable components
-- Document public methods and properties
+- Document public methods and properties with XML comments
 
-```gdscript
-# Example of good GDScript usage for components
-class_name RadioTuner
-extends Control
+```csharp
+// Example of good C# usage for components
+using Godot;
+using System;
 
-# Export variables for inspector configuration
-export var initial_frequency: float = 91.5
-export var min_frequency: float = 88.0
-export var max_frequency: float = 108.0
+namespace SignalLost
+{
+    public partial class RadioTuner : Control
+    {
+        // Export variables for inspector configuration
+        [Export]
+        public float InitialFrequency { get; set; } = 91.5f;
 
-# Signal definitions
-signal frequency_changed(frequency)
-signal signal_found(signal_data)
+        [Export]
+        public float MinFrequency { get; set; } = 88.0f;
 
-# Private variables
-var _is_on: bool = false
-var _current_frequency: float
+        [Export]
+        public float MaxFrequency { get; set; } = 108.0f;
 
-# Called when the node enters the scene tree
-func _ready() -> void:
-    _current_frequency = initial_frequency
-    _update_ui()
+        // Signal definitions
+        [Signal]
+        public delegate void FrequencyChangedEventHandler(float frequency);
 
-# Public methods
-func set_frequency(frequency: float) -> void:
-    _current_frequency = clamp(frequency, min_frequency, max_frequency)
-    _update_ui()
-    emit_signal("frequency_changed", _current_frequency)
-    _check_for_signal()
+        [Signal]
+        public delegate void SignalFoundEventHandler(GameState.SignalData signalData);
 
-func toggle_power() -> void:
-    _is_on = !_is_on
-    _update_ui()
+        // Private variables
+        private bool _isOn = false;
+        private float _currentFrequency;
 
-# Private methods
-func _update_ui() -> void:
-    $FrequencyDisplay.text = "%.1f MHz" % _current_frequency
-    $PowerButton.text = "ON" if _is_on else "OFF"
+        // Called when the node enters the scene tree
+        public override void _Ready()
+        {
+            _currentFrequency = InitialFrequency;
+            UpdateUi();
+        }
 
-func _check_for_signal() -> void:
-    var signal_data = GameState.find_signal_at_frequency(_current_frequency)
-    if signal_data:
-        emit_signal("signal_found", signal_data)
+        // Public methods
+        public void SetFrequency(float frequency)
+        {
+            _currentFrequency = Mathf.Clamp(frequency, MinFrequency, MaxFrequency);
+            UpdateUi();
+            EmitSignal(SignalName.FrequencyChanged, _currentFrequency);
+            CheckForSignal();
+        }
+
+        public void TogglePower()
+        {
+            _isOn = !_isOn;
+            UpdateUi();
+        }
+
+        // Private methods
+        private void UpdateUi()
+        {
+            GetNode<Label>("FrequencyDisplay").Text = $"{_currentFrequency:F1} MHz";
+            GetNode<Button>("PowerButton").Text = _isOn ? "ON" : "OFF";
+        }
+
+        private void CheckForSignal()
+        {
+            var gameState = GetNode<GameState>("/root/GameState");
+            var signalData = gameState.FindSignalAtFrequency(_currentFrequency);
+            if (signalData != null)
+            {
+                EmitSignal(SignalName.SignalFound, signalData);
+            }
+        }
+    }
+}
 ```
 
 ## Agent Synchronization Workflow
 
 ### Daily Sync Process
+
 1. Start by updating develop:
+
    ```bash
    git checkout develop
    git pull origin develop
    ```
 
 2. Create feature branch:
+
    ```bash
    # For Alpha agent
    git checkout -b feature/alpha/your-feature
@@ -482,7 +580,9 @@ func _check_for_signal() -> void:
    ```
 
 ### Conflict Prevention
+
 1. Check other agent's work:
+
    ```bash
    git fetch origin
    git checkout origin/feature/[alpha|beta]/*
@@ -494,9 +594,11 @@ func _check_for_signal() -> void:
    ```
 
 ### Merge Conflict Resolution
+
 1. Both agents must use the contract validation tool
 2. Conflicts in shared interfaces must be resolved via contract branches
 3. Create a contract resolution branch:
+
    ```bash
    git checkout -b feature/contract/resolve-conflict
    ```
@@ -504,10 +606,11 @@ func _check_for_signal() -> void:
 4. Both agents must approve contract resolution PRs
 
 ### PR Requirements
+
 1. PR title format: `[Alpha|Beta] Feature description`
 2. Required checks for Agent Alpha PRs:
    - All unit and integration tests passing
-   - GDScript type checking passing
+   - C# compilation passing
    - Proper documentation
    - No conflicts with develop
 3. Required checks for Agent Beta PRs:
