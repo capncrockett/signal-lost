@@ -15,7 +15,7 @@ interface RadioTunerProps {
   onFrequencyChange?: (frequency: number) => void;
 }
 
-const ZustandRadioTuner: React.FC<RadioTunerProps> = memo(({
+const ZustandRadioTunerComponent: React.FC<RadioTunerProps> = ({
   initialFrequency = 90.0,
   minFrequency = 88.0,
   maxFrequency = 108.0,
@@ -326,6 +326,9 @@ const ZustandRadioTuner: React.FC<RadioTunerProps> = memo(({
       )}
     </div>
   );
-}));  // Close the memo() call
+};
+
+// Apply memo to the component to prevent unnecessary re-renders
+const ZustandRadioTuner = memo(ZustandRadioTunerComponent);
 
 export default ZustandRadioTuner;
