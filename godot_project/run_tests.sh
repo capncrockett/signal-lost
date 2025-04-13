@@ -86,7 +86,7 @@ if [ ! -d "$DIR/addons/gut" ]; then
 fi
 
 # Run the test runner script
-"$GODOT_EXECUTABLE" --path "$DIR" --script tests/TestRunner.cs
+"$GODOT_EXECUTABLE" --path "$DIR" --script tests/test_runner.gd
 
 # Get the exit code
 EXIT_CODE=$?
