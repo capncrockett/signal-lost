@@ -1,116 +1,103 @@
-# Signal Lost Rewrite: DOM-Based Approach
+# Signal Lost Rewrite: Godot Engine Approach
 
 ## Overview
 
-After evaluating the current state of the Signal Lost game, we've decided to completely rewrite it using a DOM-based approach instead of Phaser. This decision was made due to:
+After evaluating the current state of the Signal Lost game, we've decided to completely rewrite it using the Godot Engine instead of a browser-based approach. This decision was made due to:
 
-1. Difficulties with testing Phaser canvas elements using Playwright
-2. Challenges in mocking Phaser components for unit tests
-3. The disconnect between the UI layer and testing tools
-4. The need for a more maintainable and testable architecture
+1. Performance issues with the browser-based implementation
+2. Infinite render loop in the RadioTuner component
+3. Difficulties with testing browser-based games
+4. The need for a more suitable game development platform
 
 This document outlines the plan for the rewrite, including tasks, timeline, and technical considerations.
 
 ## Previous Implementation Status
 
-The previous Phaser-based implementation achieved:
+The previous browser-based implementation achieved:
 
-- ✅ RadioTuner Component (80%+ test coverage)
-- ✅ SoundscapeManager (95%+ test coverage)
-- ✅ Message Decoder (94%+ test coverage)
-- ✅ SaveManager (100% test coverage)
-- ✅ FieldScene Grid System (tests passing)
-- ✅ Narrative Engine (97%+ test coverage)
-- ✅ Playwright scene load test (implemented)
-- ✅ Playwright console log listener test (implemented)
+- ✅ RadioTuner Component (basic functionality)
+- ✅ Audio System (basic functionality)
+- ✅ Message Decoder (basic functionality)
+- ✅ Basic UI Components
 
-However, we encountered significant challenges with the Field Scene implementation and E2E testing of canvas elements.
+However, we encountered significant challenges with performance, particularly with the RadioTuner component which suffered from an infinite render loop issue that made the game unplayable.
 
 ## Rewrite Goals
 
-1. Create a fully testable game using DOM elements
+1. Create a fully testable game using Godot Engine
 2. Maintain the core gameplay mechanics and narrative
-3. Improve performance and reduce dependencies
+3. Improve performance and stability
 4. Establish a clean, maintainable architecture
 5. Ensure comprehensive test coverage
+6. Enable cross-platform deployment
 
 ## Technical Stack
 
-- **Framework**: React with TypeScript
-- **State Management**: React Context or Redux
-- **Styling**: CSS Modules or Styled Components
-- **Testing**: Jest for unit tests, Playwright for E2E tests
-- **Audio**: Web Audio API
-- **Build**: Vite (keep existing configuration)
+- **Engine**: Godot 4.x
+- **Language**: GDScript
+- **State Management**: Godot's built-in signals and autoloaded singletons
+- **UI**: Godot's Control nodes
+- **Testing**: GUT (Godot Unit Testing)
+- **Audio**: Godot's built-in audio system
+- **Build**: Godot's export system
 
 ## Project Structure
 
 ```
-signal-lost/
-├── src/
-│   ├── components/       # UI components
-│   │   ├── radio/        # Radio tuner components
-│   │   ├── field/        # Field exploration components
-│   │   ├── narrative/    # Narrative display components
-│   │   ├── inventory/    # Inventory components
-│   │   └── common/       # Shared UI components
-│   ├── hooks/            # Custom React hooks
-│   ├── context/          # React context providers
-│   ├── utils/            # Utility functions
-│   ├── audio/            # Audio processing
-│   ├── types/            # TypeScript type definitions
-│   ├── assets/           # Static assets
-│   └── App.tsx           # Main application component
-├── tests/                # Unit and integration tests
-├── e2e/                  # End-to-end tests
-└── public/               # Public assets
+godot_project/
+├── scenes/              # Game scenes
+│   ├── radio/           # Radio tuner scenes
+│   ├── field/           # Field exploration scenes
+│   ├── narrative/       # Narrative display scenes
+│   ├── inventory/       # Inventory scenes
+│   └── ui/              # UI scenes
+├── scripts/             # GDScript files
+│   ├── autoload/        # Autoloaded singletons
+│   ├── utils/           # Utility scripts
+│   ├── audio/           # Audio processing scripts
+│   └── resources/       # Resource scripts
+├── assets/              # Game assets
+│   ├── audio/           # Audio files
+│   ├── images/          # Image files
+│   └── fonts/           # Font files
+├── tests/               # Test scripts
+│   ├── unit/            # Unit tests
+│   └── integration/     # Integration tests
+├── addons/              # Godot addons (e.g., GUT)
+└── project.godot        # Godot project file
 ```
 
 ## Sprint Plan
 
-### Sprint 01: Foundation (Completed)
+### Sprint 01: Godot Migration Foundation (Completed)
 
-1. ✅ Set up new React + TypeScript project
-2. ✅ Establish component architecture
-3. ✅ Create basic layout and navigation
-4. ✅ Set up testing infrastructure
-5. ✅ Implement state management
-6. ✅ Create design system and basic styling
-7. ✅ Implement routing system
-8. ✅ Set up asset management
-9. ✅ Add accessibility features
+1. ✅ Create migration plan for Godot
+2. ✅ Set up initial Godot project structure
+3. ✅ Clean up repository by removing React code
+4. ✅ Update documentation for Godot development
+5. ✅ Create GameState singleton
+6. ✅ Create AudioManager singleton
+7. ✅ Create RadioTuner scene and script
+8. ✅ Set up testing infrastructure
 
-### Sprint 02: Core Game Mechanics (Completed)
+### Sprint 02: Core Game Systems (Current)
 
-1. ✅ Implement radio tuner component
-   - ✅ Frequency dial interaction
-   - ✅ Signal detection
-   - ✅ Static/noise visualization
-2. ✅ Create audio system
-   - ✅ Web Audio API integration
-   - ✅ Noise generation
-   - ✅ Signal processing
-3. ✅ Implement basic narrative system
-   - ✅ Message display
-   - ✅ Progressive decoding
+1. ⬜ Implement radio tuner component
+   - ⬜ Frequency dial interaction
+   - ⬜ Signal detection
+   - ⬜ Static/noise visualization
+2. ⬜ Create audio system
+   - ⬜ Noise generation
+   - ⬜ Signal processing
+   - ⬜ Audio effects
+3. ⬜ Implement basic narrative system
+   - ⬜ Message display
+   - ⬜ Progressive decoding
+4. ⬜ Set up unit testing with GUT
+   - ⬜ Create test runner
+   - ⬜ Write tests for core systems
 
-### Sprint 2.5: Bug Fixes and Workflow Improvement (Current)
-
-1. ⬜ Fix critical bugs in the application
-   - ⬜ Resolve asset loading errors for audio files
-   - ⬜ Fix infinite render loop in RadioTuner component
-   - ⬜ Address memory leaks
-2. ⬜ Improve test infrastructure and coverage
-   - ⬜ Fix failing unit tests
-   - ⬜ Improve test mocks for audio components
-3. ⬜ Clean up code and improve quality
-   - ⬜ Remove unused code and imports
-   - ⬜ Fix TypeScript errors and warnings
-4. ⬜ Enhance agent workflow
-   - ⬜ Clarify responsibilities between Alpha and Beta
-   - ⬜ Improve communication protocols
-
-### Sprint 03: Field Exploration and Inventory (Upcoming)
+### Sprint 03: Game World and Interaction (Upcoming)
 
 1. ⬜ Implement field exploration
    - ⬜ Grid-based movement
@@ -131,81 +118,81 @@ signal-lost/
 5. ⬜ Add sound effects and audio polish
 6. ⬜ Implement accessibility features
 
-### Sprint 05: Testing and Documentation (Upcoming)
+### Sprint 05: Testing and Deployment (Upcoming)
 
 1. ⬜ Write comprehensive unit tests
-2. ⬜ Create E2E tests for critical user flows
+2. ⬜ Create manual test procedures
 3. ⬜ Document codebase
 4. ⬜ Create user documentation
-5. ⬜ Final bug fixes and polish
+5. ⬜ Set up export templates for multiple platforms
+6. ⬜ Final bug fixes and polish
 
 ## Cleanup Plan
 
 ### Phase 1: Initial Setup (Completed)
 
-1. ✅ Create new project structure
-2. ✅ Copy over essential assets
-3. ✅ Set up new testing infrastructure
+1. ✅ Create Godot project structure
+2. ✅ Set up version control for Godot project
+3. ✅ Set up testing infrastructure
 4. ✅ Establish new development workflow
 
-### Phase 2: Code Migration (In Progress)
+### Phase 2: Repository Cleanup (Completed)
 
-1. ✅ Identify reusable logic from current codebase
-2. ⬜ Refactor and migrate core game mechanics
-3. ⬜ Adapt tests for new architecture
-4. ✅ Preserve game data and content
+1. ✅ Remove React source code
+2. ✅ Remove React configuration files
+3. ✅ Remove React testing frameworks
+4. ✅ Update documentation for Godot
 
-### Phase 3: Final Cleanup (Upcoming)
+### Phase 3: Asset Migration (In Progress)
 
-1. ✅ Remove Phaser dependencies
-2. ⬜ Delete unused files and directories
-3. ⬜ Update documentation
-4. ⬜ Archive old codebase for reference
+1. ⬜ Identify reusable assets from current codebase
+2. ⬜ Convert assets to Godot-compatible formats
+3. ⬜ Organize assets in Godot project structure
+4. ⬜ Create new assets as needed
 
 ## Files to Keep
 
 - Game assets (images, audio)
 - Game data (narrative events, items)
-- Core game logic (where applicable)
-- Test fixtures and helpers (where applicable)
-- Documentation
+- Documentation (updated for Godot)
+- Godot project files
 
 ## Files to Remove
 
-- All Phaser-specific code
-- Canvas-based rendering
-- Current UI implementation
-- Phaser-specific tests
-- Unused dependencies
+- All React-specific code (completed)
+- All TypeScript configuration (completed)
+- All browser-based testing frameworks (completed)
+- All build tools for web (completed)
+- All dependencies for web development (completed)
 
 ## Development Workflow
 
-1. Create feature branches from `rewrite-dom-approach`
+1. Create feature branches from `develop`
 2. Implement features with tests
 3. Submit PRs for review
-4. Merge to `rewrite-dom-approach` branch
-5. Once stable, merge to `develop`
+4. Merge to `develop` branch
+5. Once stable, merge to `main`
 
 ## Testing Strategy
 
-1. Unit tests for all components and utilities
+1. Unit tests for all scripts and scenes
 2. Integration tests for feature combinations
-3. E2E tests for critical user flows
-4. Visual regression tests for UI components
-5. Accessibility tests
+3. Manual tests for gameplay and user experience
+4. Performance tests for resource usage
+5. Cross-platform tests for deployment targets
 
 ## Current Status
 
-1. ✅ React project setup completed
-2. ✅ Core components implemented
-3. ✅ Testing patterns established
-4. ✅ Game data and assets migrated
-5. ✅ Foundation sprint completed
+1. ✅ Godot project structure created
+2. ✅ Repository cleaned up
+3. ✅ Documentation updated for Godot
+4. ✅ Core systems designed
+5. ✅ Migration foundation sprint completed
 
 ## Next Steps
 
-1. Implement radio tuner component
-2. Create audio system
+1. Implement radio tuner component in Godot
+2. Create audio system using Godot's audio capabilities
 3. Develop narrative system
-4. Complete Sprint 02 objectives
-5. Prepare for Sprint 03
+4. Set up GUT testing
+5. Complete Sprint 02 objectives
