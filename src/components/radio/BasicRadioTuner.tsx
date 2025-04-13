@@ -24,6 +24,8 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
   maxFrequency = 108.0,
   onFrequencyChange,
 }) => {
+  // Add a console log to track renders for testing
+  console.log('BasicRadioTuner rendering', new Date().toISOString());
   const { state, dispatch } = useGameState();
   const audio = useAudio();
 
@@ -40,9 +42,11 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
   const isMountedRef = useRef<boolean>(true);
   const staticCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Force a re-render without using state
-  const [, updateState] = React.useState<object>({});
-  const forceRender = React.useCallback(() => updateState({}), []);
+  // State for UI updates
+  const [uiState, setUiState] = React.useState<{
+    showMessage: boolean;
+    isScanning: boolean;
+  }>({ showMessage: false, isScanning: false });
 
   // Initialize on mount
   useEffect(() => {
@@ -82,10 +86,9 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
       Math.abs(state.currentFrequency - frequencyRef.current) > 0.01
     ) {
       frequencyRef.current = state.currentFrequency;
-      // Force a re-render
-      forceRender();
+      // We don't need to force a re-render here, as the UI will update on the next render cycle
     }
-  }, [state.currentFrequency, forceRender]);
+  }, [state.currentFrequency]);
 
   // Process frequency changes and update audio
   useEffect(() => {
@@ -142,9 +145,8 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
       audio.playStaticNoise(intensity);
     }
 
-    // DO NOT force a re-render here - this is what causes the infinite loop
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.isRadioOn, state.discoveredFrequencies, audio, dispatch, state.currentFrequency]);
+    // We don't need to force a re-render here
+  }, [state.isRadioOn, state.discoveredFrequencies, audio, dispatch]);
 
   // Draw static visualization with performance optimizations
   useEffect(() => {
@@ -163,9 +165,10 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
 
     // Simple animation function that doesn't cause re-renders
     let animationId: number;
+    let isActive = true; // Flag to track if this effect is still active
 
     const drawStatic = (): void => {
-      if (!isMountedRef.current || !state.isRadioOn) return;
+      if (!isActive || !state.isRadioOn) return;
 
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -173,6 +176,7 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
       // Draw static noise
       const intensity = staticIntensityRef.current * 255;
 
+      // Optimize by drawing larger blocks
       for (let i = 0; i < canvas.width; i += 4) {
         for (let j = 0; j < canvas.height; j += 4) {
           const noiseValue = Math.random() * intensity;
@@ -190,16 +194,17 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
 
     // Cleanup
     return () => {
+      isActive = false; // Mark this effect as inactive
       if (animationId) {
         cancelAnimationFrame(animationId);
       }
     };
-  }, [state.isRadioOn]); // Remove forceRender from dependencies
+  }, [state.isRadioOn]); // Only re-run when radio is turned on/off
 
   // Toggle message display
   const toggleMessage = (): void => {
     showMessageRef.current = !showMessageRef.current;
-    forceRender();
+    setUiState(prev => ({ ...prev, showMessage: showMessageRef.current }));
   };
 
   // Toggle frequency scanning
@@ -230,14 +235,11 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
         if (onFrequencyChange) {
           onFrequencyChange(nextFreq);
         }
-
-        // Force a re-render
-        forceRender();
       }, 300); // Scan speed in milliseconds
     }
 
-    // Force a re-render
-    forceRender();
+    // Update UI state
+    setUiState(prev => ({ ...prev, isScanning: isScanningRef.current }));
   };
 
   // Change frequency by a specific amount
@@ -259,8 +261,7 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
       onFrequencyChange(newFreq);
     }
 
-    // Force a re-render
-    forceRender();
+    // No need to force a re-render as the state update will trigger a render
   };
 
   // Get the current message
@@ -314,6 +315,22 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
             ></div>
           </div>
         </div>
+
+        {/* Signal strength indicator */}
+        <div className="signal-strength-indicator">
+          <div className="signal-strength-label">
+            <span>Signal Strength</span>
+            <span className="signal-strength-value">
+              {Math.round(signalStrengthRef.current * 100)}%
+            </span>
+          </div>
+          <div className="signal-strength-meter">
+            <div
+              className="signal-strength-fill"
+              style={{ width: `${signalStrengthRef.current * 100}%` }}
+            ></div>
+          </div>
+        </div>
       </div>
 
       <div className="tuner-controls">
@@ -337,9 +354,9 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
           className="scan-button"
           disabled={!state.isRadioOn}
           onClick={toggleScanning}
-          aria-label={isScanningRef.current ? 'Stop scanning' : 'Start scanning'}
+          aria-label={uiState.isScanning ? 'Stop scanning' : 'Start scanning'}
         >
-          {isScanningRef.current ? 'Stop Scan' : 'Scan'}
+          {uiState.isScanning ? 'Stop Scan' : 'Scan'}
         </button>
       </div>
 
@@ -350,11 +367,11 @@ const BasicRadioTuner: React.FC<RadioTunerProps> = ({
             className="message-button"
             onClick={toggleMessage}
             disabled={!state.isRadioOn || !currentMessage}
-            aria-label={showMessageRef.current ? 'Hide message' : 'Show message'}
+            aria-label={uiState.showMessage ? 'Hide message' : 'Show message'}
           >
-            {showMessageRef.current ? 'Hide Message' : 'Show Message'}
+            {uiState.showMessage ? 'Hide Message' : 'Show Message'}
           </button>
-          {showMessageRef.current && currentMessage && (
+          {uiState.showMessage && currentMessage && (
             <MessageDisplay message={currentMessage} isVisible={true} />
           )}
         </div>
