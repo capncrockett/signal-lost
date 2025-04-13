@@ -68,7 +68,7 @@ if not exist "%DIR%addons\gut" (
 )
 
 REM Run the test runner script
-"%GODOT_EXECUTABLE%" --path "%DIR%" --script Tests/TestRunner.cs
+"%GODOT_EXECUTABLE%" --path "%DIR%" --script tests/TestRunner.cs
 
 REM Get the exit code
 set EXIT_CODE=%ERRORLEVEL%
