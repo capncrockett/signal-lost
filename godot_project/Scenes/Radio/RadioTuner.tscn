@@ -1,106 +1,102 @@
-# RadioTuner.tscn - Scene Structure
-# This is a placeholder text file describing the scene structure
-# You'll need to create this scene in the Godot Editor
+[gd_scene load_steps=2 format=3 uid="uid://c8yvxg3xnq6yw"]
 
-[gd_scene load_steps=8 format=3 uid="uid://c8q6y7r2n3x4d"]
+[ext_resource type="Script" path="res://Scenes/Radio/RadioTuner.gd" id="1_r3j2k"]
 
-[ext_resource type="Script" path="res://Scripts/RadioTuner.cs" id="1_r3j2k"]
-[ext_resource type="Texture2D" path="res://assets/images/radio/radio_background.png" id="2_a1b2c"]
-[ext_resource type="Texture2D" path="res://assets/images/radio/radio_dial.png" id="3_d4e5f"]
-[ext_resource type="Texture2D" path="res://assets/images/radio/radio_knob.png" id="4_g5h6i"]
-[ext_resource type="Texture2D" path="res://assets/images/radio/static_overlay.png" id="5_j7k8l"]
+[node name="RadioTuner" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_r3j2k")
 
-# Scene Structure:
-# - RadioTuner (Control)
-#   - Background (TextureRect)
-#   - FrequencyDisplay (Label)
-#   - PowerButton (Button)
-#   - FrequencySlider (HSlider)
-#   - SignalStrengthMeter (ProgressBar)
-#   - StaticVisualization (TextureRect)
-#   - MessageContainer (Control)
-#     - MessageButton (Button)
-#     - MessageDisplay (Control)
-#   - ScanButton (Button)
-#   - TuneDownButton (Button)
-#   - TuneUpButton (Button)
-#   - RadioDial (TextureRect)
-#   - RadioKnob (TextureRect)
+[node name="FrequencyDisplay" type="Label" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = 200.0
+offset_bottom = 80.0
+text = "90.0 MHz"
 
-# Node Properties:
-# RadioTuner:
-#   Script: RadioTuner.cs
-#   Size: (800, 600)
-#   MinFrequency: 88.0
-#   MaxFrequency: 108.0
-#   FrequencyStep: 0.1
+[node name="FrequencySlider" type="HSlider" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 100.0
+offset_right = 400.0
+offset_bottom = 130.0
+value = 10.0
 
-# FrequencyDisplay:
-#   Position: (350, 50)
-#   Size: (200, 50)
-#   Text: "90.0 MHz"
-#   Align: Center
+[node name="PowerButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 150.0
+offset_right = 150.0
+offset_bottom = 180.0
+text = "OFF"
 
-# PowerButton:
-#   Position: (50, 50)
-#   Size: (100, 50)
-#   Text: "OFF"
+[node name="SignalStrengthMeter" type="ProgressBar" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 200.0
+offset_right = 400.0
+offset_bottom = 230.0
+value = 50.0
 
-# FrequencySlider:
-#   Position: (100, 150)
-#   Size: (600, 50)
-#   Min: 0
-#   Max: 100
-#   Value: 10
+[node name="StaticVisualization" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 250.0
+offset_right = 400.0
+offset_bottom = 350.0
+color = Color(0.2, 0.2, 0.2, 0.5)
 
-# SignalStrengthMeter:
-#   Position: (100, 250)
-#   Size: (600, 30)
-#   Value: 0
+[node name="MessageContainer" type="Panel" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 50.0
+offset_top = 370.0
+offset_right = 400.0
+offset_bottom = 500.0
 
-# StaticVisualization:
-#   Position: (100, 300)
-#   Size: (600, 200)
-#   Texture: static_overlay.png
-#   Modulate: (1, 1, 1, 0.5)
+[node name="MessageButton" type="Button" parent="MessageContainer"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 150.0
+offset_bottom = 40.0
+text = "Show Message"
 
-# MessageContainer:
-#   Position: (100, 520)
-#   Size: (600, 200)
-#   Visible: false
+[node name="MessageDisplay" type="Label" parent="MessageContainer"]
+visible = false
+layout_mode = 0
+offset_left = 10.0
+offset_top = 50.0
+offset_right = 340.0
+offset_bottom = 120.0
+text = "Message content will appear here."
+autowrap_mode = 3
 
-# MessageButton:
-#   Position: (0, 0)
-#   Size: (200, 50)
-#   Text: "Show Message"
-#   Disabled: true
+[node name="ScanButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 200.0
+offset_top = 150.0
+offset_right = 300.0
+offset_bottom = 180.0
+text = "Scan"
 
-# MessageDisplay:
-#   Position: (0, 60)
-#   Size: (600, 140)
-#   Visible: false
+[node name="TuneDownButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 320.0
+offset_top = 150.0
+offset_right = 350.0
+offset_bottom = 180.0
+text = "<"
 
-# ScanButton:
-#   Position: (650, 50)
-#   Size: (100, 50)
-#   Text: "Scan"
-
-# TuneDownButton:
-#   Position: (100, 100)
-#   Size: (50, 50)
-#   Text: "<"
-
-# TuneUpButton:
-#   Position: (650, 100)
-#   Size: (50, 50)
-#   Text: ">"
-
-# RadioDial:
-#   Position: (100, 150)
-#   Size: (600, 50)
-#   Texture: radio_dial.png
-
-# RadioKnob:
-#   Position: (100, 150)
-#   Size: (50, 50)
-#   Texture: radio_knob.png
+[node name="TuneUpButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 360.0
+offset_top = 150.0
+offset_right = 390.0
+offset_bottom = 180.0
+text = ">"
