@@ -8,9 +8,9 @@ Agent Alpha is the primary developer responsible for implementing new features a
 
 - **Feature Development**: Implement new features and components
 - **Testing**: Write unit and integration tests with at least 80% coverage
-- **Code Quality**: Fix GDScript errors and bugs
+- **Code Quality**: Fix C# errors and bugs
 - **Documentation**: Maintain code documentation and comments
-- **Type Safety**: Ensure proper GDScript type hints usage
+- **Type Safety**: Ensure proper C# type safety
 - **Pull Requests**: Create PRs for feature implementation
 - **Bug Fixes**: Address issues reported by Agent Beta or users
 
@@ -20,7 +20,7 @@ Agent Alpha is the primary developer responsible for implementing new features a
 2. Create feature branch: `git checkout -b feature/alpha/feature-name`
 3. Implement feature with proper tests
 4. Ensure all unit and integration tests pass
-5. Fix any GDScript errors
+5. Fix any C# compilation errors
 6. Create PR for review by Agent Beta
 7. Address feedback from Agent Beta
 8. Merge PR to develop branch
@@ -39,7 +39,7 @@ Agent Beta is responsible for quality assurance, testing, code optimization, and
 - **Issue Reporting**: Report issues and suggest improvements
 - **Pull Requests**: Create PRs for code cleanup and optimization
 - **Documentation**: Update and maintain documentation
-- **GDScript Errors**: Fix GDScript errors in non-feature code
+- **C# Errors**: Fix C# errors in non-feature code
 - **Test Infrastructure**: Improve test infrastructure
 - **Memory Leak Detection**: Identify and document memory leaks
 - **Performance Monitoring**: Add performance monitoring tools
@@ -51,7 +51,7 @@ Agent Beta is responsible for quality assurance, testing, code optimization, and
 3. Write manual tests for new features
 4. Clean up unused code and variables
 5. Ensure consistent code style
-6. Fix GDScript errors in non-feature code
+6. Fix C# errors in non-feature code
 7. Update documentation to reflect current state
 8. Create PR for review by Agent Alpha
 9. Address feedback from Agent Alpha
@@ -63,7 +63,7 @@ Agent Beta is responsible for quality assurance, testing, code optimization, and
 - Improve test infrastructure
 - Clean up unused code and optimize node architecture
 - Document best practices for cross-agent development
-- Fix GDScript errors in non-feature code
+- Fix C# errors in non-feature code
 - Identify and document memory leaks
 - Improve documentation for agent workflow
 - Migrate remaining game concepts to Godot
@@ -80,8 +80,8 @@ Agent Beta is responsible for quality assurance, testing, code optimization, and
 ## Quality Standards
 
 - **Test Coverage**: Maintain at least 80% test coverage across all test domains
-- **Type Safety**: Use GDScript type hints effectively
-- **Code Style**: Follow Godot style guide and maintain consistent code style
+- **Type Safety**: Use C# strong typing effectively
+- **Code Style**: Follow C# coding conventions and Godot C# style guide
 - **Documentation**: Keep documentation up-to-date with implementation changes
 - **Accessibility**: Ensure the game is accessible to all users
 - **Performance**: Optimize rendering and state updates
