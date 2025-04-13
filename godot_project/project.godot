@@ -11,14 +11,14 @@ config_version=5
 [application]
 
 config/name="Signal Lost"
-run/main_scene="res://Scenes/Radio/RadioTuner.tscn"
+run/main_scene="res://MainScene.tscn"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://assets/images/icon.png"
 
 [autoload]
 
-GameState="*res://Scripts/GameState.cs"
-AudioManager="*res://Scripts/AudioManager.cs"
+GameState="*res://scripts/GameStateWrapper.gd"
+AudioManager="*res://scripts/AudioManagerWrapper.gd"
 
 [display]
 
