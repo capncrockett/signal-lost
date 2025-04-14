@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8j6y8o4n8qxv"]
+
+[ext_resource type="PackedScene" uid="uid://c8yvxg3xnq6yw" path="res://Scenes/Radio/RadioTuner.tscn" id="1_r3j2k"]
+
+[node name="MainScene" type="Node"]
+
+[node name="Label" type="Label" parent="."]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 40.0
+text = "Signal Lost - Test Project"
+
+[node name="RadioTuner" parent="." instance=ExtResource("1_r3j2k")]
