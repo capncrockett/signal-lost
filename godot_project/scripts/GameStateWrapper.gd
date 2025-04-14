@@ -2,6 +2,7 @@ extends Node
 
 # This script is a wrapper for the GameState C# class
 # It will be used as an autoload
+# Modified by Agent Beta for testing
 
 var _game_state = null
 
@@ -352,6 +353,17 @@ func reset_message_state(message_id):
 		messages[message_id].Decoded = false
 
 	return true
+
+# Added by Agent Beta for testing
+func get_agent_beta_test_info():
+	print("Agent Beta test function called!")
+	var info = {
+		"agent": "Beta",
+		"role": "QA Developer",
+		"test_time": Time.get_datetime_string_from_system()
+	}
+	print("Test info: ", info)
+	return info
 
 # Create a script with methods to simulate the C# GameState class
 func create_script_with_methods():
