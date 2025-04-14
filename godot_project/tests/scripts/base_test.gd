@@ -1,4 +1,4 @@
-extends GutTest
+extends "res://addons/gut/addons/gut/test.gd"
 class_name BaseTest
 
 # Base class for all tests
@@ -14,11 +14,11 @@ func before_each():
 	_game_state = get_node_or_null("/root/GameState")
 	if _game_state == null:
 		_game_state = get_node_or_null("/root/GameStateWrapper")
-	
+
 	_audio_manager = get_node_or_null("/root/AudioManager")
 	if _audio_manager == null:
 		_audio_manager = get_node_or_null("/root/AudioManagerWrapper")
-	
+
 	# Verify that singletons are available
 	assert_not_null(_game_state, "GameState singleton should be available")
 	assert_not_null(_audio_manager, "AudioManager singleton should be available")
@@ -29,20 +29,20 @@ func after_each():
 	if _game_state:
 		# Reset frequency
 		_game_state.set_frequency(90.0)
-		
+
 		# Turn radio off
 		if _game_state.is_radio_on():
 			_game_state.toggle_radio()
-	
+
 	# Reset audio manager
 	if _audio_manager:
 		# Stop all audio
 		_audio_manager.stop_signal()
 		_audio_manager.stop_static_noise()
-		
+
 		# Reset volume
 		_audio_manager.set_volume(1.0)
-		
+
 		# Unmute
 		if _audio_manager.is_muted():
 			_audio_manager.toggle_mute()
