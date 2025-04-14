@@ -20,8 +20,13 @@ func _ready():
 
 	print("All tests completed!")
 
-	# Exit the application
-	get_tree().quit()
+	# Exit the application with a delay to ensure all processes are completed
+	var timer = Timer.new()
+	add_child(timer)
+	timer.wait_time = 0.5
+	timer.one_shot = true
+	timer.timeout.connect(func(): get_tree().quit(0))
+	timer.start()
 
 func run_basic_tests():
 	print("\nRunning basic tests...")

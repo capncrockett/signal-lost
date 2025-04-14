@@ -19,6 +19,8 @@ func _initialize():
 			return
 		else:
 			print("ERROR: Could not load ComprehensiveTestRunnerScene.tscn")
+			quit(1)
+			return
 
 	# Fallback to GDScript test runner if C# runner is not available
 	print("Falling back to GDScript test runner")
@@ -26,12 +28,32 @@ func _initialize():
 	# Check if GUT is installed
 	if not DirAccess.dir_exists_absolute("res://addons/gut"):
 		print("ERROR: GUT addon not found. Please install it from the Asset Library.")
+		print("Running the install_gut.sh script might fix this issue.")
+		quit(1)
+		return
+
+	# Check if gut.gd exists
+	if not FileAccess.file_exists("res://addons/gut/gut.gd"):
+		print("ERROR: GUT addon is installed but gut.gd is missing.")
+		print("Try reinstalling the GUT addon using the install_gut.sh script.")
 		quit(1)
 		return
 
 	# Create GUT instance
 	var gut_script = load("res://addons/gut/gut.gd")
+	if gut_script == null:
+		print("ERROR: Failed to load GUT script. The file exists but could not be loaded.")
+		print("This might be because the project hasn't been opened in the Godot editor yet.")
+		print("Try opening the project in the Godot editor first.")
+		quit(1)
+		return
+
 	var gut = gut_script.new()
+	if gut == null:
+		print("ERROR: Failed to create GUT instance.")
+		quit(1)
+		return
+
 	get_root().add_child(gut)
 
 	# Configure GUT
@@ -56,6 +78,11 @@ func _initialize():
 
 		print("Tests completed: %d passed, %d failed, %d pending" % [passed, failed, pending])
 
-		# Exit with appropriate code
-		quit(1 if failed > 0 else 0)
+		# Add a timer to ensure all processes are completed before exiting
+		var timer = Timer.new()
+		get_root().add_child(timer)
+		timer.wait_time = 0.5
+		timer.one_shot = true
+		timer.timeout.connect(func(): quit(1 if failed > 0 else 0))
+		timer.start()
 	)
