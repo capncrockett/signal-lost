@@ -165,18 +165,28 @@ func toggle_scanning():
 	# Update UI
 	$ScanButton.text = "Stop Scan" if _is_scanning else "Scan"
 
-# Toggle message display
-func toggle_message():
+## Toggle message display
+func toggle_message() -> void:
 	_show_message = !_show_message
 
-	# Update UI
-	$MessageContainer/MessageDisplay.visible = _show_message
-	$MessageContainer/MessageButton.text = "Hide Message" if _show_message else "Show Message"
+	# Update UI - handle both cached and direct references
+	if _message_display:
+		_message_display.visible = _show_message
+	else:
+		$MessageContainer/MessageDisplay.visible = _show_message
+
+	if _message_button:
+		_message_button.text = "Hide Message" if _show_message else "Show Message"
+	else:
+		$MessageContainer/MessageButton.text = "Hide Message" if _show_message else "Show Message"
 
 	if _show_message and _current_signal_id != null and _game_state:
 		var message = _game_state.get_message(_current_signal_id)
 		if message:
-			$MessageContainer/MessageDisplay.text = message.Content
+			if _message_display:
+				_message_display.text = message.Content
+			else:
+				$MessageContainer/MessageDisplay.text = message.Content
 
 # Update the UI based on current state
 func _update_ui():
@@ -203,14 +213,24 @@ func _update_ui():
 	_tune_down_button.disabled = !_game_state.is_radio_on() or _is_scanning
 	_tune_up_button.disabled = !_game_state.is_radio_on() or _is_scanning
 
-# Update the message button state
-func _update_message_button():
+## Update the message button state
+func _update_message_button() -> void:
 	if not _game_state:
 		return
 
 	var has_message = _current_signal_id != null and _game_state.get_message(_current_signal_id) != null
-	$MessageContainer/MessageButton.disabled = !_game_state.is_radio_on() or !has_message
-	$MessageContainer.visible = has_message
+	var radio_on = _game_state.is_radio_on()
+
+	# Handle both cached and direct references
+	if _message_button:
+		_message_button.disabled = !radio_on or !has_message
+	else:
+		$MessageContainer/MessageButton.disabled = !radio_on or !has_message
+
+	if _message_container:
+		_message_container.visible = has_message
+	else:
+		$MessageContainer.visible = has_message
 
 # Signal handlers
 func _on_power_button_pressed():
