@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://c8yvxg3xnq6yw"]
+[gd_scene load_steps=3 format=3 uid="uid://c8yvxg3xnq6yw"]
 
 [ext_resource type="Script" path="res://Scenes/Radio/RadioTuner.gd" id="1_r3j2k"]
+[ext_resource type="Script" path="res://Scenes/Radio/AudioVisualizer.gd" id="2_yvxpq"]
 
 [node name="RadioTuner" type="Control"]
 layout_mode = 3
@@ -49,7 +50,16 @@ offset_left = 50.0
 offset_top = 250.0
 offset_right = 400.0
 offset_bottom = 350.0
-color = Color(0.2, 0.2, 0.2, 0.5)
+color = Color(0.1, 0.1, 0.1, 1.0)
+script = ExtResource("2_yvxpq")
+num_bars = 32
+bar_width = 4.0
+bar_spacing = 2.0
+min_bar_height = 5.0
+max_bar_height = 80.0
+signal_color = Color(0, 0.8, 0, 1)
+static_color = Color(0.8, 0.8, 0.8, 1)
+background_color = Color(0.1, 0.1, 0.1, 1)
 
 [node name="MessageContainer" type="Panel" parent="."]
 visible = false
