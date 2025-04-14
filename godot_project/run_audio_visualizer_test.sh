@@ -18,7 +18,7 @@ echo "Running Audio Visualizer Test..."
 echo "Project path: $DIR"
 
 # Run the simple audio visualizer test scene
-"$GODOT_EXECUTABLE" --path "$DIR" --headless tests/SimpleAudioVisualizerTestScene.tscn
+"$GODOT_EXECUTABLE" --path "$DIR" --headless tests/AudioVisualizerTestScene.tscn
 
 # Get the exit code
 EXIT_CODE=$?

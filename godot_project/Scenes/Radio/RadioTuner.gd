@@ -33,9 +33,25 @@ var _scan_button: Button = null
 var _tune_down_button: Button = null
 var _tune_up_button: Button = null
 
-# Called when the node enters the scene tree
-func _ready():
-	# Get references to singletons
+## Called when the node enters the scene tree
+func _ready() -> void:
+	# Initialize singleton references
+	_initialize_singletons()
+
+	# Cache node references for better performance
+	_cache_node_references()
+
+	# Create scan timer
+	_create_scan_timer()
+
+	# Connect UI signals
+	_connect_signals()
+
+	# Initialize UI
+	_update_ui()
+
+## Initialize references to singleton nodes
+func _initialize_singletons() -> void:
 	_game_state = get_node_or_null("/root/GameState")
 	if _game_state == null:
 		_game_state = get_node_or_null("/root/GameStateWrapper")
@@ -46,23 +62,59 @@ func _ready():
 
 	print("RadioTuner: GameState = %s, AudioManager = %s" % [_game_state, _audio_manager])
 
-	# Create scan timer
+## Cache node references for better performance
+func _cache_node_references() -> void:
+	_frequency_display = get_node_or_null("FrequencyDisplay")
+	_frequency_slider = get_node_or_null("FrequencySlider")
+	_power_button = get_node_or_null("PowerButton")
+	_signal_strength_meter = get_node_or_null("SignalStrengthMeter")
+	_static_visualization = get_node_or_null("StaticVisualization")
+	_message_container = get_node_or_null("MessageContainer")
+	_message_button = get_node_or_null("MessageContainer/MessageButton") if _message_container else null
+	_message_display = get_node_or_null("MessageContainer/MessageDisplay") if _message_container else null
+	_scan_button = get_node_or_null("ScanButton")
+	_tune_down_button = get_node_or_null("TuneDownButton")
+	_tune_up_button = get_node_or_null("TuneUpButton")
+
+## Create and configure the scan timer
+func _create_scan_timer() -> void:
 	_scan_timer = Timer.new()
-	_scan_timer.wait_time = 0.3  # Scan speed in seconds
+	_scan_timer.wait_time = scan_speed
 	_scan_timer.one_shot = false
 	_scan_timer.timeout.connect(_on_scan_timer_timeout)
 	add_child(_scan_timer)
 
-	# Connect signals
-	$PowerButton.pressed.connect(_on_power_button_pressed)
-	$FrequencySlider.value_changed.connect(_on_frequency_slider_changed)
-	$MessageContainer/MessageButton.pressed.connect(_on_message_button_pressed)
-	$ScanButton.pressed.connect(_on_scan_button_pressed)
-	$TuneDownButton.pressed.connect(_on_tune_down_button_pressed)
-	$TuneUpButton.pressed.connect(_on_tune_up_button_pressed)
+## Connect UI signals to their handlers
+func _connect_signals() -> void:
+	if _power_button:
+		_power_button.pressed.connect(_on_power_button_pressed)
+	else:
+		$PowerButton.pressed.connect(_on_power_button_pressed)
 
-	# Update UI
-	_update_ui()
+	if _frequency_slider:
+		_frequency_slider.value_changed.connect(_on_frequency_slider_changed)
+	else:
+		$FrequencySlider.value_changed.connect(_on_frequency_slider_changed)
+
+	if _message_button:
+		_message_button.pressed.connect(_on_message_button_pressed)
+	else:
+		$MessageContainer/MessageButton.pressed.connect(_on_message_button_pressed)
+
+	if _scan_button:
+		_scan_button.pressed.connect(_on_scan_button_pressed)
+	else:
+		$ScanButton.pressed.connect(_on_scan_button_pressed)
+
+	if _tune_down_button:
+		_tune_down_button.pressed.connect(_on_tune_down_button_pressed)
+	else:
+		$TuneDownButton.pressed.connect(_on_tune_down_button_pressed)
+
+	if _tune_up_button:
+		_tune_up_button.pressed.connect(_on_tune_up_button_pressed)
+	else:
+		$TuneUpButton.pressed.connect(_on_tune_up_button_pressed)
 
 # Process function called every frame
 func _process(delta):
@@ -119,10 +171,16 @@ func _process_frequency():
 	_update_message_button()
 
 # Update the static visualization
-func _update_static_visualization(_delta):
-	var mod_color = $StaticVisualization.modulate
-	mod_color.a = _static_intensity
-	$StaticVisualization.modulate = mod_color
+func _update_static_visualization(_delta: float) -> void:
+	# Update the audio visualizer
+	if _static_visualization and _static_visualization.has_method("set_signal_strength"):
+		_static_visualization.set_signal_strength(_signal_strength)
+		_static_visualization.set_static_intensity(_static_intensity)
+	else:
+		# Fallback to simple visualization if the audio visualizer is not available
+		var mod_color = $StaticVisualization.modulate
+		mod_color.a = _static_intensity
+		$StaticVisualization.modulate = mod_color
 
 # Change the frequency by a specific amount
 func change_frequency(amount):
