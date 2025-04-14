@@ -138,7 +138,8 @@ func get_agent_beta_test_info():
     var info = {
         "agent": "Beta",
         "role": "QA Developer",
-        "test_time": Time.get_datetime_string_from_system()
+        "test_time": Time.get_datetime_string_from_system(),
+        "version": "1.1"
     }
     print("Test info: ", info)
     return info
