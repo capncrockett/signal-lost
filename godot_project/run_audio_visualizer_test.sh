@@ -14,20 +14,19 @@ if [ ! -f "$GODOT_EXECUTABLE" ]; then
 fi
 
 echo "Using Godot executable: $GODOT_EXECUTABLE"
-echo "Running Radio Tuner Integration Test..."
+echo "Running Audio Visualizer Test..."
 echo "Project path: $DIR"
 
-# Run the integration test scene with a timeout
- "$GODOT_EXECUTABLE" --path "$DIR" --headless tests/FullIntegrationTestScene.tscn
+# Run the simple audio visualizer test scene
+"$GODOT_EXECUTABLE" --path "$DIR" --headless tests/SimpleAudioVisualizerTestScene.tscn
 
 # Get the exit code
 EXIT_CODE=$?
 
-
 if [ $EXIT_CODE -eq 0 ]; then
-    echo "Radio Tuner Integration Test completed successfully!"
+    echo "Audio Visualizer Test completed successfully!"
 else
-    echo "Radio Tuner Integration Test failed with exit code $EXIT_CODE"
+    echo "Audio Visualizer Test failed with exit code $EXIT_CODE"
 fi
 
 exit $EXIT_CODE
