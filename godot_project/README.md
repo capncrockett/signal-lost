@@ -44,32 +44,43 @@ The `RadioTuner` scene is the main gameplay element, allowing the player to:
 
 ## Testing
 
-The project uses GUT (Godot Unit Testing) for automated testing. Tests can be run from the terminal using:
+The project uses a custom testing framework for automated testing. Tests can be run from the terminal using:
 
 ```bash
-godot --path /path/to/project --script tests/test_runner.gd
+./run_custom_tests.sh
 ```
 
-Or from within the Godot editor using the GUT panel.
+Or for integration tests:
+
+```bash
+./run_integration_tests.sh
+```
 
 ## Development
 
-1. Install Godot 4.x from [godotengine.org](https://godotengine.org/download)
+1. Install Godot 4.4.1 with Mono/C# support from [godotengine.org](https://godotengine.org/download)
 2. Clone this repository
 3. Open the project in Godot
-4. Install the GUT addon from the Asset Library
+4. Run the project using the provided script: `./run_project.sh`
 
-## Terminal Testing
+## Running the Project
 
-To run tests from the terminal:
+The easiest way to run the project is to use the provided script:
 
 ```bash
-# Run all tests
-godot --path /path/to/project --script tests/test_runner.gd
-
-# Run a specific test
-godot --path /path/to/project -s addons/gut/gut_cmdln.gd -gtest=res://tests/test_radio_tuner.gd
+./run_project.sh
 ```
+
+This will automatically find the Godot executable and run the project.
+
+Alternatively, you can open the project in the Godot editor:
+
+1. Open Godot
+2. Click on "Import" or "Open"
+3. Navigate to the `godot_project` directory
+4. Select the `project.godot` file
+5. Click "Open"
+6. Once the editor is open, click the "Play" button in the top-right corner
 
 ## Building
 
@@ -88,3 +99,14 @@ godot --path /path/to/project --export "Linux/X11" /path/to/output.x86_64
 # Export for Web
 godot --path /path/to/project --export "HTML5" /path/to/output/index.html
 ```
+
+## Troubleshooting
+
+If you encounter any issues:
+
+1. Make sure you have Godot 4.4.1 with Mono/C# support installed
+2. Check that all the required assets are in the correct locations
+3. Try running the project from the Godot editor to see any error messages
+4. Check the console output for any error messages
+5. If you see errors about missing icon.png, make sure the file exists in the assets/images directory
+6. If you see errors about missing audio files, you may need to add your own audio files to the assets/audio directory

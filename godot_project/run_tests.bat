@@ -1,16 +1,60 @@
 @echo off
 REM This script runs all tests for the Signal Lost Godot project
-REM It requires Godot to be installed and available in the PATH
+REM It tries to find Godot in common installation locations
 
 echo Running tests for Signal Lost Godot project...
 
-REM Check if Godot is installed
+REM Try to find Godot executable
+set "GODOT_EXECUTABLE="
+
+REM Check if Godot is in PATH
 where godot >nul 2>nul
-if %ERRORLEVEL% neq 0 (
-    echo Error: Godot is not installed or not in PATH
-    echo Please install Godot from https://godotengine.org/download
-    exit /b 1
+if %ERRORLEVEL% equ 0 (
+    set "GODOT_EXECUTABLE=godot"
+    goto :found_godot
 )
+
+REM Check common installation locations
+if exist "%ProgramFiles%\Godot\Godot.exe" (
+    set "GODOT_EXECUTABLE=%ProgramFiles%\Godot\Godot.exe"
+    goto :found_godot
+)
+
+if exist "%ProgramFiles%\Godot_4.4.1\Godot.exe" (
+    set "GODOT_EXECUTABLE=%ProgramFiles%\Godot_4.4.1\Godot.exe"
+    goto :found_godot
+)
+
+if exist "%ProgramFiles(x86)%\Godot\Godot.exe" (
+    set "GODOT_EXECUTABLE=%ProgramFiles(x86)%\Godot\Godot.exe"
+    goto :found_godot
+)
+
+if exist "%ProgramFiles(x86)%\Godot_4.4.1\Godot.exe" (
+    set "GODOT_EXECUTABLE=%ProgramFiles(x86)%\Godot_4.4.1\Godot.exe"
+    goto :found_godot
+)
+
+REM Check for Godot in the current directory
+if exist "Godot.exe" (
+    set "GODOT_EXECUTABLE=Godot.exe"
+    goto :found_godot
+)
+
+REM Check for Godot in the parent directory
+if exist "..\Godot.exe" (
+    set "GODOT_EXECUTABLE=..\Godot.exe"
+    goto :found_godot
+)
+
+REM Godot not found
+echo Error: Godot executable not found
+echo Please install Godot from https://godotengine.org/download
+echo or specify the path to the Godot executable in the GODOT_EXECUTABLE variable
+exit /b 1
+
+:found_godot
+echo Using Godot executable: %GODOT_EXECUTABLE%
 
 REM Get the directory of this script
 set "DIR=%~dp0"
@@ -24,7 +68,7 @@ if not exist "%DIR%addons\gut" (
 )
 
 REM Run the test runner script
-godot --path "%DIR%" --script Tests/TestRunner.cs
+"%GODOT_EXECUTABLE%" --path "%DIR%" --script tests/test_runner.gd
 
 REM Get the exit code
 set EXIT_CODE=%ERRORLEVEL%
