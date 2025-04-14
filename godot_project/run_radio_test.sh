@@ -17,12 +17,11 @@ echo "Using Godot executable: $GODOT_EXECUTABLE"
 echo "Running Radio Tuner Integration Test..."
 echo "Project path: $DIR"
 
-# Run the integration test scene with a timeout
- "$GODOT_EXECUTABLE" --path "$DIR" --headless tests/FullIntegrationTestScene.tscn
+# Run the integration test scene
+"$GODOT_EXECUTABLE" --path "$DIR" --headless tests/FullIntegrationTestScene.tscn
 
 # Get the exit code
 EXIT_CODE=$?
-
 
 if [ $EXIT_CODE -eq 0 ]; then
     echo "Radio Tuner Integration Test completed successfully!"

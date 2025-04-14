@@ -17,8 +17,8 @@ echo "Using Godot executable: $GODOT_EXECUTABLE"
 echo "Running Audio Visualizer Test..."
 echo "Project path: $DIR"
 
-# Run the simple audio visualizer test scene
-"$GODOT_EXECUTABLE" --path "$DIR" --headless tests/AudioVisualizerTestScene.tscn
+# Run the audio visualizer test scene
+"$GODOT_EXECUTABLE" --path "$DIR" --headless tests/audio_visualizer/SimpleAudioVisualizerTestScene.tscn
 
 # Get the exit code
 EXIT_CODE=$?
