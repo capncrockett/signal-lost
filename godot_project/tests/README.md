@@ -4,10 +4,22 @@ This directory contains tests for the Signal Lost game.
 
 ## Test Structure
 
-- **AudioManagerTests.cs**: Tests for the audio system
-- **GameStateTests.cs**: Tests for the game state management
-- **RadioTunerTests.cs**: Tests for the radio tuner
-- **TestRunner.cs**: Script to run all tests
+### Unit Tests
+
+- **test_game_state.gd**: Tests for the game state management
+- **test_audio_manager.gd**: Tests for the audio system
+- **test_radio_tuner.gd**: Tests for the radio tuner UI
+- **test_audio_visualizer.gd**: Tests for the audio visualizer
+
+### Integration Tests
+
+- **test_radio_tuner_integration.gd**: Tests for the integration between RadioTuner, GameState, and AudioManager
+
+### Test Infrastructure
+
+- **base_test.gd**: Base class for all tests
+- **post_run.gd**: Script executed after all tests have run
+- **GutTestRunner.tscn**: Scene for running all tests
 
 ## Running Tests
 
@@ -15,9 +27,21 @@ This directory contains tests for the Signal Lost game.
 
 - Godot Engine 4.2 or later
 
-### Running Unit Tests
+### Running Tests with GUT
 
-To run the basic unit tests:
+To run all tests using the GUT framework:
+
+```bash
+# On Linux/macOS
+./run_gut_tests.sh
+
+# On Windows
+# Create a run_gut_tests.bat file with similar content
+```
+
+### Running Simple Tests
+
+To run the simple tests without GUT:
 
 ```bash
 # On Linux/macOS
@@ -36,7 +60,19 @@ To run the full integration tests that simulate a user interacting with the radi
 ./run_radio_test.sh
 
 # On Windows
-# (Create a run_radio_test.bat file similar to run_tests.bat but pointing to FullIntegrationTestScene.tscn)
+# Create a run_radio_test.bat file similar to run_tests.bat but pointing to FullIntegrationTestScene.tscn
+```
+
+### Running Audio Visualizer Tests
+
+To run the audio visualizer tests:
+
+```bash
+# On Linux/macOS
+./run_audio_visualizer_test.sh
+
+# On Windows
+# Create a run_audio_visualizer_test.bat file similar to run_tests.bat
 ```
 
 The integration test simulates a complete user workflow:
@@ -53,65 +89,66 @@ The integration test simulates a complete user workflow:
 
 Tests are written using the GUT framework. Each test class should:
 
-1. Inherit from `Test`
-2. Be decorated with `[TestClass]`
-3. Have test methods decorated with `[Test]`
-4. Override `Before()` and `After()` methods for setup and teardown
+1. Inherit from `BaseTest` (which extends `GutTest`)
+2. Implement `before_each()` and `after_each()` methods for setup and teardown if needed
+3. Name test methods with a `test_` prefix
 
 Example:
 
-```csharp
-using Godot;
-using System;
-using GUT;
+```gdscript
+extends BaseTest
 
-namespace SignalLost.Tests
-{
-	[TestClass]
-	public class MyTests : Test
-	{
-		// Called before each test
-		public override void Before()
-		{
-			// Setup code
-		}
+# Unit tests for some feature
 
-		// Called after each test
-		public override void After()
-		{
-			// Teardown code
-		}
+var _my_object = null
 
-		[Test]
-		public void TestSomething()
-		{
-			// Arrange
-			var expected = 42;
+func before_each():
+	# Call parent before_each
+	super.before_each()
 
-			// Act
-			var actual = SomeMethod();
+	# Setup code
+	_my_object = MyClass.new()
+	add_child_autofree(_my_object)
 
-			// Assert
-			AssertEqual(actual, expected, "The method should return 42");
-		}
-	}
-}
+
+func after_each():
+	# Call parent after_each
+	super.after_each()
+
+	# Teardown code
+	if _my_object:
+		_my_object.queue_free()
+		_my_object = null
+
+
+func test_something():
+	# Arrange
+	var expected = 42
+
+	# Act
+	var actual = _my_object.some_method()
+
+	# Assert
+	assert_eq(actual, expected, "The method should return 42")
 ```
 
 ## Assertions
 
 GUT provides several assertion methods:
 
-- `AssertEqual(actual, expected, message)`: Asserts that two values are equal
-- `AssertNotEqual(actual, expected, message)`: Asserts that two values are not equal
-- `AssertTrue(condition, message)`: Asserts that a condition is true
-- `AssertFalse(condition, message)`: Asserts that a condition is false
-- `AssertNull(value, message)`: Asserts that a value is null
-- `AssertNotNull(value, message)`: Asserts that a value is not null
-- `AssertGreater(value, threshold, message)`: Asserts that a value is greater than a threshold
-- `AssertLess(value, threshold, message)`: Asserts that a value is less than a threshold
-- `AssertBetween(value, min, max, message)`: Asserts that a value is between min and max
-- `AssertStringContains(text, search, message)`: Asserts that a string contains a substring
+- `assert_eq(actual, expected, message)`: Asserts that two values are equal
+- `assert_ne(actual, expected, message)`: Asserts that two values are not equal
+- `assert_true(condition, message)`: Asserts that a condition is true
+- `assert_false(condition, message)`: Asserts that a condition is false
+- `assert_null(value, message)`: Asserts that a value is null
+- `assert_not_null(value, message)`: Asserts that a value is not null
+- `assert_gt(value, threshold, message)`: Asserts that a value is greater than a threshold
+- `assert_lt(value, threshold, message)`: Asserts that a value is less than a threshold
+- `assert_between(value, min, max, message)`: Asserts that a value is between min and max
+- `assert_almost_eq(actual, expected, error_margin, message)`: Asserts that two values are almost equal
+- `assert_string_contains(text, search, message)`: Asserts that a string contains a substring
+- `assert_file_exists(path, message)`: Asserts that a file exists
+- `assert_file_does_not_exist(path, message)`: Asserts that a file does not exist
 
 ## Test Coverage
 
@@ -121,3 +158,7 @@ The goal is to maintain at least 80% test coverage across all test domains. This
 2. All edge cases should be tested
 3. All error conditions should be tested
 4. All state changes should be tested
+
+```
+
+```
