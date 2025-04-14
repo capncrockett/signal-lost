@@ -1,0 +1,32 @@
+[gd_scene load_steps=3 format=3 uid="uid://c8yvxg3xnq6yw"]
+
+[ext_resource type="Script" path="res://addons/gut/test_runner.gd" id="1_r3j2k"]
+[ext_resource type="Script" path="res://tests/AudioVisualizerTest.gd" id="2_yvxpq"]
+
+[node name="AudioVisualizerTestScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TestRunner" type="Node" parent="."]
+script = ExtResource("1_r3j2k")
+include_subdirectories = true
+inner_class_prefix = "Test_"
+script_name = "AudioVisualizerTest.gd"
+test_script_prefixes = PackedStringArray("test_", "tests/", "res://tests/")
+unit_test_name = "AudioVisualizerTest.gd"
+double_strategy = 1
+export_path = "res://test_results.xml"
+inner_class = ""
+log_level = 1
+should_exit = true
+should_exit_on_success = true
+should_maximize = true
+yield_between_tests = true
+yield_time = 1.0
+
+[node name="AudioVisualizerTest" type="Node" parent="."]
+script = ExtResource("2_yvxpq")
