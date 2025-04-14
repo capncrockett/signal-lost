@@ -108,10 +108,10 @@ func find_signal_at_frequency(freq: float):
 func calculate_signal_strength(freq: float, signal_data) -> float:
     if signal_data == null:
         return 0.0
-        
+
     var distance = abs(freq - signal_data.Frequency)
     var max_distance = signal_data.Bandwidth
-    
+
     # Calculate strength based on how close we are to the exact frequency
     # 1.0 = perfect signal, 0.0 = no signal
     if distance <= max_distance:
@@ -130,3 +130,15 @@ func get_message(message_id: String):
     if _messages.has(message_id):
         return _messages[message_id]
     return null
+
+# Added by Agent Beta for testing
+func get_agent_beta_test_info():
+    print("Agent Beta test function called!")
+    var info = {
+        "agent": "Beta",
+        "role": "QA Developer",
+        "test_time": Time.get_datetime_string_from_system(),
+        "version": "1.1"
+    }
+    print("Test info: ", info)
+    return info
