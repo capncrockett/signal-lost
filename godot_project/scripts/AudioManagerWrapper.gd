@@ -8,10 +8,23 @@ var _audio_manager = null
 func _ready():
 	print("AudioManagerWrapper is initializing...")
 
-	# Since we can't directly instantiate C# scripts from GDScript,
-	# we'll create a dummy implementation for testing
+	# Try to get the C# AudioManager if it exists as an autoload
+	var audio_manager_autoload = get_node_or_null("/root/AudioManager")
+	if audio_manager_autoload:
+		print("Found AudioManager autoload, using it")
+		_audio_manager = audio_manager_autoload
+		return
 
-	# Create a basic object to simulate AudioManager
+	# Try to instantiate the C# AudioManager class
+	if ClassDB.class_exists("SignalLost.AudioManager"):
+		print("Found AudioManager class, instantiating it")
+		_audio_manager = Node.new()
+		_audio_manager.set_script(load("res://scripts/AudioManager.cs"))
+		add_child(_audio_manager)
+		return
+
+	# Fallback to dummy implementation for testing
+	print("Creating dummy AudioManager for testing")
 	_audio_manager = Node.new()
 	_audio_manager.name = "AudioManager"
 	add_child(_audio_manager)
@@ -43,43 +56,119 @@ func _ready():
 
 # Forward methods to the C# instance
 func set_volume(vol):
-	if _audio_manager:
-		_audio_manager.SetVolume(vol)
+	# Use a simple fallback approach
+	if _audio_manager == null:
+		return false
+
+	# Try direct method call
+	if _audio_manager.has_method("SetVolume"):
+		_audio_manager.call("SetVolume", vol)
 		return true
-	return false
+
+	# Fallback - directly set the property
+	_audio_manager.set("_volume", vol)
+	return true
 
 func toggle_mute():
-	if _audio_manager:
-		_audio_manager.ToggleMute()
+	# Use a simple fallback approach
+	if _audio_manager == null:
+		return false
+
+	# Try direct method call
+	if _audio_manager.has_method("ToggleMute"):
+		_audio_manager.call("ToggleMute")
 		return true
-	return false
+
+	# Fallback - directly toggle the property
+	var is_muted = _audio_manager.get("_isMuted")
+	if is_muted != null:
+		_audio_manager.set("_isMuted", !is_muted)
+	else:
+		_audio_manager.set("_isMuted", true)
+	return true
 
 func play_static_noise(intensity):
-	if _audio_manager:
-		_audio_manager.PlayStaticNoise(intensity)
+	# Use a simple fallback approach
+	if _audio_manager == null:
+		return false
+
+	# Try direct method call
+	if _audio_manager.has_method("PlayStaticNoise"):
+		_audio_manager.call("PlayStaticNoise", intensity)
 		return true
-	return false
+
+	# Fallback - directly play the static player
+	var static_player = _audio_manager.get("_staticPlayer")
+	if static_player and static_player is AudioStreamPlayer:
+		static_player.stop()
+		static_player.play()
+	return true
 
 func stop_static_noise():
-	if _audio_manager:
-		_audio_manager.StopStaticNoise()
+	# Use a simple fallback approach
+	if _audio_manager == null:
+		return false
+
+	# Try direct method call
+	if _audio_manager.has_method("StopStaticNoise"):
+		_audio_manager.call("StopStaticNoise")
 		return true
-	return false
+
+	# Fallback - directly stop the static player
+	var static_player = _audio_manager.get("_staticPlayer")
+	if static_player and static_player is AudioStreamPlayer:
+		static_player.stop()
+	return true
 
 func play_signal(frequency, volume_scale = 1.0, waveform = "sine"):
-	return _audio_manager.PlaySignal(frequency, volume_scale, waveform) if _audio_manager else null
+	# Use a simple fallback approach
+	if _audio_manager == null:
+		return null
+
+	# Try direct method call
+	if _audio_manager.has_method("PlaySignal"):
+		return _audio_manager.call("PlaySignal", frequency, volume_scale, waveform)
+
+	# Fallback - directly play the signal player
+	var signal_player = _audio_manager.get("_signalPlayer")
+	if signal_player and signal_player is AudioStreamPlayer:
+		signal_player.stop()
+		signal_player.play()
+		return true
+	return null
 
 func stop_signal():
-	if _audio_manager:
-		_audio_manager.StopSignal()
+	# Use a simple fallback approach
+	if _audio_manager == null:
+		return false
+
+	# Try direct method call
+	if _audio_manager.has_method("StopSignal"):
+		_audio_manager.call("StopSignal")
 		return true
-	return false
+
+	# Fallback - directly stop the signal player
+	var signal_player = _audio_manager.get("_signalPlayer")
+	if signal_player and signal_player is AudioStreamPlayer:
+		signal_player.stop()
+	return true
 
 func play_effect(effect_name):
-	if _audio_manager:
-		_audio_manager.PlayEffect(effect_name)
+	# Use a simple fallback approach
+	if _audio_manager == null:
+		return false
+
+	# Try direct method call
+	if _audio_manager.has_method("PlayEffect"):
+		_audio_manager.call("PlayEffect", effect_name)
 		return true
-	return false
+
+	# Fallback - directly play the effect player
+	var effect_player = _audio_manager.get("_effectPlayer")
+	if effect_player and effect_player is AudioStreamPlayer:
+		effect_player.stop()
+		effect_player.play()
+	return true
 
 # Create a script with methods to simulate the C# AudioManager class
 func create_script_with_methods():

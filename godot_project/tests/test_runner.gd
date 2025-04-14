@@ -6,11 +6,19 @@ extends SceneTree
 func _initialize():
 	print("Starting GDScript test runner...")
 
-	# Load and run the C# test runner
-	var cs_runner = load("res://tests/TestRunner.cs")
-	if cs_runner:
-		print("Using C# test runner")
-		return
+	# Try to load the C# test runner
+	# Note: We can't directly instantiate C# scripts from GDScript
+	# So we'll check if the class exists in the global scope
+	if ClassDB.class_exists("SignalLost.Tests.TestRunner"):
+		print("C# TestRunner class found, but we can't instantiate it directly from GDScript")
+		# Instead, we'll run the ComprehensiveTestRunner which can work with both C# and GDScript
+		var scene = load("res://tests/ComprehensiveTestRunnerScene.tscn")
+		if scene:
+			var instance = scene.instantiate()
+			get_root().add_child(instance)
+			return
+		else:
+			print("ERROR: Could not load ComprehensiveTestRunnerScene.tscn")
 
 	# Fallback to GDScript test runner if C# runner is not available
 	print("Falling back to GDScript test runner")
@@ -44,7 +52,7 @@ func _initialize():
 		var failed = gut.get_fail_count()
 		var passed = gut.get_pass_count()
 		var pending = gut.get_pending_count()
-		var total = failed + passed + pending
+		var _total = failed + passed + pending
 
 		print("Tests completed: %d passed, %d failed, %d pending" % [passed, failed, pending])
 

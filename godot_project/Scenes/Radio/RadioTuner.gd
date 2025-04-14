@@ -20,16 +20,23 @@ var _audio_manager = null
 # Called when the node enters the scene tree
 func _ready():
 	# Get references to singletons
-	_game_state = get_node("/root/GameState")
-	_audio_manager = get_node("/root/AudioManager")
-	
+	_game_state = get_node_or_null("/root/GameState")
+	if _game_state == null:
+		_game_state = get_node_or_null("/root/GameStateWrapper")
+
+	_audio_manager = get_node_or_null("/root/AudioManager")
+	if _audio_manager == null:
+		_audio_manager = get_node_or_null("/root/AudioManagerWrapper")
+
+	print("RadioTuner: GameState = %s, AudioManager = %s" % [_game_state, _audio_manager])
+
 	# Create scan timer
 	_scan_timer = Timer.new()
 	_scan_timer.wait_time = 0.3  # Scan speed in seconds
 	_scan_timer.one_shot = false
 	_scan_timer.timeout.connect(_on_scan_timer_timeout)
 	add_child(_scan_timer)
-	
+
 	# Connect signals
 	$PowerButton.pressed.connect(_on_power_button_pressed)
 	$FrequencySlider.value_changed.connect(_on_frequency_slider_changed)
@@ -37,7 +44,7 @@ func _ready():
 	$ScanButton.pressed.connect(_on_scan_button_pressed)
 	$TuneDownButton.pressed.connect(_on_tune_down_button_pressed)
 	$TuneUpButton.pressed.connect(_on_tune_up_button_pressed)
-	
+
 	# Update UI
 	_update_ui()
 
@@ -52,23 +59,23 @@ func _process(delta):
 func _process_frequency():
 	if not _game_state:
 		return
-		
+
 	var signal_data = _game_state.find_signal_at_frequency(_game_state.get_current_frequency())
-	
+
 	if signal_data:
 		# Calculate signal strength
 		_signal_strength = _game_state.calculate_signal_strength(_game_state.get_current_frequency(), signal_data)
-		
+
 		# Calculate static intensity
 		_static_intensity = 1.0 - _signal_strength
-		
+
 		# Update UI
 		$SignalStrengthMeter.value = _signal_strength * 100
 		_current_signal_id = signal_data.MessageId
-		
+
 		# Add to discovered frequencies
 		_game_state.add_discovered_frequency(signal_data.Frequency)
-		
+
 		# Play audio
 		if _audio_manager:
 			if signal_data.IsStatic:
@@ -82,73 +89,73 @@ func _process_frequency():
 		_static_intensity = _game_state.get_static_intensity(_game_state.get_current_frequency())
 		_signal_strength = 0.1
 		_current_signal_id = null
-		
+
 		# Update UI
 		$SignalStrengthMeter.value = _signal_strength * 100
-		
+
 		# Play audio
 		if _audio_manager:
 			_audio_manager.stop_signal()
 			_audio_manager.play_static_noise(_static_intensity)
-	
+
 	# Update message button state
 	_update_message_button()
 
 # Update the static visualization
-func _update_static_visualization(delta):
-	var modulate = $StaticVisualization.modulate
-	modulate.a = _static_intensity
-	$StaticVisualization.modulate = modulate
+func _update_static_visualization(_delta):
+	var mod_color = $StaticVisualization.modulate
+	mod_color.a = _static_intensity
+	$StaticVisualization.modulate = mod_color
 
 # Change the frequency by a specific amount
 func change_frequency(amount):
 	if not _game_state:
 		return
-		
+
 	var new_freq = _game_state.get_current_frequency() + amount
 	new_freq = clamp(new_freq, min_frequency, max_frequency)
-	
+
 	_game_state.set_frequency(new_freq)
 
 # Toggle the radio power
 func toggle_power():
 	if not _game_state:
 		return
-		
+
 	_game_state.toggle_radio()
-	
+
 	if not _game_state.is_radio_on():
 		# Stop all audio when radio is turned off
 		if _audio_manager:
 			_audio_manager.stop_signal()
 			_audio_manager.stop_static_noise()
-		
+
 		# Stop scanning if active
 		if _is_scanning:
 			toggle_scanning()
-	
+
 	_update_ui()
 
 # Toggle frequency scanning
 func toggle_scanning():
 	_is_scanning = !_is_scanning
-	
+
 	if _is_scanning and _game_state and _game_state.is_radio_on():
 		_scan_timer.start()
 	else:
 		_scan_timer.stop()
-	
+
 	# Update UI
 	$ScanButton.text = "Stop Scan" if _is_scanning else "Scan"
 
 # Toggle message display
 func toggle_message():
 	_show_message = !_show_message
-	
+
 	# Update UI
 	$MessageContainer/MessageDisplay.visible = _show_message
 	$MessageContainer/MessageButton.text = "Hide Message" if _show_message else "Show Message"
-	
+
 	if _show_message and _current_signal_id != null and _game_state:
 		var message = _game_state.get_message(_current_signal_id)
 		if message:
@@ -158,23 +165,23 @@ func toggle_message():
 func _update_ui():
 	if not _game_state:
 		return
-		
+
 	# Update frequency display
 	$FrequencyDisplay.text = "%.1f MHz" % _game_state.get_current_frequency()
-	
+
 	# Update power button
 	$PowerButton.text = "ON" if _game_state.is_radio_on() else "OFF"
-	
+
 	# Update frequency slider
 	var percentage = (_game_state.get_current_frequency() - min_frequency) / (max_frequency - min_frequency)
 	$FrequencySlider.value = percentage * 100
-	
+
 	# Update message button
 	_update_message_button()
-	
+
 	# Update scan button
 	$ScanButton.text = "Stop Scan" if _is_scanning else "Scan"
-	
+
 	# Update tune buttons
 	$TuneDownButton.disabled = !_game_state.is_radio_on() or _is_scanning
 	$TuneUpButton.disabled = !_game_state.is_radio_on() or _is_scanning
@@ -183,7 +190,7 @@ func _update_ui():
 func _update_message_button():
 	if not _game_state:
 		return
-		
+
 	var has_message = _current_signal_id != null and _game_state.get_message(_current_signal_id) != null
 	$MessageContainer/MessageButton.disabled = !_game_state.is_radio_on() or !has_message
 	$MessageContainer.visible = has_message
@@ -195,7 +202,7 @@ func _on_power_button_pressed():
 func _on_frequency_slider_changed(value):
 	if not _game_state:
 		return
-		
+
 	var freq = min_frequency + (value / 100.0) * (max_frequency - min_frequency)
 	_game_state.set_frequency(freq)
 
@@ -215,9 +222,9 @@ func _on_scan_timer_timeout():
 	if _is_scanning and _game_state and _game_state.is_radio_on():
 		# Increment frequency by step
 		var new_freq = _game_state.get_current_frequency() + frequency_step
-		
+
 		# If we reach the max frequency, loop back to min
 		if new_freq > max_frequency:
 			new_freq = min_frequency
-		
+
 		_game_state.set_frequency(new_freq)
