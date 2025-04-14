@@ -1,21 +1,37 @@
 extends Control
 
-# Radio tuner properties
+## Radio tuner properties
 @export var min_frequency: float = 88.0
 @export var max_frequency: float = 108.0
 @export var frequency_step: float = 0.1
+@export var scan_speed: float = 0.3  # Scan speed in seconds
+@export var process_frequency_interval: int = 60  # Process frequency every 60 frames
 
-# Local state
+## Local state
 var _is_scanning: bool = false
 var _show_message: bool = false
 var _current_signal_id = null
 var _signal_strength: float = 0.0
 var _static_intensity: float = 0.5
-var _scan_timer = null
+var _scan_timer: Timer = null
+var _last_process_time: int = 0
 
-# References to singletons
+## References to singletons
 var _game_state = null
 var _audio_manager = null
+
+## Cached node references
+var _frequency_display: Label = null
+var _frequency_slider: HSlider = null
+var _power_button: Button = null
+var _signal_strength_meter: ProgressBar = null
+var _static_visualization: ColorRect = null
+var _message_container: Panel = null
+var _message_button: Button = null
+var _message_display: Label = null
+var _scan_button: Button = null
+var _tune_down_button: Button = null
+var _tune_up_button: Button = null
 
 # Called when the node enters the scene tree
 func _ready():
@@ -118,8 +134,8 @@ func change_frequency(amount):
 
 	_game_state.set_frequency(new_freq)
 
-# Toggle the radio power
-func toggle_power():
+## Toggle the radio power
+func toggle_power() -> void:
 	if not _game_state:
 		return
 
@@ -181,11 +197,11 @@ func _update_ui():
 	_update_message_button()
 
 	# Update scan button
-	$ScanButton.text = "Stop Scan" if _is_scanning else "Scan"
+	_scan_button.text = "Stop Scan" if _is_scanning else "Scan"
 
 	# Update tune buttons
-	$TuneDownButton.disabled = !_game_state.is_radio_on() or _is_scanning
-	$TuneUpButton.disabled = !_game_state.is_radio_on() or _is_scanning
+	_tune_down_button.disabled = !_game_state.is_radio_on() or _is_scanning
+	_tune_up_button.disabled = !_game_state.is_radio_on() or _is_scanning
 
 # Update the message button state
 func _update_message_button():
