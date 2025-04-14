@@ -17,7 +17,7 @@ config/icon="res://assets/images/icon.png"
 
 [autoload]
 
-GameState="*res://scripts/GameStateWrapper.gd"
+GameState="*res://scripts/FixedGameState.gd"
 AudioManager="*res://scripts/AudioManagerWrapper.gd"
 
 [display]

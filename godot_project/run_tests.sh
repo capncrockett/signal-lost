@@ -32,6 +32,11 @@ find_godot() {
         return 0
     fi
 
+    if [ -d "/Applications/Godot_mono.app" ]; then
+        echo "/Applications/Godot_mono.app/Contents/MacOS/Godot"
+        return 0
+    fi
+
     # Check for Godot in the current directory
     if [ -f "./Godot" ]; then
         echo "./Godot"
@@ -85,9 +90,9 @@ if [ ! -d "$DIR/addons/gut" ]; then
     "$DIR/install_gut.sh"
 fi
 
-# Run the simple GDScript test scene
-echo "Running simple GDScript test scene..."
-"$GODOT_EXECUTABLE" --path "$DIR" tests/SimpleGDScriptTestScene.tscn
+# Run the simple test scene
+echo "Running simple test scene..."
+"$GODOT_EXECUTABLE" --path "$DIR" --headless tests/SimpleTestScene.tscn
 
 # Get the exit code
 EXIT_CODE=$?

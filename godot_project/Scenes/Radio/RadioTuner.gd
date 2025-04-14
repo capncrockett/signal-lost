@@ -51,8 +51,9 @@ func _ready():
 # Process function called every frame
 func _process(delta):
 	if _game_state and _game_state.is_radio_on():
-		# Process frequency
-		_process_frequency()
+		# Process frequency - only once per second to avoid excessive processing
+		if Engine.get_process_frames() % 60 == 0:
+			_process_frequency()
 		_update_static_visualization(delta)
 
 # Process the current frequency

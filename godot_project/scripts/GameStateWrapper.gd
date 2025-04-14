@@ -91,6 +91,11 @@ func set_frequency(freq):
 
 	# Fallback to property setting
 	_game_state.set("CurrentFrequency", freq)
+
+	# Emit signal to notify listeners
+	if _game_state.has_signal("FrequencyChanged"):
+		_game_state.emit_signal("FrequencyChanged", freq)
+
 	return true
 
 func toggle_radio():
@@ -106,6 +111,11 @@ func toggle_radio():
 	# Fallback to property toggling
 	var is_on = is_radio_on()
 	_game_state.set("IsRadioOn", !is_on)
+
+	# Emit signal to notify listeners
+	if _game_state.has_signal("RadioToggled"):
+		_game_state.emit_signal("RadioToggled", !is_on)
+
 	return true
 
 func find_signal_at_frequency(freq):
@@ -117,13 +127,35 @@ func find_signal_at_frequency(freq):
 	if _game_state.has_method("FindSignalAtFrequency"):
 		return _game_state.call("FindSignalAtFrequency", freq)
 
-	# Fallback - simulate a signal at 91.5 MHz
-	if abs(freq - 91.5) < 0.2:
+	# Fallback - simulate signals at specific frequencies
+	if abs(freq - 91.5) < 0.3:
+		print("Found signal at 91.5")
 		return {
 			"Frequency": 91.5,
-			"Name": "Test Signal",
+			"Name": "Test Signal 1",
+			"IsStatic": true,
+			"MessageId": "msg_001",
+			"Bandwidth": 0.3
+		}
+
+	if abs(freq - 95.7) < 0.2:
+		print("Found signal at 95.7")
+		return {
+			"Frequency": 95.7,
+			"Name": "Test Signal 2",
 			"IsStatic": false,
-			"MessageId": "msg_001"
+			"MessageId": "msg_002",
+			"Bandwidth": 0.2
+		}
+
+	if abs(freq - 103.2) < 0.4:
+		print("Found signal at 103.2")
+		return {
+			"Frequency": 103.2,
+			"Name": "Test Signal 3",
+			"IsStatic": true,
+			"MessageId": "msg_003",
+			"Bandwidth": 0.4
 		}
 
 	return null
@@ -139,9 +171,14 @@ func calculate_signal_strength(freq, signal_data):
 
 	# Fallback - calculate based on distance
 	var distance = abs(freq - signal_data.Frequency)
-	if distance > 0.5:
+	var max_distance = signal_data.Bandwidth if "Bandwidth" in signal_data else 0.5
+
+	# Calculate strength based on how close we are to the exact frequency
+	# 1.0 = perfect signal, 0.0 = no signal
+	if distance <= max_distance:
+		return 1.0 - (distance / max_distance)
+	else:
 		return 0.0
-	return 1.0 - (distance * 2.0)
 
 func get_static_intensity(freq):
 	# Use a simple fallback approach
