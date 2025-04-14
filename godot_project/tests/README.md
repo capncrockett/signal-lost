@@ -58,34 +58,34 @@ using GUT;
 
 namespace SignalLost.Tests
 {
-    [TestClass]
-    public class MyTests : Test
-    {
-        // Called before each test
-        public override void Before()
-        {
-            // Setup code
-        }
+	[TestClass]
+	public class MyTests : Test
+	{
+		// Called before each test
+		public override void Before()
+		{
+			// Setup code
+		}
 
-        // Called after each test
-        public override void After()
-        {
-            // Teardown code
-        }
+		// Called after each test
+		public override void After()
+		{
+			// Teardown code
+		}
 
-        [Test]
-        public void TestSomething()
-        {
-            // Arrange
-            var expected = 42;
-            
-            // Act
-            var actual = SomeMethod();
-            
-            // Assert
-            AssertEqual(actual, expected, "The method should return 42");
-        }
-    }
+		[Test]
+		public void TestSomething()
+		{
+			// Arrange
+			var expected = 42;
+			
+			// Act
+			var actual = SomeMethod();
+			
+			// Assert
+			AssertEqual(actual, expected, "The method should return 42");
+		}
+	}
 }
 ```
 
