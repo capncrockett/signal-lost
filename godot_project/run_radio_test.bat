@@ -4,8 +4,8 @@ setlocal enabledelayedexpansion
 REM Get the directory of this script
 set "DIR=%~dp0"
 
-REM Find the Godot executable
-set "GODOT_EXECUTABLE=C:\Program Files\Godot\Godot_v4.2.exe"
+REM Set the Godot executable path
+set "GODOT_EXECUTABLE=C:\Godot_v4.4.1-stable_mono_win64\Godot_v4.4.1-stable_mono_win64\Godot_v4.4.1-stable_mono_win64_console.exe"
 
 REM Check if Godot executable exists
 if not exist "%GODOT_EXECUTABLE%" (

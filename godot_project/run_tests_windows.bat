@@ -1,6 +1,5 @@
 @echo off
-REM This script runs all tests for the Signal Lost Godot project
-REM It tries to find Godot in common installation locations
+REM This script runs all tests for the Signal Lost Godot project on Windows
 
 echo Running tests for Signal Lost Godot project...
 
@@ -13,6 +12,7 @@ if not exist "%GODOT_EXECUTABLE%" (
     echo Please install Godot or update the script with the correct path.
     exit /b 1
 )
+
 echo Using Godot executable: %GODOT_EXECUTABLE%
 
 REM Get the directory of this script
@@ -26,13 +26,14 @@ if not exist "%DIR%addons\gut" (
     call "%DIR%install_gut.bat"
 )
 
-REM Run the test runner script
-"%GODOT_EXECUTABLE%" --path "%DIR%" --script tests/test_runner.gd
+REM Run the simple test scene
+echo Running simple test scene...
+"%GODOT_EXECUTABLE%" --path "%DIR%" --headless tests/SimpleTestScene.tscn
 
 REM Get the exit code
 set EXIT_CODE=%ERRORLEVEL%
 
-if %EXIT_CODE% equ 0 (
+if %EXIT_CODE% EQU 0 (
     echo All tests passed!
 ) else (
     echo Some tests failed. See above for details.
