@@ -14,23 +14,10 @@ This directory contains tests for the Signal Lost game.
 ### Prerequisites
 
 - Godot Engine 4.2 or later
-- GUT (Godot Unit Testing) addon
 
-### Installation
+### Running Unit Tests
 
-The GUT addon will be automatically installed when running the tests. If you want to install it manually, run:
-
-```bash
-# On Linux/macOS
-./install_gut.sh
-
-# On Windows
-install_gut.bat
-```
-
-### Running Tests
-
-To run all tests:
+To run the basic unit tests:
 
 ```bash
 # On Linux/macOS
@@ -39,6 +26,28 @@ To run all tests:
 # On Windows
 run_tests.bat
 ```
+
+### Running Integration Tests
+
+To run the full integration tests that simulate a user interacting with the radio tuner:
+
+```bash
+# On Linux/macOS
+./run_radio_test.sh
+
+# On Windows
+# (Create a run_radio_test.bat file similar to run_tests.bat but pointing to FullIntegrationTestScene.tscn)
+```
+
+The integration test simulates a complete user workflow:
+
+1. Turn the radio on
+2. Set the initial frequency
+3. Scan for signals
+4. Fine-tune the frequency
+5. Check signal strength
+6. Decode messages
+7. Turn the radio off
 
 ## Writing Tests
 
@@ -78,10 +87,10 @@ namespace SignalLost.Tests
 		{
 			// Arrange
 			var expected = 42;
-			
+
 			// Act
 			var actual = SomeMethod();
-			
+
 			// Assert
 			AssertEqual(actual, expected, "The method should return 42");
 		}
