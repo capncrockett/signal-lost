@@ -37,30 +37,30 @@ namespace SignalLost
             _staticPlayer = new AudioStreamPlayer();
             _signalPlayer = new AudioStreamPlayer();
             _effectPlayer = new AudioStreamPlayer();
-            
+
             // Add to scene tree
             AddChild(_staticPlayer);
             AddChild(_signalPlayer);
             AddChild(_effectPlayer);
-            
+
             // Set up audio buses
             _masterBusIdx = AudioServer.GetBusIndex("Master");
-            
+
             // Create static bus
             AudioServer.AddBus();
             _staticBusIdx = AudioServer.GetBusCount() - 1;
             AudioServer.SetBusName(_staticBusIdx, "Static");
             AudioServer.SetBusSend(_staticBusIdx, "Master");
-            
+
             // Create signal bus
             AudioServer.AddBus();
             _signalBusIdx = AudioServer.GetBusCount() - 1;
             AudioServer.SetBusName(_signalBusIdx, "Signal");
             AudioServer.SetBusSend(_signalBusIdx, "Master");
-            
+
             // Set up effects
             SetupAudioEffects();
-            
+
             // Set initial volume
             SetVolume(_volume);
         }
@@ -73,13 +73,13 @@ namespace SignalLost
             eq.SetBandGainDb(0, -5.0f);  // Reduce low frequencies
             eq.SetBandGainDb(1, 2.0f);   // Boost mid-low frequencies
             AudioServer.AddBusEffect(_staticBusIdx, eq);
-            
+
             // Add distortion to static bus
             var distortion = new AudioEffectDistortion();
-            distortion.Mode = AudioEffectDistortion.ModeEnum.Bitcrush;
+            distortion.Mode = AudioEffectDistortion.ModeEnum.Lofi; // Changed from Bitcrush to Lofi
             distortion.Drive = 0.2f;
             AudioServer.AddBusEffect(_staticBusIdx, distortion);
-            
+
             // Add reverb to signal bus
             var reverb = new AudioEffectReverb();
             reverb.Wet = 0.1f;
@@ -93,20 +93,20 @@ namespace SignalLost
             var noiseGenerator = new AudioStreamGenerator();
             noiseGenerator.MixRate = 44100;
             noiseGenerator.BufferLength = 0.1f;  // 100ms buffer
-            
+
             AudioStreamGeneratorPlayback playback;
             _staticPlayer.Stream = noiseGenerator;
             _staticPlayer.Play();
             playback = (AudioStreamGeneratorPlayback)_staticPlayer.GetStreamPlayback();
-            
+
             // Fill the buffer with noise
             var bufferSize = (int)(noiseGenerator.BufferLength * noiseGenerator.MixRate);
             var random = new Random();
-            
+
             for (int i = 0; i < bufferSize; i++)
             {
                 float sample = 0.0f;
-                
+
                 switch (_currentNoiseType)
                 {
                     case NoiseType.White:
@@ -114,14 +114,14 @@ namespace SignalLost
                         break;
                     case NoiseType.Pink:
                         // Simple approximation of pink noise
-                        sample = (float)((random.NextDouble() * 2.0 - 1.0) * 0.7 + 
-                                        (random.NextDouble() * 2.0 - 1.0) * 0.2 + 
+                        sample = (float)((random.NextDouble() * 2.0 - 1.0) * 0.7 +
+                                        (random.NextDouble() * 2.0 - 1.0) * 0.2 +
                                         (random.NextDouble() * 2.0 - 1.0) * 0.1);
                         break;
                     case NoiseType.Brown:
                         // Simple approximation of brown noise
-                        sample = (float)((random.NextDouble() * 2.0 - 1.0) * 0.5 + 
-                                        (random.NextDouble() * 2.0 - 1.0) * 0.3 + 
+                        sample = (float)((random.NextDouble() * 2.0 - 1.0) * 0.5 +
+                                        (random.NextDouble() * 2.0 - 1.0) * 0.3 +
                                         (random.NextDouble() * 2.0 - 1.0) * 0.2);
                         break;
                     case NoiseType.Digital:
@@ -129,13 +129,13 @@ namespace SignalLost
                         sample = (float)(Math.Round(random.NextDouble()) * 2.0 - 1.0);
                         break;
                 }
-                
+
                 // Apply intensity
                 sample *= intensity;
-                
+
                 playback.PushFrame(new Vector2(sample, sample));
             }
-            
+
             return noiseGenerator;
         }
 
@@ -146,7 +146,7 @@ namespace SignalLost
             {
                 _staticPlayer.Stop();
             }
-            
+
             var noiseStream = GenerateNoiseStream(intensity);
             _staticPlayer.Stream = noiseStream;
             _staticPlayer.Bus = "Static";
@@ -167,27 +167,27 @@ namespace SignalLost
             {
                 _signalPlayer.Stop();
             }
-            
+
             var generator = new AudioStreamGenerator();
             generator.MixRate = 44100;
             generator.BufferLength = 0.1f;  // 100ms buffer
-            
+
             _signalPlayer.Stream = generator;
             _signalPlayer.Bus = "Signal";
             _signalPlayer.VolumeDb = Mathf.LinearToDb(volumeScale * _volume);
             _signalPlayer.Play();
-            
+
             var playback = (AudioStreamGeneratorPlayback)_signalPlayer.GetStreamPlayback();
-            
+
             // Fill the buffer with the waveform
             var bufferSize = (int)(generator.BufferLength * generator.MixRate);
             float phase = 0.0f;
             float increment = frequency / generator.MixRate;
-            
+
             for (int i = 0; i < bufferSize; i++)
             {
                 float sample = 0.0f;
-                
+
                 // Generate different waveforms
                 switch (waveform)
                 {
@@ -205,14 +205,14 @@ namespace SignalLost
                         sample = 2.0f * (phase % 1.0f) - 1.0f;
                         break;
                 }
-                
+
                 // Apply volume scale
                 sample *= volumeScale;
-                
+
                 playback.PushFrame(new Vector2(sample, sample));
                 phase += increment;
             }
-            
+
             return generator;
         }
 
@@ -227,7 +227,7 @@ namespace SignalLost
         {
             var effectPath = "res://assets/audio/" + effectName + ".wav";
             var effect = GD.Load<AudioStream>(effectPath);
-            
+
             if (effect != null)
             {
                 _effectPlayer.Stream = effect;

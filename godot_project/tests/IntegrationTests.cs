@@ -130,8 +130,7 @@ namespace SignalLost.Tests
             // Verify slider position updates
             float sliderValue = (float)_radioTuner.GetNode<Slider>("FrequencySlider").Value;
             float expectedValue = (_gameState.CurrentFrequency - 88.0f) / (108.0f - 88.0f) * 100;
-            AssertEqual(sliderValue, expectedValue, 0.1f,
-                "Slider position should reflect current frequency");
+            AssertEqual(sliderValue, expectedValue, "Slider position should reflect current frequency", 0.1f);
 
             // Change frequency via RadioTuner
             _radioTuner.Call("ChangeFrequency", 0.5f);
@@ -239,8 +238,7 @@ namespace SignalLost.Tests
             }
 
             // Verify we found the signal
-            AssertEqual(_gameState.CurrentFrequency, 91.5f, 0.1f,
-                "Scanning should stop at or near the signal frequency");
+            AssertEqual(_gameState.CurrentFrequency, 91.5f, "Scanning should stop at or near the signal frequency", 0.1f);
 
             // Verify the signal was discovered
             AssertGreater(_gameState.DiscoveredFrequencies.Count, initialCount,

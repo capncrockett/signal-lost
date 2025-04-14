@@ -28,7 +28,7 @@ namespace SignalLost.Tests
 		}
 
 		// Test volume setting
-		[Test]
+		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 		public void TestSetVolume()
 		{
 			// Arrange
@@ -43,7 +43,7 @@ namespace SignalLost.Tests
 		}
 
 		// Test volume limits
-		[Test]
+		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 		public void TestVolumeLimits()
 		{
 			// Arrange
@@ -66,7 +66,7 @@ namespace SignalLost.Tests
 		}
 
 		// Test mute toggle
-		[Test]
+		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 		public void TestToggleMute()
 		{
 			// Arrange
@@ -88,11 +88,12 @@ namespace SignalLost.Tests
 		}
 
 		// Test noise type setting
-		[Test]
+		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 		public void TestSetNoiseType()
 		{
 			// Arrange
-			AudioManager.NoiseType initialType = (AudioManager.NoiseType)_audioManager.Get("_currentNoiseType");
+			var initialTypeVariant = _audioManager.Get("_currentNoiseType");
+			AudioManager.NoiseType initialType = (AudioManager.NoiseType)(int)initialTypeVariant;
 			AudioManager.NoiseType newType = AudioManager.NoiseType.Pink;
 
 			// Act
@@ -106,7 +107,7 @@ namespace SignalLost.Tests
 		}
 
 		// Test static noise playback
-		[Test]
+		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 		public void TestPlayStaticNoise()
 		{
 			// Arrange
@@ -127,7 +128,7 @@ namespace SignalLost.Tests
 		}
 
 		// Test signal playback
-		[Test]
+		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 		public void TestPlaySignal()
 		{
 			// Arrange
@@ -150,7 +151,7 @@ namespace SignalLost.Tests
 		}
 
 		// Test different waveforms
-		[Test]
+		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 		public void TestDifferentWaveforms()
 		{
 			// Arrange
@@ -180,7 +181,7 @@ namespace SignalLost.Tests
 		}
 
 		// Test effect playback
-		[Test]
+		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 		public void TestPlayEffect()
 		{
 			// This test is more complex because it requires actual audio files
