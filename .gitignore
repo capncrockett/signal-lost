@@ -49,3 +49,6 @@ builds/
 
 # Godot-specific UID files
 *.uid
+
+# Temporary directories
+temp_gut/

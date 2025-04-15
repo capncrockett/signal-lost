@@ -80,22 +80,24 @@ godot_project/
 7. ✅ Create RadioTuner scene and script
 8. ✅ Set up testing infrastructure
 
-### Sprint 02: Core Game Systems (Current)
+### Sprint 02: Core Game Systems (Completed)
 
-1. ⬜ Implement radio tuner component
-   - ⬜ Frequency dial interaction
-   - ⬜ Signal detection
-   - ⬜ Static/noise visualization
-2. ⬜ Create audio system
-   - ⬜ Noise generation
-   - ⬜ Signal processing
-   - ⬜ Audio effects
-3. ⬜ Implement basic narrative system
-   - ⬜ Message display
-   - ⬜ Progressive decoding
-4. ⬜ Set up unit testing with GUT
-   - ⬜ Create test runner
-   - ⬜ Write tests for core systems
+1. ✅ Implement radio tuner component
+   - ✅ Frequency dial interaction
+   - ✅ Signal detection
+   - ✅ Static/noise visualization
+2. ✅ Create audio system
+   - ✅ Noise generation
+   - ✅ Signal processing
+   - ✅ Audio effects
+3. ✅ Implement basic narrative system
+   - ✅ Message display
+   - ✅ Progressive decoding
+4. ✅ Set up unit testing with GUT
+   - ✅ Create test runner
+   - ✅ Write tests for core systems
+5. ✅ Fix C# test framework and build errors
+6. ✅ Fix test runner hanging issues
 
 ### Sprint 03: Game World and Interaction (Upcoming)
 
@@ -186,13 +188,17 @@ godot_project/
 1. ✅ Godot project structure created
 2. ✅ Repository cleaned up
 3. ✅ Documentation updated for Godot
-4. ✅ Core systems designed
+4. ✅ Core systems designed and implemented
 5. ✅ Migration foundation sprint completed
+6. ✅ Core game systems sprint completed
+7. ✅ Testing infrastructure set up and working
+8. ✅ C# test framework fixed and operational
+9. ✅ Test runner hanging issues resolved
 
 ## Next Steps
 
-1. Implement radio tuner component in Godot
-2. Create audio system using Godot's audio capabilities
-3. Develop narrative system
-4. Set up GUT testing
-5. Complete Sprint 02 objectives
+1. Implement field exploration mechanics
+2. Create inventory system
+3. Connect field exploration with radio signals
+4. Develop game progression mechanics
+5. Complete Sprint 03 objectives

@@ -2,6 +2,7 @@ extends Node
 
 # This script is a wrapper for the GameState C# class
 # It will be used as an autoload
+# Modified by Agent Beta for testing
 
 var _game_state = null
 
@@ -127,36 +128,59 @@ func find_signal_at_frequency(freq):
 	if _game_state.has_method("FindSignalAtFrequency"):
 		return _game_state.call("FindSignalAtFrequency", freq)
 
-	# Fallback - simulate signals at specific frequencies
-	if abs(freq - 91.5) < 0.3:
-		print("Found signal at 91.5")
-		return {
+	# Define all available signals
+	var signals = [
+		{
 			"Frequency": 91.5,
-			"Name": "Test Signal 1",
+			"Name": "Emergency Broadcast",
 			"IsStatic": true,
 			"MessageId": "msg_001",
-			"Bandwidth": 0.3
-		}
-
-	if abs(freq - 95.7) < 0.2:
-		print("Found signal at 95.7")
-		return {
+			"Bandwidth": 0.3,
+			"Content": "EMERGENCY ALERT: This is an emergency broadcast. All citizens must evacuate to designated shelters immediately. This is not a drill."
+		},
+		{
 			"Frequency": 95.7,
-			"Name": "Test Signal 2",
+			"Name": "Military Communication",
 			"IsStatic": false,
 			"MessageId": "msg_002",
-			"Bandwidth": 0.2
-		}
-
-	if abs(freq - 103.2) < 0.4:
-		print("Found signal at 103.2")
-		return {
+			"Bandwidth": 0.2,
+			"Content": "MILITARY TRANSMISSION: Perimeter breach in sector 7. All units converge on coordinates 35.12, -106.54. Containment protocol alpha in effect."
+		},
+		{
 			"Frequency": 103.2,
-			"Name": "Test Signal 3",
+			"Name": "Survivor Message",
 			"IsStatic": true,
 			"MessageId": "msg_003",
-			"Bandwidth": 0.4
+			"Bandwidth": 0.4,
+			"Content": "If anyone can hear this... we're holed up in the old mining facility. Food and water running low. The things outside... they're getting closer. Please send help."
+		},
+		{
+			"Frequency": 88.3,
+			"Name": "Research Facility",
+			"IsStatic": true,
+			"MessageId": "msg_004",
+			"Bandwidth": 0.25,
+			"Content": "Lab log 37: The specimens are showing increased aggression. Containment protocols failing. If you're receiving this, stay away from the research facility. I repeat, stay away!"
+		},
+		{
+			"Frequency": 107.1,
+			"Name": "Automated Weather System",
+			"IsStatic": false,
+			"MessageId": "msg_005",
+			"Bandwidth": 0.35,
+			"Content": "AUTOMATED WEATHER ALERT: Severe atmospheric disturbance detected. Unusual radiation levels. Seek shelter immediately. This message will repeat."
 		}
+	]
+
+	# Check each signal to see if we're within its bandwidth
+	for i in range(signals.size()):
+		var signal_data = signals[i]
+		var distance = abs(freq - signal_data.Frequency)
+		if distance < signal_data.Bandwidth:
+			# Only print if we're very close to the exact frequency
+			if distance < 0.05:
+				print("Found signal at %s: %s" % [signal_data.Frequency, signal_data.Name])
+			return signal_data
 
 	return null
 
@@ -169,16 +193,29 @@ func calculate_signal_strength(freq, signal_data):
 	if _game_state.has_method("CalculateSignalStrength"):
 		return _game_state.call("CalculateSignalStrength", freq, signal_data)
 
-	# Fallback - calculate based on distance
+	# Fallback - calculate based on distance with a more realistic curve
 	var distance = abs(freq - signal_data.Frequency)
 	var max_distance = signal_data.Bandwidth if "Bandwidth" in signal_data else 0.5
 
-	# Calculate strength based on how close we are to the exact frequency
-	# 1.0 = perfect signal, 0.0 = no signal
-	if distance <= max_distance:
-		return 1.0 - (distance / max_distance)
-	else:
+	# No signal if we're outside the bandwidth
+	if distance > max_distance:
 		return 0.0
+
+	# Calculate strength based on how close we are to the exact frequency
+	# using a quadratic curve for more realistic falloff
+	# 1.0 = perfect signal, 0.0 = no signal
+	var normalized_distance = distance / max_distance
+
+	# Add some randomness to simulate atmospheric interference
+	var interference = randf() * 0.1 # Up to 10% interference
+
+	# Quadratic falloff (1 - x²) gives a more natural curve
+	var strength = 1.0 - (normalized_distance * normalized_distance)
+
+	# Apply interference
+	strength = max(0.0, strength - interference)
+
+	return strength
 
 func get_static_intensity(freq):
 	# Use a simple fallback approach
@@ -189,9 +226,33 @@ func get_static_intensity(freq):
 	if _game_state.has_method("GetStaticIntensity"):
 		return _game_state.call("GetStaticIntensity", freq)
 
-	# Fallback - generate a pseudo-random value
-	var hash_val = hash(str(freq))
-	return (hash_val % 100) / 100.0
+	# Check if we're near any signal
+	var min_static = 1.0
+	var signals = [
+		{"Frequency": 91.5, "Bandwidth": 0.3},
+		{"Frequency": 95.7, "Bandwidth": 0.2},
+		{"Frequency": 103.2, "Bandwidth": 0.4},
+		{"Frequency": 88.3, "Bandwidth": 0.25},
+		{"Frequency": 107.1, "Bandwidth": 0.35}
+	]
+
+	# Check each signal to find the minimum static level
+	for i in range(signals.size()):
+		var signal_data = signals[i]
+		var distance = abs(freq - signal_data.Frequency)
+
+		# If we're within the bandwidth, calculate static based on distance
+		if distance < signal_data.Bandwidth:
+			var normalized_distance = distance / signal_data.Bandwidth
+			var signal_static = normalized_distance * normalized_distance
+			min_static = min(min_static, signal_static)
+
+	# Add some randomness to the static
+	var base_static = 0.3 # Minimum static level even with perfect tuning
+	var random_factor = randf() * 0.2 # Up to 20% random variation
+
+	# Combine base static, signal-based static, and random factor
+	return base_static + (min_static * 0.7) + random_factor
 
 func add_discovered_frequency(freq):
 	# Use a simple fallback approach
@@ -249,8 +310,24 @@ func get_message(message_id):
 		messages = {}
 		_game_state.set("Messages", messages)
 
+	# If message doesn't exist, create it with content from the signal data
 	if not message_id in messages:
-		messages[message_id] = {"Decoded": false, "Content": "Test message content"}
+		# Find the signal with this message ID
+		var content = "No message found"
+		var signals = [
+			{"MessageId": "msg_001", "Content": "EMERGENCY ALERT: This is an emergency broadcast. All citizens must evacuate to designated shelters immediately. This is not a drill."},
+			{"MessageId": "msg_002", "Content": "MILITARY TRANSMISSION: Perimeter breach in sector 7. All units converge on coordinates 35.12, -106.54. Containment protocol alpha in effect."},
+			{"MessageId": "msg_003", "Content": "If anyone can hear this... we're holed up in the old mining facility. Food and water running low. The things outside... they're getting closer. Please send help."},
+			{"MessageId": "msg_004", "Content": "Lab log 37: The specimens are showing increased aggression. Containment protocols failing. If you're receiving this, stay away from the research facility. I repeat, stay away!"},
+			{"MessageId": "msg_005", "Content": "AUTOMATED WEATHER ALERT: Severe atmospheric disturbance detected. Unusual radiation levels. Seek shelter immediately. This message will repeat."}
+		]
+
+		for i in range(signals.size()):
+			if signals[i].MessageId == message_id:
+				content = signals[i].Content
+				break
+
+		messages[message_id] = {"Decoded": false, "Content": content}
 
 	return messages[message_id]
 
@@ -276,6 +353,17 @@ func reset_message_state(message_id):
 		messages[message_id].Decoded = false
 
 	return true
+
+# Added by Agent Beta for testing
+func get_agent_beta_test_info():
+	print("Agent Beta test function called!")
+	var info = {
+		"agent": "Beta",
+		"role": "QA Developer",
+		"test_time": Time.get_datetime_string_from_system()
+	}
+	print("Test info: ", info)
+	return info
 
 # Create a script with methods to simulate the C# GameState class
 func create_script_with_methods():

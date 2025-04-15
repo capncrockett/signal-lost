@@ -8,10 +8,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Create the addons directory if it doesn't exist
 mkdir -p "$DIR/addons"
 
-# Check if GUT is already installed
+# Remove existing GUT installation if it exists
 if [ -d "$DIR/addons/gut" ]; then
-    echo "GUT is already installed."
-    exit 0
+    echo "Removing existing GUT installation..."
+    rm -rf "$DIR/addons/gut"
 fi
 
 # Clone the GUT repository

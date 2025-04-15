@@ -90,12 +90,34 @@ if [ ! -d "$DIR/addons/gut" ]; then
     "$DIR/install_gut.sh"
 fi
 
-# Run the simple test scene
-echo "Running simple test scene..."
-"$GODOT_EXECUTABLE" --path "$DIR" --headless tests/SimpleTestScene.tscn
+# Run the simple test scene directly instead of using GUT
+echo "Running tests using SimpleTestScene.tscn..."
 
-# Get the exit code
-EXIT_CODE=$?
+# Use a background process with a timeout for macOS compatibility
+"$GODOT_EXECUTABLE" --path "$DIR" tests/SimpleTestScene.tscn &
+GODOT_PID=$!
+
+# Wait for up to 60 seconds
+wait_time=0
+while [ $wait_time -lt 60 ]; do
+    if ! kill -0 $GODOT_PID 2>/dev/null; then
+        # Process has completed
+        wait $GODOT_PID
+        EXIT_CODE=$?
+        break
+    fi
+    sleep 1
+    wait_time=$((wait_time + 1))
+done
+
+# If we've waited the full time, kill the process
+if [ $wait_time -ge 60 ]; then
+    echo "Test execution timed out after 60 seconds."
+    echo "This might indicate that the tests are hanging or not exiting properly."
+    kill -9 $GODOT_PID 2>/dev/null
+    EXIT_CODE=1  # Consider timeout as an error
+fi
+
 
 if [ $EXIT_CODE -eq 0 ]; then
     echo "All tests passed!"

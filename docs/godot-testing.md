@@ -13,8 +13,17 @@
 ## GUT (Godot Unit Testing) Setup
 
 - Tests run in Godot
-- Run: `./godot_project/run_tests.sh` (Linux/macOS) or `.\godot_project\run_tests.bat` (Windows)
+- Run: `./godot_project/run_tests.sh` (Linux/macOS) or `.\godot_project\run_tests_windows.bat` (Windows)
 - Run specific tests: `godot --path godot_project --script tests/test_runner.gd`
+- Run C# tests: `cd godot_project && dotnet test`
+
+### Test Scripts
+
+- `run_tests_windows.bat` - Runs all GDScript tests
+- `run_radio_test_windows.bat` - Runs radio-specific tests
+- `run_integration_tests.bat` - Runs integration tests
+- `run_audio_visualizer_test.sh` - Runs audio visualizer tests
+- `run_custom_tests.bat` - Runs custom tests
 
 ```gdscript
 # Example test
@@ -38,16 +47,53 @@ func test_radio_tuner_frequency_change():
 
 ---
 
+## C# Testing
+
+For C# tests, we use MSTest framework:
+
+```csharp
+using Godot;
+using System;
+using GUT;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace SignalLost.Tests
+{
+    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
+    public partial class RadioTunerTests : Test
+    {
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+        public void TestFrequencyChange()
+        {
+            // Arrange
+            var radioTuner = new RadioTuner();
+            radioTuner.CurrentFrequency = 90.0f;
+            
+            // Act
+            radioTuner.ChangeFrequency(0.1f);
+            
+            // Assert
+            AssertEqual(radioTuner.CurrentFrequency, 90.1f, "Frequency should be 90.1 after increasing by 0.1");
+        }
+    }
+}
+```
+
+---
+
 ## Terminal Testing
 
 Run tests from the terminal for CI/CD integration:
 
 ```bash
-# Run all tests
+# Run all GDScript tests
 godot --path /path/to/project --script tests/test_runner.gd
 
 # Run specific test
 godot --path /path/to/project -s addons/gut/gut_cmdln.gd -gtest=res://tests/test_radio_tuner.gd
+
+# Run C# tests
+cd godot_project && dotnet test
 ```
 
 ---
@@ -69,9 +115,14 @@ godot_project/
     │   ├── test_radio_tuner.gd  # Tests for RadioTuner
     │   ├── test_game_state.gd   # Tests for GameState
     │   └── test_audio_manager.gd # Tests for AudioManager
-    └── integration/             # Integration tests
-        ├── test_radio_narrative.gd # Tests for radio and narrative integration
-        └── test_game_flow.gd    # Tests for game flow
+    ├── integration/             # Integration tests
+    │   ├── test_radio_narrative.gd # Tests for radio and narrative integration
+    │   └── test_game_flow.gd    # Tests for game flow
+    ├── audio_visualizer/        # Audio visualizer tests
+    │   └── SimpleAudioVisualizerTestScene.tscn # Test scene for audio visualizer
+    └── agent_beta/              # Agent Beta tests
+        ├── AgentBetaTestScene.tscn # Test scene for Agent Beta
+        └── AgentBetaModificationTestScene.tscn # Test scene for Agent Beta modifications
 ```
 
 ---
@@ -99,6 +150,8 @@ godot_project/
 6. **Use Clear Names**: Test names should describe what is being tested
 7. **Clean Up**: Always clean up resources after tests
 8. **Isolate Tests**: Tests should not depend on each other
+9. **Add Timeouts**: Ensure tests don't hang by adding timeouts
+10. **Force Exit**: Use force_exit.gd to ensure tests exit properly
 
 ---
 
