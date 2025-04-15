@@ -270,7 +270,7 @@ namespace SignalLost.Tests
 				// We'll just test that the method doesn't crash
 
 				// Arrange
-				float frequency = 440.0f;
+				// We don't need frequency for this test since we're not actually playing audio
 				float volumeScale = 0.8f;
 
 				// Act - we'll skip the actual audio playback
@@ -308,7 +308,7 @@ namespace SignalLost.Tests
 				// We'll just test that the method doesn't crash
 
 				// Arrange
-				float frequency = 440.0f;
+				// We don't need frequency for this test since we're not actually playing audio
 
 				// Act - we'll skip the actual audio playback
 				// Test different waveforms by setting noise type instead
