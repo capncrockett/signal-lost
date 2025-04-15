@@ -1,5 +1,6 @@
 using Godot;
 
+[GlobalClass]
 namespace SignalLost
 {
     public partial class RadioTuner : Control
@@ -7,10 +8,10 @@ namespace SignalLost
         // Radio tuner properties
         [Export]
         public float MinFrequency { get; set; } = 88.0f;
-        
+
         [Export]
         public float MaxFrequency { get; set; } = 108.0f;
-        
+
         [Export]
         public float FrequencyStep { get; set; } = 0.1f;
 
@@ -61,7 +62,7 @@ namespace SignalLost
 
             // Initialize UI
             UpdateUi();
-            
+
             // Connect signals
             _powerButton.Pressed += OnPowerButtonPressed;
             _frequencySlider.ValueChanged += OnFrequencySliderChanged;
@@ -69,11 +70,11 @@ namespace SignalLost
             _scanButton.Pressed += OnScanButtonPressed;
             _tuneDownButton.Pressed += OnTuneDownButtonPressed;
             _tuneUpButton.Pressed += OnTuneUpButtonPressed;
-            
+
             // Connect to GameState signals
             _gameState.FrequencyChanged += OnFrequencyChanged;
             _gameState.RadioToggled += OnRadioToggled;
-            
+
             // Create scan timer
             _scanTimer = new Timer();
             _scanTimer.WaitTime = 0.3f;  // Scan speed in seconds
@@ -100,7 +101,7 @@ namespace SignalLost
                 {
                     TogglePower();
                 }
-                
+
                 // Process frequency and update audio/visuals
                 ProcessFrequency();
                 UpdateStaticVisualization((float)delta);
@@ -111,25 +112,25 @@ namespace SignalLost
         private void ProcessFrequency()
         {
             var signalData = _gameState.FindSignalAtFrequency(_gameState.CurrentFrequency);
-            
+
             if (signalData != null)
             {
                 // Calculate signal strength based on how close we are to the exact frequency
                 _signalStrength = _gameState.CalculateSignalStrength(_gameState.CurrentFrequency, signalData);
-                
+
                 // Calculate static intensity based on signal strength
                 _staticIntensity = signalData.IsStatic ? 1.0f - _signalStrength : (1.0f - _signalStrength) * 0.5f;
-                
+
                 // Update UI
                 _signalStrengthMeter.Value = _signalStrength * 100;
                 _currentSignalId = signalData.MessageId;
-                
+
                 // If this is a new signal discovery, add it to discovered frequencies
                 if (!_gameState.DiscoveredFrequencies.Contains(signalData.Frequency))
                 {
                     _gameState.AddDiscoveredFrequency(signalData.Frequency);
                 }
-                
+
                 // Play appropriate audio
                 if (signalData.IsStatic)
                 {
@@ -148,20 +149,20 @@ namespace SignalLost
             {
                 // No signal found, just play static
                 float intensity = _gameState.GetStaticIntensity(_gameState.CurrentFrequency);
-                
+
                 // Update state
                 _staticIntensity = intensity;
                 _signalStrength = 0.1f;  // Low signal strength
                 _currentSignalId = null;
-                
+
                 // Update UI
                 _signalStrengthMeter.Value = _signalStrength * 100;
-                
+
                 // Play audio
                 _audioManager.StopSignal();
                 _audioManager.PlayStaticNoise(intensity);
             }
-            
+
             // Update message button state
             UpdateMessageButton();
         }
@@ -182,7 +183,7 @@ namespace SignalLost
             float newFreq = _gameState.CurrentFrequency + amount;
             newFreq = Mathf.Clamp(newFreq, MinFrequency, MaxFrequency);
             newFreq = Mathf.Snapped(newFreq, FrequencyStep);  // Round to nearest step
-            
+
             _gameState.SetFrequency(newFreq);
         }
 
@@ -196,7 +197,7 @@ namespace SignalLost
         private void ToggleScanning()
         {
             _isScanning = !_isScanning;
-            
+
             if (_isScanning && _gameState.IsRadioOn)
             {
                 _scanTimer.Start();
@@ -205,7 +206,7 @@ namespace SignalLost
             {
                 _scanTimer.Stop();
             }
-            
+
             // Update UI
             _scanButton.Text = _isScanning ? "Stop Scan" : "Scan";
         }
@@ -214,11 +215,11 @@ namespace SignalLost
         private void ToggleMessage()
         {
             _showMessage = !_showMessage;
-            
+
             // Update UI
             _messageDisplay.Visible = _showMessage;
             _messageButton.Text = _showMessage ? "Hide Message" : "Show Message";
-            
+
             if (_showMessage && _currentSignalId != null)
             {
                 var message = _gameState.GetMessage(_currentSignalId);
@@ -236,20 +237,20 @@ namespace SignalLost
         {
             // Update frequency display
             _frequencyDisplay.Text = $"{_gameState.CurrentFrequency:F1} MHz";
-            
+
             // Update power button
             _powerButton.Text = _gameState.IsRadioOn ? "ON" : "OFF";
-            
+
             // Update frequency slider
             float percentage = (_gameState.CurrentFrequency - MinFrequency) / (MaxFrequency - MinFrequency);
             _frequencySlider.Value = percentage * 100;
-            
+
             // Update message button
             UpdateMessageButton();
-            
+
             // Update scan button
             _scanButton.Text = _isScanning ? "Stop Scan" : "Scan";
-            
+
             // Update tune buttons
             _tuneDownButton.Disabled = !_gameState.IsRadioOn || _isScanning;
             _tuneUpButton.Disabled = !_gameState.IsRadioOn || _isScanning;
@@ -302,13 +303,13 @@ namespace SignalLost
             {
                 // Increment frequency by step
                 float newFreq = _gameState.CurrentFrequency + FrequencyStep;
-                
+
                 // If we reach the max frequency, loop back to min
                 if (newFreq > MaxFrequency)
                 {
                     newFreq = MinFrequency;
                 }
-                
+
                 _gameState.SetFrequency(newFreq);
             }
         }
@@ -325,14 +326,14 @@ namespace SignalLost
                 // Stop all audio when radio is turned off
                 _audioManager.StopSignal();
                 _audioManager.StopStaticNoise();
-                
+
                 // Stop scanning if active
                 if (_isScanning)
                 {
                     ToggleScanning();
                 }
             }
-            
+
             UpdateUi();
         }
     }
