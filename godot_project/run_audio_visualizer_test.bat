@@ -1,5 +1,5 @@
 @echo off
-REM Run C# tests for the Signal Lost project
+REM Run Audio Visualizer tests for the Signal Lost project
 
 REM Get the directory of this script
 set DIR=%~dp0
@@ -14,16 +14,18 @@ set TIMESTAMP=%TIMESTAMP: =0%
 REM Create logs directory if it doesn't exist
 if not exist "%DIR%\logs" mkdir "%DIR%\logs"
 
-REM Run the C# test runner
-echo Running C# tests...
+REM Run the Audio Visualizer test scene
+echo Running Audio Visualizer tests...
 cd "%DIR%"
-"%GODOT_EXECUTABLE%" --script "tests/TestRunner.cs" > "logs/csharp_tests_%TIMESTAMP%.log" 2>&1
+"%GODOT_EXECUTABLE%" --path "%DIR%" tests/audio_visualizer/SimpleAudioVisualizerTestScene.tscn > "logs/audio_visualizer_tests_%TIMESTAMP%.log" 2>&1
 
-REM Check the exit code
-if %ERRORLEVEL% NEQ 0 (
-    echo Tests failed. See logs/csharp_tests_%TIMESTAMP%.log for details.
-    exit /b 1
+REM Get the exit code
+set EXIT_CODE=%ERRORLEVEL%
+
+if %EXIT_CODE% EQU 0 (
+    echo All Audio Visualizer tests passed!
 ) else (
-    echo All tests passed.
-    exit /b 0
+    echo Some Audio Visualizer tests failed. See logs for details.
 )
+
+exit /b %EXIT_CODE%
