@@ -17,7 +17,7 @@ if not exist "%DIR%\logs" mkdir "%DIR%\logs"
 REM Run the C# test runner
 echo Running C# tests...
 cd "%DIR%"
-"%GODOT_EXECUTABLE%" --script "tests/CSharpTestRunner.cs" > "logs/csharp_tests_%TIMESTAMP%.log" 2>&1
+"%GODOT_EXECUTABLE%" --script "tests/TestRunner.cs" > "logs/csharp_tests_%TIMESTAMP%.log" 2>&1
 
 REM Check the exit code
 if %ERRORLEVEL% NEQ 0 (
