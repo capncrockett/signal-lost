@@ -33,7 +33,8 @@ set "LOG_FILE=%DIR%logs\godot_log_%TIMESTAMP%.log"
 echo Log will be saved to: %LOG_FILE%
 
 REM Run the project with log file capture
-"%GODOT_EXECUTABLE%" --path "%DIR%" --log-file "%LOG_FILE%" %*
+cd "%DIR%"
+"%GODOT_EXECUTABLE%" --log-file "%LOG_FILE%" %*
 
 REM Get the exit code
 set EXIT_CODE=%ERRORLEVEL%
