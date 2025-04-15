@@ -129,7 +129,6 @@ namespace SignalLost.Tests
 
 		// Test power button functionality
 		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
-		[Microsoft.VisualStudio.TestTools.UnitTesting.Ignore]
 		public void TestPowerButton()
 		{
 			// Skip this test if components are not properly initialized
@@ -149,7 +148,7 @@ namespace SignalLost.Tests
 				_radioTuner.Set("_gameState", _gameState);
 
 				// Process the frequency to initialize the RadioTuner
-				_radioTuner.ProcessFrequency();
+				_radioTuner.Call("ProcessFrequency");
 
 				// Add debug output
 				GD.Print($"GameState reference set: {_gameState != null}");
@@ -158,20 +157,17 @@ namespace SignalLost.Tests
 				// Initially radio should be off
 				AssertFalse(_gameState.IsRadioOn, "Radio should start in OFF state");
 
-				// Toggle the radio state directly in GameState
-				_gameState.ToggleRadio();
-
-				// Notify the RadioTuner that the radio was toggled
-				_radioTuner.OnRadioToggled(true);
+				// Call the TogglePower method directly instead of simulating button press
+				_radioTuner.Call("TogglePower");
 
 				// Add debug output
-				GD.Print($"After ToggleRadio: GameState.IsRadioOn: {_gameState.IsRadioOn}");
+				GD.Print($"After TogglePower: GameState.IsRadioOn: {_gameState.IsRadioOn}");
 
 				// Radio should now be on
 				AssertTrue(_gameState.IsRadioOn, "Radio should be ON after toggling power");
 
 				// Call the TogglePower method again
-				_radioTuner.TogglePower();
+				_radioTuner.Call("TogglePower");
 
 				// Radio should now be off again
 				AssertFalse(_gameState.IsRadioOn, "Radio should be OFF after toggling power again");
@@ -185,7 +181,6 @@ namespace SignalLost.Tests
 
 		// Test frequency change
 		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
-		[Microsoft.VisualStudio.TestTools.UnitTesting.Ignore]
 		public void TestFrequencyChange()
 		{
 			// Skip this test if components are not properly initialized
@@ -205,7 +200,7 @@ namespace SignalLost.Tests
 				_radioTuner.Set("_gameState", _gameState);
 
 				// Process the frequency to initialize the RadioTuner
-				_radioTuner.ProcessFrequency();
+				_radioTuner.Call("ProcessFrequency");
 
 				// Add debug output
 				GD.Print($"GameState reference set: {_gameState != null}");
@@ -214,25 +209,22 @@ namespace SignalLost.Tests
 				// Set initial frequency
 				_gameState.SetFrequency(90.0f);
 
-				// Set the frequency directly in GameState
-				_gameState.SetFrequency(90.1f);
-
-				// Notify the RadioTuner that the frequency was changed
-				_radioTuner.OnFrequencyChanged(90.1f);
+				// Call the method directly
+				_radioTuner.Call("ChangeFrequency", 0.1f);
 
 				// Add debug output
-				GD.Print($"After SetFrequency: {_gameState.CurrentFrequency}");
+				GD.Print($"After ChangeFrequency: {_gameState.CurrentFrequency}");
 
 				// Check if frequency was updated
 				AssertEqual(_gameState.CurrentFrequency, 90.1f, "Frequency should be 90.1 after increasing by 0.1");
 
 				// Test frequency limits
 				_gameState.SetFrequency(MinFrequency);
-				_radioTuner.ChangeFrequency(-0.1f);
+				_radioTuner.Call("ChangeFrequency", -0.1f);
 				AssertEqual(_gameState.CurrentFrequency, MinFrequency, "Frequency should not go below minimum");
 
 				_gameState.SetFrequency(MaxFrequency);
-				_radioTuner.ChangeFrequency(0.1f);
+				_radioTuner.Call("ChangeFrequency", 0.1f);
 				AssertEqual(_gameState.CurrentFrequency, MaxFrequency, "Frequency should not go above maximum");
 			}
 			catch (Exception ex)
@@ -263,7 +255,7 @@ namespace SignalLost.Tests
 				_radioTuner.Set("_gameState", _gameState);
 
 				// Process the frequency to initialize the RadioTuner
-				_radioTuner.ProcessFrequency();
+				_radioTuner.Call("ProcessFrequency");
 
 				// Turn radio on
 				_gameState.ToggleRadio();
@@ -339,7 +331,7 @@ namespace SignalLost.Tests
 				_radioTuner.Set("_gameState", _gameState);
 
 				// Process the frequency to initialize the RadioTuner
-				_radioTuner.ProcessFrequency();
+				_radioTuner.Call("ProcessFrequency");
 
 				// Turn radio on
 				_gameState.ToggleRadio();
@@ -393,7 +385,7 @@ namespace SignalLost.Tests
 				_radioTuner.Set("_gameState", _gameState);
 
 				// Process the frequency to initialize the RadioTuner
-				_radioTuner.ProcessFrequency();
+				_radioTuner.Call("ProcessFrequency");
 
 				// Turn radio on
 				_gameState.ToggleRadio();
@@ -443,7 +435,6 @@ namespace SignalLost.Tests
 
 		// Test radio behavior when turned off
 		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
-		[Microsoft.VisualStudio.TestTools.UnitTesting.Ignore]
 		public void TestRadioOffBehavior()
 		{
 			// Skip this test if components are not properly initialized
@@ -463,7 +454,7 @@ namespace SignalLost.Tests
 				_radioTuner.Set("_gameState", _gameState);
 
 				// Process the frequency to initialize the RadioTuner
-				_radioTuner.ProcessFrequency();
+				_radioTuner.Call("ProcessFrequency");
 
 				// Add debug output
 				GD.Print($"GameState reference set in TestRadioOffBehavior: {_gameState != null}");
@@ -473,16 +464,16 @@ namespace SignalLost.Tests
 				_gameState.ToggleRadio();
 
 				// Notify the RadioTuner that the radio was toggled
-				_radioTuner.OnRadioToggled(true);
+				_radioTuner.Call("OnRadioToggled", true);
 
 				// Start scanning (set the state manually)
 				_radioTuner.Set("_isScanning", true);
 
 				// Turn radio off
-				_radioTuner.TogglePower();
+				_radioTuner.Call("TogglePower");
 
 				// Notify the RadioTuner that the radio was toggled
-				_radioTuner.OnRadioToggled(false);
+				_radioTuner.Call("OnRadioToggled", false);
 
 				// Add debug output
 				GD.Print($"After TogglePower in TestRadioOffBehavior: {_gameState.IsRadioOn}");
@@ -497,13 +488,8 @@ namespace SignalLost.Tests
 				float initialFreq = _gameState.CurrentFrequency;
 				GD.Print($"Initial frequency before change: {initialFreq}");
 
-				// Set the frequency directly in GameState
-				_gameState.SetFrequency(initialFreq + 0.1f);
-
-				// Notify the RadioTuner that the frequency was changed
-				_radioTuner.OnFrequencyChanged(initialFreq + 0.1f);
-
-				GD.Print($"After SetFrequency: {_gameState.CurrentFrequency}");
+				_radioTuner.Call("ChangeFrequency", 0.1f);
+				GD.Print($"After ChangeFrequency: {_gameState.CurrentFrequency}");
 
 				// Frequency should still change even when radio is off
 				AssertEqual(_gameState.CurrentFrequency, initialFreq + 0.1f, "Frequency should change even when radio is off");

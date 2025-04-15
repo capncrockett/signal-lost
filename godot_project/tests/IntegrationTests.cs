@@ -224,7 +224,6 @@ namespace SignalLost.Tests
 
         // Test RadioTuner and GameState integration
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.Ignore]
         public void TestRadioTunerGameStateIntegration()
         {
             // Skip this test if components are not properly initialized
@@ -244,7 +243,7 @@ namespace SignalLost.Tests
                 _radioTuner.Set("_gameState", _gameState);
 
                 // Process the frequency to initialize the RadioTuner
-                _radioTuner.ProcessFrequency();
+                _radioTuner.Call("ProcessFrequency");
 
                 // Turn radio on
                 _gameState.ToggleRadio();
@@ -265,17 +264,8 @@ namespace SignalLost.Tests
                     (_gameState.CurrentFrequency - 88.0f) / (108.0f - 88.0f) * 100;
 
                 // Verify RadioTuner frequency display updates
-                // Skip this assertion if the FrequencyDisplay node is null
-                if (_radioTuner.GetNode<Label>("FrequencyDisplay") != null)
-                {
-                    AssertEqual(_radioTuner.GetNode<Label>("FrequencyDisplay").Text, "95.5 MHz",
-                        "Frequency display should update when frequency changes");
-                }
-                else
-                {
-                    GD.Print("FrequencyDisplay node is null, skipping assertion");
-                    Pass("Skipped assertion because FrequencyDisplay node is null");
-                }
+                AssertEqual(_radioTuner.GetNode<Label>("FrequencyDisplay").Text, "95.5 MHz",
+                    "Frequency display should update when frequency changes");
 
                 // Verify slider position updates
                 float sliderValue = (float)_radioTuner.GetNode<Slider>("FrequencySlider").Value;
@@ -283,17 +273,17 @@ namespace SignalLost.Tests
                 AssertEqual(sliderValue, expectedValue, "Slider position should reflect current frequency", 0.1f);
 
                 // Change frequency via RadioTuner
-                _radioTuner.ChangeFrequency(0.5f);
+                _radioTuner.Call("ChangeFrequency", 0.5f);
 
                 // Verify GameState frequency updates
                 AssertEqual(_gameState.CurrentFrequency, 96.0f,
                     "GameState frequency should update when changed via RadioTuner");
 
                 // Toggle radio via RadioTuner
-                _radioTuner.TogglePower();
+                _radioTuner.Call("TogglePower");
 
                 // Notify the RadioTuner that the radio was toggled
-                _radioTuner.OnRadioToggled(false);
+                _radioTuner.Call("OnRadioToggled", false);
 
                 // Verify GameState radio state updates
                 AssertFalse(_gameState.IsRadioOn,
@@ -334,7 +324,7 @@ namespace SignalLost.Tests
                 _radioTuner.Set("_gameState", _gameState);
 
                 // Process the frequency to initialize the RadioTuner
-                _radioTuner.ProcessFrequency();
+                _radioTuner.Call("ProcessFrequency");
 
                 // Turn radio on
                 _gameState.ToggleRadio();
@@ -395,7 +385,6 @@ namespace SignalLost.Tests
 
         // Test scanning functionality with signal discovery
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.Ignore]
         public void TestScanningWithSignalDiscovery()
         {
             // Skip this test if components are not properly initialized
@@ -415,7 +404,7 @@ namespace SignalLost.Tests
                 _radioTuner.Set("_gameState", _gameState);
 
                 // Process the frequency to initialize the RadioTuner
-                _radioTuner.ProcessFrequency();
+                _radioTuner.Call("ProcessFrequency");
 
                 // Turn radio on
                 _gameState.ToggleRadio();
@@ -500,7 +489,7 @@ namespace SignalLost.Tests
                 _radioTuner.Set("_gameState", _gameState);
 
                 // Process the frequency to initialize the RadioTuner
-                _radioTuner.ProcessFrequency();
+                _radioTuner.Call("ProcessFrequency");
 
                 // Turn radio on
                 _gameState.ToggleRadio();
@@ -509,7 +498,7 @@ namespace SignalLost.Tests
                 _gameState.SetFrequency(88.0f);
 
                 // Try to go below minimum
-                _radioTuner.ChangeFrequency(-0.1f);
+                _radioTuner.Call("ChangeFrequency", -0.1f);
 
                 // Verify frequency is clamped
                 AssertEqual(_gameState.CurrentFrequency, 88.0f,
@@ -527,7 +516,7 @@ namespace SignalLost.Tests
                 _gameState.SetFrequency(108.0f);
 
                 // Try to go above maximum
-                _radioTuner.ChangeFrequency(0.1f);
+                _radioTuner.Call("ChangeFrequency", 0.1f);
 
                 // Verify frequency is clamped
                 AssertEqual(_gameState.CurrentFrequency, 108.0f,
@@ -569,7 +558,7 @@ namespace SignalLost.Tests
                 _radioTuner.Set("_gameState", _gameState);
 
                 // Process the frequency to initialize the RadioTuner
-                _radioTuner.ProcessFrequency();
+                _radioTuner.Call("ProcessFrequency");
 
                 // Turn radio on
                 _gameState.ToggleRadio();
@@ -606,7 +595,7 @@ namespace SignalLost.Tests
                     "Radio should be in scanning mode after toggling");
 
                 // Turn radio off via RadioTuner
-                _radioTuner.TogglePower();
+                _radioTuner.Call("TogglePower");
 
                 // Set scanning state manually (this would normally be done in the RadioTuner.OnRadioToggled method)
                 _radioTuner.Set("_isScanning", false);
@@ -643,7 +632,7 @@ namespace SignalLost.Tests
                 _radioTuner.Set("_gameState", _gameState);
 
                 // Process the frequency to initialize the RadioTuner
-                _radioTuner.ProcessFrequency();
+                _radioTuner.Call("ProcessFrequency");
 
                 // Turn radio on
                 _gameState.ToggleRadio();
@@ -692,7 +681,6 @@ namespace SignalLost.Tests
 
         // Test full radio tuning workflow
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.Ignore]
         public void TestFullRadioTuningWorkflow()
         {
             // Skip this test if components are not properly initialized
@@ -712,7 +700,7 @@ namespace SignalLost.Tests
                 _radioTuner.Set("_gameState", _gameState);
 
                 // Process the frequency to initialize the RadioTuner
-                _radioTuner.ProcessFrequency();
+                _radioTuner.Call("ProcessFrequency");
 
                 // 1. Turn radio on
                 _gameState.ToggleRadio();
@@ -770,7 +758,7 @@ namespace SignalLost.Tests
                     "Scanning should be stopped");
 
                 // 6. Fine-tune the frequency
-                _radioTuner.ChangeFrequency(0.1f);
+                _radioTuner.Call("ChangeFrequency", 0.1f);
 
                 // Process the frequency manually
                 signalData = _gameState.FindSignalAtFrequency(_gameState.CurrentFrequency);

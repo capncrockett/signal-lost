@@ -1,4 +1,5 @@
 using Godot;
+using System;
 
 namespace SignalLost
 {
@@ -198,7 +199,7 @@ namespace SignalLost
         }
 
         // Process the current frequency
-        public void ProcessFrequency()
+        private void ProcessFrequency()
         {
             if (_gameState == null) return;
 
@@ -277,7 +278,7 @@ namespace SignalLost
         }
 
         // Change the frequency by a specific amount
-        public void ChangeFrequency(float amount)
+        private void ChangeFrequency(float amount)
         {
             if (_gameState == null) return;
 
@@ -292,7 +293,7 @@ namespace SignalLost
         }
 
         // Toggle the radio power
-        public void TogglePower()
+        private void TogglePower()
         {
             if (_gameState == null) return;
 
@@ -303,7 +304,7 @@ namespace SignalLost
         }
 
         // Toggle frequency scanning
-        public void ToggleScanning()
+        private void ToggleScanning()
         {
             _isScanning = !_isScanning;
 
@@ -321,7 +322,7 @@ namespace SignalLost
         }
 
         // Toggle message display
-        public void ToggleMessage()
+        private void ToggleMessage()
         {
             _showMessage = !_showMessage;
 
@@ -441,7 +442,7 @@ namespace SignalLost
             UpdateUi();
         }
 
-        public void OnRadioToggled(bool isOn)
+        private void OnRadioToggled(bool isOn)
         {
             if (!isOn)
             {
