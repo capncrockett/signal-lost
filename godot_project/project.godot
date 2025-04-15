@@ -19,6 +19,7 @@ config/icon="res://assets/images/icon.png"
 
 GameState="*res://scripts/GameState.cs"
 AudioManager="*res://scripts/AudioManager.cs"
+MapSystem="*res://scripts/MapSystem.cs"
 
 [display]
 

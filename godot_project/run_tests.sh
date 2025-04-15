@@ -100,7 +100,7 @@ fi
 echo "Running tests using SimpleTestScene.tscn..."
 
 # Use a background process with a timeout for macOS compatibility
-"$GODOT_EXECUTABLE" --path "$DIR" tests/SimpleTestScene.tscn &
+"$GODOT_EXECUTABLE" --path "$DIR" tests/SimpleTestScene.tscn --verbose &
 GODOT_PID=$!
 
 # Wait for up to 60 seconds
