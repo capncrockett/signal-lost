@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace SignalLost
 {
-    public class LogParser : Node
+    public partial class LogParser : Node
     {
         public class LogEntry
         {
@@ -35,7 +35,7 @@ namespace SignalLost
         {
             var logEntries = new List<LogEntry>();
             var logsDir = "res://logs";
-            
+
             // Ensure the directory exists
             if (!Directory.Exists(logsDir))
             {
@@ -125,14 +125,14 @@ namespace SignalLost
         public static void PrintErrorSummary()
         {
             var entries = ParseLatestLog();
-            
+
             GD.Print($"Found {entries.Count} log entries");
-            
+
             var errors = entries.Where(e => e.Level == LogEntry.LogLevel.Error || e.Level == LogEntry.LogLevel.ScriptError).ToList();
             var warnings = entries.Where(e => e.Level == LogEntry.LogLevel.Warning).ToList();
-            
+
             GD.Print($"Errors: {errors.Count}, Warnings: {warnings.Count}");
-            
+
             if (errors.Count > 0)
             {
                 GD.Print("\n=== ERRORS ===");
@@ -141,7 +141,7 @@ namespace SignalLost
                     GD.Print(error);
                 }
             }
-            
+
             if (warnings.Count > 0)
             {
                 GD.Print("\n=== WARNINGS ===");
