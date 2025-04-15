@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://c8j6y8o4n8qxv"]
+[gd_scene load_steps=6 format=3 uid="uid://c8j6y8o4n8qxv"]
 
 [ext_resource type="PackedScene" uid="uid://c8yvxg3xnq6yw" path="res://scenes/radio/RadioTuner.tscn" id="1_r3j2k"]
 [ext_resource type="PackedScene" uid="uid://c8yvxg3xnq6yw" path="res://scenes/map/MapUI.tscn" id="2_m4p7q"]
 [ext_resource type="Script" path="res://scripts/MainScene.cs" id="3_8j7xp"]
 [ext_resource type="PackedScene" uid="uid://c8yvvs1yvqnxl" path="res://scenes/inventory/InventoryUI.tscn" id="4_ixnqm"]
+[ext_resource type="PackedScene" uid="uid://c8yvvs1yvqnxq" path="res://scenes/quest/QuestUI.tscn" id="5_ixnqn"]
 
 [node name="MainScene" type="Node"]
 script = ExtResource("3_8j7xp")
@@ -36,5 +37,15 @@ offset_right = 110.0
 offset_bottom = 140.0
 text = "Inventory"
 
+[node name="QuestButton" type="Button" parent="."]
+offset_left = 10.0
+offset_top = 150.0
+offset_right = 110.0
+offset_bottom = 190.0
+text = "Quests"
+
 [node name="InventoryUI" parent="." instance=ExtResource("4_ixnqm")]
+visible = false
+
+[node name="QuestUI" parent="." instance=ExtResource("5_ixnqn")]
 visible = false
