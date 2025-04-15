@@ -1,6 +1,7 @@
 using Godot;
 using System;
 
+[GlobalClass]
 namespace SignalLost
 {
     public partial class AudioManager : Node

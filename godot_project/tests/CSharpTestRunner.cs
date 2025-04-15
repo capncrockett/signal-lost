@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+[GlobalClass]
 namespace SignalLost.Tests
 {
     public partial class CSharpTestRunner : Node
@@ -11,17 +12,17 @@ namespace SignalLost.Tests
         private int _passedTests = 0;
         private int _failedTests = 0;
         private List<string> _failureMessages = new List<string>();
-        
+
         public override void _Ready()
         {
             GD.Print("Starting C# Test Runner...");
-            
+
             // Run all tests
             RunAllTests();
-            
+
             // Print summary
             PrintSummary();
-            
+
             // Exit with appropriate code
             if (_failedTests > 0)
             {
@@ -34,11 +35,11 @@ namespace SignalLost.Tests
                 GetTree().Quit(0);
             }
         }
-        
+
         private void RunAllTests()
         {
             GD.Print("Running all C# tests...");
-            
+
             // Get all types in the current assembly
             Assembly assembly = Assembly.GetExecutingAssembly();
             foreach (Type type in assembly.GetTypes())
@@ -48,12 +49,12 @@ namespace SignalLost.Tests
                 {
                     continue;
                 }
-                
+
                 GD.Print($"Running tests in {type.Name}...");
-                
+
                 // Create an instance of the test class
                 object instance = Activator.CreateInstance(type);
-                
+
                 // Find all test methods
                 foreach (MethodInfo method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
                 {
@@ -62,9 +63,9 @@ namespace SignalLost.Tests
                     {
                         continue;
                     }
-                    
+
                     _totalTests++;
-                    
+
                     try
                     {
                         // Run setup method if it exists
@@ -73,15 +74,15 @@ namespace SignalLost.Tests
                         {
                             setup.Invoke(instance, null);
                         }
-                        
+
                         // Run the test method
                         GD.Print($"  Running test: {method.Name}");
                         method.Invoke(instance, null);
-                        
+
                         // If we get here, the test passed
                         _passedTests++;
                         GD.Print($"  PASS: {method.Name}");
-                        
+
                         // Run teardown method if it exists
                         MethodInfo teardown = type.GetMethod("Teardown");
                         if (teardown != null)
@@ -96,7 +97,7 @@ namespace SignalLost.Tests
                         string message = $"FAIL: {type.Name}.{method.Name} - {e.InnerException?.Message ?? e.Message}";
                         _failureMessages.Add(message);
                         GD.PrintErr(message);
-                        
+
                         // Run teardown method if it exists
                         MethodInfo teardown = type.GetMethod("Teardown");
                         if (teardown != null)
@@ -114,14 +115,14 @@ namespace SignalLost.Tests
                 }
             }
         }
-        
+
         private void PrintSummary()
         {
             GD.Print("\n=== Test Summary ===");
             GD.Print($"Total tests: {_totalTests}");
             GD.Print($"Passed: {_passedTests}");
             GD.Print($"Failed: {_failedTests}");
-            
+
             if (_failedTests > 0)
             {
                 GD.Print("\n=== Failed Tests ===");

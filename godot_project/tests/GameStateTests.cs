@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using GUT;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+[GlobalClass]
 namespace SignalLost.Tests
 {
     [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]

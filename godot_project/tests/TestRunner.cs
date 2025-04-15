@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using GUT;
 
+[GlobalClass]
 namespace SignalLost.Tests
 {
     public partial class TestRunner : SceneTree
