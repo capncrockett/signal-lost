@@ -3,22 +3,28 @@
 
 echo "Running Signal Lost Godot project with error reporting..."
 
-# Set the Godot executable path based on OS
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS
-    GODOT_EXECUTABLE="/Applications/Godot.app/Contents/MacOS/Godot"
-elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    # Linux
-    GODOT_EXECUTABLE="godot"
+# Set the Godot executable path
+# Check if GODOT_PATH environment variable is set
+if [ -n "$GODOT_PATH" ]; then
+    GODOT_EXECUTABLE="$GODOT_PATH"
 else
-    # Windows with WSL or Git Bash
-    GODOT_EXECUTABLE="C:/Godot_v4.4.1-stable_mono_win64/Godot_v4.4.1-stable_mono_win64/Godot_v4.4.1-stable_mono_win64_console.exe"
+    # Default based on OS
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        GODOT_EXECUTABLE="/Applications/Godot.app/Contents/MacOS/Godot"
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # Linux
+        GODOT_EXECUTABLE="godot"
+    else
+        # Windows with WSL or Git Bash
+        GODOT_EXECUTABLE="godot"
+    fi
 fi
 
-# Check if Godot executable exists
-if [ ! -f "$GODOT_EXECUTABLE" ]; then
-    echo "Error: Godot executable not found at $GODOT_EXECUTABLE"
-    echo "Please install Godot or update the script with the correct path."
+# Check if Godot executable exists or is in PATH
+if ! command -v "$GODOT_EXECUTABLE" &> /dev/null; then
+    echo "Error: Godot executable not found at $GODOT_EXECUTABLE or in PATH"
+    echo "Please install Godot, add it to PATH, or set the GODOT_PATH environment variable."
     exit 1
 fi
 

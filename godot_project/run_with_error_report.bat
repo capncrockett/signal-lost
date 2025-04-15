@@ -4,12 +4,19 @@ REM This script runs the Godot project and generates an error report
 echo Running Signal Lost Godot project with error reporting...
 
 REM Set the Godot executable path
-set "GODOT_EXECUTABLE=C:\Godot_v4.4.1-stable_mono_win64\Godot_v4.4.1-stable_mono_win64\Godot_v4.4.1-stable_mono_win64_console.exe"
+REM Check if GODOT_PATH environment variable is set
+if defined GODOT_PATH (
+    set "GODOT_EXECUTABLE=%GODOT_PATH%"
+) else (
+    REM Default to godot in PATH
+    set "GODOT_EXECUTABLE=godot"
+)
 
-REM Check if Godot executable exists
-if not exist "%GODOT_EXECUTABLE%" (
-    echo Error: Godot executable not found at %GODOT_EXECUTABLE%
-    echo Please install Godot or update the script with the correct path.
+REM Check if Godot executable exists or is in PATH
+where /q "%GODOT_EXECUTABLE%"
+if %ERRORLEVEL% neq 0 (
+    echo Error: Godot executable not found at %GODOT_EXECUTABLE% or in PATH
+    echo Please install Godot, add it to PATH, or set the GODOT_PATH environment variable.
     exit /b 1
 )
 
