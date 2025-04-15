@@ -14,7 +14,6 @@ var _current_signal_id = null
 var _signal_strength: float = 0.0
 var _static_intensity: float = 0.5
 var _scan_timer: Timer = null
-var _last_process_time: int = 0
 
 ## References to singletons
 var _game_state = null
@@ -86,6 +85,7 @@ func _create_scan_timer() -> void:
 
 ## Connect UI signals to their handlers
 func _connect_signals() -> void:
+	# Connect UI button signals
 	if _power_button:
 		_power_button.pressed.connect(_on_power_button_pressed)
 	else:
@@ -115,6 +115,13 @@ func _connect_signals() -> void:
 		_tune_up_button.pressed.connect(_on_tune_up_button_pressed)
 	else:
 		$TuneUpButton.pressed.connect(_on_tune_up_button_pressed)
+
+	# Connect GameState signals
+	if _game_state:
+		if _game_state.has_signal("FrequencyChanged"):
+			_game_state.connect("FrequencyChanged", _on_frequency_changed)
+		if _game_state.has_signal("RadioToggled"):
+			_game_state.connect("RadioToggled", _on_radio_toggled)
 
 # Process function called every frame
 func _process(delta):
@@ -323,3 +330,12 @@ func _on_scan_timer_timeout():
 			new_freq = min_frequency
 
 		_game_state.set_frequency(new_freq)
+
+# Signal handlers for GameState signals
+func _on_frequency_changed(_new_frequency):
+	# Update UI when frequency changes
+	_update_ui()
+
+func _on_radio_toggled(_is_on):
+	# Update UI when radio is toggled
+	_update_ui()
