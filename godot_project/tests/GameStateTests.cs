@@ -1,12 +1,9 @@
-using Godot;
-using System;
-using System.Collections.Generic;
 using GUT;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Godot;
 
-[GlobalClass]
 namespace SignalLost.Tests
 {
+    [GlobalClass]
     [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
     public partial class GameStateTests : Test
     {

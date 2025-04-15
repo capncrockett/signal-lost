@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
-[GlobalClass]
 namespace SignalLost
 {
+    [GlobalClass]
     public partial class GameState : Node
     {
         // Game state variables
