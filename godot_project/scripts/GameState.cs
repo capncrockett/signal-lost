@@ -158,6 +158,9 @@ namespace SignalLost
         [Signal]
         public delegate void LocationChangedEventHandler(string locationId);
 
+        [Signal]
+        public delegate void InventoryChangedEventHandler();
+
         // Functions to modify state
         public void SetFrequency(float freq)
         {
@@ -189,6 +192,30 @@ namespace SignalLost
                 CurrentLocation = locationId;
                 EmitSignal(SignalName.LocationChanged, locationId);
             }
+        }
+
+        // Inventory management functions
+        public void AddToInventory(string itemId)
+        {
+            Inventory.Add(itemId);
+            EmitSignal(SignalName.InventoryChanged);
+        }
+
+        public void RemoveFromInventory(string itemId)
+        {
+            Inventory.Remove(itemId);
+            EmitSignal(SignalName.InventoryChanged);
+        }
+
+        public void ClearInventory()
+        {
+            Inventory.Clear();
+            EmitSignal(SignalName.InventoryChanged);
+        }
+
+        public bool HasItem(string itemId)
+        {
+            return Inventory.Contains(itemId);
         }
 
         // Save and load functions
