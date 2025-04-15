@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using GUT;
 
 namespace SignalLost.Tests
@@ -109,7 +110,7 @@ namespace SignalLost.Tests
             powerButton.Name = "PowerButton";
             radioTuner.AddChild(powerButton);
 
-            var frequencySlider = new Slider();
+            var frequencySlider = new HSlider();
             frequencySlider.Name = "FrequencySlider";
             radioTuner.AddChild(frequencySlider);
 
@@ -618,7 +619,7 @@ namespace SignalLost.Tests
                         // No signal, just static
                         _radioTuner.Set("_signalStrength", 0.1f);
                         _radioTuner.Set("_staticIntensity", 0.9f);
-                        _radioTuner.Set("_currentSignalId", null);
+                        _radioTuner.Set("_currentSignalId", "");
                     }
                 }
 
@@ -665,8 +666,8 @@ namespace SignalLost.Tests
                 var signalData = _gameState.FindSignalAtFrequency(_gameState.CurrentFrequency);
                 if (signalData == null)
                 {
-                    // No signal, set the current signal ID to null
-                    _radioTuner.Set("_currentSignalId", null);
+                    // No signal, set the current signal ID to empty string
+                    _radioTuner.Set("_currentSignalId", "");
                 }
 
                 // Verify no signal is detected
@@ -715,9 +716,9 @@ namespace SignalLost.Tests
                 if (signalData != null)
                 {
                     // Calculate signal strength
-                    float signalStrength = _gameState.CalculateSignalStrength(_gameState.CurrentFrequency, signalData);
-                    _radioTuner.Set("_signalStrength", signalStrength);
-                    _radioTuner.Set("_staticIntensity", 1.0f - signalStrength);
+                    float strength = _gameState.CalculateSignalStrength(_gameState.CurrentFrequency, signalData);
+                    _radioTuner.Set("_signalStrength", strength);
+                    _radioTuner.Set("_staticIntensity", 1.0f - strength);
                 }
 
                 // 7. Check signal strength
