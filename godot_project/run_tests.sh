@@ -37,6 +37,12 @@ find_godot() {
         return 0
     fi
 
+    # Check Windows location from run_project_windows.bat
+    if [ -f "C:\Godot_v4.4.1-stable_mono_win64\Godot_v4.4.1-stable_mono_win64\Godot_v4.4.1-stable_mono_win64_console.exe" ]; then
+        echo "C:\Godot_v4.4.1-stable_mono_win64\Godot_v4.4.1-stable_mono_win64\Godot_v4.4.1-stable_mono_win64_console.exe"
+        return 0
+    fi
+
     # Check for Godot in the current directory
     if [ -f "./Godot" ]; then
         echo "./Godot"
