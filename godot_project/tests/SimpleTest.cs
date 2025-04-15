@@ -103,6 +103,9 @@ namespace SignalLost.Tests
             // Run AudioVisualizer tests
             RunTestsForClass(typeof(AudioVisualizerTests));
 
+            // Run MapSystem tests
+            RunTestsForClass(typeof(MapSystemTests));
+
             // Run integration tests
             RunTestsForClass(typeof(IntegrationTests));
         }

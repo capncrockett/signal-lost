@@ -12,7 +12,7 @@ namespace SignalLost
         public float CurrentFrequency { get; private set; } = 90.0f;
         public bool IsRadioOn { get; private set; } = false;
         public List<float> DiscoveredFrequencies { get; private set; } = new List<float>();
-        public string CurrentLocation { get; private set; } = "bunker";
+        public string CurrentLocation { get; set; } = "bunker";
         public List<string> Inventory { get; private set; } = new List<string>();
         public int GameProgress { get; private set; } = 0;
 
@@ -155,6 +155,9 @@ namespace SignalLost
         [Signal]
         public delegate void MessageDecodedEventHandler(string messageId);
 
+        [Signal]
+        public delegate void LocationChangedEventHandler(string locationId);
+
         // Functions to modify state
         public void SetFrequency(float freq)
         {
@@ -177,6 +180,15 @@ namespace SignalLost
                 return true;
             }
             return false;
+        }
+
+        public void SetCurrentLocation(string locationId)
+        {
+            if (CurrentLocation != locationId)
+            {
+                CurrentLocation = locationId;
+                EmitSignal(SignalName.LocationChanged, locationId);
+            }
         }
 
         // Save and load functions
