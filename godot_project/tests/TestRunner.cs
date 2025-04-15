@@ -4,9 +4,9 @@ using System.Reflection;
 using System.Collections.Generic;
 using GUT;
 
-[GlobalClass]
 namespace SignalLost.Tests
 {
+    [GlobalClass]
     public partial class TestRunner : SceneTree
     {
         // This script runs all tests from the command line

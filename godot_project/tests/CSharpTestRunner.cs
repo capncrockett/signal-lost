@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-[GlobalClass]
 namespace SignalLost.Tests
 {
+    [GlobalClass]
     public partial class CSharpTestRunner : Node
     {
         private int _totalTests = 0;

@@ -1,8 +1,8 @@
 using Godot;
 
-[GlobalClass]
 namespace SignalLost
 {
+    [GlobalClass]
     public partial class RadioTuner : Control
     {
         // Radio tuner properties

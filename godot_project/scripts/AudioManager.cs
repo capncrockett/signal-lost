@@ -1,9 +1,9 @@
 using Godot;
 using System;
 
-[GlobalClass]
 namespace SignalLost
 {
+    [GlobalClass]
     public partial class AudioManager : Node
     {
         // Audio properties
