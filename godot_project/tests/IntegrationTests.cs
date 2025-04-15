@@ -267,14 +267,17 @@ namespace SignalLost.Tests
                 AssertEqual(sliderValue, expectedValue, "Slider position should reflect current frequency", 0.1f);
 
                 // Change frequency via RadioTuner
-                _radioTuner.Call("ChangeFrequency", 0.5f);
+                _radioTuner.ChangeFrequency(0.5f);
 
                 // Verify GameState frequency updates
                 AssertEqual(_gameState.CurrentFrequency, 96.0f,
                     "GameState frequency should update when changed via RadioTuner");
 
                 // Toggle radio via RadioTuner
-                _radioTuner.Call("TogglePower");
+                _radioTuner.TogglePower();
+
+                // Notify the RadioTuner that the radio was toggled
+                _radioTuner.OnRadioToggled(false);
 
                 // Verify GameState radio state updates
                 AssertFalse(_gameState.IsRadioOn,
@@ -469,7 +472,7 @@ namespace SignalLost.Tests
                 _gameState.SetFrequency(88.0f);
 
                 // Try to go below minimum
-                _radioTuner.Call("ChangeFrequency", -0.1f);
+                _radioTuner.ChangeFrequency(-0.1f);
 
                 // Verify frequency is clamped
                 AssertEqual(_gameState.CurrentFrequency, 88.0f,
@@ -487,7 +490,7 @@ namespace SignalLost.Tests
                 _gameState.SetFrequency(108.0f);
 
                 // Try to go above maximum
-                _radioTuner.Call("ChangeFrequency", 0.1f);
+                _radioTuner.ChangeFrequency(0.1f);
 
                 // Verify frequency is clamped
                 AssertEqual(_gameState.CurrentFrequency, 108.0f,
@@ -709,7 +712,7 @@ namespace SignalLost.Tests
                     "Scanning should be stopped");
 
                 // 6. Fine-tune the frequency
-                _radioTuner.Call("ChangeFrequency", 0.1f);
+                _radioTuner.ChangeFrequency(0.1f);
 
                 // Process the frequency manually
                 signalData = _gameState.FindSignalAtFrequency(_gameState.CurrentFrequency);
