@@ -27,7 +27,7 @@ if not exist "%DIR%addons\gut" (
 )
 
 REM Run the test runner script
-"%GODOT_EXECUTABLE%" --path "%DIR%" --script tests/test_runner.gd
+"%GODOT_EXECUTABLE%" --path "%DIR%" --script "tests/test_runner.gd"
 
 REM Get the exit code
 set EXIT_CODE=%ERRORLEVEL%
