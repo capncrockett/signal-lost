@@ -24,8 +24,8 @@ REM Create logs directory if it doesn't exist
 if not exist "%DIR%logs" mkdir "%DIR%logs"
 
 REM Generate timestamp for log file
-for /f "tokens=2 delims==" %%a in ('wmic OS Get localdatetime /value') do set "dt=%%a"
-set "TIMESTAMP=%dt:~0,8%-%dt:~8,6%"
+set "TIMESTAMP=%DATE:~-4,4%%DATE:~-7,2%%DATE:~-10,2%-%TIME:~0,2%%TIME:~3,2%%TIME:~6,2%"
+set "TIMESTAMP=%TIMESTAMP: =0%"
 
 REM Set log file path
 set "LOG_FILE=%DIR%logs\godot_log_%TIMESTAMP%.log"
@@ -33,7 +33,8 @@ set "LOG_FILE=%DIR%logs\godot_log_%TIMESTAMP%.log"
 echo Log will be saved to: %LOG_FILE%
 
 REM Run the project with log file capture
-"%GODOT_EXECUTABLE%" --path "%DIR%" --log-file "%LOG_FILE%" %*
+cd "%DIR%"
+"%GODOT_EXECUTABLE%" --log-file "%LOG_FILE%" %*
 
 REM Get the exit code
 set EXIT_CODE=%ERRORLEVEL%

@@ -12,7 +12,7 @@ func _initialize():
     print("Current audio driver: ", AudioServer.get_output_device())
 
     # Print any errors
-    print("Last error: ", OS.get_last_error())
+    print("Last error check")
 
     # Print warning about audio output device
     print("WARNING: Current output_device invalidated, taking output_device")
