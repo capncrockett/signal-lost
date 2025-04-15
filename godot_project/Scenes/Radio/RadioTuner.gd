@@ -118,10 +118,29 @@ func _connect_signals() -> void:
 
 	# Connect GameState signals
 	if _game_state:
+		# Print available signals for debugging
+		print("Available signals in GameState:")
+		for signal_info in _game_state.get_signal_list():
+			print(" - " + signal_info.name)
+
+		# Try different signal name formats (CamelCase and snake_case)
 		if _game_state.has_signal("FrequencyChanged"):
+			print("Connecting to FrequencyChanged signal")
 			_game_state.connect("FrequencyChanged", _on_frequency_changed)
+		elif _game_state.has_signal("frequency_changed"):
+			print("Connecting to frequency_changed signal")
+			_game_state.connect("frequency_changed", _on_frequency_changed)
+		else:
+			print("WARNING: Could not find frequency change signal")
+
 		if _game_state.has_signal("RadioToggled"):
+			print("Connecting to RadioToggled signal")
 			_game_state.connect("RadioToggled", _on_radio_toggled)
+		elif _game_state.has_signal("radio_toggled"):
+			print("Connecting to radio_toggled signal")
+			_game_state.connect("radio_toggled", _on_radio_toggled)
+		else:
+			print("WARNING: Could not find radio toggle signal")
 
 # Process function called every frame
 func _process(delta):
@@ -334,8 +353,10 @@ func _on_scan_timer_timeout():
 # Signal handlers for GameState signals
 func _on_frequency_changed(_new_frequency):
 	# Update UI when frequency changes
+	print("RadioTuner: Frequency changed to " + str(_new_frequency))
 	_update_ui()
 
 func _on_radio_toggled(_is_on):
 	# Update UI when radio is toggled
+	print("RadioTuner: Radio toggled to " + str(_is_on))
 	_update_ui()
