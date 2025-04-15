@@ -131,6 +131,4 @@ else
     echo "Some tests failed. See above for details."
 fi
 
-# TODO: Fix the remaining failing tests properly
-# For now, we'll ignore the exit code to allow the PR to be merged
-exit 0
+exit $EXIT_CODE
