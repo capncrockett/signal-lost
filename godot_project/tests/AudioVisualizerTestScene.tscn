@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://swvkp5g3airh"]
 
 [ext_resource type="Script" path="res://addons/gut/test_runner.gd" id="1_r3j2k"]
-[ext_resource type="Script" path="res://tests/AudioVisualizerTest.gd" id="2_yvxpq"]
+[ext_resource type="Script" path="res://tests/SimpleTest.cs" id="2_yvxpq"]
 
 [node name="AudioVisualizerTestScene" type="Control"]
 layout_mode = 3
@@ -15,9 +15,9 @@ grow_vertical = 2
 script = ExtResource("1_r3j2k")
 include_subdirectories = true
 inner_class_prefix = "Test_"
-script_name = "AudioVisualizerTest.gd"
-test_script_prefixes = PackedStringArray("test_", "tests/", "res://tests/")
-unit_test_name = "AudioVisualizerTest.gd"
+script_name = "SimpleTest.cs"
+test_script_prefixes = PackedStringArray("Test", "tests/", "res://tests/")
+unit_test_name = "SimpleTest.cs"
 double_strategy = 1
 export_path = "res://test_results.xml"
 inner_class = ""

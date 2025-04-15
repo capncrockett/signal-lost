@@ -39,4 +39,14 @@ for /r godot_project %%f in (*.gd) do (
     if errorlevel 1 del /q "%%f"
 )
 
+REM Update scene files to use C# scripts
+echo Updating scene files to use C# scripts...
+
+REM Note: Windows batch files don't have a direct equivalent to sed
+REM You would need to use PowerShell or a third-party tool to do this properly
+REM For now, we'll just note that the scene files need to be updated manually
+
+echo Note: Scene files need to be updated manually to use C# scripts.
+echo Please run the cleanup_gitignored.sh script on a Linux/Mac system or use a text editor to update the scene files.
+
 echo Cleanup complete!
