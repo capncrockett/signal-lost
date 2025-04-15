@@ -267,6 +267,13 @@ namespace SignalLost.Tests
 
             foreach (var method in testClass.GetMethods())
             {
+                // Skip methods with Ignore attribute
+                if (method.GetCustomAttribute<Microsoft.VisualStudio.TestTools.UnitTesting.IgnoreAttribute>() != null)
+                {
+                    GD.Print($"Skipping ignored test: {method.Name}");
+                    continue;
+                }
+
                 // Check for Test attribute
                 if (method.GetCustomAttribute<TestAttribute>() != null ||
                     method.GetCustomAttribute<Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute>() != null)

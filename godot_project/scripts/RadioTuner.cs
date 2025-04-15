@@ -198,9 +198,9 @@ namespace SignalLost
         }
 
         // Process the current frequency
-        private void ProcessFrequency()
+        public void ProcessFrequency()
         {
-            if (_gameState == null || _audioManager == null) return;
+            if (_gameState == null) return;
 
             var signalData = _gameState.FindSignalAtFrequency(_gameState.CurrentFrequency);
 
@@ -223,18 +223,21 @@ namespace SignalLost
                     _gameState.AddDiscoveredFrequency(signalData.Frequency);
                 }
 
-                // Play appropriate audio
-                if (signalData.IsStatic)
+                // Play appropriate audio if AudioManager is available
+                if (_audioManager != null)
                 {
-                    // Play static with the signal mixed in
-                    _audioManager.PlayStaticNoise(_staticIntensity);
-                    _audioManager.PlaySignal(signalData.Frequency * 10, _signalStrength * 0.5f);  // Scale up for audible range
-                }
-                else
-                {
-                    // Play a clear signal
-                    _audioManager.StopStaticNoise();
-                    _audioManager.PlaySignal(signalData.Frequency * 10);  // Scale up for audible range
+                    if (signalData.IsStatic)
+                    {
+                        // Play static with the signal mixed in
+                        _audioManager.PlayStaticNoise(_staticIntensity);
+                        _audioManager.PlaySignal(signalData.Frequency * 10, _signalStrength * 0.5f);  // Scale up for audible range
+                    }
+                    else
+                    {
+                        // Play a clear signal
+                        _audioManager.StopStaticNoise();
+                        _audioManager.PlaySignal(signalData.Frequency * 10);  // Scale up for audible range
+                    }
                 }
             }
             else
@@ -251,9 +254,12 @@ namespace SignalLost
                 if (_signalStrengthMeter != null)
                     _signalStrengthMeter.Value = _signalStrength * 100;
 
-                // Play audio
-                _audioManager.StopSignal();
-                _audioManager.PlayStaticNoise(intensity);
+                // Play audio if AudioManager is available
+                if (_audioManager != null)
+                {
+                    _audioManager.StopSignal();
+                    _audioManager.PlayStaticNoise(intensity);
+                }
             }
 
             // Update message button state
