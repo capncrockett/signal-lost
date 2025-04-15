@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
+[GlobalClass]
 namespace SignalLost
 {
     public partial class GameState : Node
@@ -101,7 +102,7 @@ namespace SignalLost
         {
             float distance = Math.Abs(freq - signalData.Frequency);
             float maxDistance = signalData.Bandwidth;
-            
+
             // Calculate strength based on how close we are to the exact frequency
             // 1.0 = perfect signal, 0.0 = no signal
             if (distance <= maxDistance)
@@ -191,15 +192,15 @@ namespace SignalLost
                 ["game_progress"] = GameProgress,
                 ["messages"] = Messages
             };
-            
+
             string jsonString = JsonSerializer.Serialize(saveData);
-            
+
             using var saveFile = FileAccess.Open("user://savegame.save", FileAccess.ModeFlags.Write);
             if (saveFile == null)
             {
                 return false;
             }
-            
+
             saveFile.StoreLine(jsonString);
             return true;
         }
@@ -210,16 +211,16 @@ namespace SignalLost
             {
                 return false;
             }
-            
+
             using var saveFile = FileAccess.Open("user://savegame.save", FileAccess.ModeFlags.Read);
             if (saveFile == null)
             {
                 return false;
             }
-            
+
             string jsonString = saveFile.GetLine();
             var saveData = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonString);
-            
+
             CurrentFrequency = Convert.ToSingle(saveData["current_frequency"]);
             IsRadioOn = Convert.ToBoolean(saveData["is_radio_on"]);
             DiscoveredFrequencies = JsonSerializer.Deserialize<List<float>>(saveData["discovered_frequencies"].ToString());
@@ -227,7 +228,7 @@ namespace SignalLost
             Inventory = JsonSerializer.Deserialize<List<string>>(saveData["inventory"].ToString());
             GameProgress = Convert.ToInt32(saveData["game_progress"]);
             Messages = JsonSerializer.Deserialize<Dictionary<string, MessageData>>(saveData["messages"].ToString());
-            
+
             return true;
         }
     }
