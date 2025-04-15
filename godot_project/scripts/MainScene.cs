@@ -11,6 +11,8 @@ namespace SignalLost
         private Control _mapUI;
         private Button _inventoryButton;
         private Control _inventoryUI;
+        private Button _questButton;
+        private Control _questUI;
 
         // Called when the node enters the scene tree for the first time
         public override void _Ready()
@@ -20,14 +22,18 @@ namespace SignalLost
             _mapUI = GetNode<Control>("MapUI");
             _inventoryButton = GetNode<Button>("InventoryButton");
             _inventoryUI = GetNode<Control>("InventoryUI");
+            _questButton = GetNode<Button>("QuestButton");
+            _questUI = GetNode<Control>("QuestUI");
 
             // Connect signals
             _mapButton.Pressed += OnMapButtonPressed;
             _inventoryButton.Pressed += OnInventoryButtonPressed;
+            _questButton.Pressed += OnQuestButtonPressed;
 
             // Hide the UIs initially
             _mapUI.Visible = false;
             _inventoryUI.Visible = false;
+            _questUI.Visible = false;
         }
 
         // Event handlers
@@ -36,10 +42,11 @@ namespace SignalLost
             // Toggle the map UI
             _mapUI.Visible = !_mapUI.Visible;
 
-            // Hide the inventory UI if the map UI is shown
+            // Hide other UIs if this UI is shown
             if (_mapUI.Visible)
             {
                 _inventoryUI.Visible = false;
+                _questUI.Visible = false;
             }
         }
 
@@ -48,10 +55,24 @@ namespace SignalLost
             // Toggle the inventory UI
             _inventoryUI.Visible = !_inventoryUI.Visible;
 
-            // Hide the map UI if the inventory UI is shown
+            // Hide other UIs if this UI is shown
             if (_inventoryUI.Visible)
             {
                 _mapUI.Visible = false;
+                _questUI.Visible = false;
+            }
+        }
+
+        private void OnQuestButtonPressed()
+        {
+            // Toggle the quest UI
+            _questUI.Visible = !_questUI.Visible;
+
+            // Hide other UIs if this UI is shown
+            if (_questUI.Visible)
+            {
+                _mapUI.Visible = false;
+                _inventoryUI.Visible = false;
             }
         }
     }
