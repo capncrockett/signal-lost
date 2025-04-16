@@ -40,6 +40,8 @@ builds/
 
 # Godot-specific backup files
 *.bak
+*.bak2
+*.pixel
 
 # Godot-specific user settings
 .godot/editor_settings-*.tres
@@ -55,3 +57,6 @@ temp_gut/
 
 # Generated files
 godot_project/tools/scene_analysis.md
+
+# Screenshots
+screenshot*.png
