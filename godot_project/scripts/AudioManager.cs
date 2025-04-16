@@ -127,60 +127,96 @@ namespace SignalLost
         // Generate a noise stream with given intensity
         private AudioStreamGenerator GenerateNoiseStream(float intensity)
         {
-            var noiseGenerator = new AudioStreamGenerator();
-            noiseGenerator.MixRate = 44100;
-            noiseGenerator.BufferLength = 0.2f;  // 200ms buffer for smoother looping
-
-            // Set up the stream in the player
-            _staticPlayer.Stream = noiseGenerator;
-            _staticPlayer.Play();
-
-            // Get the playback instance
-            var playback = (AudioStreamGeneratorPlayback)_staticPlayer.GetStreamPlayback();
-
-            // Fill the buffer with noise
-            var bufferSize = (int)(noiseGenerator.BufferLength * noiseGenerator.MixRate);
-
-            // Reset noise generation state for consistency
-            Array.Clear(_pinkNoiseBuffer, 0, _pinkNoiseBuffer.Length);
-            _brownNoiseLastValue = 0.0f;
-
-            for (int i = 0; i < bufferSize; i++)
+            try
             {
-                float sample = 0.0f;
+                // Create a new generator with a longer buffer for better continuity
+                var noiseGenerator = new AudioStreamGenerator();
+                noiseGenerator.MixRate = 44100;
+                noiseGenerator.BufferLength = 1.0f;  // 1 second buffer for better continuity
 
-                // Generate different types of noise
-                switch (_currentNoiseType)
+                // Set up the stream in the player
+                _staticPlayer.Stream = noiseGenerator;
+                _staticPlayer.Play();
+
+                // Get the playback instance
+                var playback = (AudioStreamGeneratorPlayback)_staticPlayer.GetStreamPlayback();
+                if (playback == null)
                 {
-                    case NoiseType.White:
-                        sample = GenerateWhiteNoise();
-                        break;
-                    case NoiseType.Pink:
-                        sample = GeneratePinkNoise();
-                        break;
-                    case NoiseType.Brown:
-                        sample = GenerateBrownNoise();
-                        break;
-                    case NoiseType.Digital:
-                        sample = GenerateDigitalNoise();
-                        break;
+                    GD.PrintErr("Failed to get audio playback instance");
+                    return noiseGenerator;
                 }
 
-                // Apply intensity with a slight curve for more natural fading
-                float adjustedIntensity = Mathf.Pow(intensity, 1.5f);
-                sample *= adjustedIntensity;
+                // Fill the buffer with noise
+                var bufferSize = (int)(noiseGenerator.BufferLength * noiseGenerator.MixRate);
 
-                // Add subtle crackle effect for realism
-                if (_random.NextDouble() < 0.01f * intensity)
+                // Reset noise generation state for consistency
+                Array.Clear(_pinkNoiseBuffer, 0, _pinkNoiseBuffer.Length);
+                _brownNoiseLastValue = 0.0f;
+
+                // Pre-generate white noise for efficiency
+                float[] whiteNoise = new float[bufferSize];
+                for (int i = 0; i < bufferSize; i++)
                 {
-                    sample += (float)(_random.NextDouble() * 0.5f - 0.25f) * intensity;
+                    whiteNoise[i] = (float)_random.NextDouble() * 2.0f - 1.0f;
                 }
 
-                playback.PushFrame(new Vector2(sample, sample));
+                // Process the noise based on the selected type
+                for (int i = 0; i < bufferSize; i++)
+                {
+                    float sample = 0.0f;
+
+                    // Generate different types of noise
+                    switch (_currentNoiseType)
+                    {
+                        case NoiseType.White:
+                            sample = whiteNoise[i];
+                            break;
+                        case NoiseType.Pink:
+                            // Use pre-generated white noise
+                            sample = GeneratePinkNoiseFromSample(whiteNoise[i]);
+                            break;
+                        case NoiseType.Brown:
+                            // Use pre-generated white noise
+                            sample = GenerateBrownNoiseFromSample(whiteNoise[i]);
+                            break;
+                        case NoiseType.Digital:
+                            // Use pre-generated white noise
+                            sample = GenerateDigitalNoiseFromSample(whiteNoise[i]);
+                            break;
+                    }
+
+                    // Apply intensity with a gentle curve for more natural fading
+                    float adjustedIntensity = Mathf.Pow(intensity, 1.2f);
+                    sample *= adjustedIntensity;
+
+                    // Add occasional crackle effect for realism (less frequent)
+                    if (_random.NextDouble() < 0.005f * intensity)
+                    {
+                        sample += (float)(_random.NextDouble() * 0.3f - 0.15f) * intensity;
+                    }
+
+                    // Apply a very subtle low-pass filter to smooth out harsh frequencies
+                    _lastSample = _lastSample * 0.2f + sample * 0.8f;
+                    sample = _lastSample;
+
+                    // Push the frame to the audio buffer
+                    playback.PushFrame(new Vector2(sample, sample));
+                }
+
+                // Set the player to loop for continuous playback
+                _staticPlayer.Autoplay = true;
+
+                return noiseGenerator;
             }
-
-            return noiseGenerator;
+            catch (Exception ex)
+            {
+                GD.PrintErr($"Error generating noise stream: {ex.Message}");
+                return null;
+            }
         }
+
+        // Last sample for simple low-pass filtering
+        private float _lastSample = 0.0f;
 
         // Generate white noise (equal energy per frequency)
         private float GenerateWhiteNoise()
@@ -191,8 +227,12 @@ namespace SignalLost
         // Generate pink noise (1/f spectrum - more natural sounding)
         private float GeneratePinkNoise()
         {
-            float white = GenerateWhiteNoise();
+            return GeneratePinkNoiseFromSample(GenerateWhiteNoise());
+        }
 
+        // Generate pink noise from a provided white noise sample
+        private float GeneratePinkNoiseFromSample(float white)
+        {
             // Paul Kellet's refined method for pink noise generation
             _pinkNoiseBuffer[0] = 0.99886f * _pinkNoiseBuffer[0] + white * 0.0555179f;
             _pinkNoiseBuffer[1] = 0.99332f * _pinkNoiseBuffer[1] + white * 0.0750759f;
@@ -211,8 +251,12 @@ namespace SignalLost
         // Generate brown noise (1/f² spectrum - deeper rumble)
         private float GenerateBrownNoise()
         {
-            float white = GenerateWhiteNoise();
+            return GenerateBrownNoiseFromSample(GenerateWhiteNoise());
+        }
 
+        // Generate brown noise from a provided white noise sample
+        private float GenerateBrownNoiseFromSample(float white)
+        {
             // Simple first-order low-pass filter
             _brownNoiseLastValue = (_brownNoiseLastValue + (0.02f * white)) / 1.02f;
 
@@ -223,15 +267,27 @@ namespace SignalLost
         // Generate digital noise (harsh, bit-crushed sound)
         private float GenerateDigitalNoise()
         {
+            return GenerateDigitalNoiseFromSample(GenerateWhiteNoise());
+        }
+
+        // Generate digital noise from a provided white noise sample
+        private float GenerateDigitalNoiseFromSample(float raw)
+        {
             // Quantize to fewer steps for digital sound
             int steps = 8;
-            float raw = GenerateWhiteNoise();
             return Mathf.Round(raw * steps) / steps;
         }
+
+        // Timer for continuous static noise generation
+        private Timer _staticNoiseTimer;
+        private float _currentStaticIntensity = 0.0f;
 
         // Play static noise with given intensity
         public void PlayStaticNoise(float intensity)
         {
+            // Store the current intensity for use in the timer callback
+            _currentStaticIntensity = intensity;
+
             // If intensity is very low, just stop the player
             if (intensity < 0.05f)
             {
@@ -239,26 +295,48 @@ namespace SignalLost
                 return;
             }
 
-            // If already playing, just adjust volume for smoother transition
-            if (_staticPlayer.Playing)
-            {
-                // Smoothly adjust volume
-                _staticPlayer.VolumeDb = Mathf.LinearToDb(intensity * _volume);
-                return;
-            }
-
-            // Generate and play new noise stream
+            // Set up the static player
             _staticPlayer.Bus = "Static";
             _staticPlayer.VolumeDb = Mathf.LinearToDb(intensity * _volume);
 
-            // GenerateNoiseStream will set up the stream and start playback
+            // Create and start the timer if it doesn't exist
+            if (_staticNoiseTimer == null)
+            {
+                _staticNoiseTimer = new Timer();
+                _staticNoiseTimer.WaitTime = 0.2f; // Refresh noise every 200ms
+                _staticNoiseTimer.Timeout += OnStaticNoiseTimerTimeout;
+                _staticNoiseTimer.Autostart = true;
+                AddChild(_staticNoiseTimer);
+            }
+
+            // Generate and play new noise stream immediately
             GenerateNoiseStream(intensity);
+        }
+
+        // Timer callback to continuously generate static noise
+        private void OnStaticNoiseTimerTimeout()
+        {
+            if (_currentStaticIntensity >= 0.05f && !_staticPlayer.Playing)
+            {
+                // Regenerate the noise to keep it continuous
+                GenerateNoiseStream(_currentStaticIntensity);
+            }
         }
 
         // Stop static noise
         public void StopStaticNoise()
         {
+            // Stop the player
             _staticPlayer.Stop();
+
+            // Reset the current intensity
+            _currentStaticIntensity = 0.0f;
+
+            // Stop and remove the timer if it exists
+            if (_staticNoiseTimer != null)
+            {
+                _staticNoiseTimer.Stop();
+            }
         }
 
         // Play signal tone at specified frequency
