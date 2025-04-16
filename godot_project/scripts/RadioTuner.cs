@@ -210,8 +210,13 @@ namespace SignalLost
                 // Calculate signal strength based on how close we are to the exact frequency
                 _signalStrength = _gameState.CalculateSignalStrength(_gameState.CurrentFrequency, signalData);
 
-                // Calculate static intensity based on signal strength
-                _staticIntensity = signalData.IsStatic ? 1.0f - _signalStrength : (1.0f - _signalStrength) * 0.5f;
+                // Calculate static intensity based on signal strength - inverse relationship
+                // As signal strength increases, static intensity decreases
+                _staticIntensity = 1.0f - _signalStrength;
+
+                // Apply a curve to make the transition more natural
+                // This makes weak signals have more static and strong signals have much less
+                _staticIntensity = Mathf.Pow(_staticIntensity, 0.7f);
 
                 // Update UI
                 if (_signalStrengthMeter != null)
@@ -225,50 +230,72 @@ namespace SignalLost
                 }
 
                 // Play appropriate audio
-                if (signalData.IsStatic)
+                if (_signalStrength < 0.8f) // If signal is not very strong, play some static
                 {
-                    // Play static with the signal mixed in
+                    // Play static with volume based on inverse of signal strength
                     _audioManager.PlayStaticNoise(_staticIntensity);
-                    _audioManager.PlaySignal(signalData.Frequency * 10, _signalStrength * 0.5f);  // Scale up for audible range
                 }
                 else
                 {
-                    // Play a clear signal
+                    // For very strong signals, stop the static completely
                     _audioManager.StopStaticNoise();
-                    _audioManager.PlaySignal(signalData.Frequency * 10);  // Scale up for audible range
                 }
+
+                // Always play the signal, with volume based on signal strength
+                _audioManager.PlaySignal(signalData.Frequency * 10, _signalStrength);  // Scale up for audible range
             }
             else
             {
                 // No signal found, just play static
-                float intensity = _gameState.GetStaticIntensity(_gameState.CurrentFrequency);
+                float baseIntensity = _gameState.GetStaticIntensity(_gameState.CurrentFrequency);
+
+                // Add some randomness to the static intensity for more realism
+                float randomFactor = 1.0f + (float)(new Random().NextDouble() * 0.2 - 0.1); // ±10% variation
+                float intensity = Mathf.Clamp(baseIntensity * randomFactor, 0.0f, 1.0f);
 
                 // Update state
                 _staticIntensity = intensity;
-                _signalStrength = 0.1f;  // Low signal strength
+                _signalStrength = 0.0f;  // No signal
                 _currentSignalId = null;
 
                 // Update UI
                 if (_signalStrengthMeter != null)
-                    _signalStrengthMeter.Value = _signalStrength * 100;
+                    _signalStrengthMeter.Value = 0; // No signal strength
 
-                // Play audio
+                // Play audio - just static, no signal
                 _audioManager.StopSignal();
                 _audioManager.PlayStaticNoise(intensity);
             }
 
             // Update message button state
             UpdateMessageButton();
+
+            // Update audio visualizer if present
+            UpdateAudioVisualizer();
         }
 
         // Update the static visualization
         private void UpdateStaticVisualization(float delta)
         {
-            // This would normally update a shader or material
-            // For now, we'll just update a property
+            if (_staticVisualization == null) return;
+
+            // Update the static visualization opacity based on static intensity
             var modulate = _staticVisualization.Modulate;
             modulate.A = _staticIntensity;
             _staticVisualization.Modulate = modulate;
+        }
+
+        // Update the audio visualizer if present
+        private void UpdateAudioVisualizer()
+        {
+            // Find audio visualizer in children
+            var visualizer = GetNodeOrNull<AudioVisualizer>("AudioVisualizer");
+            if (visualizer != null)
+            {
+                // Update the visualizer with current signal and static values
+                visualizer.SetSignalStrength(_signalStrength);
+                visualizer.SetStaticIntensity(_staticIntensity);
+            }
         }
 
         // Change the frequency by a specific amount
