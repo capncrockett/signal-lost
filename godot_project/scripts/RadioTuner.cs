@@ -269,9 +269,6 @@ namespace SignalLost
 
             // Update message button state
             UpdateMessageButton();
-
-            // Update audio visualizer if present
-            UpdateAudioVisualizer();
         }
 
         // Update the static visualization
@@ -285,18 +282,7 @@ namespace SignalLost
             _staticVisualization.Modulate = modulate;
         }
 
-        // Update the audio visualizer if present
-        private void UpdateAudioVisualizer()
-        {
-            // Find audio visualizer in children
-            var visualizer = GetNodeOrNull<AudioVisualizer>("AudioVisualizer");
-            if (visualizer != null)
-            {
-                // Update the visualizer with current signal and static values
-                visualizer.SetSignalStrength(_signalStrength);
-                visualizer.SetStaticIntensity(_staticIntensity);
-            }
-        }
+
 
         // Change the frequency by a specific amount
         public void ChangeFrequency(float amount)
