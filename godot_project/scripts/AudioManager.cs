@@ -754,6 +754,16 @@ namespace SignalLost
             AudioServer.SetBusMute(_masterBusIdx, _isMuted);
         }
 
+        // Set mute state directly
+        public void SetMuted(bool isMuted)
+        {
+            if (_isMuted != isMuted)
+            {
+                _isMuted = isMuted;
+                AudioServer.SetBusMute(_masterBusIdx, _isMuted);
+            }
+        }
+
         // Set the noise type
         public void SetNoiseType(NoiseType type)
         {
