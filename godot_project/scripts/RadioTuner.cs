@@ -116,20 +116,20 @@ namespace SignalLost
                 }
 
                 // Get UI references
-                _frequencyDisplay = GetNodeOrNull<Label>("MainContainer/FrequencyPanel/FrequencyDisplay");
-                _powerButton = GetNodeOrNull<Button>("MainContainer/ControlsContainer/PowerButton");
-                _frequencySlider = GetNodeOrNull<Slider>("MainContainer/TuningContainer/FrequencySlider");
-                _signalStrengthMeter = GetNodeOrNull<ProgressBar>("MainContainer/SignalStrengthContainer/StrengthMeterContainer/SignalStrengthMeter");
-                _staticVisualization = GetNodeOrNull<Control>("MainContainer/VisualizationContainer/SignalContainer/StaticVisualization");
+                _frequencyDisplay = GetNodeOrNull<Label>("RadioPanel/FrequencyDisplayPanel/FrequencyDisplay");
+                _powerButton = GetNodeOrNull<Button>("RadioPanel/TuningSection/ButtonsRow/PowerButton");
+                _frequencySlider = GetNodeOrNull<Slider>("RadioPanel/TuningSection/FrequencySlider");
+                _signalStrengthMeter = GetNodeOrNull<ProgressBar>("RadioPanel/SignalSection/SignalStrengthContainer/SignalStrengthMeter");
+                _staticVisualization = GetNodeOrNull<Control>("RadioPanel/VisualizationSection/VisualizationContainer/StaticVisualization");
                 _staticOverlay = _staticVisualization != null ? _staticVisualization.GetNodeOrNull<TextureRect>("StaticOverlay") : null;
-                _messageContainer = GetNodeOrNull<Control>("MessageContainer");
+                _messageContainer = GetNodeOrNull<Control>("RadioPanel/MessageContainer");
                 _messageButton = _messageContainer != null ? _messageContainer.GetNodeOrNull<Button>("MessageButton") : null;
                 _messageDisplay = _messageContainer != null ? _messageContainer.GetNodeOrNull<Control>("MessageDisplay") : null;
-                _scanButton = GetNodeOrNull<Button>("MainContainer/ControlsContainer/ScanButton");
-                _tuneDownButton = GetNodeOrNull<Button>("MainContainer/ControlsContainer/TuneDownButton");
-                _tuneUpButton = GetNodeOrNull<Button>("MainContainer/ControlsContainer/TuneUpButton");
-                _tuningKnob = GetNodeOrNull<TextureRect>("MainContainer/TuningContainer/KnobContainer/TuningKnob");
-                _morseVisualizer = GetNodeOrNull<MorseVisualizer>("MainContainer/VisualizationContainer/MorseContainer/MorseVisualizer");
+                _scanButton = GetNodeOrNull<Button>("RadioPanel/TuningSection/ButtonsRow/ScanButton");
+                _tuneDownButton = GetNodeOrNull<Button>("RadioPanel/TuningSection/ButtonsRow/TuneDownButton");
+                _tuneUpButton = GetNodeOrNull<Button>("RadioPanel/TuningSection/ButtonsRow/TuneUpButton");
+                _tuningKnob = GetNodeOrNull<TextureRect>("RadioPanel/TuningSection/FrequencySlider/TuningKnob");
+                _morseVisualizer = GetNodeOrNull<MorseVisualizer>("RadioPanel/VisualizationSection/MorseContainer/MorseVisualizer");
 
                 // Initialize UI
                 UpdateUi();
