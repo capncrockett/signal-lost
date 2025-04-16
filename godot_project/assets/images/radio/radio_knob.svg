@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <!-- Outer circle (knob body) -->
+  <circle cx="50" cy="50" r="45" fill="#333333" stroke="#222222" stroke-width="2"/>
+  
+  <!-- Inner circle (knob face) -->
+  <circle cx="50" cy="50" r="35" fill="#444444" stroke="#555555" stroke-width="1"/>
+  
+  <!-- Knob indicator line -->
+  <line x1="50" y1="50" x2="50" y2="15" stroke="#00ff00" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Knob center dot -->
+  <circle cx="50" cy="50" r="5" fill="#222222" stroke="#666666" stroke-width="1"/>
+  
+  <!-- Knob grip texture (radial lines) -->
+  <g stroke="#555555" stroke-width="1.5">
+    <line x1="50" y1="50" x2="76" y2="24" />
+    <line x1="50" y1="50" x2="24" y2="24" />
+    <line x1="50" y1="50" x2="76" y2="76" />
+    <line x1="50" y1="50" x2="24" y2="76" />
+    <line x1="50" y1="50" x2="85" y2="50" />
+    <line x1="50" y1="50" x2="15" y2="50" />
+    <line x1="50" y1="50" x2="50" y2="85" />
+  </g>
+</svg>
