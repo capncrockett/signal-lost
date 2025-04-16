@@ -1,0 +1,3 @@
+@echo off
+echo Running Signal Lost game with console output...
+"C:\Godot_v4.4.1-stable_mono_win64\Godot_v4.4.1-stable_mono_win64\Godot_v4.4.1-stable_mono_win64_console.exe" --path . --verbose --run MainScene.tscn

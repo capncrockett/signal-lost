@@ -60,7 +60,7 @@
    ```csharp
    using Godot;
    using System;
-   
+
    namespace SignalLost
    {
        public partial class MyComponent : Node
@@ -68,27 +68,27 @@
            // Properties with proper C# naming
            [Export]
            public float MyProperty { get; set; } = 0.0f;
-           
+
            // Private fields with underscore prefix
            private float _myField = 0.0f;
-           
+
            // Godot lifecycle methods
            public override void _Ready()
            {
                // Initialization
            }
-           
+
            public override void _Process(double delta)
            {
                // Per-frame logic
            }
-           
+
            // Public methods
            public void DoSomething()
            {
                // Implementation
            }
-           
+
            // Private methods
            private void HandleSomething()
            {
@@ -103,13 +103,13 @@
    // Define signal
    [Signal]
    public delegate void MySignalEventHandler(string parameter);
-   
+
    // Emit signal
    EmitSignal(SignalName.MySignal, "parameter");
-   
+
    // Connect to signal
    otherNode.MySignal += OnMySignal;
-   
+
    // Signal handler
    private void OnMySignal(string parameter)
    {
@@ -122,37 +122,37 @@
    using Godot;
    using System;
    using Microsoft.VisualStudio.TestTools.UnitTesting;
-   
+
    namespace SignalLost.Tests
    {
        [TestClass]
        public partial class MyComponentTests : Test
        {
            private MyComponent _component;
-           
+
            [TestInitialize]
            public void Setup()
            {
                _component = new MyComponent();
                AddChild(_component);
            }
-           
+
            [TestCleanup]
            public void Teardown()
            {
                _component.QueueFree();
                _component = null;
            }
-           
+
            [TestMethod]
            public void TestSomething()
            {
                // Arrange
                _component.MyProperty = 1.0f;
-               
+
                // Act
                _component.DoSomething();
-               
+
                // Assert
                Assert.AreEqual(2.0f, _component.MyProperty);
            }
@@ -197,6 +197,28 @@
    ```
    - Error reports are saved to `godot_project/logs/`
 
+## Running the Game
+
+1. **Running from the command line (preferred method)**
+   ```bash
+   cd godot_project
+   "C:\Godot_v4.4.1-stable_mono_win64\Godot_v4.4.1-stable_mono_win64\Godot_v4.4.1-stable_mono_win64_console.exe" --path . --verbose --run MainScene.tscn
+   ```
+   - This runs the game directly with console output visible
+   - Allows for debugging and seeing error messages in real-time
+   - Preferred over using the Godot editor for regular development
+
+2. **Development workflow**
+   - Edit code in VS Code
+   - Run the game using the command line method above
+   - View debug output in the console
+   - Only use the Godot editor when necessary for scene editing
+
+3. **Debugging with console output**
+   - Add `GD.Print()` statements to your code
+   - All output will be visible in the console when running with `--verbose`
+   - Use `GD.PrintErr()` for error messages
+
 ## Common Issues
 
 1. **Missing partial keyword**
@@ -210,3 +232,8 @@
 3. **Scene loading issues**
    - Use absolute paths: `GD.Load<PackedScene>("res://scenes/my_scene.tscn")`
    - Check for case sensitivity in paths
+
+4. **Game crashes when running**
+   - Check the console output for error messages
+   - Look for exceptions in the C# code
+   - Verify that all resources are properly loaded

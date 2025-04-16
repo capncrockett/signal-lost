@@ -216,7 +216,11 @@ namespace SignalLost
 
                 // Apply a curve to make the transition more natural
                 // This makes weak signals have more static and strong signals have much less
-                _staticIntensity = Mathf.Pow(_staticIntensity, 0.7f);
+                // Using a more aggressive curve (0.5) for faster reduction of static as signal improves
+                _staticIntensity = Mathf.Pow(_staticIntensity, 0.5f);
+
+                // Ensure there's always some minimum static (authentic radio feel)
+                _staticIntensity = Mathf.Max(_staticIntensity, 0.15f);
 
                 // Update UI
                 if (_signalStrengthMeter != null)
@@ -229,20 +233,17 @@ namespace SignalLost
                     _gameState.AddDiscoveredFrequency(signalData.Frequency);
                 }
 
-                // Play appropriate audio
-                if (_signalStrength < 0.8f) // If signal is not very strong, play some static
-                {
-                    // Play static with volume based on inverse of signal strength
-                    _audioManager.PlayStaticNoise(_staticIntensity);
-                }
-                else
-                {
-                    // For very strong signals, stop the static completely
-                    _audioManager.StopStaticNoise();
-                }
+                // Play appropriate audio - always keep static playing but adjust volume
+                // Play static with volume based on inverse of signal strength
+                _audioManager.PlayStaticNoise(_staticIntensity);
 
-                // Always play the signal, with volume based on signal strength
-                _audioManager.PlaySignal(signalData.Frequency * 10, _signalStrength);  // Scale up for audible range
+                // Debug output
+                GD.Print($"Signal strength: {_signalStrength:F2}, Static intensity: {_staticIntensity:F2}");
+
+                // Play the signal, with volume based on signal strength
+                // Always use morse code pattern, but volume depends on signal strength
+                bool useBeepMode = true; // Always use morse code pattern
+                _audioManager.PlaySignal(signalData.Frequency * 10, _signalStrength, "sine", useBeepMode);  // Scale up for audible range
             }
             else
             {
@@ -468,6 +469,12 @@ namespace SignalLost
             }
             else
             {
+                // Always start with static noise at full volume when turning on
+                if (_audioManager != null)
+                {
+                    _audioManager.PlayStaticNoise(1.0f);
+                }
+
                 // Process frequency to start playing appropriate audio
                 ProcessFrequency();
             }
