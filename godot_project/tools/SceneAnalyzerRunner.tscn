@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dxnq8y5yvqnxr"]
 
-[ext_resource type="Script" path="res://tools/SceneAnalyzer.cs" id="1_analyzer"]
+[ext_resource type="Script" uid="uid://bmrmf0d5u815w" path="res://tools/SceneAnalyzer.cs" id="1_analyzer"]
 
 [node name="SceneAnalyzerRunner" type="Node"]
 
