@@ -344,88 +344,177 @@ namespace SignalLost
             _currentStaticIntensity = 0.0f;
         }
 
+        // Signal playback state
+        private AudioStreamGeneratorPlayback _signalPlayback;
+        private bool _isSignalInitialized = false;
+        private float _currentSignalVolume = 1.0f;
+        private string _currentWaveform = "sine";
+        private bool _isBeepMode = false;
+        private float _beepPhase = 0.0f;
+        private float _beepTimer = 0.0f;
+
         // Play signal tone at specified frequency
-        public AudioStreamGenerator PlaySignal(float frequency, float volumeScale = 1.0f, string waveform = "sine")
+        public AudioStreamGenerator PlaySignal(float frequency, float volumeScale = 1.0f, string waveform = "sine", bool beepMode = false)
         {
-            // If volume scale is very low, just stop the player
-            if (volumeScale < 0.05f)
+            try
             {
-                StopSignal();
-                return null;
-            }
-
-            // If already playing and frequency is close, just adjust volume for smoother transition
-            if (_signalPlayer.Playing && _currentSignalFrequency > 0 &&
-                Mathf.Abs(_currentSignalFrequency - frequency) < 0.5f)
-            {
-                // Smoothly adjust volume
-                _signalPlayer.VolumeDb = Mathf.LinearToDb(volumeScale * _volume);
-                return (AudioStreamGenerator)_signalPlayer.Stream;
-            }
-
-            // Stop if playing
-            if (_signalPlayer.Playing)
-            {
-                _signalPlayer.Stop();
-            }
-
-            // Store current frequency for future reference
-            _currentSignalFrequency = frequency;
-
-            // Create new generator
-            var generator = new AudioStreamGenerator();
-            generator.MixRate = 44100;
-            generator.BufferLength = 0.2f;  // 200ms buffer for smoother looping
-
-            // Set up the player
-            _signalPlayer.Stream = generator;
-            _signalPlayer.Bus = "Signal";
-            _signalPlayer.VolumeDb = Mathf.LinearToDb(volumeScale * _volume);
-            _signalPlayer.Play();
-
-            // Get the playback instance
-            var playback = (AudioStreamGeneratorPlayback)_signalPlayer.GetStreamPlayback();
-
-            // Fill the buffer with the waveform
-            var bufferSize = (int)(generator.BufferLength * generator.MixRate);
-            float phase = 0.0f;
-            float baseIncrement = frequency / generator.MixRate;
-
-            for (int i = 0; i < bufferSize; i++)
-            {
-                float sample = 0.0f;
-
-                // Add slight frequency modulation for more realistic radio sound
-                float modulation = 1.0f + (float)Math.Sin(i * 0.0001f) * 0.001f;
-                float increment = baseIncrement * modulation;
-
-                // Generate different waveforms
-                switch (waveform)
+                // If volume scale is very low, just stop the player
+                if (volumeScale < 0.05f)
                 {
-                    case "sine":
-                        sample = Mathf.Sin(phase * 2.0f * Mathf.Pi);
-                        break;
-                    case "square":
-                        sample = (phase % 1.0f) < 0.5f ? 1.0f : -1.0f;
-                        break;
-                    case "triangle":
-                        float t = phase % 1.0f;
-                        sample = 2.0f * (t < 0.5f ? t : 1.0f - t) - 1.0f;
-                        break;
-                    case "sawtooth":
-                        sample = 2.0f * (phase % 1.0f) - 1.0f;
-                        break;
+                    StopSignal();
+                    return null;
                 }
 
-                // Apply volume scale with slight random variation for realism
-                float randomVariation = 1.0f + ((float)_random.NextDouble() * 0.02f - 0.01f);
-                sample *= volumeScale * randomVariation;
+                // Store current parameters for continuous playback
+                _currentSignalVolume = volumeScale;
+                _currentWaveform = waveform;
+                _isBeepMode = beepMode;
 
-                playback.PushFrame(new Vector2(sample, sample));
-                phase += increment;
+                // If already playing and frequency is close, just adjust volume for smoother transition
+                if (_signalPlayer.Playing && _currentSignalFrequency > 0 &&
+                    Mathf.Abs(_currentSignalFrequency - frequency) < 0.5f)
+                {
+                    // Smoothly adjust volume
+                    float currentDb = _signalPlayer.VolumeDb;
+                    float targetDb = Mathf.LinearToDb(volumeScale * _volume);
+                    _signalPlayer.VolumeDb = Mathf.Lerp(currentDb, targetDb, 0.3f);
+
+                    // Play squelch on effect if we're newly detecting a strong signal
+                    if (beepMode && !_isBeepMode)
+                    {
+                        PlaySquelchOn();
+                    }
+
+                    _isBeepMode = beepMode;
+                    return (AudioStreamGenerator)_signalPlayer.Stream;
+                }
+
+                // If we're starting a new signal and it's a strong one, play squelch on
+                if (beepMode && (!_signalPlayer.Playing || _currentSignalFrequency == 0))
+                {
+                    PlaySquelchOn();
+                }
+
+                // Stop if playing
+                if (_signalPlayer.Playing)
+                {
+                    _signalPlayer.Stop();
+                }
+
+                // Store current frequency for future reference
+                _currentSignalFrequency = frequency;
+
+                // Create new generator with longer buffer for better continuity
+                var generator = new AudioStreamGenerator();
+                generator.MixRate = 44100;
+                generator.BufferLength = 1.0f;  // 1 second buffer for better continuity
+
+                // Set up the player
+                _signalPlayer.Stream = generator;
+                _signalPlayer.Bus = "Signal";
+                _signalPlayer.VolumeDb = Mathf.LinearToDb(volumeScale * _volume);
+                _signalPlayer.Play();
+
+                // Get the playback instance and store it for continuous filling
+                _signalPlayback = (AudioStreamGeneratorPlayback)_signalPlayer.GetStreamPlayback();
+                if (_signalPlayback == null)
+                {
+                    GD.PrintErr("Failed to get signal playback instance");
+                    return generator;
+                }
+
+                // Mark as initialized
+                _isSignalInitialized = true;
+
+                // Reset beep state
+                _beepPhase = 0.0f;
+                _beepTimer = 0.0f;
+
+                // Fill the buffer initially
+                FillSignalBuffer();
+
+                return generator;
             }
+            catch (Exception ex)
+            {
+                GD.PrintErr($"Error playing signal: {ex.Message}");
+                return null;
+            }
+        }
 
-            return generator;
+        // Fill the signal buffer - called continuously to keep audio playing
+        private void FillSignalBuffer()
+        {
+            if (!_isSignalInitialized || _signalPlayback == null) return;
+
+            try
+            {
+                // Check if we need to fill the buffer
+                int availableFrames = _signalPlayback.GetFramesAvailable();
+                if (availableFrames < 1000) return; // Skip if buffer is mostly full
+
+                // Fill the buffer with the waveform
+                float phase = _beepPhase; // Continue from last phase for smooth waveform
+                float baseIncrement = _currentSignalFrequency / 44100.0f;
+                float beepTimer = _beepTimer; // For beep mode timing
+
+                for (int i = 0; i < availableFrames; i++)
+                {
+                    float sample = 0.0f;
+
+                    // Add slight frequency modulation for more realistic radio sound
+                    float modulation = 1.0f + (float)Math.Sin(i * 0.0001f) * 0.001f;
+                    float increment = baseIncrement * modulation;
+
+                    // For beep mode, we alternate between tone and silence
+                    bool generateTone = !_isBeepMode || beepTimer < 0.5f; // 0.5 second tone, 0.5 second silence
+
+                    if (generateTone)
+                    {
+                        // Generate different waveforms
+                        switch (_currentWaveform)
+                        {
+                            case "sine":
+                                sample = Mathf.Sin(phase * 2.0f * Mathf.Pi);
+                                break;
+                            case "square":
+                                sample = (phase % 1.0f) < 0.5f ? 1.0f : -1.0f;
+                                break;
+                            case "triangle":
+                                float t = phase % 1.0f;
+                                sample = 2.0f * (t < 0.5f ? t : 1.0f - t) - 1.0f;
+                                break;
+                            case "sawtooth":
+                                sample = 2.0f * (phase % 1.0f) - 1.0f;
+                                break;
+                        }
+
+                        // Apply volume scale with slight random variation for realism
+                        float randomVariation = 1.0f + ((float)_random.NextDouble() * 0.02f - 0.01f);
+                        sample *= _currentSignalVolume * randomVariation;
+                    }
+
+                    // Push the frame to the audio buffer
+                    _signalPlayback.PushFrame(new Vector2(sample, sample));
+
+                    // Update phase and beep timer
+                    phase += increment;
+                    if (_isBeepMode)
+                    {
+                        beepTimer += 1.0f / 44100.0f; // Increment by sample duration
+                        if (beepTimer >= 1.0f) // 1 second cycle (0.5s on, 0.5s off)
+                            beepTimer = 0.0f;
+                    }
+                }
+
+                // Store the current phase and beep timer for next buffer fill
+                _beepPhase = phase % 1.0f; // Keep phase in 0-1 range
+                _beepTimer = beepTimer;
+            }
+            catch (Exception ex)
+            {
+                GD.PrintErr($"Error filling signal buffer: {ex.Message}");
+            }
         }
 
         // Current signal frequency (for smooth transitions)
@@ -434,7 +523,17 @@ namespace SignalLost
         // Stop signal tone
         public void StopSignal()
         {
+            // Play squelch off effect if we were in beep mode
+            if (_signalPlayer.Playing && _isBeepMode)
+            {
+                PlaySquelchOff();
+            }
+
+            // Reset signal state
             _signalPlayer.Stop();
+            _isSignalInitialized = false;
+            _currentSignalFrequency = 0.0f;
+            _isBeepMode = false;
         }
 
         // Play a sound effect
@@ -447,6 +546,117 @@ namespace SignalLost
             {
                 _effectPlayer.Stream = effect;
                 _effectPlayer.Play();
+            }
+        }
+
+        // Play squelch on effect (chirp when signal starts)
+        public void PlaySquelchOn()
+        {
+            try
+            {
+                // Create a short chirp sound
+                var generator = new AudioStreamGenerator();
+                generator.MixRate = 44100;
+                generator.BufferLength = 0.15f; // 150ms chirp
+
+                _effectPlayer.Stream = generator;
+                _effectPlayer.Bus = "Signal";
+                _effectPlayer.VolumeDb = Mathf.LinearToDb(0.8f * _volume);
+                _effectPlayer.Play();
+
+                var playback = (AudioStreamGeneratorPlayback)_effectPlayer.GetStreamPlayback();
+                if (playback == null) return;
+
+                // Generate a rising tone (squelch on effect)
+                int bufferSize = (int)(generator.BufferLength * generator.MixRate);
+                float phase = 0.0f;
+
+                for (int i = 0; i < bufferSize; i++)
+                {
+                    // Frequency rises from 800Hz to 1200Hz
+                    float progress = (float)i / bufferSize;
+                    float freq = 800.0f + (400.0f * progress);
+                    float increment = freq / generator.MixRate;
+
+                    // Generate sine wave
+                    float sample = Mathf.Sin(phase * 2.0f * Mathf.Pi);
+
+                    // Apply envelope (quick attack, longer decay)
+                    float envelope;
+                    if (progress < 0.1f) // Attack (first 10%)
+                        envelope = progress / 0.1f;
+                    else if (progress > 0.7f) // Decay (last 30%)
+                        envelope = (1.0f - progress) / 0.3f;
+                    else // Sustain (middle 60%)
+                        envelope = 1.0f;
+
+                    sample *= envelope;
+
+                    // Add a bit of noise for realism
+                    if (progress > 0.6f)
+                        sample += GenerateWhiteNoise() * 0.05f * (progress - 0.6f) / 0.4f;
+
+                    playback.PushFrame(new Vector2(sample, sample));
+                    phase += increment;
+                }
+            }
+            catch (Exception ex)
+            {
+                GD.PrintErr($"Error playing squelch on: {ex.Message}");
+            }
+        }
+
+        // Play squelch off effect (chirp when signal ends)
+        public void PlaySquelchOff()
+        {
+            try
+            {
+                // Create a short chirp sound
+                var generator = new AudioStreamGenerator();
+                generator.MixRate = 44100;
+                generator.BufferLength = 0.15f; // 150ms chirp
+
+                _effectPlayer.Stream = generator;
+                _effectPlayer.Bus = "Signal";
+                _effectPlayer.VolumeDb = Mathf.LinearToDb(0.8f * _volume);
+                _effectPlayer.Play();
+
+                var playback = (AudioStreamGeneratorPlayback)_effectPlayer.GetStreamPlayback();
+                if (playback == null) return;
+
+                // Generate a falling tone (squelch off effect)
+                int bufferSize = (int)(generator.BufferLength * generator.MixRate);
+                float phase = 0.0f;
+
+                for (int i = 0; i < bufferSize; i++)
+                {
+                    // Frequency falls from 1200Hz to 800Hz
+                    float progress = (float)i / bufferSize;
+                    float freq = 1200.0f - (400.0f * progress);
+                    float increment = freq / generator.MixRate;
+
+                    // Generate sine wave
+                    float sample = Mathf.Sin(phase * 2.0f * Mathf.Pi);
+
+                    // Apply envelope (quick attack, longer decay)
+                    float envelope;
+                    if (progress < 0.1f) // Attack (first 10%)
+                        envelope = progress / 0.1f;
+                    else // Decay (remaining 90%)
+                        envelope = (1.0f - progress) / 0.9f;
+
+                    sample *= envelope;
+
+                    // Add increasing noise for realism
+                    sample += GenerateWhiteNoise() * 0.1f * progress;
+
+                    playback.PushFrame(new Vector2(sample, sample));
+                    phase += increment;
+                }
+            }
+            catch (Exception ex)
+            {
+                GD.PrintErr($"Error playing squelch off: {ex.Message}");
             }
         }
 
@@ -477,6 +687,12 @@ namespace SignalLost
             if (_isStaticInitialized && _staticPlayer.Playing)
             {
                 FillStaticNoiseBuffer();
+            }
+
+            // Keep the signal buffer filled
+            if (_isSignalInitialized && _signalPlayer.Playing)
+            {
+                FillSignalBuffer();
             }
         }
     }

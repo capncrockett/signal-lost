@@ -237,8 +237,10 @@ namespace SignalLost
                 // Debug output
                 GD.Print($"Signal strength: {_signalStrength:F2}, Static intensity: {_staticIntensity:F2}");
 
-                // Always play the signal, with volume based on signal strength
-                _audioManager.PlaySignal(signalData.Frequency * 10, _signalStrength);  // Scale up for audible range
+                // Play the signal, with volume based on signal strength
+                // Use beep mode for strong signals (over 0.7 strength)
+                bool useBeepMode = _signalStrength > 0.7f;
+                _audioManager.PlaySignal(signalData.Frequency * 10, _signalStrength, "sine", useBeepMode);  // Scale up for audible range
             }
             else
             {
