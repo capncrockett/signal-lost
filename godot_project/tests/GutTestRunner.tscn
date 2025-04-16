@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://c8yvxg3xnq6yw"]
+[gd_scene load_steps=2 format=3 uid="uid://g8yvxg3xnq6yw"]
 
 [ext_resource type="Script" path="res://addons/gut/addons/gut/gut.gd" id="1_r3j2k"]
 
@@ -18,12 +18,12 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_r3j2k")
-_select_script = "res://tests/unit/test_game_state.gd"
+_select_script = "res://tests/GameStateTests.cs"
 _tests_like = ""
 _should_maximize = true
 _should_print_to_console = true
 _log_level = 3
 _yield_between_tests = true
-_directory1 = "res://tests/unit"
-_directory2 = "res://tests/integration"
-_post_run_script = "res://tests/scripts/post_run.gd"
+_directory1 = "res://tests"
+_directory2 = ""
+_post_run_script = ""

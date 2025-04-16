@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3 uid="uid://dxnq8y5yvqnxr"]
+
+[ext_resource type="Script" uid="uid://bmrmf0d5u815w" path="res://tools/SceneAnalyzer.cs" id="1_analyzer"]
+
+[node name="SceneAnalyzerRunner" type="Node"]
+
+[node name="SceneAnalyzer" type="Node" parent="."]
+script = ExtResource("1_analyzer")
+OutputPath = "res://tools/scene_analysis.md"
+
+[node name="Instructions" type="Label" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Scene Analyzer Tool
+
+This tool analyzes all scenes in the project and generates a report with:
+- Detection of duplicate UIDs
+- Scene hierarchy visualization
+- Detailed scene references
+
+The report will be saved to: res://tools/scene_analysis.md
+
+Press F5 to run the analyzer."
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://c8j6y8o4n8qxv"]
+[gd_scene load_steps=3 format=3 uid="uid://h8j6y8o4n8qxv"]
 
-[ext_resource type="Script" path="res://tests/ComprehensiveTestRunner.gd" id="1_0xnvs"]
-[ext_resource type="Script" path="res://tests/force_exit.gd" id="2_f7g8h"]
+[ext_resource type="Script" path="res://tests/CSharpTestRunner.cs" id="1_0xnvs"]
+[ext_resource type="Script" path="res://tests/TestRunner.cs" id="2_f7g8h"]
 
 [node name="ComprehensiveTestRunnerScene" type="Node"]
 script = ExtResource("1_0xnvs")

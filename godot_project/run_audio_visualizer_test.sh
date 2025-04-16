@@ -4,7 +4,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Find the Godot executable
-GODOT_EXECUTABLE="/Applications/Godot_mono.app/Contents/MacOS/Godot"
+GODOT_EXECUTABLE="C:\Godot_v4.4.1-stable_mono_win64\Godot_v4.4.1-stable_mono_win64\Godot_v4.4.1-stable_mono_win64_console.exe"
 
 # Check if Godot executable exists
 if [ ! -f "$GODOT_EXECUTABLE" ]; then

@@ -22,7 +22,8 @@ echo Project path: %DIR%
 
 REM Run the comprehensive test runner scene
 echo Running comprehensive test runner scene...
-"%GODOT_EXECUTABLE%" --path "%DIR%" tests/ComprehensiveTestRunnerScene.tscn
+cd "%DIR%"
+"%GODOT_EXECUTABLE%" tests/ComprehensiveTestRunnerScene.tscn
 
 REM Get the exit code
 set EXIT_CODE=%ERRORLEVEL%

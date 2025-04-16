@@ -17,8 +17,11 @@ config/icon="res://assets/images/icon.png"
 
 [autoload]
 
-GameState="*res://scripts/FixedGameState.gd"
-AudioManager="*res://scripts/AudioManagerWrapper.gd"
+GameState="*res://scripts/GameState.cs"
+AudioManager="*res://scripts/AudioManager.cs"
+MapSystem="*res://scripts/MapSystem.cs"
+InventorySystem="*res://scripts/InventorySystem.cs"
+QuestSystem="*res://scripts/QuestSystem.cs"
 
 [display]
 

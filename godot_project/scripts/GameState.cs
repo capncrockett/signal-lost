@@ -5,13 +5,14 @@ using System.Text.Json;
 
 namespace SignalLost
 {
+    [GlobalClass]
     public partial class GameState : Node
     {
         // Game state variables
         public float CurrentFrequency { get; private set; } = 90.0f;
         public bool IsRadioOn { get; private set; } = false;
         public List<float> DiscoveredFrequencies { get; private set; } = new List<float>();
-        public string CurrentLocation { get; private set; } = "bunker";
+        public string CurrentLocation { get; set; } = "bunker";
         public List<string> Inventory { get; private set; } = new List<string>();
         public int GameProgress { get; private set; } = 0;
 
@@ -101,7 +102,7 @@ namespace SignalLost
         {
             float distance = Math.Abs(freq - signalData.Frequency);
             float maxDistance = signalData.Bandwidth;
-            
+
             // Calculate strength based on how close we are to the exact frequency
             // 1.0 = perfect signal, 0.0 = no signal
             if (distance <= maxDistance)
@@ -154,6 +155,12 @@ namespace SignalLost
         [Signal]
         public delegate void MessageDecodedEventHandler(string messageId);
 
+        [Signal]
+        public delegate void LocationChangedEventHandler(string locationId);
+
+        [Signal]
+        public delegate void InventoryChangedEventHandler();
+
         // Functions to modify state
         public void SetFrequency(float freq)
         {
@@ -178,6 +185,39 @@ namespace SignalLost
             return false;
         }
 
+        public void SetCurrentLocation(string locationId)
+        {
+            if (CurrentLocation != locationId)
+            {
+                CurrentLocation = locationId;
+                EmitSignal(SignalName.LocationChanged, locationId);
+            }
+        }
+
+        // Inventory management functions
+        public void AddToInventory(string itemId)
+        {
+            Inventory.Add(itemId);
+            EmitSignal(SignalName.InventoryChanged);
+        }
+
+        public void RemoveFromInventory(string itemId)
+        {
+            Inventory.Remove(itemId);
+            EmitSignal(SignalName.InventoryChanged);
+        }
+
+        public void ClearInventory()
+        {
+            Inventory.Clear();
+            EmitSignal(SignalName.InventoryChanged);
+        }
+
+        public bool HasItem(string itemId)
+        {
+            return Inventory.Contains(itemId);
+        }
+
         // Save and load functions
         public bool SaveGame()
         {
@@ -191,15 +231,15 @@ namespace SignalLost
                 ["game_progress"] = GameProgress,
                 ["messages"] = Messages
             };
-            
+
             string jsonString = JsonSerializer.Serialize(saveData);
-            
+
             using var saveFile = FileAccess.Open("user://savegame.save", FileAccess.ModeFlags.Write);
             if (saveFile == null)
             {
                 return false;
             }
-            
+
             saveFile.StoreLine(jsonString);
             return true;
         }
@@ -210,16 +250,16 @@ namespace SignalLost
             {
                 return false;
             }
-            
+
             using var saveFile = FileAccess.Open("user://savegame.save", FileAccess.ModeFlags.Read);
             if (saveFile == null)
             {
                 return false;
             }
-            
+
             string jsonString = saveFile.GetLine();
             var saveData = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonString);
-            
+
             CurrentFrequency = Convert.ToSingle(saveData["current_frequency"]);
             IsRadioOn = Convert.ToBoolean(saveData["is_radio_on"]);
             DiscoveredFrequencies = JsonSerializer.Deserialize<List<float>>(saveData["discovered_frequencies"].ToString());
@@ -227,7 +267,7 @@ namespace SignalLost
             Inventory = JsonSerializer.Deserialize<List<string>>(saveData["inventory"].ToString());
             GameProgress = Convert.ToInt32(saveData["game_progress"]);
             Messages = JsonSerializer.Deserialize<Dictionary<string, MessageData>>(saveData["messages"].ToString());
-            
+
             return true;
         }
     }
