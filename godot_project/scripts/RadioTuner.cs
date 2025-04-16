@@ -238,8 +238,8 @@ namespace SignalLost
                 GD.Print($"Signal strength: {_signalStrength:F2}, Static intensity: {_staticIntensity:F2}");
 
                 // Play the signal, with volume based on signal strength
-                // Use beep mode for strong signals (over 0.7 strength)
-                bool useBeepMode = _signalStrength > 0.7f;
+                // Always use morse code pattern, but volume depends on signal strength
+                bool useBeepMode = true; // Always use morse code pattern
                 _audioManager.PlaySignal(signalData.Frequency * 10, _signalStrength, "sine", useBeepMode);  // Scale up for audible range
             }
             else
@@ -466,6 +466,12 @@ namespace SignalLost
             }
             else
             {
+                // Always start with static noise at full volume when turning on
+                if (_audioManager != null)
+                {
+                    _audioManager.PlayStaticNoise(1.0f);
+                }
+
                 // Process frequency to start playing appropriate audio
                 ProcessFrequency();
             }
