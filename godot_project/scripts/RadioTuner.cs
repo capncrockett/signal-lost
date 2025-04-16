@@ -219,6 +219,9 @@ namespace SignalLost
                 // Using a more aggressive curve (0.5) for faster reduction of static as signal improves
                 _staticIntensity = Mathf.Pow(_staticIntensity, 0.5f);
 
+                // Ensure there's always some minimum static (authentic radio feel)
+                _staticIntensity = Mathf.Max(_staticIntensity, 0.15f);
+
                 // Update UI
                 if (_signalStrengthMeter != null)
                     _signalStrengthMeter.Value = _signalStrength * 100;

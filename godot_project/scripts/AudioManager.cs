@@ -645,34 +645,35 @@ namespace SignalLost
                 var playback = (AudioStreamGeneratorPlayback)_effectPlayer.GetStreamPlayback();
                 if (playback == null) return;
 
-                // Generate a rising tone (squelch on effect)
+                // Generate a more subtle rising tone (squelch on effect)
                 int bufferSize = (int)(generator.BufferLength * generator.MixRate);
                 float phase = 0.0f;
 
                 for (int i = 0; i < bufferSize; i++)
                 {
-                    // Frequency rises from 800Hz to 1200Hz
+                    // Frequency rises more subtly from 600Hz to 800Hz
                     float progress = (float)i / bufferSize;
-                    float freq = 800.0f + (400.0f * progress);
+                    float freq = 600.0f + (200.0f * progress);
                     float increment = freq / generator.MixRate;
 
                     // Generate sine wave
                     float sample = Mathf.Sin(phase * 2.0f * Mathf.Pi);
 
-                    // Apply envelope (quick attack, longer decay)
+                    // Apply smoother envelope
                     float envelope;
-                    if (progress < 0.1f) // Attack (first 10%)
-                        envelope = progress / 0.1f;
-                    else if (progress > 0.7f) // Decay (last 30%)
-                        envelope = (1.0f - progress) / 0.3f;
-                    else // Sustain (middle 60%)
+                    if (progress < 0.15f) // Attack (first 15%)
+                        envelope = progress / 0.15f;
+                    else if (progress > 0.6f) // Decay (last 40%)
+                        envelope = (1.0f - progress) / 0.4f;
+                    else // Sustain (middle 45%)
                         envelope = 1.0f;
 
-                    sample *= envelope;
+                    // Reduce overall volume
+                    sample *= envelope * 0.7f;
 
-                    // Add a bit of noise for realism
-                    if (progress > 0.6f)
-                        sample += GenerateWhiteNoise() * 0.05f * (progress - 0.6f) / 0.4f;
+                    // Add a bit of noise for realism, but less than before
+                    if (progress > 0.5f)
+                        sample += GenerateWhiteNoise() * 0.03f * (progress - 0.5f) / 0.5f;
 
                     playback.PushFrame(new Vector2(sample, sample));
                     phase += increment;
@@ -702,31 +703,32 @@ namespace SignalLost
                 var playback = (AudioStreamGeneratorPlayback)_effectPlayer.GetStreamPlayback();
                 if (playback == null) return;
 
-                // Generate a falling tone (squelch off effect)
+                // Generate a more subtle falling tone (squelch off effect)
                 int bufferSize = (int)(generator.BufferLength * generator.MixRate);
                 float phase = 0.0f;
 
                 for (int i = 0; i < bufferSize; i++)
                 {
-                    // Frequency falls from 1200Hz to 800Hz
+                    // Frequency falls more subtly from 800Hz to 600Hz
                     float progress = (float)i / bufferSize;
-                    float freq = 1200.0f - (400.0f * progress);
+                    float freq = 800.0f - (200.0f * progress);
                     float increment = freq / generator.MixRate;
 
                     // Generate sine wave
                     float sample = Mathf.Sin(phase * 2.0f * Mathf.Pi);
 
-                    // Apply envelope (quick attack, longer decay)
+                    // Apply smoother envelope with faster decay
                     float envelope;
                     if (progress < 0.1f) // Attack (first 10%)
                         envelope = progress / 0.1f;
-                    else // Decay (remaining 90%)
-                        envelope = (1.0f - progress) / 0.9f;
+                    else // Faster decay (remaining 90%)
+                        envelope = (1.0f - progress) / 0.6f;
 
-                    sample *= envelope;
+                    // Reduce overall volume
+                    sample *= envelope * 0.6f;
 
-                    // Add increasing noise for realism
-                    sample += GenerateWhiteNoise() * 0.1f * progress;
+                    // Add less noise for realism
+                    sample += GenerateWhiteNoise() * 0.05f * progress;
 
                     playback.PushFrame(new Vector2(sample, sample));
                     phase += increment;
