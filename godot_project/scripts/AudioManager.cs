@@ -351,7 +351,66 @@ namespace SignalLost
         private string _currentWaveform = "sine";
         private bool _isBeepMode = false;
         private float _beepPhase = 0.0f;
-        private float _beepTimer = 0.0f;
+        private float _morseTimer = 0.0f;
+        private int _morseIndex = 0;
+
+        // Morse code for "TEST": - (T) . (E) ... (S) - (T)
+        private readonly bool[] _morseTest = new bool[] {
+            // T: -
+            true, false,  // Dash, then symbol space
+
+            // Letter space between T and E
+            false,
+
+            // E: .
+            true, false,  // Dot, then symbol space
+
+            // Letter space between E and S
+            false,
+
+            // S: ...
+            true, false,  // Dot, then symbol space
+            true, false,  // Dot, then symbol space
+            true, false,  // Dot, then symbol space
+
+            // Letter space between S and T
+            false,
+
+            // T: -
+            true, false,  // Dash, then symbol space
+
+            // Word space at the end before repeating
+            false, false
+        };
+
+        // Morse timing for each element (in seconds)
+        private readonly float[] _morseTiming = new float[] {
+            // T: -
+            0.3f, 0.1f,  // Dash duration, symbol space
+
+            // Letter space between T and E
+            0.3f,
+
+            // E: .
+            0.1f, 0.1f,  // Dot duration, symbol space
+
+            // Letter space between E and S
+            0.3f,
+
+            // S: ...
+            0.1f, 0.1f,  // Dot duration, symbol space
+            0.1f, 0.1f,  // Dot duration, symbol space
+            0.1f, 0.1f,  // Dot duration, symbol space
+
+            // Letter space between S and T
+            0.3f,
+
+            // T: -
+            0.3f, 0.1f,  // Dash duration, symbol space
+
+            // Word space at the end before repeating
+            0.7f, 0.7f
+        };
 
         // Play signal tone at specified frequency
         public AudioStreamGenerator PlaySignal(float frequency, float volumeScale = 1.0f, string waveform = "sine", bool beepMode = false)
@@ -426,9 +485,10 @@ namespace SignalLost
                 // Mark as initialized
                 _isSignalInitialized = true;
 
-                // Reset beep state
+                // Reset morse code state
                 _beepPhase = 0.0f;
-                _beepTimer = 0.0f;
+                _morseTimer = 0.0f;
+                _morseIndex = 0;
 
                 // Fill the buffer initially
                 FillSignalBuffer();
@@ -456,7 +516,10 @@ namespace SignalLost
                 // Fill the buffer with the waveform
                 float phase = _beepPhase; // Continue from last phase for smooth waveform
                 float baseIncrement = _currentSignalFrequency / 44100.0f;
-                float beepTimer = _beepTimer; // For beep mode timing
+                float morseTimer = _morseTimer; // For morse code timing
+                int morseIndex = _morseIndex; // Current position in morse code
+
+                // Note: Morse code timing is now defined in the _morseTiming array
 
                 for (int i = 0; i < availableFrames; i++)
                 {
@@ -466,8 +529,28 @@ namespace SignalLost
                     float modulation = 1.0f + (float)Math.Sin(i * 0.0001f) * 0.001f;
                     float increment = baseIncrement * modulation;
 
-                    // For beep mode, we alternate between tone and silence
-                    bool generateTone = !_isBeepMode || beepTimer < 0.5f; // 0.5 second tone, 0.5 second silence
+                    // Determine if we should generate a tone based on morse code
+                    bool generateTone = true;
+
+                    if (_isBeepMode)
+                    {
+                        // Get the current morse code element
+                        bool isOn = _morseTest[morseIndex];
+
+                        // Get the timing for this element
+                        float elementDuration = _morseTiming[morseIndex];
+
+                        // Only generate tone when the element is "on"
+                        generateTone = isOn;
+
+                        // Update the timer and move to next element if needed
+                        morseTimer += 1.0f / 44100.0f; // Increment by sample duration
+                        if (morseTimer >= elementDuration)
+                        {
+                            morseTimer = 0.0f;
+                            morseIndex = (morseIndex + 1) % _morseTest.Length;
+                        }
+                    }
 
                     if (generateTone)
                     {
@@ -497,19 +580,14 @@ namespace SignalLost
                     // Push the frame to the audio buffer
                     _signalPlayback.PushFrame(new Vector2(sample, sample));
 
-                    // Update phase and beep timer
+                    // Always update phase for continuous waveform
                     phase += increment;
-                    if (_isBeepMode)
-                    {
-                        beepTimer += 1.0f / 44100.0f; // Increment by sample duration
-                        if (beepTimer >= 1.0f) // 1 second cycle (0.5s on, 0.5s off)
-                            beepTimer = 0.0f;
-                    }
                 }
 
-                // Store the current phase and beep timer for next buffer fill
+                // Store the current state for next buffer fill
                 _beepPhase = phase % 1.0f; // Keep phase in 0-1 range
-                _beepTimer = beepTimer;
+                _morseTimer = morseTimer;
+                _morseIndex = morseIndex;
             }
             catch (Exception ex)
             {
