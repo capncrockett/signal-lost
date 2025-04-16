@@ -18,11 +18,11 @@ namespace SignalLost
         public override void _Ready()
         {
             // Get references to UI elements
-            _mapButton = GetNode<Button>("MapButton");
+            _mapButton = GetNode<Button>("SidePanel/VBoxContainer/MapButton");
             _mapUI = GetNode<Control>("MapUI");
-            _inventoryButton = GetNode<Button>("InventoryButton");
+            _inventoryButton = GetNode<Button>("SidePanel/VBoxContainer/InventoryButton");
             _inventoryUI = GetNode<Control>("InventoryUI");
-            _questButton = GetNode<Button>("QuestButton");
+            _questButton = GetNode<Button>("SidePanel/VBoxContainer/QuestButton");
             _questUI = GetNode<Control>("QuestUI");
 
             // Connect signals
