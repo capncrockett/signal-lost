@@ -124,38 +124,72 @@ namespace SignalLost
         private float[] _pinkNoiseBuffer = new float[7];
         private float _brownNoiseLastValue = 0.0f;
 
+        // Current static noise intensity for continuous playback
+        private float _currentStaticIntensity = 0.0f;
+        private float _lastSample = 0.0f;
+        private AudioStreamGeneratorPlayback _staticPlayback;
+        private bool _isStaticInitialized = false;
+
         // Create a looping noise stream with given intensity
         private AudioStream CreateLoopingNoiseStream(float intensity)
         {
             try
             {
-                // Create a simple noise sample
-                var audioStreamSample = new AudioStreamGenerator();
-                audioStreamSample.MixRate = 44100;
-                audioStreamSample.BufferLength = 1.0f; // 1 second buffer
+                // Store the current intensity for continuous playback
+                _currentStaticIntensity = intensity;
+
+                // Create a simple noise sample with a longer buffer for better continuity
+                var audioStreamGenerator = new AudioStreamGenerator();
+                audioStreamGenerator.MixRate = 44100;
+                audioStreamGenerator.BufferLength = 2.0f; // 2 second buffer for better continuity
 
                 // Set up the stream in the player
-                _staticPlayer.Stream = audioStreamSample;
+                _staticPlayer.Stream = audioStreamGenerator;
                 _staticPlayer.Play();
 
-                // Get the playback instance
-                var playback = (AudioStreamGeneratorPlayback)_staticPlayer.GetStreamPlayback();
-                if (playback == null)
+                // Get the playback instance and store it for continuous filling
+                _staticPlayback = (AudioStreamGeneratorPlayback)_staticPlayer.GetStreamPlayback();
+                if (_staticPlayback == null)
                 {
                     GD.PrintErr("Failed to get audio playback instance");
-                    return audioStreamSample;
+                    return audioStreamGenerator;
                 }
 
-                // Generate a 1-second noise sample
-                int sampleLength = (int)(audioStreamSample.BufferLength * audioStreamSample.MixRate);
+                // Mark as initialized
+                _isStaticInitialized = true;
 
-                // Reset noise generation state for consistency
-                Array.Clear(_pinkNoiseBuffer, 0, _pinkNoiseBuffer.Length);
-                _brownNoiseLastValue = 0.0f;
-                float lastSample = 0.0f;
+                // Fill the buffer initially
+                FillStaticNoiseBuffer();
 
-                // Generate the noise samples
-                for (int i = 0; i < sampleLength; i++)
+                return audioStreamGenerator;
+            }
+            catch (Exception ex)
+            {
+                GD.PrintErr($"Error creating looping noise stream: {ex.Message}");
+                return null;
+            }
+        }
+
+        // Fill the static noise buffer - called continuously to keep audio playing
+        private void FillStaticNoiseBuffer()
+        {
+            if (!_isStaticInitialized || _staticPlayback == null) return;
+
+            try
+            {
+                // Check if we need to fill the buffer
+                int availableFrames = _staticPlayback.GetFramesAvailable();
+                if (availableFrames < 1000) return; // Skip if buffer is mostly full
+
+                // Reset noise generation state for consistency if buffer is nearly empty
+                if (availableFrames > 80000)
+                {
+                    Array.Clear(_pinkNoiseBuffer, 0, _pinkNoiseBuffer.Length);
+                    _brownNoiseLastValue = 0.0f;
+                }
+
+                // Generate noise samples to fill the buffer
+                for (int i = 0; i < availableFrames; i++)
                 {
                     float sample = 0.0f;
 
@@ -177,29 +211,26 @@ namespace SignalLost
                     }
 
                     // Apply intensity with a gentle curve for more natural fading
-                    float adjustedIntensity = Mathf.Pow(intensity, 1.2f);
+                    float adjustedIntensity = Mathf.Pow(_currentStaticIntensity, 1.2f);
                     sample *= adjustedIntensity;
 
                     // Add occasional crackle effect for realism (less frequent)
-                    if (_random.NextDouble() < 0.005f * intensity)
+                    if (_random.NextDouble() < 0.005f * _currentStaticIntensity)
                     {
-                        sample += (float)(_random.NextDouble() * 0.3f - 0.15f) * intensity;
+                        sample += (float)(_random.NextDouble() * 0.3f - 0.15f) * _currentStaticIntensity;
                     }
 
                     // Apply a very subtle low-pass filter to smooth out harsh frequencies
-                    lastSample = lastSample * 0.2f + sample * 0.8f;
-                    sample = lastSample;
+                    _lastSample = _lastSample * 0.2f + sample * 0.8f;
+                    sample = _lastSample;
 
                     // Push the frame to the audio buffer
-                    playback.PushFrame(new Vector2(sample, sample));
+                    _staticPlayback.PushFrame(new Vector2(sample, sample));
                 }
-
-                return audioStreamSample;
             }
             catch (Exception ex)
             {
-                GD.PrintErr($"Error creating looping noise stream: {ex.Message}");
-                return null;
+                GD.PrintErr($"Error filling static noise buffer: {ex.Message}");
             }
         }
 
@@ -268,12 +299,14 @@ namespace SignalLost
         {
             try
             {
-                // If intensity is very low, just stop the player
+                // If intensity is very low, just reduce volume but don't stop
                 if (intensity < 0.05f)
                 {
-                    StopStaticNoise();
-                    return;
+                    intensity = 0.05f; // Keep a minimum level of static
                 }
+
+                // Update the current intensity for continuous playback
+                _currentStaticIntensity = intensity;
 
                 // Set up the static player
                 _staticPlayer.Bus = "Static";
@@ -281,8 +314,13 @@ namespace SignalLost
                 // If already playing, just adjust volume for smoother transition
                 if (_staticPlayer.Playing)
                 {
-                    // Smoothly adjust volume
-                    _staticPlayer.VolumeDb = Mathf.LinearToDb(intensity * _volume);
+                    // Smoothly adjust volume using interpolation for more natural transitions
+                    float currentDb = _staticPlayer.VolumeDb;
+                    float targetDb = Mathf.LinearToDb(intensity * _volume);
+                    _staticPlayer.VolumeDb = Mathf.Lerp(currentDb, targetDb, 0.3f);
+
+                    // Make sure the buffer stays filled
+                    FillStaticNoiseBuffer();
                     return;
                 }
 
@@ -301,8 +339,9 @@ namespace SignalLost
         // Stop static noise
         public void StopStaticNoise()
         {
-            // Stop the player
-            _staticPlayer.Stop();
+            // Instead of stopping, just set volume very low
+            _staticPlayer.VolumeDb = -80.0f; // Nearly silent
+            _currentStaticIntensity = 0.0f;
         }
 
         // Play signal tone at specified frequency
@@ -429,6 +468,16 @@ namespace SignalLost
         public void SetNoiseType(NoiseType type)
         {
             _currentNoiseType = type;
+        }
+
+        // Process method called every frame
+        public override void _Process(double delta)
+        {
+            // Keep the static noise buffer filled
+            if (_isStaticInitialized && _staticPlayer.Playing)
+            {
+                FillStaticNoiseBuffer();
+            }
         }
     }
 }
