@@ -22,12 +22,15 @@ namespace SignalLost
         private Slider _frequencySlider;
         private ProgressBar _signalStrengthMeter;
         private Control _staticVisualization;
+        private TextureRect _staticOverlay;
         private Control _messageContainer;
         private Button _messageButton;
         private Control _messageDisplay;
         private Button _scanButton;
         private Button _tuneDownButton;
         private Button _tuneUpButton;
+        private TextureRect _tuningKnob;
+        private MorseVisualizer _morseVisualizer;
 
         // Local state
         private bool _isScanning = false;
@@ -113,17 +116,20 @@ namespace SignalLost
                 }
 
                 // Get UI references
-                _frequencyDisplay = GetNodeOrNull<Label>("FrequencyDisplay");
-                _powerButton = GetNodeOrNull<Button>("PowerButton");
-                _frequencySlider = GetNodeOrNull<Slider>("FrequencySlider");
-                _signalStrengthMeter = GetNodeOrNull<ProgressBar>("SignalStrengthMeter");
-                _staticVisualization = GetNodeOrNull<Control>("StaticVisualization");
-                _messageContainer = GetNodeOrNull<Control>("MessageContainer");
+                _frequencyDisplay = GetNodeOrNull<Label>("RadioPanel/FrequencyDisplayPanel/FrequencyDisplay");
+                _powerButton = GetNodeOrNull<Button>("RadioPanel/TuningSection/ButtonsRow/PowerButton");
+                _frequencySlider = GetNodeOrNull<Slider>("RadioPanel/TuningSection/FrequencySlider");
+                _signalStrengthMeter = GetNodeOrNull<ProgressBar>("RadioPanel/SignalSection/SignalStrengthContainer/SignalStrengthMeter");
+                _staticVisualization = GetNodeOrNull<Control>("RadioPanel/VisualizationContainer/StaticVisualization");
+                _staticOverlay = _staticVisualization != null ? _staticVisualization.GetNodeOrNull<TextureRect>("StaticOverlay") : null;
+                _messageContainer = GetNodeOrNull<Control>("RadioPanel/MessageContainer");
                 _messageButton = _messageContainer != null ? _messageContainer.GetNodeOrNull<Button>("MessageButton") : null;
                 _messageDisplay = _messageContainer != null ? _messageContainer.GetNodeOrNull<Control>("MessageDisplay") : null;
-                _scanButton = GetNodeOrNull<Button>("ScanButton");
-                _tuneDownButton = GetNodeOrNull<Button>("TuneDownButton");
-                _tuneUpButton = GetNodeOrNull<Button>("TuneUpButton");
+                _scanButton = GetNodeOrNull<Button>("RadioPanel/TuningSection/ButtonsRow/ScanButton");
+                _tuneDownButton = GetNodeOrNull<Button>("RadioPanel/TuningSection/ButtonsRow/TuneDownButton");
+                _tuneUpButton = GetNodeOrNull<Button>("RadioPanel/TuningSection/ButtonsRow/TuneUpButton");
+                _tuningKnob = GetNodeOrNull<TextureRect>("RadioPanel/TuningSection/FrequencySlider/TuningKnob");
+                _morseVisualizer = GetNodeOrNull<MorseVisualizer>("RadioPanel/MorseContainer/MorseVisualizer");
 
                 // Initialize UI
                 UpdateUi();
@@ -275,12 +281,34 @@ namespace SignalLost
         // Update the static visualization
         private void UpdateStaticVisualization(float delta)
         {
-            if (_staticVisualization == null) return;
+            // Update the audio visualizer
+            if (_staticVisualization != null && _staticVisualization is AudioVisualizer audioVisualizer)
+            {
+                audioVisualizer.SetSignalStrength(_signalStrength);
+                audioVisualizer.SetStaticIntensity(_staticIntensity);
+            }
 
-            // Update the static visualization opacity based on static intensity
-            var modulate = _staticVisualization.Modulate;
-            modulate.A = _staticIntensity;
-            _staticVisualization.Modulate = modulate;
+            // Update the static overlay
+            if (_staticOverlay != null)
+            {
+                var modulate = _staticOverlay.Modulate;
+                modulate.A = _staticIntensity * 0.7f; // Reduce opacity a bit for better visibility
+                _staticOverlay.Modulate = modulate;
+            }
+
+            // Update the morse visualizer
+            if (_morseVisualizer != null)
+            {
+                _morseVisualizer.SetSignalStrength(_signalStrength);
+            }
+
+            // Rotate the tuning knob based on frequency
+            if (_tuningKnob != null)
+            {
+                float percentage = (_gameState.CurrentFrequency - MinFrequency) / (MaxFrequency - MinFrequency);
+                float rotation = percentage * 270.0f; // 270 degrees of rotation
+                _tuningKnob.RotationDegrees = rotation;
+            }
         }
 
 
