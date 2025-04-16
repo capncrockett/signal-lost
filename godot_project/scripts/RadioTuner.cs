@@ -328,6 +328,20 @@ namespace SignalLost
             OnFrequencyChanged(newFreq);
         }
 
+        // Set the frequency directly
+        public void SetFrequency(float frequency)
+        {
+            if (_gameState == null) return;
+
+            float newFreq = Mathf.Clamp(frequency, MinFrequency, MaxFrequency);
+            newFreq = Mathf.Snapped(newFreq, FrequencyStep);  // Round to nearest step
+
+            _gameState.SetFrequency(newFreq);
+
+            // For testing purposes, manually call OnFrequencyChanged
+            OnFrequencyChanged(newFreq);
+        }
+
         // Toggle the radio power
         public void TogglePower()
         {
@@ -339,12 +353,24 @@ namespace SignalLost
             OnRadioToggled(_gameState.IsRadioOn);
         }
 
+        // Set the radio power state directly
+        public void SetPower(bool isOn)
+        {
+            if (_gameState == null) return;
+
+            if (_gameState.IsRadioOn != isOn)
+            {
+                _gameState.ToggleRadio();
+                OnRadioToggled(_gameState.IsRadioOn);
+            }
+        }
+
         // Toggle frequency scanning
         public void ToggleScanning()
         {
             _isScanning = !_isScanning;
 
-            if (_isScanning && _gameState.IsRadioOn)
+            if (_isScanning && _gameState != null && _gameState.IsRadioOn)
             {
                 _scanTimer.Start();
             }
@@ -354,7 +380,17 @@ namespace SignalLost
             }
 
             // Update UI
-            _scanButton.Text = _isScanning ? "Stop Scan" : "Scan";
+            if (_scanButton != null)
+                _scanButton.Text = _isScanning ? "Stop Scan" : "Scan";
+        }
+
+        // Set scanning state directly
+        public void SetScanning(bool scanning)
+        {
+            if (_isScanning != scanning)
+            {
+                ToggleScanning();
+            }
         }
 
         // Toggle message display
@@ -508,6 +544,41 @@ namespace SignalLost
             }
 
             UpdateUi();
+        }
+
+        // Getter methods for compatibility with pixel-based UI
+
+        // Get the current frequency
+        public float GetCurrentFrequency()
+        {
+            return _gameState != null ? _gameState.CurrentFrequency : MinFrequency;
+        }
+
+        // Check if the radio is powered on
+        public bool IsPowerOn()
+        {
+            return _gameState != null && _gameState.IsRadioOn;
+        }
+
+        // Check if the radio is scanning
+        public bool IsScanning()
+        {
+            return _isScanning;
+        }
+
+        // Get the current signal strength
+        public float GetSignalStrength()
+        {
+            return _signalStrength;
+        }
+
+        // Set mute state
+        public void SetMute(bool isMuted)
+        {
+            if (_audioManager != null)
+            {
+                _audioManager.SetMuted(isMuted);
+            }
         }
     }
 }
