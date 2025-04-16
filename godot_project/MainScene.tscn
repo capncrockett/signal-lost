@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://c8j6y8o4n8qxv"]
 
 [ext_resource type="PackedScene" uid="uid://c8yvxg3xnq6yw" path="res://scenes/radio/RadioTuner.tscn" id="1_r3j2k"]
-[ext_resource type="PackedScene" uid="uid://c8yvxg3xnq6yw" path="res://scenes/map/MapUI.tscn" id="2_m4p7q"]
+[ext_resource type="PackedScene" uid="uid://b8yvxg3xnq6yw" path="res://scenes/map/MapUI.tscn" id="2_m4p7q"]
 [ext_resource type="Script" path="res://scripts/MainScene.cs" id="3_8j7xp"]
 [ext_resource type="PackedScene" uid="uid://c8yvvs1yvqnxl" path="res://scenes/inventory/InventoryUI.tscn" id="4_ixnqm"]
 [ext_resource type="PackedScene" uid="uid://c8yvvs1yvqnxq" path="res://scenes/quest/QuestUI.tscn" id="5_ixnqn"]
