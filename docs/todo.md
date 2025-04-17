@@ -108,7 +108,7 @@ godot_project/
 2. ⬜ Extend pixel-based approach to other UI elements
    - ✅ Create pixel-based inventory UI
    - ✅ Implement pixel-based message display
-   - ⬜ Design pixel-based map interface
+   - ✅ Design pixel-based map interface
 3. ⬜ Implement field exploration
    - ⬜ Grid-based movement
    - ⬜ Player character with pixel-based rendering
@@ -156,7 +156,7 @@ godot_project/
 3. ⬜ Extend pixel-based approach to other UI components
    - ✅ Implement pixel-based inventory UI
    - ✅ Implement enhanced pixel-based message display
-   - ⬜ Implement pixel-based map interface
+   - ✅ Implement pixel-based map interface
 4. ⬜ Create pixel-based game world and characters
 5. ⬜ Retain minimal essential assets (title screen, character portraits)
 
