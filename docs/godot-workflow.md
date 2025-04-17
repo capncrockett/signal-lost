@@ -1,6 +1,6 @@
-# Development Workflow (Godot Engine with Alpha/Beta Agent Development)
+# Development Workflow (Signal Lost with C# in Godot Engine)
 
-> **Note**: This workflow document outlines the development process for the Godot Engine implementation of Signal Lost with Alpha/Beta Agent Development.
+> **Note**: This workflow document outlines the current development process for Signal Lost using C# in Godot Engine with Alpha/Beta Agent collaboration.
 
 ## Pre-coding Checklist
 
@@ -41,29 +41,36 @@ The agents collaborate through a structured development process:
 - Agent Beta reviews Agent Alpha's code for quality and test coverage
 - Agent Alpha implements fixes based on Agent Beta's feedback
 
-```gdscript
-# Example of interface contract between agents
-# Shared interface used by both Alpha and Beta agents
-class_name Signal
-extends Resource
+```csharp
+// Example of interface contract between agents
+// Shared interface used by both Alpha and Beta agents
+namespace SignalLost
+{
+    [GlobalClass]
+    public partial class Signal : Resource
+    {
+        public string Id { get; set; }
+        public float Frequency { get; set; }
+        public float Strength { get; set; }
+        public string Type { get; set; }  // "message", "location", or "event"
+        public string Content { get; set; }
+        public bool Discovered { get; set; }
+        public int Timestamp { get; set; }
 
-var id: String
-var frequency: float
-var strength: float
-var type: String  # "message", "location", or "event"
-var content: String
-var discovered: bool
-var timestamp: int
+        // Agent Alpha implements signal detection
+        public static Signal DetectSignal(float frequency)
+        {
+            // Implementation by Agent Alpha
+            return null;
+        }
 
-# Agent Alpha implements signal detection
-func detect_signal(frequency: float) -> Signal:
-    # Implementation by Agent Alpha
-    pass
-
-# Agent Beta consumes signals for narrative progression
-func process_signal(signal: Signal) -> void:
-    # Implementation by Agent Beta
-    pass
+        // Agent Beta consumes signals for narrative progression
+        public void ProcessSignal()
+        {
+            // Implementation by Agent Beta
+        }
+    }
+}
 ```
 
 ## Godot Engine Approach
@@ -94,68 +101,123 @@ Signal Lost uses the Godot Engine for game development, providing a robust frame
 
 ### Example Implementation
 
-```gdscript
-extends Control
+```csharp
+using Godot;
+using System;
 
-# Radio tuner properties
-export var min_frequency: float = 88.0
-export var max_frequency: float = 108.0
-export var frequency_step: float = 0.1
+namespace SignalLost
+{
+    [GlobalClass]
+    public partial class RadioTuner : Control
+    {
+        // Export variables for inspector configuration
+        [Export]
+        public float MinFrequency { get; set; } = 88.0f;
 
-# UI references
-onready var frequency_display = $FrequencyDisplay
-onready var power_button = $PowerButton
-onready var frequency_slider = $FrequencySlider
-onready var signal_strength_meter = $SignalStrengthMeter
-onready var static_visualization = $StaticVisualization
+        [Export]
+        public float MaxFrequency { get; set; } = 108.0f;
 
-# Local state
-var is_on: bool = false
-var current_frequency: float = 90.0
+        [Export]
+        public float FrequencyStep { get; set; } = 0.1f;
 
-# Called when the node enters the scene tree
-func _ready() -> void:
-    # Initialize UI
-    update_ui()
+        // Private member variables
+        private Label _frequencyDisplay;
+        private Button _powerButton;
+        private Slider _frequencySlider;
+        private ProgressBar _signalStrengthMeter;
+        private Control _staticVisualization;
 
-    # Connect signals
-    power_button.connect("pressed", self, "_on_power_button_pressed")
-    frequency_slider.connect("value_changed", self, "_on_frequency_slider_changed")
+        // Local state
+        private bool _isOn = false;
+        private float _currentFrequency = 90.0f;
 
-# Process function called every frame
-func _process(delta: float) -> void:
-    if is_on:
-        # Process input
-        if Input.is_action_just_pressed("tune_up"):
-            change_frequency(frequency_step)
-        elif Input.is_action_just_pressed("tune_down"):
-            change_frequency(-frequency_step)
+        // Called when the node enters the scene tree
+        public override void _Ready()
+        {
+            // Get UI references
+            _frequencyDisplay = GetNode<Label>("FrequencyDisplay");
+            _powerButton = GetNode<Button>("PowerButton");
+            _frequencySlider = GetNode<Slider>("FrequencySlider");
+            _signalStrengthMeter = GetNode<ProgressBar>("SignalStrengthMeter");
+            _staticVisualization = GetNode<Control>("StaticVisualization");
 
-        # Update visualization
-        update_static_visualization(delta)
+            // Initialize UI
+            UpdateUI();
 
-# Change the frequency by a specific amount
-func change_frequency(amount: float) -> void:
-    current_frequency = clamp(current_frequency + amount, min_frequency, max_frequency)
-    current_frequency = stepify(current_frequency, frequency_step)  # Round to nearest step
-    update_ui()
+            // Connect signals
+            _powerButton.Pressed += OnPowerButtonPressed;
+            _frequencySlider.ValueChanged += OnFrequencySliderChanged;
+        }
 
-# Toggle the radio power
-func toggle_power() -> void:
-    is_on = !is_on
-    update_ui()
+        // Process function called every frame
+        public override void _Process(double delta)
+        {
+            if (_isOn)
+            {
+                // Process input
+                if (Input.IsActionJustPressed("tune_up"))
+                {
+                    ChangeFrequency(FrequencyStep);
+                }
+                else if (Input.IsActionJustPressed("tune_down"))
+                {
+                    ChangeFrequency(-FrequencyStep);
+                }
 
-# Update the UI based on current state
-func update_ui() -> void:
-    # Update frequency display
-    frequency_display.text = "%.1f MHz" % current_frequency
+                // Update visualization
+                UpdateStaticVisualization(delta);
+            }
+        }
 
-    # Update power button
-    power_button.text = "ON" if is_on else "OFF"
+        // Change the frequency by a specific amount
+        public void ChangeFrequency(float amount)
+        {
+            _currentFrequency = Mathf.Clamp(_currentFrequency + amount, MinFrequency, MaxFrequency);
+            _currentFrequency = Mathf.Round(_currentFrequency * 10) / 10;  // Round to nearest 0.1
+            UpdateUI();
+        }
 
-    # Update frequency slider
-    var percentage = (current_frequency - min_frequency) / (max_frequency - min_frequency)
-    frequency_slider.value = percentage * 100
+        // Toggle the radio power
+        public void TogglePower()
+        {
+            _isOn = !_isOn;
+            UpdateUI();
+        }
+
+        // Update the UI based on current state
+        private void UpdateUI()
+        {
+            // Update frequency display
+            _frequencyDisplay.Text = $"{_currentFrequency:F1} MHz";
+
+            // Update power button
+            _powerButton.Text = _isOn ? "ON" : "OFF";
+
+            // Update frequency slider
+            float percentage = (_currentFrequency - MinFrequency) / (MaxFrequency - MinFrequency);
+            _frequencySlider.Value = percentage * 100;
+        }
+
+        // Event handlers
+        private void OnPowerButtonPressed()
+        {
+            TogglePower();
+        }
+
+        private void OnFrequencySliderChanged(double value)
+        {
+            float percentage = (float)value / 100.0f;
+            _currentFrequency = MinFrequency + percentage * (MaxFrequency - MinFrequency);
+            _currentFrequency = Mathf.Round(_currentFrequency * 10) / 10;  // Round to nearest 0.1
+            UpdateUI();
+        }
+
+        private void UpdateStaticVisualization(double delta)
+        {
+            // Implementation for static visualization
+        }
+    }
+}
 ```
 
 ## Component Development Workflow
@@ -317,9 +379,6 @@ namespace SignalLost.Tests
 
 # Check for C# compilation errors
 dotnet build godot_project/SignalLost.sln
-
-# Run static analysis
-godot --path godot_project --script addons/gdlint/gdlint.gd
 
 # Run all checks at once
 ./godot_project/check_all.sh
