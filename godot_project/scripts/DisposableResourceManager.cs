@@ -13,13 +13,13 @@ namespace SignalLost
     {
         // Singleton instance
         private static DisposableResourceManager _instance;
-        
+
         // List of resources to dispose on exit
         private List<IDisposable> _disposables = new List<IDisposable>();
-        
+
         // Dictionary to track resources by owner
         private Dictionary<Node, List<IDisposable>> _resourcesByOwner = new Dictionary<Node, List<IDisposable>>();
-        
+
         // Configuration
         [Export]
         public bool LogDisposals { get; set; } = true;
@@ -33,14 +33,18 @@ namespace SignalLost
             {
                 if (_instance == null)
                 {
-                    _instance = Engine.GetMainLoop().GetRoot().GetNodeOrNull<DisposableResourceManager>("/root/DisposableResourceManager");
-                    
+                    var mainLoop = Engine.GetMainLoop();
+                    if (mainLoop is SceneTree sceneTree)
+                    {
+                        _instance = sceneTree.Root.GetNodeOrNull<DisposableResourceManager>("/root/DisposableResourceManager");
+                    }
+
                     if (_instance == null)
                     {
                         GD.PrintErr("DisposableResourceManager: Instance not found. Make sure it's added as an autoload singleton.");
                     }
                 }
-                
+
                 return _instance;
             }
         }
@@ -50,10 +54,10 @@ namespace SignalLost
         {
             GD.Print("DisposableResourceManager: Initializing...");
             _instance = this;
-            
+
             // Connect to tree exiting signal to clean up resources
             GetTree().Root.TreeExiting += OnTreeExiting;
-            
+
             GD.Print("DisposableResourceManager: Ready");
         }
 
@@ -78,24 +82,24 @@ namespace SignalLost
             {
                 _disposables.Add(disposable);
             }
-            
+
             // If owner is provided, associate the resource with it
             if (owner != null)
             {
                 if (!_resourcesByOwner.ContainsKey(owner))
                 {
                     _resourcesByOwner[owner] = new List<IDisposable>();
-                    
+
                     // Connect to owner's tree_exiting signal
                     owner.TreeExiting += () => DisposeResourcesForOwner(owner);
                 }
-                
+
                 if (!_resourcesByOwner[owner].Contains(disposable))
                 {
                     _resourcesByOwner[owner].Add(disposable);
                 }
             }
-            
+
             if (LogDisposals)
             {
                 GD.Print($"DisposableResourceManager: Registered {disposable.GetType().Name}" +
@@ -115,20 +119,20 @@ namespace SignalLost
 
             // Remove from global list
             _disposables.Remove(disposable);
-            
+
             // Remove from all owners
             foreach (var entry in _resourcesByOwner)
             {
                 entry.Value.Remove(disposable);
             }
-            
+
             // Dispose if requested
             if (dispose)
             {
                 try
                 {
                     disposable.Dispose();
-                    
+
                     if (LogDisposals)
                     {
                         GD.Print($"DisposableResourceManager: Disposed {disposable.GetType().Name}");
@@ -154,10 +158,10 @@ namespace SignalLost
             {
                 GD.Print($"DisposableResourceManager: Disposing resources for {owner.Name}");
             }
-            
+
             // Get resources for this owner
             var resources = new List<IDisposable>(_resourcesByOwner[owner]);
-            
+
             // Dispose each resource
             foreach (var disposable in resources)
             {
@@ -165,10 +169,10 @@ namespace SignalLost
                 {
                     // Remove from global list
                     _disposables.Remove(disposable);
-                    
+
                     // Dispose
                     disposable.Dispose();
-                    
+
                     if (LogDisposals)
                     {
                         GD.Print($"DisposableResourceManager: Disposed {disposable.GetType().Name} owned by {owner.Name}");
@@ -179,7 +183,7 @@ namespace SignalLost
                     GD.PrintErr($"DisposableResourceManager: Error disposing {disposable.GetType().Name}: {ex.Message}");
                 }
             }
-            
+
             // Clear the list
             _resourcesByOwner.Remove(owner);
         }
@@ -193,10 +197,10 @@ namespace SignalLost
             {
                 GD.Print($"DisposableResourceManager: Disposing all resources ({_disposables.Count} total)");
             }
-            
+
             // Create a copy of the list to avoid modification during iteration
             var disposables = new List<IDisposable>(_disposables);
-            
+
             // Dispose each resource
             foreach (var disposable in disposables)
             {
@@ -209,11 +213,11 @@ namespace SignalLost
                     GD.PrintErr($"DisposableResourceManager: Error disposing {disposable.GetType().Name}: {ex.Message}");
                 }
             }
-            
+
             // Clear all lists
             _disposables.Clear();
             _resourcesByOwner.Clear();
-            
+
             if (LogDisposals)
             {
                 GD.Print("DisposableResourceManager: All resources disposed");
@@ -241,38 +245,38 @@ namespace SignalLost
         {
             GD.Print("=== DISPOSABLE RESOURCE REPORT ===");
             GD.Print($"Total managed resources: {_disposables.Count}");
-            
+
             // Group by type
             Dictionary<string, int> countsByType = new Dictionary<string, int>();
-            
+
             foreach (var disposable in _disposables)
             {
                 string typeName = disposable.GetType().Name;
-                
+
                 if (!countsByType.ContainsKey(typeName))
                 {
                     countsByType[typeName] = 0;
                 }
-                
+
                 countsByType[typeName]++;
             }
-            
+
             // Print counts by type
             foreach (var entry in countsByType)
             {
                 GD.Print($"  {entry.Key}: {entry.Value}");
             }
-            
+
             // Print resources by owner
             GD.Print("Resources by owner:");
             foreach (var entry in _resourcesByOwner)
             {
                 Node owner = entry.Key;
                 var resources = entry.Value;
-                
+
                 GD.Print($"  {owner.Name}: {resources.Count} resources");
             }
-            
+
             GD.Print("==================================");
         }
     }

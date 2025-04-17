@@ -51,18 +51,18 @@ namespace SignalLost
         public override void _Ready()
         {
             GD.Print("ResourceTracker: Initializing...");
-            
+
             // Get reference to memory profiler
             _memoryProfiler = GetNode<MemoryProfiler>("/root/MemoryProfiler");
-            
+
             if (_memoryProfiler == null)
             {
                 GD.PrintErr("ResourceTracker: MemoryProfiler not found. Make sure it's added as an autoload singleton.");
             }
-            
+
             // Set up process priority
             ProcessPriority = 90; // Run after memory profiler
-            
+
             _isInitialized = true;
             GD.Print("ResourceTracker: Ready");
         }
@@ -89,49 +89,49 @@ namespace SignalLost
 
             string resourceType = resource.GetType().Name;
             string resourceId = resource.GetInstanceId().ToString();
-            
+
             // Only track specific resource types
-            if (!_resourceTypesToTrack.Contains(resourceType) && 
+            if (!_resourceTypesToTrack.Contains(resourceType) &&
                 !_resourceTypesToTrack.Any(t => resourceType.Contains(t)))
             {
                 return;
             }
-            
+
             // Create weak reference to avoid preventing garbage collection
             WeakReference weakRef = new WeakReference(resource);
-            
+
             // Store resource path
             if (string.IsNullOrEmpty(sourcePath) && resource.ResourcePath != null)
             {
                 sourcePath = resource.ResourcePath;
             }
-            
+
             if (!string.IsNullOrEmpty(sourcePath))
             {
                 _resourcePaths[resourceId] = sourcePath;
             }
-            
+
             // Add to tracked resources
             if (!_trackedResources.ContainsKey(resourceType))
             {
                 _trackedResources[resourceType] = new List<WeakReference>();
             }
-            
+
             _trackedResources[resourceType].Add(weakRef);
-            
+
             // Also track with memory profiler if available
             if (_memoryProfiler != null)
             {
                 _memoryProfiler.TrackObject(resource, "Resource:" + resourceType);
             }
-            
+
             // Update resource counts
             if (!_resourceCounts.ContainsKey(resourceType))
             {
                 _resourceCounts[resourceType] = 0;
             }
             _resourceCounts[resourceType]++;
-            
+
             if (LogToConsole && _resourceCounts[resourceType] % 10 == 0)
             {
                 GD.Print($"ResourceTracker: Now tracking {_resourceCounts[resourceType]} {resourceType} resources");
@@ -149,7 +149,7 @@ namespace SignalLost
 
             string resourceType = resource.GetType().Name;
             string resourceId = resource.GetInstanceId().ToString();
-            
+
             if (_trackedResources.ContainsKey(resourceType))
             {
                 // Find and remove the weak reference
@@ -159,24 +159,24 @@ namespace SignalLost
                     if (!weakRef.IsAlive || weakRef.Target == resource)
                     {
                         _trackedResources[resourceType].RemoveAt(i);
-                        
+
                         // Update resource count
                         if (_resourceCounts.ContainsKey(resourceType))
                         {
                             _resourceCounts[resourceType] = Math.Max(0, _resourceCounts[resourceType] - 1);
                         }
-                        
+
                         break;
                     }
                 }
             }
-            
+
             // Remove resource path
             if (_resourcePaths.ContainsKey(resourceId))
             {
                 _resourcePaths.Remove(resourceId);
             }
-            
+
             // Also untrack with memory profiler if available
             if (_memoryProfiler != null)
             {
@@ -193,12 +193,12 @@ namespace SignalLost
         public T TrackLoadedResource<T>(string path) where T : Resource
         {
             T resource = ResourceLoader.Load<T>(path);
-            
+
             if (resource != null)
             {
                 TrackResource(resource, path);
             }
-            
+
             return resource;
         }
 
@@ -211,14 +211,14 @@ namespace SignalLost
                 return;
 
             GD.Print("=== RESOURCE USAGE REPORT ===");
-            
+
             // Sort resource counts by count (descending)
             var sortedCounts = _resourceCounts.OrderByDescending(pair => pair.Value).ToList();
-            
+
             foreach (var pair in sortedCounts)
             {
                 GD.Print($"  {pair.Key}: {pair.Value} instances");
-                
+
                 // List paths for this resource type (up to 5)
                 if (_trackedResources.ContainsKey(pair.Key))
                 {
@@ -228,15 +228,15 @@ namespace SignalLost
                         if (weakRef.IsAlive && weakRef.Target is Resource resource)
                         {
                             string resourceId = resource.GetInstanceId().ToString();
-                            string path = _resourcePaths.ContainsKey(resourceId) ? 
-                                         _resourcePaths[resourceId] : 
+                            string path = _resourcePaths.ContainsKey(resourceId) ?
+                                         _resourcePaths[resourceId] :
                                          resource.ResourcePath;
-                                         
+
                             if (!string.IsNullOrEmpty(path))
                             {
                                 GD.Print($"    - {path}");
                                 pathsListed++;
-                                
+
                                 if (pathsListed >= 5)
                                 {
                                     GD.Print($"    ... and {_trackedResources[pair.Key].Count - 5} more");
@@ -247,7 +247,7 @@ namespace SignalLost
                     }
                 }
             }
-            
+
             GD.Print("============================");
         }
 
@@ -258,19 +258,19 @@ namespace SignalLost
         {
             // Group resources by path to detect duplicates
             Dictionary<string, List<WeakReference>> resourcesByPath = new Dictionary<string, List<WeakReference>>();
-            
+
             foreach (var entry in _trackedResources)
             {
                 string resourceType = entry.Key;
                 var weakRefs = entry.Value;
-                
+
                 // Clean up dead references
                 for (int i = weakRefs.Count - 1; i >= 0; i--)
                 {
                     if (!weakRefs[i].IsAlive)
                     {
                         weakRefs.RemoveAt(i);
-                        
+
                         // Update resource count
                         if (_resourceCounts.ContainsKey(resourceType))
                         {
@@ -280,29 +280,29 @@ namespace SignalLost
                     else if (weakRefs[i].Target is Resource resource)
                     {
                         string resourceId = resource.GetInstanceId().ToString();
-                        string path = _resourcePaths.ContainsKey(resourceId) ? 
-                                     _resourcePaths[resourceId] : 
+                        string path = _resourcePaths.ContainsKey(resourceId) ?
+                                     _resourcePaths[resourceId] :
                                      resource.ResourcePath;
-                                     
+
                         if (!string.IsNullOrEmpty(path))
                         {
                             if (!resourcesByPath.ContainsKey(path))
                             {
                                 resourcesByPath[path] = new List<WeakReference>();
                             }
-                            
+
                             resourcesByPath[path].Add(weakRefs[i]);
                         }
                     }
                 }
             }
-            
+
             // Check for duplicate resources (same path loaded multiple times)
             foreach (var entry in resourcesByPath)
             {
                 string path = entry.Key;
                 var resources = entry.Value;
-                
+
                 if (resources.Count > ResourceWarningThreshold)
                 {
                     // Get the resource type
@@ -311,13 +311,13 @@ namespace SignalLost
                     {
                         resourceType = resource.GetType().Name;
                     }
-                    
+
                     // Emit warning signal
                     EmitSignal(SignalName.ResourceLeakDetected, resourceType, path, resources.Count);
-                    
+
                     if (LogToConsole)
                     {
-                        GD.PrintWarning($"ResourceTracker: Potential resource leak detected! " +
+                        GD.PrintErr($"ResourceTracker: Potential resource leak detected! " +
                                        $"{resources.Count} instances of {resourceType} loaded from {path}");
                     }
                 }
@@ -336,21 +336,21 @@ namespace SignalLost
             {
                 GD.Print("ResourceTracker: Forcing resource cleanup...");
             }
-            
+
             // Force garbage collection first
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            
+
             // Clean up tracked resources
             int totalRemoved = 0;
-            
+
             foreach (var entry in _trackedResources)
             {
                 string resourceType = entry.Key;
                 var weakRefs = entry.Value;
-                
+
                 int initialCount = weakRefs.Count;
-                
+
                 // Remove dead references
                 for (int i = weakRefs.Count - 1; i >= 0; i--)
                 {
@@ -359,14 +359,14 @@ namespace SignalLost
                         weakRefs.RemoveAt(i);
                     }
                 }
-                
+
                 int removedCount = initialCount - weakRefs.Count;
                 totalRemoved += removedCount;
-                
+
                 // Update resource count
                 _resourceCounts[resourceType] = weakRefs.Count;
             }
-            
+
             if (LogToConsole)
             {
                 GD.Print($"ResourceTracker: Cleanup complete. Removed {totalRemoved} dead resource references.");

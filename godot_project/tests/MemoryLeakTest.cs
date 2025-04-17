@@ -19,20 +19,20 @@ namespace SignalLost
         private Button _toggleUIButton;
         private Label _statusLabel;
         private MemoryLeakDetectorUI _memoryUI;
-        
+
         // References to other components
         private MemoryProfiler _memoryProfiler;
         private ResourceTracker _resourceTracker;
         private DisposableResourceManager _disposableManager;
-        
+
         // Test objects
         private List<object> _managedObjects = new List<object>();
         private List<Resource> _managedResources = new List<Resource>();
-        
+
         // Leak simulation
         private static List<object> _leakedObjects = new List<object>();
         private Timer _leakTimer;
-        
+
         // Called when the node enters the scene tree
         public override void _Ready()
         {
@@ -44,26 +44,26 @@ namespace SignalLost
             _toggleUIButton = GetNode<Button>("%ToggleUIButton");
             _statusLabel = GetNode<Label>("%StatusLabel");
             _memoryUI = GetNode<MemoryLeakDetectorUI>("%MemoryLeakDetectorUI");
-            
+
             // Get references to other components
             _memoryProfiler = GetNode<MemoryProfiler>("/root/MemoryProfiler");
             _resourceTracker = GetNode<ResourceTracker>("/root/ResourceTracker");
             _disposableManager = DisposableResourceManager.Instance;
-            
+
             // Connect signals
             _createObjectsButton.Pressed += OnCreateObjectsButtonPressed;
             _createLeakButton.Pressed += OnCreateLeakButtonPressed;
             _createResourcesButton.Pressed += OnCreateResourcesButtonPressed;
             _cleanupButton.Pressed += OnCleanupButtonPressed;
             _toggleUIButton.Pressed += OnToggleUIButtonPressed;
-            
+
             // Create leak timer
             _leakTimer = new Timer();
             _leakTimer.WaitTime = 0.5;
             _leakTimer.OneShot = false;
             _leakTimer.Timeout += OnLeakTimerTimeout;
             AddChild(_leakTimer);
-            
+
             // Update status
             UpdateStatus("Ready");
         }
@@ -72,20 +72,20 @@ namespace SignalLost
         private void OnCreateObjectsButtonPressed()
         {
             UpdateStatus("Creating objects...");
-            
+
             // Create a bunch of managed objects
             for (int i = 0; i < 100; i++)
             {
                 var obj = new TestObject($"Test_{i}");
                 _managedObjects.Add(obj);
-                
+
                 // Track with memory profiler
                 if (_memoryProfiler != null)
                 {
                     _memoryProfiler.TrackObject(obj, "TestObject");
                 }
             }
-            
+
             UpdateStatus($"Created {_managedObjects.Count} managed objects");
         }
 
@@ -108,26 +108,25 @@ namespace SignalLost
         private void OnCreateResourcesButtonPressed()
         {
             UpdateStatus("Creating resources...");
-            
+
             // Create a bunch of resources
             for (int i = 0; i < 10; i++)
             {
                 // Create image
-                var image = new Image();
-                image.Create(64, 64, false, Image.Format.Rgba8);
-                
+                var image = Image.CreateEmpty(64, 64, false, Image.Format.Rgba8);
+
                 // Create texture from image
                 var texture = ImageTexture.CreateFromImage(image);
-                
+
                 // Track resources
                 if (_resourceTracker != null)
                 {
                     _resourceTracker.TrackResource(texture, $"TestTexture_{i}");
                 }
-                
+
                 _managedResources.Add(texture);
             }
-            
+
             UpdateStatus($"Created {_managedResources.Count} resources");
         }
 
@@ -135,13 +134,13 @@ namespace SignalLost
         private void OnCleanupButtonPressed()
         {
             UpdateStatus("Cleaning up...");
-            
+
             // Clear managed objects
             _managedObjects.Clear();
-            
+
             // Clear managed resources
             _managedResources.Clear();
-            
+
             // Force garbage collection
             if (_memoryProfiler != null)
             {
@@ -152,7 +151,7 @@ namespace SignalLost
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
-            
+
             UpdateStatus("Cleanup complete");
         }
 
@@ -171,14 +170,14 @@ namespace SignalLost
             {
                 var obj = new LeakyObject($"Leak_{_leakedObjects.Count}");
                 _leakedObjects.Add(obj);
-                
+
                 // Track with memory profiler
                 if (_memoryProfiler != null)
                 {
                     _memoryProfiler.TrackObject(obj, "LeakyObject");
                 }
             }
-            
+
             UpdateStatus($"Leaking objects... ({_leakedObjects.Count} total)");
         }
 
@@ -193,7 +192,7 @@ namespace SignalLost
         {
             public string Name { get; private set; }
             public byte[] Data { get; private set; }
-            
+
             public TestObject(string name)
             {
                 Name = name;
@@ -206,7 +205,7 @@ namespace SignalLost
         {
             public string Name { get; private set; }
             public byte[] Data { get; private set; }
-            
+
             public LeakyObject(string name)
             {
                 Name = name;
