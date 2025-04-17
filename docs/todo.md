@@ -106,7 +106,7 @@ godot_project/
    - ✅ Create interactive radio controls using drawing primitives
    - ✅ Implement realistic radio tuning experience
 2. ⬜ Extend pixel-based approach to other UI elements
-   - ⬜ Create pixel-based inventory UI
+   - ✅ Create pixel-based inventory UI
    - ⬜ Implement pixel-based message display
    - ⬜ Design pixel-based map interface
 3. ⬜ Implement field exploration
