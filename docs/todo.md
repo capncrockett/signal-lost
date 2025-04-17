@@ -107,7 +107,7 @@ godot_project/
    - ✅ Implement realistic radio tuning experience
 2. ⬜ Extend pixel-based approach to other UI elements
    - ✅ Create pixel-based inventory UI
-   - ⬜ Implement pixel-based message display
+   - ✅ Implement pixel-based message display
    - ⬜ Design pixel-based map interface
 3. ⬜ Implement field exploration
    - ⬜ Grid-based movement
@@ -154,6 +154,9 @@ godot_project/
 1. ✅ Adopt pixel-based approach for UI elements
 2. ✅ Implement radio interface using drawing primitives
 3. ⬜ Extend pixel-based approach to other UI components
+   - ✅ Implement pixel-based inventory UI
+   - ✅ Implement enhanced pixel-based message display
+   - ⬜ Implement pixel-based map interface
 4. ⬜ Create pixel-based game world and characters
 5. ⬜ Retain minimal essential assets (title screen, character portraits)
 
