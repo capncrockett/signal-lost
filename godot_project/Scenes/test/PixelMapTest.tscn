@@ -1,0 +1,69 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8qjx5y6yvqnxr"]
+
+[ext_resource type="Script" path="res://scripts/PixelMapTest.cs" id="1_test"]
+
+[node name="PixelMapTest" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_test")
+
+[node name="PixelMapInterface" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("res://scripts/PixelMapInterface.cs")
+
+[node name="Instructions" type="Label" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 420.0
+offset_bottom = 120.0
+text = "Pixel Map Test
+
+Press M to toggle map
+Click on locations to select them
+Drag to pan the map
+Scroll to zoom in/out"
+
+[node name="TestButtons" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 150.0
+offset_right = 220.0
+offset_bottom = 350.0
+
+[node name="DiscoverForestButton" type="Button" parent="TestButtons"]
+layout_mode = 2
+text = "Discover Forest"
+
+[node name="DiscoverLakeButton" type="Button" parent="TestButtons"]
+layout_mode = 2
+text = "Discover Lake"
+
+[node name="DiscoverCabinButton" type="Button" parent="TestButtons"]
+layout_mode = 2
+text = "Discover Cabin"
+
+[node name="DiscoverRoadButton" type="Button" parent="TestButtons"]
+layout_mode = 2
+text = "Discover Road"
+
+[node name="DiscoverTownButton" type="Button" parent="TestButtons"]
+layout_mode = 2
+text = "Discover Town"
+
+[node name="DiscoverFactoryButton" type="Button" parent="TestButtons"]
+layout_mode = 2
+text = "Discover Factory"
+
+[node name="TakeScreenshotButton" type="Button" parent="TestButtons"]
+layout_mode = 2
+text = "Take Screenshot"
