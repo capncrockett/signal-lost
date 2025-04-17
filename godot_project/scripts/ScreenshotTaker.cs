@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.IO;
+using System.Diagnostics;
 using Environment = System.Environment;
 
 namespace SignalLost
@@ -17,8 +18,16 @@ namespace SignalLost
         [Export]
         public string ScreenshotDirectory { get; set; } = "screenshots";
 
+        [Export]
+        public bool CleanupAfterScreenshot { get; set; } = true;
+
+        [Signal]
+        public delegate void ScreenshotTakenEventHandler(string path);
+
         private bool _screenshotTaken = false;
         private float _timer = 0;
+        private DisposableResourceManager _resourceManager;
+        private MemoryProfiler _memoryProfiler;
 
         public override void _Ready()
         {
@@ -26,6 +35,10 @@ namespace SignalLost
 
             // Create screenshots directory if it doesn't exist
             EnsureScreenshotDirectoryExists();
+
+            // Get references to other components
+            _resourceManager = DisposableResourceManager.Instance;
+            _memoryProfiler = GetNode<MemoryProfiler>("/root/MemoryProfiler");
         }
 
         public override void _Process(double delta)
@@ -51,10 +64,20 @@ namespace SignalLost
             // Get the viewport image
             var image = GetViewport().GetTexture().GetImage();
 
+            // Track the image with memory profiler if available
+            if (_memoryProfiler != null)
+            {
+                _memoryProfiler.TrackObject(image, "Screenshot");
+            }
+
             // Generate a filename if none provided
             if (string.IsNullOrEmpty(filename))
             {
                 filename = $"screenshot_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.png";
+            }
+            else if (!filename.EndsWith(".png"))
+            {
+                filename = $"{filename}.png";
             }
 
             // Determine the save path based on platform
@@ -66,10 +89,19 @@ namespace SignalLost
             if (err == Error.Ok)
             {
                 GD.Print($"Screenshot saved to: {savePath}");
+
+                // Emit signal
+                EmitSignal(SignalName.ScreenshotTaken, savePath);
             }
             else
             {
                 GD.PrintErr($"Failed to save screenshot: {err}");
+            }
+
+            // Clean up resources
+            if (CleanupAfterScreenshot)
+            {
+                CleanupScreenshotResources(image);
             }
         }
 
@@ -145,6 +177,52 @@ namespace SignalLost
             if (@event is InputEventKey keyEvent && keyEvent.Pressed && keyEvent.Keycode == Key.F12)
             {
                 TakeScreenshot();
+            }
+        }
+
+        // Clean up resources after taking a screenshot
+        private void CleanupScreenshotResources(Image image)
+        {
+            // Force garbage collection
+            if (_memoryProfiler != null)
+            {
+                _memoryProfiler.UntrackObject(image, "Screenshot");
+                _memoryProfiler.ForceGarbageCollection();
+            }
+            else
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+
+            // On macOS, we need to kill the Preview process that might have been launched
+            if (OS.GetName() == "macOS")
+            {
+                KillPreviewProcess();
+            }
+        }
+
+        // Kill the Preview process on macOS
+        private void KillPreviewProcess()
+        {
+            try
+            {
+                if (OS.GetName() == "macOS")
+                {
+                    // Check if Preview is running
+                    Process[] previewProcesses = Process.GetProcessesByName("Preview");
+
+                    if (previewProcesses.Length > 0)
+                    {
+                        GD.Print("ScreenshotTaker: Preview process detected, not killing to avoid disrupting user.");
+                        // We don't actually kill Preview as it might disrupt the user
+                        // This is just a check to be aware of potential resource usage
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                GD.PrintErr($"ScreenshotTaker: Error checking Preview process: {ex.Message}");
             }
         }
     }
