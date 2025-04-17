@@ -430,13 +430,13 @@ namespace SignalLost.Tests
 			Pass("Test skipped on Mac platform");
 			return;
 
-			// Skip this test if components are not properly initialized
+			/* Skip this test if components are not properly initialized
 			if (_gameState == null || _radioTuner == null)
 			{
 				GD.PrintErr("GameState or RadioTuner is null, skipping TestRadioOffBehavior");
 				Pass("Test skipped due to initialization issues");
 				return;
-			}
+			}*/
 
 			try
 			{
