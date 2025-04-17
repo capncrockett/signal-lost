@@ -4,7 +4,7 @@ using GUT;
 
 namespace SignalLost.Tests
 {
-    [TestClass]
+    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
     public partial class PixelInventoryUITests : Test
     {
         private PixelInventoryUI _inventoryUI;
@@ -12,7 +12,7 @@ namespace SignalLost.Tests
         private GameState _gameState;
 
         // Setup method called before each test
-        public override void Before()
+        public new void Before()
         {
             // Create a mock GameState
             _gameState = new GameState();
@@ -34,7 +34,7 @@ namespace SignalLost.Tests
         }
 
         // Teardown method called after each test
-        public override void After()
+        public new void After()
         {
             // Remove nodes
             _inventoryUI.QueueFree();
@@ -42,7 +42,7 @@ namespace SignalLost.Tests
             _gameState.QueueFree();
         }
 
-        [Test]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestInitialization()
         {
             // Verify that the inventory UI is initialized correctly
@@ -50,7 +50,7 @@ namespace SignalLost.Tests
             AssertFalse(_inventoryUI.IsVisible(), "PixelInventoryUI should be hidden by default");
         }
 
-        [Test]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestVisibility()
         {
             // Test setting visibility
@@ -68,7 +68,7 @@ namespace SignalLost.Tests
             AssertFalse(_inventoryUI.IsVisible(), "PixelInventoryUI should be hidden after ToggleVisibility()");
         }
 
-        [Test]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestInventoryChanges()
         {
             // Add items to the inventory
@@ -97,7 +97,7 @@ namespace SignalLost.Tests
             _inventoryUI._Draw();
         }
 
-        [Test]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestInputHandling()
         {
             // Make the inventory UI visible

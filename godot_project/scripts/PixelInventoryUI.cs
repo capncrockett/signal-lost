@@ -68,7 +68,7 @@ namespace SignalLost
         }
 
         // Show or hide the inventory UI
-        public void SetVisible(bool visible)
+        public new void SetVisible(bool visible)
         {
             _isVisible = visible;
             SetProcess(visible);
@@ -83,7 +83,7 @@ namespace SignalLost
         }
 
         // Check if the inventory UI is visible
-        public bool IsVisible()
+        public new bool IsVisible()
         {
             return _isVisible;
         }
@@ -97,22 +97,22 @@ namespace SignalLost
             if (@event is InputEventMouseMotion mouseMotion)
             {
                 _mousePosition = mouseMotion.Position;
-                
+
                 // Update button hover states
                 foreach (var buttonId in _buttonRects.Keys)
                 {
                     _buttonHovered[buttonId] = _buttonRects[buttonId].HasPoint(_mousePosition);
                 }
-                
+
                 // Update tooltip
                 UpdateTooltip();
-                
+
                 // Handle dragging
                 if (_isDragging)
                 {
                     QueueRedraw();
                 }
-                
+
                 QueueRedraw();
             }
             else if (@event is InputEventMouseButton mouseButton)
@@ -131,24 +131,24 @@ namespace SignalLost
                                 return;
                             }
                         }
-                        
+
                         // Check if an item slot was clicked
                         foreach (var itemId in _itemSlotRects.Keys)
                         {
                             if (_itemSlotRects[itemId].HasPoint(_mousePosition))
                             {
                                 _selectedItemId = itemId;
-                                
+
                                 // Start dragging
                                 _isDragging = true;
                                 _draggedItemId = itemId;
                                 _dragStartPosition = _mousePosition;
-                                
+
                                 QueueRedraw();
                                 return;
                             }
                         }
-                        
+
                         // If nothing was clicked, deselect
                         _selectedItemId = null;
                         QueueRedraw();
@@ -164,7 +164,7 @@ namespace SignalLost
                             }
                             _buttonPressed[buttonId] = false;
                         }
-                        
+
                         // End dragging
                         if (_isDragging)
                         {
@@ -178,11 +178,11 @@ namespace SignalLost
                                     break;
                                 }
                             }
-                            
+
                             _isDragging = false;
                             _draggedItemId = null;
                         }
-                        
+
                         QueueRedraw();
                     }
                 }
@@ -286,31 +286,31 @@ namespace SignalLost
             int totalSlots = _inventorySystem.GetMaxInventorySize();
             int slotsPerRow = GridSize;
             int rows = (int)Math.Ceiling((float)totalSlots / slotsPerRow);
-            
+
             // Calculate slot size based on available space
             float availableWidth = width - (slotsPerRow + 1) * SlotPadding;
             float availableHeight = height - (rows + 1) * SlotPadding;
             int calculatedSlotSize = (int)Math.Min(availableWidth / slotsPerRow, availableHeight / rows);
             int slotSize = Math.Min(calculatedSlotSize, SlotSize);
-            
+
             // Clear previous slot rects
             _itemSlotRects.Clear();
-            
+
             // Get inventory
             var inventory = _inventorySystem.GetInventory();
-            
+
             // Draw grid
             for (int i = 0; i < totalSlots; i++)
             {
                 int row = i / slotsPerRow;
                 int col = i % slotsPerRow;
-                
+
                 float slotX = x + col * (slotSize + SlotPadding) + SlotPadding;
                 float slotY = y + row * (slotSize + SlotPadding) + SlotPadding;
-                
+
                 // Draw slot background
                 DrawRect(new Rect2(slotX, slotY, slotSize, slotSize), new Color(0.15f, 0.15f, 0.15f, 1.0f));
-                
+
                 // Draw slot border
                 Color borderColor = BorderColor;
                 if (_selectedItemId != null && i < inventory.Count && inventory.ElementAt(i).Key == _selectedItemId)
@@ -318,32 +318,32 @@ namespace SignalLost
                     borderColor = HighlightColor;
                 }
                 DrawRect(new Rect2(slotX, slotY, slotSize, slotSize), borderColor, false, BorderWidth);
-                
+
                 // Draw item if slot is filled
                 if (i < inventory.Count)
                 {
                     var item = inventory.ElementAt(i).Value;
                     string itemId = item.Id;
-                    
+
                     // Skip if this is the dragged item
                     if (_isDragging && _draggedItemId == itemId)
                         continue;
-                    
+
                     // Draw item icon (simplified as a colored square for now)
                     Color itemColor = GetItemColor(item.Category);
                     DrawRect(new Rect2(slotX + 4, slotY + 4, slotSize - 8, slotSize - 8), itemColor);
-                    
+
                     // Draw item initial
                     string initial = item.Name.Length > 0 ? item.Name[0].ToString() : "?";
                     DrawPixelText(initial, new Vector2(slotX + slotSize / 2 - 3, slotY + slotSize / 2 + 3), TextColor, 1);
-                    
+
                     // Draw quantity if more than 1
                     if (item.Quantity > 1)
                     {
                         string quantityText = item.Quantity.ToString();
                         DrawPixelText(quantityText, new Vector2(slotX + slotSize - 4 - quantityText.Length * 6, slotY + slotSize - 10), TextColor, 1);
                     }
-                    
+
                     // Store slot rect for interaction
                     _itemSlotRects[itemId] = new Rect2(slotX, slotY, slotSize, slotSize);
                 }
@@ -355,20 +355,20 @@ namespace SignalLost
         {
             if (_selectedItemId == null || !_inventorySystem.GetInventory().ContainsKey(_selectedItemId))
                 return;
-                
+
             var item = _inventorySystem.GetInventory()[_selectedItemId];
-            
+
             // Draw panel background
             DrawRect(new Rect2(x, y, width, height), new Color(0.15f, 0.15f, 0.15f, 1.0f));
             DrawRect(new Rect2(x, y, width, height), BorderColor, false, BorderWidth);
-            
+
             // Draw item name
             DrawPixelText(item.Name.ToUpper(), new Vector2(x + 5, y + 15), TextColor, 1);
-            
+
             // Draw item quantity
             string quantityText = $"QTY: {item.Quantity}";
             DrawPixelText(quantityText, new Vector2(x + width - 5 - quantityText.Length * 6, y + 15), TextColor, 1);
-            
+
             // Draw item category
             string categoryText = $"[{item.Category.ToUpper()}]";
             DrawPixelText(categoryText, new Vector2(x + 5, y + 30), new Color(0.7f, 0.7f, 0.7f, 1.0f), 1);
@@ -379,81 +379,81 @@ namespace SignalLost
         {
             // Clear previous button rects
             _buttonRects.Clear();
-            
+
             // Initialize button states if needed
             if (!_buttonHovered.ContainsKey("use"))
             {
                 _buttonHovered["use"] = false;
                 _buttonPressed["use"] = false;
             }
-            
+
             if (!_buttonHovered.ContainsKey("drop"))
             {
                 _buttonHovered["drop"] = false;
                 _buttonPressed["drop"] = false;
             }
-            
+
             if (!_buttonHovered.ContainsKey("close"))
             {
                 _buttonHovered["close"] = false;
                 _buttonPressed["close"] = false;
             }
-            
+
             // Calculate button dimensions
             float buttonWidth = 80;
             float buttonHeight = 30;
             float buttonSpacing = 10;
             float buttonsX = x + width - buttonWidth * 3 - buttonSpacing * 2;
             float buttonsY = y + height - buttonHeight - 5;
-            
+
             // Draw Use button
             Color useButtonColor = ButtonColor;
             if (_buttonHovered["use"])
             {
                 useButtonColor = _buttonPressed["use"] ? ButtonPressColor : ButtonHoverColor;
             }
-            
-            bool canUseItem = _selectedItemId != null && 
-                              _inventorySystem.GetInventory().ContainsKey(_selectedItemId) && 
+
+            bool canUseItem = _selectedItemId != null &&
+                              _inventorySystem.GetInventory().ContainsKey(_selectedItemId) &&
                               _inventorySystem.GetInventory()[_selectedItemId].IsUsable;
-                              
+
             if (!canUseItem)
             {
                 useButtonColor = new Color(useButtonColor.R, useButtonColor.G, useButtonColor.B, 0.5f);
             }
-            
+
             DrawRect(new Rect2(buttonsX, buttonsY, buttonWidth, buttonHeight), useButtonColor);
             DrawRect(new Rect2(buttonsX, buttonsY, buttonWidth, buttonHeight), BorderColor, false, BorderWidth);
             DrawPixelText("USE", new Vector2(buttonsX + buttonWidth / 2 - 9, buttonsY + buttonHeight / 2 + 3), TextColor, 1);
             _buttonRects["use"] = new Rect2(buttonsX, buttonsY, buttonWidth, buttonHeight);
-            
+
             // Draw Drop button
             Color dropButtonColor = ButtonColor;
             if (_buttonHovered["drop"])
             {
                 dropButtonColor = _buttonPressed["drop"] ? ButtonPressColor : ButtonHoverColor;
             }
-            
-            bool canDropItem = _selectedItemId != null && 
+
+            bool canDropItem = _selectedItemId != null &&
                                _inventorySystem.GetInventory().ContainsKey(_selectedItemId);
-                               
+
             if (!canDropItem)
             {
                 dropButtonColor = new Color(dropButtonColor.R, dropButtonColor.G, dropButtonColor.B, 0.5f);
             }
-            
+
             DrawRect(new Rect2(buttonsX + buttonWidth + buttonSpacing, buttonsY, buttonWidth, buttonHeight), dropButtonColor);
             DrawRect(new Rect2(buttonsX + buttonWidth + buttonSpacing, buttonsY, buttonWidth, buttonHeight), BorderColor, false, BorderWidth);
             DrawPixelText("DROP", new Vector2(buttonsX + buttonWidth + buttonSpacing + buttonWidth / 2 - 12, buttonsY + buttonHeight / 2 + 3), TextColor, 1);
             _buttonRects["drop"] = new Rect2(buttonsX + buttonWidth + buttonSpacing, buttonsY, buttonWidth, buttonHeight);
-            
+
             // Draw Close button
             Color closeButtonColor = ButtonColor;
             if (_buttonHovered["close"])
             {
                 closeButtonColor = _buttonPressed["close"] ? ButtonPressColor : ButtonHoverColor;
             }
-            
+
             DrawRect(new Rect2(buttonsX + (buttonWidth + buttonSpacing) * 2, buttonsY, buttonWidth, buttonHeight), closeButtonColor);
             DrawRect(new Rect2(buttonsX + (buttonWidth + buttonSpacing) * 2, buttonsY, buttonWidth, buttonHeight), BorderColor, false, BorderWidth);
             DrawPixelText("CLOSE", new Vector2(buttonsX + (buttonWidth + buttonSpacing) * 2 + buttonWidth / 2 - 15, buttonsY + buttonHeight / 2 + 3), TextColor, 1);
@@ -465,25 +465,25 @@ namespace SignalLost
         {
             if (_draggedItemId == null || !_inventorySystem.GetInventory().ContainsKey(_draggedItemId))
                 return;
-                
+
             var item = _inventorySystem.GetInventory()[_draggedItemId];
-            
+
             // Calculate item position (centered on mouse)
             float itemSize = SlotSize;
             float itemX = _mousePosition.X - itemSize / 2;
             float itemY = _mousePosition.Y - itemSize / 2;
-            
+
             // Draw item background
             DrawRect(new Rect2(itemX, itemY, itemSize, itemSize), new Color(0.15f, 0.15f, 0.15f, 0.8f));
-            
+
             // Draw item icon
             Color itemColor = GetItemColor(item.Category);
             DrawRect(new Rect2(itemX + 4, itemY + 4, itemSize - 8, itemSize - 8), itemColor);
-            
+
             // Draw item initial
             string initial = item.Name.Length > 0 ? item.Name[0].ToString() : "?";
             DrawPixelText(initial, new Vector2(itemX + itemSize / 2 - 3, itemY + itemSize / 2 + 3), TextColor, 1);
-            
+
             // Draw quantity if more than 1
             if (item.Quantity > 1)
             {
@@ -497,37 +497,37 @@ namespace SignalLost
         {
             if (!_showTooltip || string.IsNullOrEmpty(_tooltipText))
                 return;
-                
+
             // Calculate tooltip dimensions
             float padding = 5;
             float lineHeight = 15;
             string[] lines = _tooltipText.Split('\n');
             float maxLineWidth = 0;
-            
+
             foreach (var line in lines)
             {
                 maxLineWidth = Mathf.Max(maxLineWidth, line.Length * 6);
             }
-            
+
             float tooltipWidth = maxLineWidth + padding * 2;
             float tooltipHeight = lines.Length * lineHeight + padding * 2;
-            
+
             // Adjust position to keep tooltip on screen
             Vector2 position = _tooltipPosition;
             if (position.X + tooltipWidth > Size.X)
             {
                 position.X = Size.X - tooltipWidth;
             }
-            
+
             if (position.Y + tooltipHeight > Size.Y)
             {
                 position.Y = Size.Y - tooltipHeight;
             }
-            
+
             // Draw tooltip background
             DrawRect(new Rect2(position.X, position.Y, tooltipWidth, tooltipHeight), new Color(0.1f, 0.1f, 0.1f, 0.9f));
             DrawRect(new Rect2(position.X, position.Y, tooltipWidth, tooltipHeight), BorderColor, false, BorderWidth);
-            
+
             // Draw tooltip text
             for (int i = 0; i < lines.Length; i++)
             {
@@ -540,10 +540,10 @@ namespace SignalLost
         {
             if (string.IsNullOrEmpty(text))
                 return;
-                
+
             float x = position.X;
             float y = position.Y;
-            
+
             foreach (char c in text)
             {
                 if (c == ' ')
@@ -551,9 +551,9 @@ namespace SignalLost
                     x += 6 * scale;
                     continue;
                 }
-                
+
                 var pattern = _pixelFont.GetCharacterPattern(c);
-                
+
                 for (int py = 0; py < pattern.GetLength(0); py++)
                 {
                     for (int px = 0; px < pattern.GetLength(1); px++)
@@ -569,7 +569,7 @@ namespace SignalLost
                         }
                     }
                 }
-                
+
                 x += 6 * scale; // Character width + spacing
             }
         }
@@ -597,10 +597,10 @@ namespace SignalLost
         {
             _showTooltip = false;
             _tooltipText = "";
-            
+
             if (!ShowTooltips)
                 return;
-                
+
             // Check if mouse is over an item slot
             foreach (var itemId in _itemSlotRects.Keys)
             {
@@ -612,7 +612,7 @@ namespace SignalLost
                     return;
                 }
             }
-            
+
             // Check if mouse is over a button
             if (_buttonRects.ContainsKey("use") && _buttonRects["use"].HasPoint(_mousePosition))
             {
@@ -662,14 +662,14 @@ namespace SignalLost
         {
             if (itemId == null || !_inventorySystem.GetInventory().ContainsKey(itemId))
                 return;
-                
+
             var item = _inventorySystem.GetInventory()[itemId];
-            
+
             if (!item.IsUsable)
                 return;
-                
+
             _inventorySystem.UseItem(itemId);
-            
+
             // If the item was consumed and no longer exists, clear selection
             if (!_inventorySystem.GetInventory().ContainsKey(itemId))
             {
@@ -682,9 +682,9 @@ namespace SignalLost
         {
             if (itemId == null || !_inventorySystem.GetInventory().ContainsKey(itemId))
                 return;
-                
+
             _inventorySystem.RemoveItemFromInventory(itemId, 1);
-            
+
             // If the item was completely removed, clear selection
             if (!_inventorySystem.GetInventory().ContainsKey(itemId))
             {
