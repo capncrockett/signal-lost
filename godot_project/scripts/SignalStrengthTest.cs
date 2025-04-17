@@ -40,7 +40,7 @@ namespace SignalLost
             _perfectButton.Pressed += () => SetSignalStrength(1.0f);
 
             // Set initial signal strength
-            SetSignalStrength((float)_slider.Value / 100.0f);
+            SetSignalStrength((float)(_slider.Value / 100.0));
 
             GD.Print("SignalStrengthTest ready!");
         }
@@ -48,7 +48,7 @@ namespace SignalLost
         // Called when the slider value changes
         private void OnSliderValueChanged(double value)
         {
-            float signalStrength = (float)value / 100.0f;
+            float signalStrength = (float)(value / 100.0);
             SetSignalStrength(signalStrength);
         }
 
