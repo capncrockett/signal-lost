@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 // This file provides stub implementations of GUT classes for C# tests
 // It allows tests written for GUT to run without the actual GUT framework
+// Updated for cross-platform compatibility (Windows/Mac)
 namespace GUT
 {
     /// <summary>
@@ -12,6 +13,7 @@ namespace GUT
     [GlobalClass]
     public partial class Test : Node
     {
+#if !DUPLICATE_METHODS_DEFINED
         // Setup method called before each test
         public virtual void Before()
         {
@@ -75,8 +77,10 @@ namespace GUT
             // Pass is always successful
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, message);
         }
+#endif
     }
 
+#if !DUPLICATE_ATTRIBUTES_DEFINED
     // Attribute for marking test classes
     [AttributeUsage(AttributeTargets.Class)]
     public class TestClassAttribute : Attribute
@@ -88,4 +92,5 @@ namespace GUT
     public class TestAttribute : Attribute
     {
     }
+#endif
 }

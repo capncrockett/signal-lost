@@ -40,7 +40,7 @@ namespace SignalLost
             _perfectButton.Pressed += () => SetSignalStrength(1.0f);
 
             // Set initial signal strength
-            SetSignalStrength(_slider.Value / 100.0f);
+            SetSignalStrength((float)_slider.Value / 100.0f);
 
             GD.Print("SignalStrengthTest ready!");
         }
