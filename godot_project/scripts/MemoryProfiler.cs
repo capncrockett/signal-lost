@@ -22,7 +22,7 @@ namespace SignalLost
         public delegate void MemoryLeakDetectedEventHandler(string objectType, int count, string stackTrace);
 
         [Signal]
-        public delegate void MemorySnapshotTakenEventHandler(Dictionary<string, int> snapshot);
+        public delegate void MemorySnapshotTakenEventHandler();
 
         // Configuration
         [Export]
@@ -60,13 +60,13 @@ namespace SignalLost
         public override void _Ready()
         {
             GD.Print("MemoryProfiler: Initializing...");
-            
+
             // Take initial snapshot
             TakeMemorySnapshot();
-            
+
             // Register for process frame notifications
             ProcessPriority = 100; // Low priority to run after other processes
-            
+
             _isInitialized = true;
             GD.Print("MemoryProfiler: Ready");
         }
@@ -102,30 +102,30 @@ namespace SignalLost
 
             // Store previous snapshot for comparison
             _previousSnapshot = new Dictionary<string, int>(_objectCounts);
-            
+
             // Clear current counts
             _objectCounts.Clear();
-            
+
             // Get current memory usage
             long currentMemoryUsage = GC.GetTotalMemory(false);
-            
+
             // Calculate memory change
             long memoryDelta = currentMemoryUsage - _lastMemoryUsage;
             _lastMemoryUsage = currentMemoryUsage;
-            
+
             // Log memory usage
             if (LogToConsole)
             {
                 GD.Print($"MemoryProfiler: Memory usage: {FormatBytes(currentMemoryUsage)} " +
                          $"(Delta: {(memoryDelta >= 0 ? "+" : "")}{FormatBytes(memoryDelta)})");
             }
-            
+
             // Count objects by type
             CountObjectsByType();
-            
-            // Emit signal with snapshot data
-            EmitSignal(SignalName.MemorySnapshotTaken, _objectCounts);
-            
+
+            // Emit signal that snapshot was taken
+            EmitSignal(SignalName.MemorySnapshotTaken);
+
             // Check for significant changes
             AnalyzeMemoryChanges();
         }
@@ -145,28 +145,28 @@ namespace SignalLost
             {
                 if (LogToConsole)
                 {
-                    GD.PrintWarning($"MemoryProfiler: Maximum tracked objects limit reached ({MAX_TRACKED_OBJECTS})");
+                    GD.PrintErr($"MemoryProfiler: Maximum tracked objects limit reached ({MAX_TRACKED_OBJECTS})");
                 }
                 return;
             }
 
             string objectType = obj.GetType().Name;
             string key = string.IsNullOrEmpty(tag) ? objectType : $"{objectType}:{tag}";
-            
+
             // Create weak reference to avoid preventing garbage collection
             WeakReference weakRef = new WeakReference(obj);
-            
+
             // Store stack trace for debugging
-            string stackTrace = Environment.StackTrace;
+            string stackTrace = System.Environment.StackTrace;
             string objectId = RuntimeHelpers.GetHashCode(obj).ToString();
             _creationStackTraces[objectId] = stackTrace;
-            
+
             // Add to tracked objects
             if (!_trackedObjects.ContainsKey(key))
             {
                 _trackedObjects[key] = new List<WeakReference>();
             }
-            
+
             _trackedObjects[key].Add(weakRef);
             _totalTrackedObjects++;
         }
@@ -183,7 +183,7 @@ namespace SignalLost
 
             string objectType = obj.GetType().Name;
             string key = string.IsNullOrEmpty(tag) ? objectType : $"{objectType}:{tag}";
-            
+
             if (_trackedObjects.ContainsKey(key))
             {
                 // Find and remove the weak reference
@@ -197,14 +197,14 @@ namespace SignalLost
                         break;
                     }
                 }
-                
+
                 // Remove the key if no more objects of this type
                 if (_trackedObjects[key].Count == 0)
                 {
                     _trackedObjects.Remove(key);
                 }
             }
-            
+
             // Remove stack trace
             string objectId = RuntimeHelpers.GetHashCode(obj).ToString();
             if (_creationStackTraces.ContainsKey(objectId))
@@ -222,28 +222,28 @@ namespace SignalLost
             {
                 GD.Print("MemoryProfiler: Forcing garbage collection...");
             }
-            
+
             // Store pre-GC memory usage
             long preGcMemory = GC.GetTotalMemory(false);
-            
+
             // Force full garbage collection
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
             GC.WaitForPendingFinalizers();
-            
+
             // Get post-GC memory usage
             long postGcMemory = GC.GetTotalMemory(true);
             long freedMemory = preGcMemory - postGcMemory;
-            
+
             if (LogToConsole)
             {
                 GD.Print($"MemoryProfiler: Garbage collection complete. " +
                          $"Freed: {FormatBytes(freedMemory)}, " +
                          $"Current usage: {FormatBytes(postGcMemory)}");
             }
-            
+
             // Update last memory usage
             _lastMemoryUsage = postGcMemory;
-            
+
             // Take a new snapshot after GC
             TakeMemorySnapshot();
         }
@@ -259,16 +259,16 @@ namespace SignalLost
             GD.Print("=== MEMORY USAGE REPORT ===");
             GD.Print($"Total Memory: {FormatBytes(GC.GetTotalMemory(false))}");
             GD.Print($"Total Tracked Objects: {_totalTrackedObjects}");
-            
+
             // Sort object counts by count (descending)
             var sortedCounts = _objectCounts.OrderByDescending(pair => pair.Value).ToList();
-            
+
             GD.Print("Object Counts:");
             foreach (var pair in sortedCounts)
             {
                 GD.Print($"  {pair.Key}: {pair.Value}");
             }
-            
+
             GD.Print("=========================");
         }
 
@@ -285,10 +285,10 @@ namespace SignalLost
             {
                 string objectType = entry.Key;
                 var weakRefs = entry.Value;
-                
+
                 // Count objects that are still alive
                 int aliveCount = 0;
-                
+
                 // Clean up dead references
                 for (int i = weakRefs.Count - 1; i >= 0; i--)
                 {
@@ -302,7 +302,7 @@ namespace SignalLost
                         aliveCount++;
                     }
                 }
-                
+
                 // Check if we have a potential leak (many instances of the same type)
                 if (aliveCount > WarningThreshold)
                 {
@@ -320,15 +320,15 @@ namespace SignalLost
                             }
                         }
                     }
-                    
+
                     // Emit warning signal
                     EmitSignal(SignalName.MemoryLeakDetected, objectType, aliveCount, sampleStackTrace);
-                    
+
                     if (LogToConsole)
                     {
-                        GD.PrintWarning($"MemoryProfiler: Potential memory leak detected! " +
+                        GD.PrintErr($"MemoryProfiler: Potential memory leak detected! " +
                                        $"{aliveCount} instances of {objectType} still alive.");
-                        GD.PrintWarning($"Sample creation stack trace: {sampleStackTrace}");
+                        GD.PrintErr($"Sample creation stack trace: {sampleStackTrace}");
                     }
                 }
             }
@@ -344,15 +344,15 @@ namespace SignalLost
             {
                 string objectType = entry.Key;
                 int aliveCount = entry.Value.Count(wr => wr.IsAlive);
-                
+
                 if (aliveCount > 0)
                 {
                     _objectCounts[objectType] = aliveCount;
                 }
             }
-            
+
             // Add Godot object counts
-            _objectCounts["Godot.Node"] = Engine.GetProcessFrames();
+            _objectCounts["Godot.Node"] = (int)Engine.GetProcessFrames();
             _objectCounts["Total Memory (bytes)"] = (int)GC.GetTotalMemory(false);
         }
 
@@ -368,42 +368,42 @@ namespace SignalLost
             {
                 string objectType = entry.Key;
                 int currentCount = entry.Value;
-                
+
                 // Skip non-numeric entries
                 if (objectType == "Total Memory (bytes)")
                     continue;
-                
+
                 // Check if this type existed in previous snapshot
                 if (_previousSnapshot.TryGetValue(objectType, out int previousCount))
                 {
                     // Calculate growth
                     float growthRate = previousCount > 0 ? (float)(currentCount - previousCount) / previousCount : 0;
-                    
+
                     // Check for significant growth
                     if (previousCount > 10 && growthRate > WarningGrowthRate)
                     {
-                        EmitSignal(SignalName.MemoryWarning, 
-                            $"Significant growth detected: {objectType} increased by {growthRate:P0}", 
-                            objectType, 
+                        EmitSignal(SignalName.MemoryWarning,
+                            $"Significant growth detected: {objectType} increased by {growthRate:P0}",
+                            objectType,
                             currentCount);
-                        
+
                         if (LogToConsole)
                         {
-                            GD.PrintWarning($"MemoryProfiler: {objectType} count increased from {previousCount} to {currentCount} ({growthRate:P0})");
+                            GD.PrintErr($"MemoryProfiler: {objectType} count increased from {previousCount} to {currentCount} ({growthRate:P0})");
                         }
                     }
                 }
                 else if (currentCount > WarningThreshold)
                 {
                     // New object type with high count
-                    EmitSignal(SignalName.MemoryWarning, 
-                        $"New object type with high count: {objectType}", 
-                        objectType, 
+                    EmitSignal(SignalName.MemoryWarning,
+                        $"New object type with high count: {objectType}",
+                        objectType,
                         currentCount);
-                    
+
                     if (LogToConsole)
                     {
-                        GD.PrintWarning($"MemoryProfiler: New object type {objectType} with high count: {currentCount}");
+                        GD.PrintErr($"MemoryProfiler: New object type {objectType} with high count: {currentCount}");
                     }
                 }
             }
@@ -417,13 +417,13 @@ namespace SignalLost
             string[] suffixes = { "B", "KB", "MB", "GB" };
             int order = 0;
             double size = bytes;
-            
+
             while (size >= 1024 && order < suffixes.Length - 1)
             {
                 order++;
                 size /= 1024;
             }
-            
+
             return $"{size:0.##} {suffixes[order]}";
         }
     }

@@ -60,7 +60,7 @@ namespace SignalLost
         }
 
         // Show or hide the map interface
-        public void SetVisible(bool visible)
+        public new void SetVisible(bool visible)
         {
             _isVisible = visible;
             SetProcess(visible);
@@ -75,7 +75,7 @@ namespace SignalLost
         }
 
         // Check if the map interface is visible
-        public bool IsVisible()
+        public new bool IsVisible()
         {
             return _isVisible;
         }
@@ -89,7 +89,7 @@ namespace SignalLost
             if (@event is InputEventMouseMotion mouseMotion)
             {
                 _mousePosition = mouseMotion.Position;
-                
+
                 // Handle dragging
                 if (_isDragging)
                 {
@@ -97,7 +97,7 @@ namespace SignalLost
                     _dragStartPosition = mouseMotion.Position;
                     QueueRedraw();
                 }
-                
+
                 // Update hover state for locations
                 UpdateLocationHover();
             }
@@ -115,7 +115,7 @@ namespace SignalLost
                     {
                         // Stop dragging
                         _isDragging = false;
-                        
+
                         // Check if a location was clicked
                         foreach (var locationId in _locationRects.Keys)
                         {
@@ -157,22 +157,22 @@ namespace SignalLost
                 return;
 
             Vector2 size = Size;
-            
+
             // Draw background
             DrawRect(new Rect2(0, 0, size.X, size.Y), BackgroundColor);
-            
+
             // Draw grid
             if (ShowGrid)
             {
                 DrawGrid();
             }
-            
+
             // Draw connections between locations
             DrawConnections();
-            
+
             // Draw locations
             DrawLocations();
-            
+
             // Draw UI elements (title, info panel, etc.)
             DrawUI();
         }
@@ -182,17 +182,17 @@ namespace SignalLost
         {
             Vector2 size = Size;
             float scaledGridSize = GridSize * ZoomLevel;
-            
+
             // Calculate grid offset based on map offset
             float offsetX = (MapOffset.X * ZoomLevel) % scaledGridSize;
             float offsetY = (MapOffset.Y * ZoomLevel) % scaledGridSize;
-            
+
             // Draw vertical grid lines
             for (float x = offsetX; x < size.X; x += scaledGridSize)
             {
                 DrawLine(new Vector2(x, 0), new Vector2(x, size.Y), GridColor, 1);
             }
-            
+
             // Draw horizontal grid lines
             for (float y = offsetY; y < size.Y; y += scaledGridSize)
             {
@@ -204,27 +204,27 @@ namespace SignalLost
         private void DrawConnections()
         {
             var locations = _mapSystem.GetAllLocations();
-            
+
             foreach (var location in locations.Values)
             {
                 if (!location.IsDiscovered)
                     continue;
-                
+
                 Vector2 startPos = GetScreenPosition(location.Position);
-                
+
                 foreach (var connectedId in location.ConnectedLocations)
                 {
                     if (!locations.ContainsKey(connectedId))
                         continue;
-                    
+
                     var connectedLocation = locations[connectedId];
-                    
+
                     // Only draw connections to discovered locations
                     if (!connectedLocation.IsDiscovered)
                         continue;
-                    
+
                     Vector2 endPos = GetScreenPosition(connectedLocation.Position);
-                    
+
                     // Draw the connection line
                     DrawLine(startPos, endPos, ConnectionColor, 2);
                 }
@@ -235,22 +235,22 @@ namespace SignalLost
         private void DrawLocations()
         {
             _locationRects.Clear();
-            
+
             var locations = _mapSystem.GetAllLocations();
             string currentLocationId = _gameState.CurrentLocation;
-            
+
             foreach (var location in locations.Values)
             {
                 // Skip undiscovered locations
                 if (!location.IsDiscovered)
                     continue;
-                
+
                 Vector2 pos = GetScreenPosition(location.Position);
                 float size = LocationSize * ZoomLevel;
-                
+
                 // Determine location color
                 Color color = LocationColor;
-                
+
                 if (location.Id == currentLocationId)
                 {
                     // Current location
@@ -262,14 +262,14 @@ namespace SignalLost
                     // Selected location
                     color = new Color(0.7f, 0.3f, 0.3f, 1.0f);
                 }
-                
+
                 // Draw location marker
                 DrawCircle(pos, size, color);
-                
+
                 // Draw location name
-                DrawString(ThemeDB.FallbackFont, pos + new Vector2(0, size + 10), 
+                DrawString(ThemeDB.FallbackFont, pos + new Vector2(0, size + 10),
                     location.Name, HorizontalAlignment.Center, -1, (int)(12 * ZoomLevel), TextColor);
-                
+
                 // Store location rect for interaction
                 _locationRects[location.Id] = new Rect2(pos.X - size, pos.Y - size, size * 2, size * 2);
             }
@@ -279,16 +279,16 @@ namespace SignalLost
         private void DrawUI()
         {
             Vector2 size = Size;
-            
+
             // Draw title
-            DrawString(ThemeDB.FallbackFont, new Vector2(20, 30), 
+            DrawString(ThemeDB.FallbackFont, new Vector2(20, 30),
                 "SIGNAL LOST - MAP", HorizontalAlignment.Left, -1, 24, TextColor);
-            
+
             // Draw selected location info if any
             if (_selectedLocationId != null)
             {
                 var location = _mapSystem.GetLocation(_selectedLocationId);
-                
+
                 if (location != null)
                 {
                     // Draw info panel
@@ -296,39 +296,39 @@ namespace SignalLost
                     float panelHeight = 200;
                     float panelX = size.X - panelWidth - 20;
                     float panelY = 20;
-                    
-                    DrawRect(new Rect2(panelX, panelY, panelWidth, panelHeight), 
+
+                    DrawRect(new Rect2(panelX, panelY, panelWidth, panelHeight),
                         new Color(0.15f, 0.15f, 0.15f, 0.9f));
-                    
+
                     // Draw location name
-                    DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, panelY + 30), 
+                    DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, panelY + 30),
                         location.Name, HorizontalAlignment.Left, -1, 18, TextColor);
-                    
+
                     // Draw location description
-                    DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, panelY + 60), 
+                    DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, panelY + 60),
                         location.Description, HorizontalAlignment.Left, (int)panelWidth - 20, 14, TextColor);
-                    
+
                     // Draw connected locations
-                    DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, panelY + 120), 
+                    DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, panelY + 120),
                         "Connected to:", HorizontalAlignment.Left, -1, 14, TextColor);
-                    
+
                     float y = panelY + 140;
                     foreach (var connectedId in location.ConnectedLocations)
                     {
                         var connectedLocation = _mapSystem.GetLocation(connectedId);
-                        
+
                         if (connectedLocation != null && connectedLocation.IsDiscovered)
                         {
-                            DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 20, y), 
+                            DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 20, y),
                                 "• " + connectedLocation.Name, HorizontalAlignment.Left, -1, 12, TextColor);
                             y += 20;
                         }
                     }
                 }
             }
-            
+
             // Draw help text
-            DrawString(ThemeDB.FallbackFont, new Vector2(20, size.Y - 20), 
+            DrawString(ThemeDB.FallbackFont, new Vector2(20, size.Y - 20),
                 "Drag to pan | Scroll to zoom | ESC to close", HorizontalAlignment.Left, -1, 12, TextColor);
         }
 
@@ -337,7 +337,7 @@ namespace SignalLost
         {
             Vector2 size = Size;
             Vector2 center = size / 2;
-            
+
             return center + (mapPosition + MapOffset) * ZoomLevel;
         }
 
@@ -346,7 +346,7 @@ namespace SignalLost
         {
             Vector2 size = Size;
             Vector2 center = size / 2;
-            
+
             return (screenPosition - center) / ZoomLevel - MapOffset;
         }
 
@@ -354,11 +354,11 @@ namespace SignalLost
         private void UpdateLocationHover()
         {
             bool needsRedraw = false;
-            
+
             foreach (var locationId in _locationRects.Keys)
             {
                 bool isHovered = _locationRects[locationId].HasPoint(_mousePosition);
-                
+
                 // If hover state changed, redraw
                 if (isHovered && _selectedLocationId != locationId)
                 {
@@ -366,7 +366,7 @@ namespace SignalLost
                     needsRedraw = true;
                 }
             }
-            
+
             if (needsRedraw)
             {
                 QueueRedraw();
