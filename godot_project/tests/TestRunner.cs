@@ -142,6 +142,9 @@ namespace SignalLost.Tests
                         beforeMethod.Invoke(testInstance, null);
                     }
                 }
+            }
+            return true; // Continue processing
+        }
 
                 // Call the test method
                 method.Invoke(_currentTestInstance, null);

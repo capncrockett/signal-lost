@@ -38,7 +38,6 @@ namespace SignalLost.Tests
                 _inventorySystem.QueueFree();
                 _inventorySystem = null;
             }
-
             if (_gameState != null)
             {
                 _gameState.QueueFree();

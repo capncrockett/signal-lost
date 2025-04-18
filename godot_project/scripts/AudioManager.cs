@@ -294,6 +294,73 @@ namespace SignalLost
             return Mathf.Round(raw * steps) / steps;
         }
 
+        // Last sample for simple low-pass filtering
+        private float _lastSample = 0.0f;
+
+        // Generate white noise (equal energy per frequency)
+        private float GenerateWhiteNoise()
+        {
+            return (float)_random.NextDouble() * 2.0f - 1.0f;
+        }
+
+        // Generate pink noise (1/f spectrum - more natural sounding)
+        private float GeneratePinkNoise()
+        {
+            return GeneratePinkNoiseFromSample(GenerateWhiteNoise());
+        }
+
+        // Generate pink noise from a provided white noise sample
+        private float GeneratePinkNoiseFromSample(float white)
+        {
+            // Paul Kellet's refined method for pink noise generation
+            _pinkNoiseBuffer[0] = 0.99886f * _pinkNoiseBuffer[0] + white * 0.0555179f;
+            _pinkNoiseBuffer[1] = 0.99332f * _pinkNoiseBuffer[1] + white * 0.0750759f;
+            _pinkNoiseBuffer[2] = 0.96900f * _pinkNoiseBuffer[2] + white * 0.1538520f;
+            _pinkNoiseBuffer[3] = 0.86650f * _pinkNoiseBuffer[3] + white * 0.3104856f;
+            _pinkNoiseBuffer[4] = 0.55000f * _pinkNoiseBuffer[4] + white * 0.5329522f;
+            _pinkNoiseBuffer[5] = -0.7616f * _pinkNoiseBuffer[5] - white * 0.0168980f;
+
+            float pink = _pinkNoiseBuffer[0] + _pinkNoiseBuffer[1] + _pinkNoiseBuffer[2] + _pinkNoiseBuffer[3] + _pinkNoiseBuffer[4] + _pinkNoiseBuffer[5] + _pinkNoiseBuffer[6] + white * 0.5362f;
+            _pinkNoiseBuffer[6] = white * 0.115926f;
+
+            // Normalize to -1.0 to 1.0 range
+            return pink * 0.11f;
+        }
+
+        // Generate brown noise (1/f² spectrum - deeper rumble)
+        private float GenerateBrownNoise()
+        {
+            return GenerateBrownNoiseFromSample(GenerateWhiteNoise());
+        }
+
+        // Generate brown noise from a provided white noise sample
+        private float GenerateBrownNoiseFromSample(float white)
+        {
+            // Simple first-order low-pass filter
+            _brownNoiseLastValue = (_brownNoiseLastValue + (0.02f * white)) / 1.02f;
+
+            // Normalize to -1.0 to 1.0 range
+            return _brownNoiseLastValue * 3.5f;
+        }
+
+        // Generate digital noise (harsh, bit-crushed sound)
+        private float GenerateDigitalNoise()
+        {
+            return GenerateDigitalNoiseFromSample(GenerateWhiteNoise());
+        }
+
+        // Generate digital noise from a provided white noise sample
+        private float GenerateDigitalNoiseFromSample(float raw)
+        {
+            // Quantize to fewer steps for digital sound
+            int steps = 8;
+            return Mathf.Round(raw * steps) / steps;
+        }
+
+        // Timer for continuous static noise generation
+        private Timer _staticNoiseTimer;
+        private float _currentStaticIntensity = 0.0f;
+
         // Play static noise with given intensity
         public void PlayStaticNoise(float intensity)
         {

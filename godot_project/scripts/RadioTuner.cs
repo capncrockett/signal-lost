@@ -85,7 +85,12 @@ namespace SignalLost
         // Toggle the radio power
         public void TogglePower()
         {
+            if (_gameState == null) return;
+
             _gameState.ToggleRadio();
+
+            // For testing purposes, manually call OnRadioToggled
+            OnRadioToggled(_gameState.IsRadioOn);
         }
 
         // Change the frequency

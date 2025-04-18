@@ -1,7 +1,6 @@
 using Godot;
 using System;
 using GUT;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {

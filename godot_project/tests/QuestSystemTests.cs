@@ -38,7 +38,6 @@ namespace SignalLost.Tests
             _questSystem.Set("_gameState", _gameState);
             _questSystem.Set("_inventorySystem", _inventorySystem);
             _questSystem.Set("_mapSystem", _mapSystem);
-
             // Initialize systems
             _inventorySystem.Call("InitializeItemDatabase");
             _mapSystem.Call("InitializeLocations");
@@ -54,19 +53,16 @@ namespace SignalLost.Tests
                 _questSystem.QueueFree();
                 _questSystem = null;
             }
-
             if (_mapSystem != null)
             {
                 _mapSystem.QueueFree();
                 _mapSystem = null;
             }
-
             if (_inventorySystem != null)
             {
                 _inventorySystem.QueueFree();
                 _inventorySystem = null;
             }
-
             if (_gameState != null)
             {
                 _gameState.QueueFree();
@@ -205,7 +201,6 @@ namespace SignalLost.Tests
             // Arrange
             Setup();
             _questSystem.ActivateQuest("quest_explore_forest");
-
             // Discover and visit the forest location
             _mapSystem.DiscoverLocation("forest");
             _gameState.SetCurrentLocation("forest");
