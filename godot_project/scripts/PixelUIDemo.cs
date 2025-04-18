@@ -4,7 +4,7 @@ using System;
 namespace SignalLost
 {
     [GlobalClass]
-    public partial class PixelUITest : Control
+    public partial class PixelUIDemo : Control
     {
         // UI properties
         private Color _backgroundColor = new Color(0.1f, 0.1f, 0.1f, 1.0f);
@@ -29,7 +29,7 @@ namespace SignalLost
         public override void _Ready()
         {
             UpdateInteractionAreas();
-            GD.Print("PixelUITest ready!");
+            GD.Print("PixelUIDemo ready!");
 
             // Visualize the initial UI state
             UIVisualizer.VisualizeUI(this);

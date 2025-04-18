@@ -66,7 +66,6 @@ namespace SignalLost
             _questSystem.QuestDiscovered += OnQuestAdded;
             _questSystem.QuestActivated += OnQuestUpdated;
             _questSystem.QuestCompleted += OnQuestCompleted;
-            // _questSystem.QuestFailed += OnQuestFailed; // No QuestFailed signal in QuestSystem
 
             // Set up input processing
             SetProcessInput(true);
@@ -141,7 +140,8 @@ namespace SignalLost
                         var quest = _questSystem.GetQuest(_selectedQuestId);
                         if (quest != null && quest.IsActive)
                         {
-                            // _questSystem.AbandonQuest(_selectedQuestId); // No AbandonQuest method in QuestSystem
+                            // Deactivate the quest (no AbandonQuest method available)
+                            GD.Print($"Would abandon quest {_selectedQuestId} if method was available");
                         }
                     }
                     // Check if a quest item was clicked
@@ -242,14 +242,15 @@ namespace SignalLost
             var quests = new Dictionary<string, QuestSystem.QuestData>();
             if (_activeTab == "active")
             {
-                // Get active quests
-                foreach (var quest in _questSystem.GetActiveQuests())
+                // Get active and available quests
+                var activeQuests = _questSystem.GetActiveQuests();
+                foreach (var quest in activeQuests)
                 {
                     quests[quest.Key] = quest.Value;
                 }
 
-                // Get discovered but not active quests
-                foreach (var quest in _questSystem.GetDiscoveredQuests())
+                var allQuests = _questSystem.GetDiscoveredQuests();
+                foreach (var quest in allQuests)
                 {
                     if (!quest.Value.IsActive && !quest.Value.IsCompleted)
                     {
@@ -260,7 +261,8 @@ namespace SignalLost
             else // completed tab
             {
                 // Get completed quests
-                foreach (var quest in _questSystem.GetCompletedQuests())
+                var completedQuests = _questSystem.GetCompletedQuests();
+                foreach (var quest in completedQuests)
                 {
                     quests[quest.Key] = quest.Value;
                 }
@@ -283,8 +285,6 @@ namespace SignalLost
                     itemColor = ActiveQuestColor;
                 else if (quest.Value.IsCompleted)
                     itemColor = CompletedQuestColor;
-                else if (quest.Value.IsCompleted && false) // No failed state in QuestSystem
-                    itemColor = FailedQuestColor;
 
                 // Highlight if selected
                 if (quest.Key == _selectedQuestId)
@@ -329,8 +329,9 @@ namespace SignalLost
             DrawPixelText(quest.Title.ToUpper(), new Vector2(x + 15, y + 25), TextColor, 1);
 
             // Draw quest status
-            string statusText = "STATUS: " + (quest.IsActive ? "ACTIVE" : (quest.IsCompleted ? "COMPLETED" : "AVAILABLE"));
-            DrawPixelText(statusText, new Vector2(x + 15, y + 50), GetStatusColor(quest), 1);
+            string status = quest.IsCompleted ? "COMPLETED" : (quest.IsActive ? "ACTIVE" : "AVAILABLE");
+            string statusText = $"STATUS: {status}";
+            DrawPixelText(statusText, new Vector2(x + 15, y + 50), GetStatusColor(quest.IsCompleted, quest.IsActive), 1);
 
             // Draw quest description
             DrawWrappedText(quest.Description, new Vector2(x + 15, y + 80), width - 30, TextColor, 1);
@@ -451,12 +452,12 @@ namespace SignalLost
         }
 
         // Get color based on quest status
-        private Color GetStatusColor(QuestSystem.QuestData quest)
+        private Color GetStatusColor(bool isCompleted, bool isActive)
         {
-            if (quest.IsActive)
-                return ActiveQuestColor;
-            else if (quest.IsCompleted)
+            if (isCompleted)
                 return CompletedQuestColor;
+            else if (isActive)
+                return ActiveQuestColor;
             else
                 return TextColor;
         }
@@ -473,11 +474,6 @@ namespace SignalLost
         }
 
         private void OnQuestCompleted(string questId)
-        {
-            QueueRedraw();
-        }
-
-        private void OnQuestFailed(string questId)
         {
             QueueRedraw();
         }

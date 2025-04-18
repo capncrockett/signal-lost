@@ -128,22 +128,8 @@ namespace SignalLost
             string itemDescription = $"A {itemName.ToLower()} that can be used for various purposes.";
             int quantity = GD.RandRange(1, 5);
 
-            // Create and add the item
-            // Commented out due to missing InventoryItem class
-            /*
-            var item = new InventoryItem
-            {
-                Id = itemId,
-                Name = itemName,
-                Description = itemDescription,
-                Category = itemCategory,
-                Quantity = quantity,
-                IsUsable = true,
-                IsDroppable = true
-            };
-
-            _inventorySystem.AddItem(item);
-            */
+            // Add the item to inventory
+            _inventorySystem.AddItemToInventory(itemId, quantity);
 
             // Update counter and status
             _itemCounter++;
@@ -164,29 +150,21 @@ namespace SignalLost
             string questTitle = $"Test Quest {_questCounter + 1}";
             string questDescription = $"This is a test quest to demonstrate the pixel-based quest UI. Complete the objectives to finish the quest.";
 
-            // Create objectives
-            // Commented out due to missing QuestObjective class
-            /*
-            var objectives = new List<QuestObjective>
+            // Create a test quest
+            var objectives = new List<QuestSystem.QuestObjective>
             {
-                new QuestObjective { Description = "Find the hidden item", IsCompleted = false },
-                new QuestObjective { Description = "Talk to the NPC", IsCompleted = false },
-                new QuestObjective { Description = "Return to the starting point", IsCompleted = false }
+                new QuestSystem.QuestObjective
+                {
+                    Id = $"{questId}_obj1",
+                    Description = "Find the hidden item",
+                    Type = QuestSystem.QuestObjectiveType.CollectItem,
+                    TargetId = "hidden_item",
+                    RequiredAmount = 1
+                }
             };
 
-            // Create and add the quest
-            var quest = new Quest
-            {
-                Id = questId,
-                Title = questTitle,
-                Description = questDescription,
-                Objectives = objectives,
-                Reward = "100 XP and a special item",
-                Status = QuestStatus.Available
-            };
-
-            _questSystem.AddQuest(quest);
-            */
+            // Discover the quest
+            _questSystem.DiscoverQuest(questId);
 
             // Update counter and status
             _questCounter++;
@@ -208,20 +186,15 @@ namespace SignalLost
             if (frequency > 108.0f) frequency = 88.0f + (frequency - 108.0f);
             string message = "This is a test signal. SOS. TEST.";
 
-            // Create and add the signal
-            // Commented out due to missing RadioSignal class
-            /*
-            var signal = new RadioSignal
+            // Add a signal
+            _radioSystem.AddSignal(new RadioSignal
             {
                 Id = signalId,
                 Frequency = frequency,
                 Message = message,
                 Type = RadioSignalType.Morse,
                 Strength = 0.8f
-            };
-
-            _radioSystem.AddSignal(signal);
-            */
+            });
 
             // Update counter and status
             _signalCounter++;
@@ -246,9 +219,7 @@ namespace SignalLost
                 GD.RandRange(-200, 200)
             );
 
-            // Create and add the location
-            // Commented out due to missing MapLocation class
-            /*
+            // Create a location
             var location = new MapLocation
             {
                 Id = locationId,
@@ -270,12 +241,9 @@ namespace SignalLost
                 if (previousLocation != null)
                 {
                     previousLocation.ConnectedLocations.Add(locationId);
-                    _mapSystem.UpdateLocation(previousLocation);
                 }
             }
 
-            _mapSystem.AddLocation(location);
-            */
 
             // Update counter and status
             _locationCounter++;
