@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace SignalLost.Tests
 {
     [GlobalClass]
-    [TestClass]
+    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
     public partial class AudioVisualizerTests : Test
     {
         private AudioVisualizer _audioVisualizer = null;
@@ -33,7 +33,7 @@ namespace SignalLost.Tests
         }
 
         // Test initialization
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestInitialization()
         {
             // Assert default properties are set correctly
@@ -57,7 +57,7 @@ namespace SignalLost.Tests
         }
 
         // Test signal strength setting
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestSetSignalStrength()
         {
             // Arrange
@@ -88,7 +88,7 @@ namespace SignalLost.Tests
         }
 
         // Test static intensity setting
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestSetStaticIntensity()
         {
             // Arrange
@@ -119,7 +119,7 @@ namespace SignalLost.Tests
         }
 
         // Test bar height calculation
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestBarHeightCalculation()
         {
             // This is a more complex test as CalculateBarHeight is private
@@ -156,7 +156,7 @@ namespace SignalLost.Tests
         }
 
         // Test that the visualizer responds to both signal and static
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestSignalAndStaticVisualization()
         {
             // Set both signal and static to non-zero values

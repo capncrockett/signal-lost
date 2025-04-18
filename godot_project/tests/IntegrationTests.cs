@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
-    [TestClass]
+    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
     public partial class IntegrationTests : Test
     {
         // Components to test
@@ -164,7 +164,7 @@ namespace SignalLost.Tests
         }
 
         // Test GameState and AudioManager integration
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestGameStateAudioManagerIntegration()
         {
             // Skip this test if components are not properly initialized
@@ -224,7 +224,7 @@ namespace SignalLost.Tests
         }
 
         // Test RadioTuner and GameState integration
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestRadioTunerGameStateIntegration()
         {
             // Skip this test on Mac
@@ -282,7 +282,7 @@ namespace SignalLost.Tests
         }
 
         // Test signal discovery and message decoding
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestSignalDiscoveryAndMessageDecoding()
         {
             // Skip this test if components are not properly initialized
@@ -356,7 +356,7 @@ namespace SignalLost.Tests
         }
 
         // Test scanning functionality with signal discovery
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestScanningWithSignalDiscovery()
         {
             // Skip this test if components are not properly initialized
@@ -436,7 +436,7 @@ namespace SignalLost.Tests
         }
 
         // Test edge case: radio behavior at frequency boundaries
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestFrequencyBoundaries()
         {
             // Skip this test if components are not properly initialized

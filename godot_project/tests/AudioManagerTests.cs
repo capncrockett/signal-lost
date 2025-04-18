@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace SignalLost.Tests
 {
 	[GlobalClass]
-	[TestClass]
+	[Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
 	public partial class AudioManagerTests : Test
 	{
 		private AudioManager _audioManager = null;

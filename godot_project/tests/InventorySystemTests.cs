@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
-    [TestClass]
+    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
     public partial class InventorySystemTests : Node
     {
         private InventorySystem _inventorySystem;
@@ -47,7 +47,7 @@ namespace SignalLost.Tests
         }
 
         // Test getting an item from the database
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestGetItem()
         {
             // Arrange
@@ -71,7 +71,7 @@ namespace SignalLost.Tests
         }
 
         // Test adding an item to the inventory
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestAddItemToInventory()
         {
             // Arrange
@@ -96,7 +96,7 @@ namespace SignalLost.Tests
         }
 
         // Test adding multiple items to the inventory
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestAddMultipleItems()
         {
             // Arrange
@@ -122,7 +122,7 @@ namespace SignalLost.Tests
         }
 
         // Test removing an item from the inventory
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestRemoveItemFromInventory()
         {
             // Arrange
@@ -153,7 +153,7 @@ namespace SignalLost.Tests
         }
 
         // Test using an item
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestUseItem()
         {
             // Arrange
@@ -186,7 +186,7 @@ namespace SignalLost.Tests
         }
 
         // Test inventory capacity
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestInventoryCapacity()
         {
             // Arrange
@@ -215,7 +215,7 @@ namespace SignalLost.Tests
         }
 
         // Test getting items by category
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestGetItemsByCategory()
         {
             // Arrange

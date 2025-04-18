@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
-    [TestClass]
+    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
     public partial class QuestSystemTests : Node
     {
         private QuestSystem _questSystem;
@@ -75,7 +75,7 @@ namespace SignalLost.Tests
         }
 
         // Test getting a quest from the database
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestGetQuest()
         {
             // Arrange
@@ -101,7 +101,7 @@ namespace SignalLost.Tests
         }
 
         // Test activating a quest
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestActivateQuest()
         {
             // Arrange
@@ -127,7 +127,7 @@ namespace SignalLost.Tests
         }
 
         // Test completing a quest objective
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestUpdateQuestObjective()
         {
             // Arrange
@@ -161,7 +161,7 @@ namespace SignalLost.Tests
         }
 
         // Test quest prerequisites
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestQuestPrerequisites()
         {
             // Arrange
@@ -199,7 +199,7 @@ namespace SignalLost.Tests
         }
 
         // Test location-based quest discovery
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestLocationBasedQuestDiscovery()
         {
             // Arrange

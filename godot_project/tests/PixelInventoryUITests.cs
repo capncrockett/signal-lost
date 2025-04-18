@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
-    [TestClass]
+    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
     public partial class PixelInventoryUITests : Test
     {
         private PixelInventoryUI _inventoryUI;
@@ -43,7 +43,7 @@ namespace SignalLost.Tests
             _gameState.QueueFree();
         }
 
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestInitialization()
         {
             // Verify that the inventory UI is initialized correctly
@@ -51,7 +51,7 @@ namespace SignalLost.Tests
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(_inventoryUI.IsVisible(), "PixelInventoryUI should be hidden by default");
         }
 
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestVisibility()
         {
             // Test setting visibility
@@ -69,7 +69,7 @@ namespace SignalLost.Tests
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(_inventoryUI.IsVisible(), "PixelInventoryUI should be hidden after ToggleVisibility()");
         }
 
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestInventoryChanges()
         {
             // Add items to the inventory
@@ -90,7 +90,7 @@ namespace SignalLost.Tests
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(2, _inventorySystem.GetTotalItemCount(), "Inventory should have 2 items after removing battery");
         }
 
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestInputHandling()
         {
             // Make the inventory UI visible
