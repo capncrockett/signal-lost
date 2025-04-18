@@ -3,7 +3,6 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using GUT;
-using Test = GUT.Test;
 
 namespace SignalLost.Tests
 {
@@ -31,15 +30,9 @@ namespace SignalLost.Tests
         private int _currentMethodIndex = 0;
         private object _currentTestInstance;
 
-        // Command line arguments
-        private List<string> _skipClasses = new List<string>();
-
         public override void _Initialize()
         {
             GD.Print("Starting C# test runner...");
-
-            // Parse command line arguments
-            ParseCommandLineArguments();
 
             // Find all test classes
             _testClasses = FindTestClasses();
@@ -133,28 +126,18 @@ namespace SignalLost.Tests
             try
             {
                 // Call Before method
-                if (_currentTestInstance is GUT.Test testInstance)
+                if (_currentTestInstance is Test testInstance)
                 {
-                    // Call Before method using reflection since it might not be available
-                    var beforeMethod = testInstance.GetType().GetMethod("Before");
-                    if (beforeMethod != null)
-                    {
-                        beforeMethod.Invoke(testInstance, null);
-                    }
+                    testInstance.Before();
                 }
 
                 // Call the test method
                 method.Invoke(_currentTestInstance, null);
 
                 // Call After method
-                if (_currentTestInstance is GUT.Test testInstance2)
+                if (_currentTestInstance is Test testInstance2)
                 {
-                    // Call After method using reflection since it might not be available
-                    var afterMethod = testInstance2.GetType().GetMethod("After");
-                    if (afterMethod != null)
-                    {
-                        afterMethod.Invoke(testInstance2, null);
-                    }
+                    testInstance2.After();
                 }
 
                 GD.Print($"Test {method.Name} PASSED");
@@ -170,14 +153,9 @@ namespace SignalLost.Tests
                 // Try to call After method even if the test failed
                 try
                 {
-                    if (_currentTestInstance is GUT.Test testInstance)
+                    if (_currentTestInstance is Test testInstance)
                     {
-                        // Call After method using reflection since it might not be available
-                        var afterMethod = testInstance.GetType().GetMethod("After");
-                        if (afterMethod != null)
-                        {
-                            afterMethod.Invoke(testInstance, null);
-                        }
+                        testInstance.After();
                     }
                 }
                 catch (Exception afterEx)
@@ -217,16 +195,11 @@ namespace SignalLost.Tests
         private void ContinueAfterTimeout()
         {
             // Clean up the current test instance if needed
-            if (_currentTestInstance is GUT.Test testInstance)
+            if (_currentTestInstance is Test testInstance)
             {
                 try
                 {
-                    // Call After method using reflection since it might not be available
-                    var afterMethod = testInstance.GetType().GetMethod("After");
-                    if (afterMethod != null)
-                    {
-                        afterMethod.Invoke(testInstance, null);
-                    }
+                    testInstance.After();
                 }
                 catch (Exception ex)
                 {
@@ -265,59 +238,21 @@ namespace SignalLost.Tests
             }
         }
 
-        private void ParseCommandLineArguments()
-        {
-            var args = OS.GetCmdlineArgs();
-
-            // Default skip classes
-            _skipClasses = new List<string>
-            {
-                "IntegrationTests",
-                "RadioTunerTests",
-                "PixelInventoryUITests",
-                "PixelMapInterfaceTests",
-                "QuestSystemTests",
-                "PixelRadioInterfaceTests"
-            };
-
-            // Parse command line arguments
-            for (int i = 0; i < args.Length; i++)
-            {
-                if (args[i] == "--skip-classes" && i + 1 < args.Length)
-                {
-                    var skipClassesArg = args[i + 1];
-                    var skipClassesList = skipClassesArg.Split(',');
-                    foreach (var className in skipClassesList)
-                    {
-                        if (!_skipClasses.Contains(className))
-                        {
-                            _skipClasses.Add(className);
-                        }
-                    }
-                }
-            }
-        }
-
-        private List<Type> FindTestClasses()
+        private static List<Type> FindTestClasses()
         {
             var testClasses = new List<Type>();
             var assembly = Assembly.GetExecutingAssembly();
 
             foreach (var type in assembly.GetTypes())
             {
-                // Skip classes in the skip list
-                if (_skipClasses.Contains(type.Name))
-                {
-                    continue;
-                }
-
                 // Check for TestClass attribute
-                if (type.GetCustomAttribute<Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute>() != null)
+                if (type.GetCustomAttribute<TestClassAttribute>() != null ||
+                    type.GetCustomAttribute<Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute>() != null)
                 {
                     testClasses.Add(type);
                 }
                 // Also check for class names ending with "Tests"
-                else if (type.Name.EndsWith("Tests") && type.IsSubclassOf(typeof(GUT.Test)))
+                else if (type.Name.EndsWith("Tests") && type.IsSubclassOf(typeof(Test)))
                 {
                     testClasses.Add(type);
                 }
@@ -333,7 +268,8 @@ namespace SignalLost.Tests
             foreach (var method in testClass.GetMethods())
             {
                 // Check for Test attribute
-                if (method.GetCustomAttribute<Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute>() != null)
+                if (method.GetCustomAttribute<TestAttribute>() != null ||
+                    method.GetCustomAttribute<Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute>() != null)
                 {
                     testMethods.Add(method);
                 }

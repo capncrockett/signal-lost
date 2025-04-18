@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://dmbob5vrkmmjp"]
+
+[ext_resource type="Script" path="res://tests/SimpleTest.cs" id="1_r3j2k"]
+[ext_resource type="Script" path="res://tests/TestRunner.cs" id="2_f7g8h"]
+
+[node name="SimpleTestScene" type="Node"]
+script = ExtResource("1_r3j2k")
+
+[node name="ForceExit" type="Node" parent="."]
+script = ExtResource("2_f7g8h")

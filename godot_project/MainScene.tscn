@@ -1,0 +1,87 @@
+[gd_scene load_steps=6 format=3 uid="uid://c8j6y8o4n8qxv"]
+
+[ext_resource type="PackedScene" uid="uid://c8yvxg3xnq6yw" path="res://scenes/radio/RadioTuner.tscn" id="1_r3j2k"]
+[ext_resource type="PackedScene" uid="uid://b8yvxg3xnq6yw" path="res://scenes/map/MapUI.tscn" id="2_m4p7q"]
+[ext_resource type="Script" uid="uid://5qrxps0wsnxj" path="res://scripts/MainScene.cs" id="3_8j7xp"]
+[ext_resource type="PackedScene" uid="uid://c8yvvs1yvqnxl" path="res://scenes/inventory/InventoryUI.tscn" id="4_ixnqm"]
+[ext_resource type="PackedScene" uid="uid://c8yvvs1yvqnxq" path="res://scenes/quest/QuestUI.tscn" id="5_ixnqn"]
+
+[node name="MainScene" type="Node"]
+script = ExtResource("3_8j7xp")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.05, 1)
+
+[node name="Title" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 20.0
+offset_right = 100.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 28
+text = "SIGNAL LOST"
+horizontal_alignment = 1
+
+[node name="RadioTuner" parent="." instance=ExtResource("1_r3j2k")]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -150.0
+offset_right = 300.0
+offset_bottom = 150.0
+
+[node name="MapUI" parent="." instance=ExtResource("2_m4p7q")]
+visible = false
+offset_left = 150.0
+
+[node name="SidePanel" type="Panel" parent="."]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 150.0
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SidePanel"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 80.0
+offset_right = -10.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="MapButton" type="Button" parent="SidePanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+text = "Map"
+
+[node name="InventoryButton" type="Button" parent="SidePanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+text = "Inventory"
+
+[node name="QuestButton" type="Button" parent="SidePanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+text = "Quests"
+
+[node name="InventoryUI" parent="." instance=ExtResource("4_ixnqm")]
+visible = false
+offset_left = 150.0
+
+[node name="QuestUI" parent="." instance=ExtResource("5_ixnqn")]
+visible = false
+offset_left = 150.0

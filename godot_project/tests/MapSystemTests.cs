@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
+    [TestClass]
     public partial class MapSystemTests : Node
     {
         private TestMapSystem _mapSystem;
@@ -34,7 +34,7 @@ namespace SignalLost.Tests
         }
 
         // Test getting a location
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+        [TestMethod]
         public void TestGetLocation()
         {
             // Arrange
@@ -46,10 +46,10 @@ namespace SignalLost.Tests
                 var location = _mapSystem.GetLocation("bunker");
 
                 // Assert
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(location, "Location should not be null");
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(location.Id, "bunker", "Location ID should match");
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(location.Name, "Emergency Bunker", "Location name should match");
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(location.IsDiscovered, "Starting location should be discovered");
+                AssertNotNull(location, "Location should not be null");
+                AssertEqual(location.Id, "bunker", "Location ID should match");
+                AssertEqual(location.Name, "Emergency Bunker", "Location name should match");
+                AssertTrue(location.IsDiscovered, "Starting location should be discovered");
             }
             finally
             {
@@ -58,7 +58,7 @@ namespace SignalLost.Tests
         }
 
         // Test discovering a location
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+        [TestMethod]
         public void TestDiscoverLocation()
         {
             // Arrange
@@ -71,8 +71,8 @@ namespace SignalLost.Tests
                 var location = _mapSystem.GetLocation("forest");
 
                 // Assert
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(result, "DiscoverLocation should return true");
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(location.IsDiscovered, "Location should be discovered");
+                AssertTrue(result, "DiscoverLocation should return true");
+                AssertTrue(location.IsDiscovered, "Location should be discovered");
             }
             finally
             {
@@ -81,7 +81,7 @@ namespace SignalLost.Tests
         }
 
         // Test changing location
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+        [TestMethod]
         public void TestChangeLocation()
         {
             // Arrange
@@ -102,8 +102,8 @@ namespace SignalLost.Tests
                 GD.Print($"New location: {_mapSystem.GetCurrentLocation()}");
 
                 // Assert
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(result, "ChangeLocation should return true");
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_mapSystem.GetCurrentLocation(), "forest", "Current location should be updated");
+                AssertTrue(result, "ChangeLocation should return true");
+                AssertEqual(_mapSystem.GetCurrentLocation(), "forest", "Current location should be updated");
             }
             finally
             {
@@ -112,7 +112,7 @@ namespace SignalLost.Tests
         }
 
         // Test getting connected locations
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+        [TestMethod]
         public void TestGetConnectedLocations()
         {
             // Arrange
@@ -133,7 +133,7 @@ namespace SignalLost.Tests
                 }
 
                 // Assert
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(connectedLocations.Count, 2, "Bunker should have 2 connected locations");
+                AssertEqual(connectedLocations.Count, 2, "Bunker should have 2 connected locations");
 
                 // Check that forest and road are connected to bunker
                 bool hasForest = false;
@@ -145,8 +145,8 @@ namespace SignalLost.Tests
                     if (location.Id == "road") hasRoad = true;
                 }
 
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(hasForest, "Forest should be connected to bunker");
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(hasRoad, "Road should be connected to bunker");
+                AssertTrue(hasForest, "Forest should be connected to bunker");
+                AssertTrue(hasRoad, "Road should be connected to bunker");
             }
             finally
             {
@@ -155,7 +155,7 @@ namespace SignalLost.Tests
         }
 
         // Test location connection check
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+        [TestMethod]
         public void TestIsLocationConnected()
         {
             // Arrange
@@ -183,9 +183,9 @@ namespace SignalLost.Tests
                 GD.Print($"Is lake connected: {isLakeConnected}");
 
                 // Assert
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(isForestConnected, "Forest should be connected to bunker");
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(isRoadConnected, "Road should be connected to bunker");
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(isLakeConnected, "Lake should not be connected to bunker");
+                AssertTrue(isForestConnected, "Forest should be connected to bunker");
+                AssertTrue(isRoadConnected, "Road should be connected to bunker");
+                AssertFalse(isLakeConnected, "Lake should not be connected to bunker");
             }
             finally
             {
