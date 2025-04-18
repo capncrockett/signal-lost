@@ -5,13 +5,9 @@ on:
     branches: [develop]
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
-      - 'src/components/radio/**'
-      - 'src/components/narrative/**'
-      - 'src/audio/**'
-      - 'src/context/**'
-      - 'src/types/**'
-      - 'src/data/**'
-      - 'tests/integration/**'
+      - 'godot_project/scripts/**'
+      - 'godot_project/scenes/**'
+      - 'godot_project/tests/**'
 
 permissions:
   contents: read
@@ -22,21 +18,14 @@ jobs:
   validate-contracts:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x]
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v1
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+          version: 4.2.1
+          use-dotnet: false
 
       - name: Determine agent type
         id: agent-type
@@ -47,89 +36,51 @@ jobs:
           elif [[ "${{ github.head_ref }}" == feature/beta/* ]]; then
             echo "agent=beta" >> $GITHUB_OUTPUT
             echo "This is a Beta agent PR"
-          elif [[ "${{ github.head_ref }}" == feature/contract/* ]]; then
-            echo "agent=contract" >> $GITHUB_OUTPUT
-            echo "This is a contract update PR"
+          elif [[ "${{ github.head_ref }}" == cleanup/* ]]; then
+            echo "agent=cleanup" >> $GITHUB_OUTPUT
+            echo "This is a cleanup PR"
           else
             echo "agent=unknown" >> $GITHUB_OUTPUT
             echo "Unknown agent type"
           fi
 
-      - name: Validate interface contracts
-        id: validate-contracts
+      - name: Validate C# compilation
+        id: validate-csharp
         run: |
-          echo "Running contract validation..."
+          echo "Running C# validation..."
           # Create a validation report file
           touch validation-report.md
-          echo "# Interface Contract Validation Report" >> validation-report.md
+          echo "# C# Validation Report" >> validation-report.md
           echo "" >> validation-report.md
 
-          # Run TypeScript compiler in strict mode for interface files
-          echo "## Type Checking" >> validation-report.md
-          if npx tsc --noEmit --strict src/types/*.d.ts; then
-            echo "✅ Type definitions are valid" >> validation-report.md
+          # Run dotnet build to check for compilation errors
+          cd godot_project
+          if dotnet build -v minimal; then
+            echo "✅ C# compilation successful" >> ../validation-report.md
           else
-            echo "❌ Type definition errors found" >> validation-report.md
-            echo "Please fix the type errors in the interface contracts" >> validation-report.md
+            echo "❌ C# compilation errors found" >> ../validation-report.md
+            echo "Please fix the C# compilation errors" >> ../validation-report.md
             exit 1
           fi
 
-          # Check for Alpha/Beta interface compatibility
-          echo "" >> validation-report.md
-          echo "## Interface Compatibility" >> validation-report.md
-
-          # Run the contract validation script if it exists
-          if [ -f "scripts/validate-contracts.js" ]; then
-            if node scripts/validate-contracts.js >> validation-report.md; then
-              echo "✅ Interface contracts are compatible" >> validation-report.md
-            else
-              echo "❌ Interface compatibility issues found" >> validation-report.md
-              echo "Please ensure Alpha and Beta components use compatible interfaces" >> validation-report.md
-              exit 1
-            fi
-          else
-            echo "⚠️ Contract validation script not found" >> validation-report.md
-            echo "Creating a basic validation check..." >> validation-report.md
-
-            # Basic validation: check if required interfaces exist
-            if grep -q "interface Signal" src/types/*.d.ts; then
-              echo "✅ Signal interface found" >> validation-report.md
-            else
-              echo "❌ Signal interface not found" >> validation-report.md
-              echo "The Signal interface is required for Alpha/Beta integration" >> validation-report.md
-              exit 1
-            fi
-
-            if grep -q "interface GameEvent" src/types/*.d.ts; then
-              echo "✅ GameEvent interface found" >> validation-report.md
-            else
-              echo "❌ GameEvent interface not found" >> validation-report.md
-              echo "The GameEvent interface is required for Alpha/Beta integration" >> validation-report.md
-              exit 1
-            fi
-          fi
-
-      - name: Run cross-agent integration tests
+      - name: Run Godot unit tests
         id: integration-tests
         run: |
-          echo "Running cross-agent integration tests..."
+          echo "Running Godot unit tests..."
           # Create a test report file
           touch integration-test-report.md
-          echo "# Cross-Agent Integration Test Report" >> integration-test-report.md
+          echo "# Godot Test Report" >> integration-test-report.md
           echo "" >> integration-test-report.md
 
-          # Run integration tests if they exist
-          if [ -d "tests/integration" ]; then
-            if npm run test:integration >> integration-test-report.md 2>&1; then
-              echo "✅ Integration tests passed" >> integration-test-report.md
-            else
-              echo "❌ Integration tests failed" >> integration-test-report.md
-              echo "Please fix the integration issues between Alpha and Beta components" >> integration-test-report.md
-              exit 1
-            fi
+          # Run tests
+          cd godot_project
+          chmod +x run_tests.sh
+          if ./run_tests.sh >> ../integration-test-report.md 2>&1; then
+            echo "✅ Godot tests passed" >> ../integration-test-report.md
           else
-            echo "⚠️ No integration tests found" >> integration-test-report.md
-            echo "Consider adding integration tests for Alpha/Beta components" >> integration-test-report.md
+            echo "❌ Godot tests failed" >> ../integration-test-report.md
+            echo "Please fix the test failures" >> ../integration-test-report.md
+            exit 1
           fi
 
       - name: Generate agent-specific feedback
@@ -144,37 +95,37 @@ jobs:
           if [[ "${{ steps.agent-type.outputs.agent }}" == "alpha" ]]; then
             echo "## Feedback for Agent Alpha" >> agent-feedback.md
             echo "" >> agent-feedback.md
-            echo "### Radio Tuner Component" >> agent-feedback.md
-            echo "- Ensure signal detection maintains compatibility with narrative system" >> agent-feedback.md
-            echo "- Verify audio system changes don't affect narrative event handling" >> agent-feedback.md
+            echo "### Radio System" >> agent-feedback.md
+            echo "- Ensure radio system maintains compatibility with message system" >> agent-feedback.md
+            echo "- Verify audio system changes don't affect game state handling" >> agent-feedback.md
             echo "" >> agent-feedback.md
-            echo "### Audio System" >> agent-feedback.md
-            echo "- Check that audio changes maintain proper event dispatching" >> agent-feedback.md
-            echo "- Ensure volume controls don't interfere with narrative audio cues" >> agent-feedback.md
+            echo "### UI System" >> agent-feedback.md
+            echo "- Check that UI changes maintain proper event dispatching" >> agent-feedback.md
+            echo "- Ensure pixel-based UI components are consistent" >> agent-feedback.md
           elif [[ "${{ steps.agent-type.outputs.agent }}" == "beta" ]]; then
             echo "## Feedback for Agent Beta" >> agent-feedback.md
             echo "" >> agent-feedback.md
-            echo "### Narrative System" >> agent-feedback.md
-            echo "- Ensure narrative components properly consume signals from the radio tuner" >> agent-feedback.md
+            echo "### Message System" >> agent-feedback.md
+            echo "- Ensure message components properly consume signals from the radio system" >> agent-feedback.md
             echo "- Verify message display works with all signal types" >> agent-feedback.md
             echo "" >> agent-feedback.md
             echo "### Game State" >> agent-feedback.md
-            echo "- Check that game state changes don't affect radio tuner functionality" >> agent-feedback.md
+            echo "- Check that game state changes don't affect radio system functionality" >> agent-feedback.md
             echo "- Ensure event system properly handles audio events" >> agent-feedback.md
-          elif [[ "${{ steps.agent-type.outputs.agent }}" == "contract" ]]; then
-            echo "## Feedback for Contract Changes" >> agent-feedback.md
+          elif [[ "${{ steps.agent-type.outputs.agent }}" == "cleanup" ]]; then
+            echo "## Feedback for Cleanup Changes" >> agent-feedback.md
             echo "" >> agent-feedback.md
-            echo "### Interface Contracts" >> agent-feedback.md
-            echo "- Ensure changes are backward compatible when possible" >> agent-feedback.md
-            echo "- Verify both Alpha and Beta components can adapt to the new contracts" >> agent-feedback.md
-            echo "- Consider adding migration guides for significant changes" >> agent-feedback.md
+            echo "### Code Cleanup" >> agent-feedback.md
+            echo "- Ensure removed code doesn't break existing functionality" >> agent-feedback.md
+            echo "- Verify documentation is updated to reflect the current state" >> agent-feedback.md
+            echo "- Consider archiving important code instead of deleting it" >> agent-feedback.md
           else
             echo "## General Feedback" >> agent-feedback.md
             echo "" >> agent-feedback.md
             echo "- Please use the proper branch naming convention:" >> agent-feedback.md
             echo "  - `feature/alpha/*` for Agent Alpha changes" >> agent-feedback.md
             echo "  - `feature/beta/*` for Agent Beta changes" >> agent-feedback.md
-            echo "  - `feature/contract/*` for interface contract changes" >> agent-feedback.md
+            echo "  - `cleanup/*` for cleanup changes" >> agent-feedback.md
           fi
 
       - name: Check for other agent's approval
