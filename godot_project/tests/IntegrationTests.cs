@@ -15,7 +15,7 @@ namespace SignalLost.Tests
         private PackedScene _radioTunerScene;
 
         // Called before each test
-        public void Before()
+        public override void Before()
         {
             try
             {
@@ -151,7 +151,7 @@ namespace SignalLost.Tests
         }
 
         // Called after each test
-        public void After()
+        public override void After()
         {
             // Clean up
             _radioTuner.QueueFree();
