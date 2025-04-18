@@ -11,7 +11,7 @@ namespace SignalLost.Tests
         private GameState _gameState = null;
 
         // Called before each test
-        public override void Before()
+        public new void Before()
         {
             // Create a new instance of the GameState
             _gameState = new GameState();
@@ -20,7 +20,7 @@ namespace SignalLost.Tests
         }
 
         // Called after each test
-        public override void After()
+        public new void After()
         {
             // Clean up
             _gameState.QueueFree();

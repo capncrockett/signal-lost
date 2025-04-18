@@ -18,7 +18,7 @@ namespace SignalLost.Tests
 		private const float MaxFrequency = 108.0f;
 
 		// Called before each test
-		public override void Before()
+		public new void Before()
 		{
 			try
 			{
@@ -121,7 +121,7 @@ namespace SignalLost.Tests
 		}
 
 		// Called after each test
-		public override void After()
+		public new void After()
 		{
 			// Clean up
 			_radioTuner.QueueFree();
