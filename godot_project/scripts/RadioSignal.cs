@@ -5,10 +5,10 @@ namespace SignalLost
 {
     public enum RadioSignalType
     {
-        Morse,
         Voice,
+        Morse,
         Data,
-        Noise
+        Beacon
     }
 
     public class RadioSignal
@@ -18,7 +18,6 @@ namespace SignalLost
         public string Message { get; set; }
         public RadioSignalType Type { get; set; }
         public float Strength { get; set; } = 1.0f;
-        public bool IsDiscovered { get; set; } = false;
-        public bool IsDecoded { get; set; } = false;
+        public bool IsActive { get; set; } = true;
     }
 }

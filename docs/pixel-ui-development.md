@@ -1,25 +1,8 @@
-# Extending the Pixel-Based UI System
+# Pixel-Based UI Development Guide
 
-This document provides guidelines and examples for extending the pixel-based UI system in Signal Lost.
+## Overview
 
-## Table of Contents
-
-1. [Introduction](#introduction)
-2. [Creating New UI Components](#creating-new-ui-components)
-3. [Using the UI Visualization System](#using-the-ui-visualization-system)
-4. [Best Practices](#best-practices)
-5. [Common Patterns](#common-patterns)
-6. [Examples](#examples)
-
-## Introduction
-
-The pixel-based UI system in Signal Lost uses Godot's drawing primitives to create UI elements instead of relying on image assets. This approach offers flexibility, reduced file size, and a consistent retro aesthetic.
-
-When extending the system, keep these principles in mind:
-- Use drawing primitives for all visual elements
-- Maintain pixel-perfect rendering
-- Provide clear visual feedback for interactions
-- Use the UI visualization tools for debugging
+This document provides guidelines for extending the pixel-based UI system in Signal Lost and outlines the development roadmap.
 
 ## Creating New UI Components
 
@@ -103,59 +86,6 @@ For dynamic components, also implement:
 - `_Process()`: Update the component state
 - `_Notification()`: Handle resize and other notifications
 
-## Using the UI Visualization System
-
-The UI Visualization System helps debug and improve your UI components.
-
-### Visualizing a Component
-
-```csharp
-// In your component's _Ready() method
-UIVisualizer.VisualizeUI(this);
-
-// After significant state changes
-public void ToggleState()
-{
-    _isActive = !_isActive;
-    QueueRedraw();
-    
-    // Visualize the updated state
-    UIVisualizer.VisualizeUI(this);
-}
-```
-
-### Interpreting the Visualization
-
-The visualization provides:
-
-1. A text-based ASCII representation of your UI
-2. Detailed logging of element positions and states
-3. Information about hover states and interactions
-
-Use this information to:
-- Verify element positioning
-- Check interaction areas
-- Debug state changes
-
-### Taking Screenshots
-
-For visual debugging, use the `ScreenshotTaker`:
-
-```csharp
-// Add to your scene
-var screenshotTaker = new ScreenshotTaker();
-AddChild(screenshotTaker);
-
-// Or trigger manually
-public void TakeDebugScreenshot()
-{
-    var image = GetViewport().GetTexture().GetImage();
-    string path = "user://debug_screenshot.png";
-    image.SavePng(path);
-    GD.Print($"Screenshot saved to: {OS.GetUserDataDir()}/debug_screenshot.png");
-}
-```
-
 ## Best Practices
 
 ### Performance Optimization
@@ -197,7 +127,7 @@ public override void _Process(double delta)
 - Make interactive elements clearly distinguishable
 - Test with different color settings
 
-## Common Patterns
+## Common UI Patterns
 
 ### Button Implementation
 
@@ -255,41 +185,54 @@ private void DrawSlider(Rect2 rect, float value, bool isHovered)
 }
 ```
 
-### Text Input Implementation
+## Development Roadmap
 
-```csharp
-private void DrawTextInput(Rect2 rect, string text, bool isFocused)
-{
-    // Draw input background
-    DrawRect(rect, new Color(0.05f, 0.05f, 0.05f, 1.0f));
-    
-    // Draw input border
-    Color borderColor = isFocused ? _focusBorderColor : _borderColor;
-    DrawRect(rect, borderColor, false, isFocused ? 2 : 1);
-    
-    // Draw input text
-    DrawString(ThemeDB.FallbackFont, 
-        new Vector2(rect.Position.X + 5, rect.Position.Y + rect.Size.Y / 2 + 6),
-        text, 
-        HorizontalAlignment.Left, -1, 16, _textColor);
-    
-    // Draw cursor if focused
-    if (isFocused && (Time.GetTicksMsec() % 1000 < 500))
-    {
-        float textWidth = ThemeDB.FallbackFont.GetStringSize(text, 0, 16).X;
-        DrawRect(new Rect2(
-            rect.Position.X + 5 + textWidth,
-            rect.Position.Y + 5,
-            2,
-            rect.Size.Y - 10
-        ), _textColor);
-    }
-}
+### Completed Features
+
+- ✅ Basic pixel-based UI framework
+- ✅ Pixel-based radio interface
+- ✅ Pixel-based inventory UI
+- ✅ Pixel-based message display
+- ✅ Pixel-based map interface
+
+### Current Development
+
+- 🔄 Field exploration system
+- 🔄 Game progression mechanics
+- 🔄 Save/load system
+
+### Upcoming Features
+
+- ⬜ Advanced radio features
+  - ⬜ Signal analysis tools
+  - ⬜ Frequency scanner visualization
+  - ⬜ Morse code visualization
+- ⬜ World integration
+  - ⬜ Link radio signals to world locations
+  - ⬜ Implement signal strength based on proximity
+  - ⬜ Add environmental effects on radio reception
+- ⬜ Visual polish
+  - ⬜ Refine all UI animations
+  - ⬜ Improve color schemes and contrast
+  - ⬜ Add subtle visual effects (glow, scan lines)
+
+## Testing
+
+Each UI component should have corresponding test scenes and unit tests:
+
+- Unit tests verify functionality and behavior
+- Test scenes allow visual inspection and interaction testing
+
+Run tests using:
+
+```bash
+cd godot_project
+./run_tests.bat
 ```
 
-## Examples
+## Example Components
 
-### Simple Toggle Switch
+### Toggle Switch
 
 ```csharp
 public partial class PixelToggleSwitch : Control
@@ -454,5 +397,3 @@ public partial class PixelProgressBar : Control
     }
 }
 ```
-
-These examples demonstrate how to create reusable UI components using the pixel-based approach. You can extend these patterns to create more complex UI elements for your game.
