@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace SignalLost.Tests
 {
     [GlobalClass]
-    [TestClass]
+    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
     public partial class GameStateTests : Test
     {
         private GameState _gameState = null;
@@ -28,7 +28,7 @@ namespace SignalLost.Tests
         }
 
         // Test frequency setting
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestSetFrequency()
         {
             // Arrange
@@ -44,7 +44,7 @@ namespace SignalLost.Tests
         }
 
         // Test frequency limits
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestFrequencyLimits()
         {
             // Arrange
@@ -67,7 +67,7 @@ namespace SignalLost.Tests
         }
 
         // Test radio toggle
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestToggleRadio()
         {
             // Arrange
@@ -89,7 +89,7 @@ namespace SignalLost.Tests
         }
 
         // Test signal detection
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestFindSignalAtFrequency()
         {
             // Arrange
@@ -107,7 +107,7 @@ namespace SignalLost.Tests
         }
 
         // Test signal strength calculation
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestCalculateSignalStrength()
         {
             // Arrange
@@ -127,7 +127,7 @@ namespace SignalLost.Tests
         }
 
         // Test discovered frequencies
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestAddDiscoveredFrequency()
         {
             // Arrange
@@ -152,7 +152,7 @@ namespace SignalLost.Tests
         }
 
         // Test message decoding
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestDecodeMessage()
         {
             // Arrange
@@ -173,7 +173,7 @@ namespace SignalLost.Tests
         }
 
         // Test static intensity
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestGetStaticIntensity()
         {
             // Arrange

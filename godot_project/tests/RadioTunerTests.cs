@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
-	[TestClass]
+	[Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
 	public partial class RadioTunerTests : Test
 	{
 		// Path to the scene we want to test
@@ -129,7 +129,7 @@ namespace SignalLost.Tests
 		}
 
 		// Test power button functionality
-		[TestMethod]
+		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 		public void TestPowerButton()
 		{
 			// Skip this test if components are not properly initialized
@@ -181,7 +181,7 @@ namespace SignalLost.Tests
 		}
 
 		// Test frequency change
-		[TestMethod]
+		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 		public void TestFrequencyChange()
 		{
 			// Skip this test if components are not properly initialized
@@ -233,7 +233,7 @@ namespace SignalLost.Tests
 		}
 
 		// Test signal detection
-		[TestMethod]
+		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 		public void TestSignalDetection()
 		{
 			// Skip this test if components are not properly initialized
@@ -306,7 +306,7 @@ namespace SignalLost.Tests
 		}
 
 		// Test scanning functionality
-		[TestMethod]
+		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 		public void TestScanning()
 		{
 			// Skip this test if components are not properly initialized
@@ -357,7 +357,7 @@ namespace SignalLost.Tests
 		}
 
 		// Test message display
-		[TestMethod]
+		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 		public void TestMessageDisplay()
 		{
 			// Skip this test if components are not properly initialized
@@ -423,7 +423,7 @@ namespace SignalLost.Tests
 		}
 
 		// Test radio behavior when turned off
-		[TestMethod]
+		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 		public void TestRadioOffBehavior()
 		{
 			// Skip this test on Mac

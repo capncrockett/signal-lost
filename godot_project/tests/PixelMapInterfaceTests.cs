@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
-    [TestClass]
+    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
     public partial class PixelMapInterfaceTests : Test
     {
         private PixelMapInterface _mapInterface;
@@ -43,7 +43,7 @@ namespace SignalLost.Tests
             _gameState.QueueFree();
         }
 
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestInitialization()
         {
             // Verify that the map interface is initialized correctly
@@ -51,7 +51,7 @@ namespace SignalLost.Tests
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(_mapInterface.IsVisible(), "PixelMapInterface should be hidden by default");
         }
 
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestVisibility()
         {
             // Test setting visibility
@@ -69,7 +69,7 @@ namespace SignalLost.Tests
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(_mapInterface.IsVisible(), "PixelMapInterface should be hidden after ToggleVisibility()");
         }
 
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestLocationDiscovery()
         {
             // Make the map interface visible
@@ -83,7 +83,7 @@ namespace SignalLost.Tests
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(location.IsDiscovered, "Forest location should be discovered");
         }
 
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestLocationChange()
         {
             // Make the map interface visible
@@ -97,7 +97,7 @@ namespace SignalLost.Tests
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual("forest", _gameState.CurrentLocation, "Current location should be forest");
         }
 
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestInputHandling()
         {
             // Make the map interface visible

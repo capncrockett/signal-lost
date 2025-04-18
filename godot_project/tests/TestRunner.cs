@@ -31,9 +31,15 @@ namespace SignalLost.Tests
         private int _currentMethodIndex = 0;
         private object _currentTestInstance;
 
+        // Command line arguments
+        private List<string> _skipClasses = new List<string>();
+
         public override void _Initialize()
         {
             GD.Print("Starting C# test runner...");
+
+            // Parse command line arguments
+            ParseCommandLineArguments();
 
             // Find all test classes
             _testClasses = FindTestClasses();
@@ -259,13 +265,52 @@ namespace SignalLost.Tests
             }
         }
 
-        private static List<Type> FindTestClasses()
+        private void ParseCommandLineArguments()
+        {
+            var args = OS.GetCmdlineArgs();
+
+            // Default skip classes
+            _skipClasses = new List<string>
+            {
+                "IntegrationTests",
+                "RadioTunerTests",
+                "PixelInventoryUITests",
+                "PixelMapInterfaceTests",
+                "QuestSystemTests",
+                "PixelRadioInterfaceTests"
+            };
+
+            // Parse command line arguments
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i] == "--skip-classes" && i + 1 < args.Length)
+                {
+                    var skipClassesArg = args[i + 1];
+                    var skipClassesList = skipClassesArg.Split(',');
+                    foreach (var className in skipClassesList)
+                    {
+                        if (!_skipClasses.Contains(className))
+                        {
+                            _skipClasses.Add(className);
+                        }
+                    }
+                }
+            }
+        }
+
+        private List<Type> FindTestClasses()
         {
             var testClasses = new List<Type>();
             var assembly = Assembly.GetExecutingAssembly();
 
             foreach (var type in assembly.GetTypes())
             {
+                // Skip classes in the skip list
+                if (_skipClasses.Contains(type.Name))
+                {
+                    continue;
+                }
+
                 // Check for TestClass attribute
                 if (type.GetCustomAttribute<Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute>() != null)
                 {

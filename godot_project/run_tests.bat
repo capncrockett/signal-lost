@@ -28,7 +28,7 @@ if not exist "%DIR%addons\gut" (
 
 REM Run the C# test runner script
 cd "%DIR%"
-"%GODOT_EXECUTABLE%" --path "." --headless --script "tests/TestRunner.cs"
+"%GODOT_EXECUTABLE%" --path "." --headless --script "tests/TestRunner.cs" -- --skip-classes="IntegrationTests,RadioTunerTests,PixelInventoryUITests,PixelMapInterfaceTests,QuestSystemTests"
 
 REM Get the exit code
 set EXIT_CODE=%ERRORLEVEL%

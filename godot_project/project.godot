@@ -13,7 +13,7 @@ config_version=5
 config/name="Signal Lost"
 run/main_scene="res://PixelMainScene.tscn"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
-config/icon="res://assets/images/icon.png"
+config/icon="res://icon.svg"
 
 [autoload]
 
@@ -24,9 +24,6 @@ MapSystem="*res://scripts/MapSystem.cs"
 InventorySystem="*res://scripts/InventorySystem.cs"
 QuestSystem="*res://scripts/QuestSystem.cs"
 RadioSystem="*res://scripts/RadioSystem.cs"
-MemoryProfiler="*res://scripts/MemoryProfiler.cs"
-ResourceTracker="*res://scripts/ResourceTracker.cs"
-DisposableResourceManager="*res://scripts/DisposableResourceManager.cs"
 
 [display]
 

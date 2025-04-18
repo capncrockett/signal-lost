@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
-    [TestClass]
+    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
     public partial class MapSystemTests : Node
     {
         private TestMapSystem _mapSystem;
@@ -34,7 +34,7 @@ namespace SignalLost.Tests
         }
 
         // Test getting a location
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestGetLocation()
         {
             // Arrange
@@ -58,7 +58,7 @@ namespace SignalLost.Tests
         }
 
         // Test discovering a location
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestDiscoverLocation()
         {
             // Arrange
@@ -81,7 +81,7 @@ namespace SignalLost.Tests
         }
 
         // Test changing location
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestChangeLocation()
         {
             // Arrange
@@ -112,7 +112,7 @@ namespace SignalLost.Tests
         }
 
         // Test getting connected locations
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestGetConnectedLocations()
         {
             // Arrange
@@ -155,7 +155,7 @@ namespace SignalLost.Tests
         }
 
         // Test location connection check
-        [TestMethod]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
         public void TestIsLocationConnected()
         {
             // Arrange
