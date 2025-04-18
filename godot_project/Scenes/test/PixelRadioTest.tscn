@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3]
 
-[ext_resource type="Script" path="res://scripts/RadioTuner.cs" id="1_radio"]
+[ext_resource type="Script" path="res://scripts/PixelRadioInterface.cs" id="1_radio"]
 [ext_resource type="Script" path="res://scripts/PixelRadioInterface.cs" id="2_pixel"]
 [ext_resource type="Script" path="res://scripts/PixelRadioVisualizer.cs" id="3_visualizer"]
 [ext_resource type="Script" path="res://scripts/ScreenshotTaker.cs" id="4_screenshot"]

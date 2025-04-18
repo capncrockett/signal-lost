@@ -17,14 +17,14 @@ namespace SignalLost.Tests
             // Create a new GameState
             _gameState = new GameState();
             AddChild(_gameState);
-            
+
             // Create a new InventorySystem
             _inventorySystem = new InventorySystem();
             AddChild(_inventorySystem);
-            
+
             // Set the GameState reference in InventorySystem
             _inventorySystem.Set("_gameState", _gameState);
-            
+
             // Initialize the item database
             _inventorySystem.Call("InitializeItemDatabase");
         }
@@ -38,7 +38,7 @@ namespace SignalLost.Tests
                 _inventorySystem.QueueFree();
                 _inventorySystem = null;
             }
-            
+
             if (_gameState != null)
             {
                 _gameState.QueueFree();
@@ -59,10 +59,10 @@ namespace SignalLost.Tests
                 var item = _inventorySystem.GetItem("flashlight");
 
                 // Assert
-                AssertNotNull(item, "Item should not be null");
-                AssertEqual(item.Id, "flashlight", "Item ID should be 'flashlight'");
-                AssertEqual(item.Name, "Flashlight", "Item name should be 'Flashlight'");
-                AssertEqual(item.Category, "tool", "Item category should be 'tool'");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(item, "Item should not be null");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(item.Id, "flashlight", "Item ID should be 'flashlight'");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(item.Name, "Flashlight", "Item name should be 'Flashlight'");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(item.Category, "tool", "Item category should be 'tool'");
             }
             finally
             {
@@ -84,10 +84,10 @@ namespace SignalLost.Tests
                 var inventory = _inventorySystem.GetInventory();
 
                 // Assert
-                AssertTrue(result, "AddItemToInventory should return true");
-                AssertEqual(inventory.Count, 1, "Inventory should have 1 item");
-                AssertTrue(inventory.ContainsKey("flashlight"), "Inventory should contain 'flashlight'");
-                AssertEqual(inventory["flashlight"].Quantity, 1, "Flashlight quantity should be 1");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(result, "AddItemToInventory should return true");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(inventory.Count, 1, "Inventory should have 1 item");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(inventory.ContainsKey("flashlight"), "Inventory should contain 'flashlight'");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(inventory["flashlight"].Quantity, 1, "Flashlight quantity should be 1");
             }
             finally
             {
@@ -111,9 +111,9 @@ namespace SignalLost.Tests
                 var inventory = _inventorySystem.GetInventory();
 
                 // Assert
-                AssertEqual(inventory.Count, 2, "Inventory should have 2 unique items");
-                AssertEqual(inventory["flashlight"].Quantity, 2, "Flashlight quantity should be 2");
-                AssertEqual(inventory["battery"].Quantity, 1, "Battery quantity should be 1");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(inventory.Count, 2, "Inventory should have 2 unique items");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(inventory["flashlight"].Quantity, 2, "Flashlight quantity should be 2");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(inventory["battery"].Quantity, 1, "Battery quantity should be 1");
             }
             finally
             {
@@ -136,15 +136,15 @@ namespace SignalLost.Tests
                 var inventory = _inventorySystem.GetInventory();
 
                 // Assert
-                AssertTrue(result, "RemoveItemFromInventory should return true");
-                AssertEqual(inventory["flashlight"].Quantity, 1, "Flashlight quantity should be 1");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(result, "RemoveItemFromInventory should return true");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(inventory["flashlight"].Quantity, 1, "Flashlight quantity should be 1");
 
                 // Remove the last flashlight
                 result = _inventorySystem.RemoveItemFromInventory("flashlight");
                 inventory = _inventorySystem.GetInventory();
 
-                AssertTrue(result, "RemoveItemFromInventory should return true");
-                AssertFalse(inventory.ContainsKey("flashlight"), "Inventory should not contain 'flashlight'");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(result, "RemoveItemFromInventory should return true");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(inventory.ContainsKey("flashlight"), "Inventory should not contain 'flashlight'");
             }
             finally
             {
@@ -168,16 +168,16 @@ namespace SignalLost.Tests
                 var inventory1 = _inventorySystem.GetInventory();
 
                 // Assert
-                AssertTrue(result1, "UseItem should return true for medkit");
-                AssertFalse(inventory1.ContainsKey("medkit"), "Medkit should be consumed and removed from inventory");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(result1, "UseItem should return true for medkit");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(inventory1.ContainsKey("medkit"), "Medkit should be consumed and removed from inventory");
 
                 // Act - Use a non-consumable item
                 bool result2 = _inventorySystem.UseItem("flashlight");
                 var inventory2 = _inventorySystem.GetInventory();
 
                 // Assert
-                AssertTrue(result2, "UseItem should return true for flashlight");
-                AssertTrue(inventory2.ContainsKey("flashlight"), "Flashlight should still be in inventory after use");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(result2, "UseItem should return true for flashlight");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(inventory2.ContainsKey("flashlight"), "Flashlight should still be in inventory after use");
             }
             finally
             {
@@ -202,11 +202,11 @@ namespace SignalLost.Tests
                 bool result4 = _inventorySystem.AddItemToInventory("key_cabin"); // This should fail due to capacity
 
                 // Assert
-                AssertTrue(result1, "Should be able to add flashlight");
-                AssertTrue(result2, "Should be able to add battery");
-                AssertTrue(result3, "Should be able to add medkit");
-                AssertFalse(result4, "Should not be able to add key_cabin due to capacity");
-                AssertEqual(_inventorySystem.GetTotalItemCount(), 3, "Total item count should be 3");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(result1, "Should be able to add flashlight");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(result2, "Should be able to add battery");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(result3, "Should be able to add medkit");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(result4, "Should not be able to add key_cabin due to capacity");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_inventorySystem.GetTotalItemCount(), 3, "Total item count should be 3");
             }
             finally
             {
@@ -233,10 +233,10 @@ namespace SignalLost.Tests
                 var keys = _inventorySystem.GetItemsByCategory("key");
 
                 // Assert
-                AssertEqual(tools.Count, 1, "Should have 1 tool");
-                AssertEqual(consumables.Count, 2, "Should have 2 consumables");
-                AssertEqual(keys.Count, 1, "Should have 1 key");
-                AssertEqual(tools[0].Id, "flashlight", "Tool should be flashlight");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(tools.Count, 1, "Should have 1 tool");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(consumables.Count, 2, "Should have 2 consumables");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(keys.Count, 1, "Should have 1 key");
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(tools[0].Id, "flashlight", "Tool should be flashlight");
             }
             finally
             {

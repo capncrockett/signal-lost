@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://c8yvxg3xnq6yw"]
 
-[ext_resource type="Script" path="res://scripts/RadioTuner.cs" id="1_r3j2k"]
+[ext_resource type="Script" path="res://scripts/PixelRadioInterface.cs" id="1_r3j2k"]
 [ext_resource type="Script" path="res://scripts/AudioVisualizer.cs" id="2_yvxpq"]
 
 [node name="RadioTuner" type="Control"]
