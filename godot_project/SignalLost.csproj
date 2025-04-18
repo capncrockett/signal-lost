@@ -3,6 +3,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>SignalLost</RootNamespace>
+    <!-- Cross-platform compatibility flags -->
+    <DefineConstants>$(DefineConstants);DUPLICATE_METHODS_DEFINED;DUPLICATE_ATTRIBUTES_DEFINED</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MSTest.TestFramework" Version="3.4.0" />
