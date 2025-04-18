@@ -1,16 +1,17 @@
 using Godot;
 using GUT;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
     [GlobalClass]
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
+    [TestClass]
     public partial class AudioVisualizerTests : Test
     {
         private AudioVisualizer _audioVisualizer = null;
 
         // Called before each test
-        public override void Before()
+        public void Before()
         {
             // Create a new instance of the AudioVisualizer
             _audioVisualizer = new AudioVisualizer();
@@ -24,7 +25,7 @@ namespace SignalLost.Tests
         }
 
         // Called after each test
-        public override void After()
+        public void After()
         {
             // Clean up
             _audioVisualizer.QueueFree();
@@ -32,31 +33,31 @@ namespace SignalLost.Tests
         }
 
         // Test initialization
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+        [TestMethod]
         public void TestInitialization()
         {
             // Assert default properties are set correctly
-            AssertEqual(_audioVisualizer.NumBars, 32, "NumBars should be initialized to 32");
-            AssertEqual(_audioVisualizer.BarWidth, 4.0f, "BarWidth should be initialized to 4.0");
-            AssertEqual(_audioVisualizer.BarSpacing, 2.0f, "BarSpacing should be initialized to 2.0");
-            AssertEqual(_audioVisualizer.MinBarHeight, 5.0f, "MinBarHeight should be initialized to 5.0");
-            AssertEqual(_audioVisualizer.MaxBarHeight, 100.0f, "MaxBarHeight should be initialized to 100.0");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_audioVisualizer.NumBars, 32, "NumBars should be initialized to 32");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_audioVisualizer.BarWidth, 4.0f, "BarWidth should be initialized to 4.0");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_audioVisualizer.BarSpacing, 2.0f, "BarSpacing should be initialized to 2.0");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_audioVisualizer.MinBarHeight, 5.0f, "MinBarHeight should be initialized to 5.0");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_audioVisualizer.MaxBarHeight, 100.0f, "MaxBarHeight should be initialized to 100.0");
 
             // Check colors
-            AssertEqual(_audioVisualizer.SignalColor, new Color(0.0f, 0.8f, 0.0f, 1.0f),
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_audioVisualizer.SignalColor, new Color(0.0f, 0.8f, 0.0f, 1.0f),
                 "SignalColor should be initialized to green");
-            AssertEqual(_audioVisualizer.StaticColor, new Color(0.8f, 0.8f, 0.8f, 1.0f),
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_audioVisualizer.StaticColor, new Color(0.8f, 0.8f, 0.8f, 1.0f),
                 "StaticColor should be initialized to light gray");
-            AssertEqual(_audioVisualizer.BackgroundColor, new Color(0.1f, 0.1f, 0.1f, 1.0f),
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_audioVisualizer.BackgroundColor, new Color(0.1f, 0.1f, 0.1f, 1.0f),
                 "BackgroundColor should be initialized to dark gray");
 
             // Check that the background color is applied
-            AssertEqual(_audioVisualizer.Color, _audioVisualizer.BackgroundColor,
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_audioVisualizer.Color, _audioVisualizer.BackgroundColor,
                 "ColorRect color should be set to BackgroundColor");
         }
 
         // Test signal strength setting
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+        [TestMethod]
         public void TestSetSignalStrength()
         {
             // Arrange
@@ -82,11 +83,12 @@ namespace SignalLost.Tests
             var barHeightsAfterChange = (float[])_audioVisualizer.Get("_barHeights");
 
             // The test passes if we can call the methods without errors
-            Pass("SetSignalStrength method works correctly");
+            // Test passes if we reach this point
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "SetSignalStrength method works correctly");
         }
 
         // Test static intensity setting
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+        [TestMethod]
         public void TestSetStaticIntensity()
         {
             // Arrange
@@ -112,11 +114,12 @@ namespace SignalLost.Tests
             var barHeightsAfterChange = (float[])_audioVisualizer.Get("_barHeights");
 
             // The test passes if we can call the methods without errors
-            Pass("SetStaticIntensity method works correctly");
+            // Test passes if we reach this point
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "SetStaticIntensity method works correctly");
         }
 
         // Test bar height calculation
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+        [TestMethod]
         public void TestBarHeightCalculation()
         {
             // This is a more complex test as CalculateBarHeight is private
@@ -136,7 +139,7 @@ namespace SignalLost.Tests
             // Assert all bars are at minimum height
             for (int i = 0; i < barHeights.Length; i++)
             {
-                AssertEqual(barHeights[i], _audioVisualizer.MinBarHeight,
+                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(barHeights[i], _audioVisualizer.MinBarHeight,
                     $"Bar {i} should be at minimum height when signal and static are 0");
             }
 
@@ -148,11 +151,12 @@ namespace SignalLost.Tests
             barHeights = (float[])_audioVisualizer.Get("_barHeights");
 
             // The test passes if we can call the methods and process without errors
-            Pass("Bar height calculation works correctly");
+            // Test passes if we reach this point
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Bar height calculation works correctly");
         }
 
         // Test that the visualizer responds to both signal and static
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+        [TestMethod]
         public void TestSignalAndStaticVisualization()
         {
             // Set both signal and static to non-zero values
@@ -168,7 +172,8 @@ namespace SignalLost.Tests
             var barHeights = (float[])_audioVisualizer.Get("_barHeights");
 
             // The test passes if we can call the methods and process without errors
-            Pass("Signal and static visualization works correctly");
+            // Test passes if we reach this point
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Signal and static visualization works correctly");
         }
     }
 }

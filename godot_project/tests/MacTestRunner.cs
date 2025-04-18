@@ -60,18 +60,20 @@ public partial class MacTestRunner : Node
                 try
                 {
                     // Call Before method if it exists
-                    if (testInstance is Test testObj)
+                    var beforeMethod = testInstance.GetType().GetMethod("Before");
+                    if (beforeMethod != null)
                     {
-                        testObj.Before();
+                        beforeMethod.Invoke(testInstance, null);
                     }
 
                     // Call the test method
                     method.Invoke(testInstance, null);
 
                     // Call After method if it exists
-                    if (testInstance is Test testObj2)
+                    var afterMethod = testInstance.GetType().GetMethod("After");
+                    if (afterMethod != null)
                     {
-                        testObj2.After();
+                        afterMethod.Invoke(testInstance, null);
                     }
 
                     GD.Print($"Test {method.Name} PASSED");
@@ -87,9 +89,11 @@ public partial class MacTestRunner : Node
                     // Try to call After method even if the test failed
                     try
                     {
-                        if (testInstance is Test testObj)
+                        // Call After method if it exists
+                        var afterMethod = testInstance.GetType().GetMethod("After");
+                        if (afterMethod != null)
                         {
-                            testObj.After();
+                            afterMethod.Invoke(testInstance, null);
                         }
                     }
                     catch (Exception afterEx)
@@ -130,12 +134,12 @@ public partial class MacTestRunner : Node
         foreach (var type in assembly.GetTypes())
         {
             // Check for TestClass attribute
-            if (type.GetCustomAttribute<TestClassAttribute>() != null)
+            if (type.GetCustomAttribute<Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute>() != null)
             {
                 testClasses.Add(type);
             }
             // Also check for class names ending with "Tests"
-            else if (type.Name.EndsWith("Tests") && type.IsSubclassOf(typeof(Test)))
+            else if (type.Name.EndsWith("Tests") && type.IsSubclassOf(typeof(GUT.Test)))
             {
                 testClasses.Add(type);
             }
@@ -151,7 +155,7 @@ public partial class MacTestRunner : Node
         foreach (var method in testClass.GetMethods())
         {
             // Check for Test attribute
-            if (method.GetCustomAttribute<GUT.TestAttribute>() != null)
+            if (method.GetCustomAttribute<Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute>() != null)
             {
                 testMethods.Add(method);
             }
