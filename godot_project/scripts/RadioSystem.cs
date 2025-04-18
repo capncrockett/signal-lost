@@ -159,7 +159,7 @@ namespace SignalLost
                 // No signal found
                 _signalStrength = 0.0f;
                 _staticIntensity = 1.0f;
-                
+
                 if (_currentSignalId != null)
                 {
                     EmitSignal(SignalName.SignalLost, _currentSignalId);

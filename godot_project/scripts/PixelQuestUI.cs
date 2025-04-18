@@ -4,6 +4,14 @@ using System.Collections.Generic;
 
 namespace SignalLost
 {
+    // Quest status enum for UI display
+    public enum QuestUIStatus
+    {
+        Available,
+        Active,
+        Completed,
+        Failed
+    }
     [GlobalClass]
     public partial class PixelQuestUI : Control
     {

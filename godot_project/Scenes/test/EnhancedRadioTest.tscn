@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3]
 
-[ext_resource type="Script" path="res://scripts/RadioTuner.cs" id="1_radio"]
+[ext_resource type="Script" path="res://scripts/PixelRadioInterface.cs" id="1_radio"]
 [ext_resource type="Script" path="res://scripts/EnhancedRadioInterface.cs" id="2_enhanced"]
 [ext_resource type="Script" path="res://scripts/StaticNoiseVisualizer.cs" id="3_static"]
 [ext_resource type="Script" path="res://scripts/MorseCodeVisualizer.cs" id="4_morse"]

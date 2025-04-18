@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace SignalLost
 {
     [GlobalClass]
-    public partial class PixelUITest : Node
+    public partial class PixelUITestScene : Node
     {
         // References to UI components
         private PixelRadioInterface _radioInterface;
@@ -243,6 +243,7 @@ namespace SignalLost
                     previousLocation.ConnectedLocations.Add(locationId);
                 }
             }
+
 
             // Update counter and status
             _locationCounter++;

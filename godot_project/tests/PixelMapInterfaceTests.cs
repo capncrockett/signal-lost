@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using GUT;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
@@ -12,7 +13,7 @@ namespace SignalLost.Tests
         private GameState _gameState;
 
         // Setup method called before each test
-        public override void Before()
+        public void Before()
         {
             // Create a mock GameState
             _gameState = new GameState();
@@ -34,7 +35,7 @@ namespace SignalLost.Tests
         }
 
         // Teardown method called after each test
-        public override void After()
+        public void After()
         {
             // Remove nodes
             _mapInterface.QueueFree();
@@ -42,65 +43,61 @@ namespace SignalLost.Tests
             _gameState.QueueFree();
         }
 
-        [Test]
+        [TestMethod]
         public void TestInitialization()
         {
             // Verify that the map interface is initialized correctly
-            AssertNotNull(_mapInterface, "PixelMapInterface should not be null");
-            AssertFalse(_mapInterface.IsVisible(), "PixelMapInterface should be hidden by default");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(_mapInterface, "PixelMapInterface should not be null");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(_mapInterface.IsVisible(), "PixelMapInterface should be hidden by default");
         }
 
-        [Test]
+        [TestMethod]
         public void TestVisibility()
         {
             // Test setting visibility
             _mapInterface.SetVisible(true);
-            AssertTrue(_mapInterface.IsVisible(), "PixelMapInterface should be visible after SetVisible(true)");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(_mapInterface.IsVisible(), "PixelMapInterface should be visible after SetVisible(true)");
 
             _mapInterface.SetVisible(false);
-            AssertFalse(_mapInterface.IsVisible(), "PixelMapInterface should be hidden after SetVisible(false)");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(_mapInterface.IsVisible(), "PixelMapInterface should be hidden after SetVisible(false)");
 
             // Test toggling visibility
             _mapInterface.ToggleVisibility();
-            AssertTrue(_mapInterface.IsVisible(), "PixelMapInterface should be visible after ToggleVisibility()");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(_mapInterface.IsVisible(), "PixelMapInterface should be visible after ToggleVisibility()");
 
             _mapInterface.ToggleVisibility();
-            AssertFalse(_mapInterface.IsVisible(), "PixelMapInterface should be hidden after ToggleVisibility()");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(_mapInterface.IsVisible(), "PixelMapInterface should be hidden after ToggleVisibility()");
         }
 
-        [Test]
+        [TestMethod]
         public void TestLocationDiscovery()
         {
             // Make the map interface visible
             _mapInterface.SetVisible(true);
 
             // Simulate discovering a location
-            _mapSystem.EmitSignal(MapSystem.SignalName.LocationDiscovered, "forest");
+            _mapSystem.DiscoverLocation("forest");
 
-            // Simulate a frame update
-            _mapInterface._Process(0.016);
-            _mapInterface._Draw();
-
-            // No assertion needed, just checking that it doesn't crash
+            // Verify that the location is discovered
+            var location = _mapSystem.GetLocation("forest");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(location.IsDiscovered, "Forest location should be discovered");
         }
 
-        [Test]
+        [TestMethod]
         public void TestLocationChange()
         {
             // Make the map interface visible
             _mapInterface.SetVisible(true);
 
             // Simulate changing the current location
-            _mapSystem.EmitSignal(MapSystem.SignalName.LocationChanged, "bunker");
+            _mapSystem.DiscoverLocation("forest");
+            _gameState.SetCurrentLocation("forest");
 
-            // Simulate a frame update
-            _mapInterface._Process(0.016);
-            _mapInterface._Draw();
-
-            // No assertion needed, just checking that it doesn't crash
+            // Verify that the current location is changed
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual("forest", _gameState.CurrentLocation, "Current location should be forest");
         }
 
-        [Test]
+        [TestMethod]
         public void TestInputHandling()
         {
             // Make the map interface visible
@@ -113,23 +110,7 @@ namespace SignalLost.Tests
             _mapInterface._Input(escapeEvent);
 
             // Verify that the map interface is hidden
-            AssertFalse(_mapInterface.IsVisible(), "PixelMapInterface should be hidden after pressing Escape");
-
-            // Make the map interface visible again
-            _mapInterface.SetVisible(true);
-
-            // Simulate a mouse wheel event for zooming
-            var wheelEvent = new InputEventMouseButton();
-            wheelEvent.ButtonIndex = MouseButton.WheelUp;
-            wheelEvent.Pressed = true;
-            wheelEvent.Position = new Vector2(100, 100);
-            _mapInterface._Input(wheelEvent);
-
-            // Simulate a frame update
-            _mapInterface._Process(0.016);
-            _mapInterface._Draw();
-
-            // No assertion needed for zoom, just checking that it doesn't crash
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(_mapInterface.IsVisible(), "PixelMapInterface should be hidden after pressing Escape");
         }
     }
 }

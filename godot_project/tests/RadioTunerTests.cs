@@ -1,10 +1,11 @@
 using Godot;
 using System;
 using GUT;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
-	[Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
+	[TestClass]
 	public partial class RadioTunerTests : Test
 	{
 		// Path to the scene we want to test
@@ -17,7 +18,7 @@ namespace SignalLost.Tests
 		private const float MaxFrequency = 108.0f;
 
 		// Called before each test
-		public override void Before()
+		public void Before()
 		{
 			try
 			{
@@ -120,7 +121,7 @@ namespace SignalLost.Tests
 		}
 
 		// Called after each test
-		public override void After()
+		public void After()
 		{
 			// Clean up
 			_radioTuner.QueueFree();
@@ -128,14 +129,14 @@ namespace SignalLost.Tests
 		}
 
 		// Test power button functionality
-		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+		[TestMethod]
 		public void TestPowerButton()
 		{
 			// Skip this test if components are not properly initialized
 			if (_gameState == null || _radioTuner == null)
 			{
 				GD.PrintErr("GameState or RadioTuner is null, skipping TestPowerButton");
-				Pass("Test skipped due to initialization issues");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped due to initialization issues");
 				return;
 			}
 
@@ -152,7 +153,7 @@ namespace SignalLost.Tests
 				GD.Print($"GameState.IsRadioOn: {_gameState.IsRadioOn}");
 
 				// Initially radio should be off
-				AssertFalse(_gameState.IsRadioOn, "Radio should start in OFF state");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(_gameState.IsRadioOn, "Radio should start in OFF state");
 
 				// Call the TogglePower method directly instead of simulating button press
 				_radioTuner.TogglePower();
@@ -164,13 +165,13 @@ namespace SignalLost.Tests
 				GD.Print($"After TogglePower: GameState.IsRadioOn: {_gameState.IsRadioOn}");
 
 				// Radio should now be on
-				AssertTrue(_gameState.IsRadioOn, "Radio should be ON after toggling power");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(_gameState.IsRadioOn, "Radio should be ON after toggling power");
 
 				// Call the TogglePower method again
 				_radioTuner.TogglePower();
 
 				// Radio should now be off again
-				AssertFalse(_gameState.IsRadioOn, "Radio should be OFF after toggling power again");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(_gameState.IsRadioOn, "Radio should be OFF after toggling power again");
 			}
 			catch (Exception ex)
 			{
@@ -180,14 +181,14 @@ namespace SignalLost.Tests
 		}
 
 		// Test frequency change
-		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+		[TestMethod]
 		public void TestFrequencyChange()
 		{
 			// Skip this test if components are not properly initialized
 			if (_gameState == null || _radioTuner == null)
 			{
 				GD.PrintErr("GameState or RadioTuner is null, skipping TestFrequencyChange");
-				Pass("Test skipped due to initialization issues");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped due to initialization issues");
 				return;
 			}
 
@@ -213,16 +214,16 @@ namespace SignalLost.Tests
 				GD.Print($"After ChangeFrequency: {_gameState.CurrentFrequency}");
 
 				// Check if frequency was updated
-				AssertEqual(_gameState.CurrentFrequency, 90.1f, "Frequency should be 90.1 after increasing by 0.1");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.CurrentFrequency, 90.1f, "Frequency should be 90.1 after increasing by 0.1");
 
 				// Test frequency limits
 				_gameState.SetFrequency(MinFrequency);
 				_radioTuner.ChangeFrequency(-0.1f);
-				AssertEqual(_gameState.CurrentFrequency, MinFrequency, "Frequency should not go below minimum");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.CurrentFrequency, MinFrequency, "Frequency should not go below minimum");
 
 				_gameState.SetFrequency(MaxFrequency);
 				_radioTuner.ChangeFrequency(0.1f);
-				AssertEqual(_gameState.CurrentFrequency, MaxFrequency, "Frequency should not go above maximum");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.CurrentFrequency, MaxFrequency, "Frequency should not go above maximum");
 			}
 			catch (Exception ex)
 			{
@@ -232,14 +233,14 @@ namespace SignalLost.Tests
 		}
 
 		// Test signal detection
-		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+		[TestMethod]
 		public void TestSignalDetection()
 		{
 			// Skip this test if components are not properly initialized
 			if (_gameState == null || _radioTuner == null)
 			{
 				GD.PrintErr("GameState or RadioTuner is null, skipping TestSignalDetection");
-				Pass("Test skipped due to initialization issues");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped due to initialization issues");
 				return;
 			}
 
@@ -274,11 +275,11 @@ namespace SignalLost.Tests
 				}
 
 				// Check if signal was detected
-				AssertNotNull(_radioTuner.Get("_currentSignalId"), "Signal should be detected at frequency 91.5");
-				AssertTrue((float)_radioTuner.Get("_signalStrength") > 0.5f, "Signal strength should be high when tuned correctly");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(_radioTuner.Get("_currentSignalId"), "Signal should be detected at frequency 91.5");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue((float)_radioTuner.Get("_signalStrength") > 0.5f, "Signal strength should be high when tuned correctly");
 
 				// Check if frequency was added to discovered frequencies
-				AssertTrue(_gameState.DiscoveredFrequencies.Contains(91.5f), "Frequency should be added to discovered frequencies");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(_gameState.DiscoveredFrequencies.Contains(91.5f), "Frequency should be added to discovered frequencies");
 
 				// Set frequency to a non-signal area
 				_gameState.SetFrequency(92.5f);  // This should not match any signal
@@ -294,8 +295,8 @@ namespace SignalLost.Tests
 				}
 
 				// Check that no signal was detected
-				AssertEqual(_radioTuner.Get("_currentSignalId").ToString(), "", "No signal should be detected at frequency 92.5");
-				AssertTrue((float)_radioTuner.Get("_signalStrength") < 0.2f, "Signal strength should be low when no signal is present");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_radioTuner.Get("_currentSignalId").ToString(), "", "No signal should be detected at frequency 92.5");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue((float)_radioTuner.Get("_signalStrength") < 0.2f, "Signal strength should be low when no signal is present");
 			}
 			catch (Exception ex)
 			{
@@ -305,14 +306,14 @@ namespace SignalLost.Tests
 		}
 
 		// Test scanning functionality
-		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+		[TestMethod]
 		public void TestScanning()
 		{
 			// Skip this test if components are not properly initialized
 			if (_gameState == null || _radioTuner == null)
 			{
 				GD.PrintErr("GameState or RadioTuner is null, skipping TestScanning");
-				Pass("Test skipped due to initialization issues");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped due to initialization issues");
 				return;
 			}
 
@@ -334,19 +335,19 @@ namespace SignalLost.Tests
 				_radioTuner.Set("_isScanning", true);
 
 				// Verify scanning state
-				AssertTrue((bool)_radioTuner.Get("_isScanning"), "Radio should be in scanning mode");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue((bool)_radioTuner.Get("_isScanning"), "Radio should be in scanning mode");
 
 				// Simulate scan timer timeout by manually changing the frequency
 				_gameState.SetFrequency(90.1f);
 
 				// Frequency should have increased
-				AssertEqual(_gameState.CurrentFrequency, 90.1f, "Frequency should increase after scan timer timeout");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.CurrentFrequency, 90.1f, "Frequency should increase after scan timer timeout");
 
 				// Stop scanning (set the state manually)
 				_radioTuner.Set("_isScanning", false);
 
 				// Verify scanning state
-				AssertFalse((bool)_radioTuner.Get("_isScanning"), "Radio should not be in scanning mode after toggling");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse((bool)_radioTuner.Get("_isScanning"), "Radio should not be in scanning mode after toggling");
 			}
 			catch (Exception ex)
 			{
@@ -356,14 +357,14 @@ namespace SignalLost.Tests
 		}
 
 		// Test message display
-		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+		[TestMethod]
 		public void TestMessageDisplay()
 		{
 			// Skip this test if components are not properly initialized
 			if (_gameState == null || _radioTuner == null)
 			{
 				GD.PrintErr("GameState or RadioTuner is null, skipping TestMessageDisplay");
-				Pass("Test skipped due to initialization issues");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped due to initialization issues");
 				return;
 			}
 
@@ -393,7 +394,7 @@ namespace SignalLost.Tests
 				_radioTuner.GetNode<Button>("MessageContainer/MessageButton").Disabled = false;
 
 				// Check if message button is enabled
-				AssertFalse(_radioTuner.GetNode<Button>("MessageContainer/MessageButton").Disabled,
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(_radioTuner.GetNode<Button>("MessageContainer/MessageButton").Disabled,
 					"Message button should be enabled when signal is detected");
 
 				// Toggle message display (set the state manually)
@@ -401,8 +402,8 @@ namespace SignalLost.Tests
 				_radioTuner.GetNode<Control>("MessageContainer/MessageDisplay").Visible = true;
 
 				// Check if message is displayed
-				AssertTrue((bool)_radioTuner.Get("_showMessage"), "Message should be displayed after toggling");
-				AssertTrue(_radioTuner.GetNode<Control>("MessageContainer/MessageDisplay").Visible,
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue((bool)_radioTuner.Get("_showMessage"), "Message should be displayed after toggling");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(_radioTuner.GetNode<Control>("MessageContainer/MessageDisplay").Visible,
 					"Message display should be visible");
 
 				// Toggle message display again (set the state manually)
@@ -410,8 +411,8 @@ namespace SignalLost.Tests
 				_radioTuner.GetNode<Control>("MessageContainer/MessageDisplay").Visible = false;
 
 				// Check if message is hidden
-				AssertFalse((bool)_radioTuner.Get("_showMessage"), "Message should be hidden after toggling again");
-				AssertFalse(_radioTuner.GetNode<Control>("MessageContainer/MessageDisplay").Visible,
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse((bool)_radioTuner.Get("_showMessage"), "Message should be hidden after toggling again");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(_radioTuner.GetNode<Control>("MessageContainer/MessageDisplay").Visible,
 					"Message display should be hidden");
 			}
 			catch (Exception ex)
@@ -422,12 +423,12 @@ namespace SignalLost.Tests
 		}
 
 		// Test radio behavior when turned off
-		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+		[TestMethod]
 		public void TestRadioOffBehavior()
 		{
 			// Skip this test on Mac
 			GD.Print("Skipping TestRadioOffBehavior on Mac");
-			Pass("Test skipped on Mac platform");
+			Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped on Mac platform");
 			return;
 
 			/* Skip this test if components are not properly initialized
@@ -472,7 +473,7 @@ namespace SignalLost.Tests
 				_radioTuner.Set("_isScanning", false);
 
 				// Check if scanning stopped
-				AssertFalse((bool)_radioTuner.Get("_isScanning"), "Scanning should stop when radio is turned off");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse((bool)_radioTuner.Get("_isScanning"), "Scanning should stop when radio is turned off");
 
 				// Try to change frequency when radio is off
 				float initialFreq = _gameState.CurrentFrequency;
@@ -481,7 +482,7 @@ namespace SignalLost.Tests
 				GD.Print($"After ChangeFrequency: {_gameState.CurrentFrequency}");
 
 				// Frequency should still change even when radio is off
-				AssertEqual(_gameState.CurrentFrequency, initialFreq + 0.1f, "Frequency should change even when radio is off");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.CurrentFrequency, initialFreq + 0.1f, "Frequency should change even when radio is off");
 			}
 			catch (Exception ex)
 			{
