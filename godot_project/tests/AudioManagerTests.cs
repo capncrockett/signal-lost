@@ -1,10 +1,11 @@
 using Godot;
 using GUT;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
 	[GlobalClass]
-	[Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
+	[TestClass]
 	public partial class AudioManagerTests : Test
 	{
 		private AudioManager _audioManager = null;

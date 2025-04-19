@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8j6y8o4n8qxp"]
+
+[ext_resource type="Script" path="res://tests/CSharpTestRunner.cs" id="1_runner"]
+
+[node name="CSharpTestScene" type="Node"]
+script = ExtResource("1_runner")

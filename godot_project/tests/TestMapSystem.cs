@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SignalLost.Tests
 {
@@ -12,79 +13,108 @@ namespace SignalLost.Tests
     {
         // Current location
         private string _currentLocation = "bunker";
-        
+
         // Dictionary of locations
-        private Dictionary<string, MapLocation> _locations = new Dictionary<string, MapLocation>();
-        
+        private static Dictionary<string, MapLocation> _locations = new Dictionary<string, MapLocation>();
+
         // Dictionary of connections between locations
-        private Dictionary<string, List<string>> _connections = new Dictionary<string, List<string>>();
-        
+        private static Dictionary<string, List<string>> _connections = new Dictionary<string, List<string>>();
+
+        // Flag to track if initialization has been done
+        private static bool _initialized = false;
+
         // Called when the node enters the scene tree for the first time
         public override void _Ready()
         {
-            // Initialize locations
-            InitializeLocations();
-            
-            // Initialize connections
-            InitializeConnections();
+            // Only initialize once
+            if (!_initialized)
+            {
+                // Initialize locations
+                InitializeLocations();
+
+                // Initialize connections
+                InitializeConnections();
+
+                _initialized = true;
+            }
         }
-        
+
         // Initialize test locations
         private void InitializeLocations()
         {
-            // Add test locations
-            _locations.Add("bunker", new MapLocation
+            // Clear existing locations first to avoid duplicate key errors
+            _locations.Clear();
+
+            try
             {
-                Id = "bunker",
-                Name = "Emergency Bunker",
-                Description = "A concrete bunker built for emergencies.",
-                IsDiscovered = true
-            });
-            
-            _locations.Add("forest", new MapLocation
+                // Add test locations
+                _locations["bunker"] = new MapLocation
+                {
+                    Id = "bunker",
+                    Name = "Emergency Bunker",
+                    Description = "A concrete bunker built for emergencies.",
+                    IsDiscovered = true
+                };
+
+                _locations["forest"] = new MapLocation
+                {
+                    Id = "forest",
+                    Name = "Dense Forest",
+                    Description = "A thick forest with tall trees.",
+                    IsDiscovered = false
+                };
+
+                _locations["road"] = new MapLocation
+                {
+                    Id = "road",
+                    Name = "Abandoned Road",
+                    Description = "An old road that hasn't been used in years.",
+                    IsDiscovered = false
+                };
+
+                _locations["lake"] = new MapLocation
+                {
+                    Id = "lake",
+                    Name = "Misty Lake",
+                    Description = "A small lake surrounded by mist.",
+                    IsDiscovered = false
+                };
+
+                _locations["cabin"] = new MapLocation
+                {
+                    Id = "cabin",
+                    Name = "Old Cabin",
+                    Description = "A weathered wooden cabin in the woods.",
+                    IsDiscovered = false
+                };
+            }
+            catch (Exception ex)
             {
-                Id = "forest",
-                Name = "Dense Forest",
-                Description = "A thick forest with tall trees.",
-                IsDiscovered = false
-            });
-            
-            _locations.Add("road", new MapLocation
-            {
-                Id = "road",
-                Name = "Abandoned Road",
-                Description = "An old road that hasn't been used in years.",
-                IsDiscovered = false
-            });
-            
-            _locations.Add("lake", new MapLocation
-            {
-                Id = "lake",
-                Name = "Misty Lake",
-                Description = "A small lake surrounded by mist.",
-                IsDiscovered = false
-            });
-            
-            _locations.Add("cabin", new MapLocation
-            {
-                Id = "cabin",
-                Name = "Old Cabin",
-                Description = "A weathered wooden cabin in the woods.",
-                IsDiscovered = false
-            });
+                GD.PrintErr($"Error initializing locations: {ex.Message}");
+            }
         }
-        
+
         // Initialize connections between locations
         private void InitializeConnections()
         {
-            // Add connections
-            _connections.Add("bunker", new List<string> { "forest", "road" });
-            _connections.Add("forest", new List<string> { "bunker", "lake", "cabin" });
-            _connections.Add("road", new List<string> { "bunker", "cabin" });
-            _connections.Add("lake", new List<string> { "forest" });
-            _connections.Add("cabin", new List<string> { "forest", "road" });
+            // Clear existing connections first to avoid duplicate key errors
+            _connections.Clear();
+
+            try
+            {
+                // Add connections
+                _connections["bunker"] = new List<string> { "forest", "road" };
+                _connections["forest"] = new List<string> { "bunker", "lake", "cabin" };
+                _connections["road"] = new List<string> { "bunker", "cabin" };
+                _connections["lake"] = new List<string> { "forest" };
+                _connections["cabin"] = new List<string> { "forest", "road" };
+            }
+            catch (Exception ex)
+            {
+                GD.PrintErr($"Error initializing connections: {ex.Message}");
+            }
         }
-        
+
         // Get a location by ID
         public MapLocation GetLocation(string locationId)
         {
@@ -92,34 +122,34 @@ namespace SignalLost.Tests
             {
                 return _locations[locationId];
             }
-            
+
             return null;
         }
-        
+
         // Get the current location ID
         public string GetCurrentLocation()
         {
             return _currentLocation;
         }
-        
+
         // Get all locations
         public List<MapLocation> GetAllLocations()
         {
             List<MapLocation> result = new List<MapLocation>();
-            
+
             foreach (var location in _locations.Values)
             {
                 result.Add(location);
             }
-            
+
             return result;
         }
-        
+
         // Get locations connected to the current location
         public List<MapLocation> GetConnectedLocations()
         {
             List<MapLocation> result = new List<MapLocation>();
-            
+
             if (_connections.ContainsKey(_currentLocation))
             {
                 foreach (var locationId in _connections[_currentLocation])
@@ -130,10 +160,10 @@ namespace SignalLost.Tests
                     }
                 }
             }
-            
+
             return result;
         }
-        
+
         // Check if a location is connected to the current location
         public bool IsLocationConnected(string locationId)
         {
@@ -141,10 +171,10 @@ namespace SignalLost.Tests
             {
                 return _connections[_currentLocation].Contains(locationId);
             }
-            
+
             return false;
         }
-        
+
         // Discover a location
         public bool DiscoverLocation(string locationId)
         {
@@ -153,10 +183,10 @@ namespace SignalLost.Tests
                 _locations[locationId].IsDiscovered = true;
                 return true;
             }
-            
+
             return false;
         }
-        
+
         // Change the current location
         public bool ChangeLocation(string locationId)
         {
@@ -170,11 +200,11 @@ namespace SignalLost.Tests
                     return true;
                 }
             }
-            
+
             return false;
         }
     }
-    
+
     // MapLocation class
     public class MapLocation
     {

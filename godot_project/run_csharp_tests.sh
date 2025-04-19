@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Build the test project
-echo "Building test project..."
-dotnet build SignalLostTests.csproj
+# Skip building the project during transition
+# echo "Building project..."
+# dotnet build
 
 # Run the tests using Godot
 echo "Running tests..."
-/Applications/Godot_mono.app/Contents/MacOS/Godot --headless --path . tests/CSharpTestScene.tscn
+/Applications/Godot_mono.app/Contents/MacOS/Godot --headless --path . --script tests/TestRunner.cs
 
 echo "Tests completed."
