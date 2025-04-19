@@ -86,31 +86,14 @@ namespace SignalLost.Utils
         }
 
         /// <summary>
-        /// Gets the platform-specific directory for saving screenshots.
+        /// Gets the directory for saving screenshots, using the user:// directory for cross-platform compatibility.
         /// </summary>
         /// <returns>The full path to the screenshots directory.</returns>
         private string GetScreenshotDirectory()
         {
-            string basePath;
-
-            if (OS.GetName() == "macOS")
-            {
-                // Mac-specific path: ~/Documents/SignalLost/Screenshots
-                string homeDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                basePath = Path.Combine(homeDir, "Documents", "SignalLost", ScreenshotDirectoryName);
-            }
-            else if (OS.GetName() == "Windows")
-            {
-                // Windows-specific path: My Pictures/SignalLost/Screenshots
-                string picturesDir = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-                basePath = Path.Combine(picturesDir, "SignalLost", ScreenshotDirectoryName);
-            }
-            else
-            {
-                // Default path for other platforms: user://Screenshots
-                string userDir = OS.GetUserDataDir();
-                basePath = Path.Combine(userDir, ScreenshotDirectoryName);
-            }
+            // Use user:// directory for cross-platform compatibility
+            string userDir = OS.GetUserDataDir();
+            string basePath = Path.Combine(userDir, ScreenshotDirectoryName);
 
             return basePath;
         }

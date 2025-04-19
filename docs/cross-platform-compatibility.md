@@ -14,9 +14,9 @@ Signal Lost is designed to work on both Windows and macOS platforms. This docume
 
 ### File System Access
 
-- **Screenshots**: Use platform-specific paths for saving screenshots
+- **Screenshots**: Use `OS.GetUserDataDir()` (Godot's `user://` directory) for saving screenshots to ensure cross-platform compatibility
 - **User Data**: Use `OS.GetUserDataDir()` for user-specific data
-- **External Files**: Use `System.Environment.GetFolderPath()` for platform-specific folders
+- **External Files**: Use `System.Environment.GetFolderPath()` for platform-specific folders when necessary
 
 ## C# Type Handling
 
@@ -136,14 +136,15 @@ public partial class PlatformSpecific : Node
 
 ## Screenshot System
 
-The screenshot system has been updated to work on both Windows and macOS:
+The screenshot system uses Godot's `user://` directory for cross-platform compatibility:
 
 ```csharp
 public class ScreenshotTaker : Node
 {
     public string TakeScreenshot(string filename)
     {
-        string directory = GetScreenshotDirectory();
+        // Get user data directory for cross-platform compatibility
+        string directory = Path.Combine(OS.GetUserDataDir(), ScreenshotDirectoryName);
         string fullPath = Path.Combine(directory, filename);
 
         // Ensure directory exists
