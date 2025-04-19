@@ -14,9 +14,9 @@ Signal Lost is designed to work on both Windows and macOS platforms. This docume
 
 ### File System Access
 
-- **Screenshots**: Use platform-specific paths for saving screenshots
+- **Screenshots**: Use `OS.GetUserDataDir()` (Godot's `user://` directory) for saving screenshots to ensure cross-platform compatibility
 - **User Data**: Use `OS.GetUserDataDir()` for user-specific data
-- **External Files**: Use `System.Environment.GetFolderPath()` for platform-specific folders
+- **External Files**: Use `System.Environment.GetFolderPath()` for platform-specific folders when necessary
 
 ## C# Type Handling
 
@@ -136,14 +136,15 @@ public partial class PlatformSpecific : Node
 
 ## Screenshot System
 
-The screenshot system has been updated to work on both Windows and macOS:
+The screenshot system uses Godot's `user://` directory for cross-platform compatibility:
 
 ```csharp
 public class ScreenshotTaker : Node
 {
     public string TakeScreenshot(string filename)
     {
-        string directory = GetScreenshotDirectory();
+        // Get user data directory for cross-platform compatibility
+        string directory = Path.Combine(OS.GetUserDataDir(), ScreenshotDirectoryName);
         string fullPath = Path.Combine(directory, filename);
 
         // Ensure directory exists
@@ -159,8 +160,16 @@ public class ScreenshotTaker : Node
         GD.Print($"Screenshot saved to: {fullPath}");
         return fullPath;
     }
+```
 
-    private string GetScreenshotDirectory()
+### AI Screenshot Tool
+
+For AI agent development, we've created a specialized screenshot tool that loads the main game scene and takes a screenshot. This tool is essential for AI agents to visually verify their work.
+
+See [AI Screenshot Tool](ai-screenshot-tool.md) for more details.
+
+```csharp
+private string GetScreenshotDirectory()
     {
         string basePath;
 
@@ -184,7 +193,9 @@ public class ScreenshotTaker : Node
 
         return basePath;
     }
+
 }
+
 ```
 
 ## Conclusion
@@ -192,3 +203,7 @@ public class ScreenshotTaker : Node
 By following these guidelines, you can ensure that Signal Lost works consistently across both Windows and macOS platforms. Regular testing on both platforms is essential to catch and fix any platform-specific issues early in development.
 
 The test runner has been updated to work on both platforms, and platform-specific code has been implemented for file system access and screenshots. Continue to test on both platforms regularly to ensure compatibility.
+
+```
+
+```

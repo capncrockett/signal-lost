@@ -19,9 +19,9 @@ REM echo Building project...
 REM dotnet build
 
 REM Run the C# test runner
-echo Running C# tests...
+echo Running tests...
 cd "%DIR%"
-"%GODOT_EXECUTABLE%" --headless --path . --script "tests/TestRunner.cs" > "logs/csharp_tests_%TIMESTAMP%.log" 2>&1
+"%GODOT_EXECUTABLE%" --headless --path . tests/CSharpTestScene.tscn > "logs/csharp_tests_%TIMESTAMP%.log" 2>&1
 
 REM Check the exit code
 if %ERRORLEVEL% NEQ 0 (

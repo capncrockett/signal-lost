@@ -48,45 +48,60 @@ namespace SignalLost.Tests
             try
             {
                 // Add test locations
-                _locations["bunker"] = new MapLocation
+                if (!_locations.ContainsKey("bunker"))
                 {
-                    Id = "bunker",
-                    Name = "Emergency Bunker",
-                    Description = "A concrete bunker built for emergencies.",
-                    IsDiscovered = true
-                };
+                    _locations["bunker"] = new MapLocation
+                    {
+                        Id = "bunker",
+                        Name = "Emergency Bunker",
+                        Description = "A concrete bunker built for emergencies.",
+                        IsDiscovered = true
+                    };
+                }
 
-                _locations["forest"] = new MapLocation
+                if (!_locations.ContainsKey("forest"))
                 {
-                    Id = "forest",
-                    Name = "Dense Forest",
-                    Description = "A thick forest with tall trees.",
-                    IsDiscovered = false
-                };
+                    _locations["forest"] = new MapLocation
+                    {
+                        Id = "forest",
+                        Name = "Dense Forest",
+                        Description = "A thick forest with tall trees.",
+                        IsDiscovered = false
+                    };
+                }
 
-                _locations["road"] = new MapLocation
+                if (!_locations.ContainsKey("road"))
                 {
-                    Id = "road",
-                    Name = "Abandoned Road",
-                    Description = "An old road that hasn't been used in years.",
-                    IsDiscovered = false
-                };
+                    _locations["road"] = new MapLocation
+                    {
+                        Id = "road",
+                        Name = "Abandoned Road",
+                        Description = "An old road that hasn't been used in years.",
+                        IsDiscovered = false
+                    };
+                }
 
-                _locations["lake"] = new MapLocation
+                if (!_locations.ContainsKey("lake"))
                 {
-                    Id = "lake",
-                    Name = "Misty Lake",
-                    Description = "A small lake surrounded by mist.",
-                    IsDiscovered = false
-                };
+                    _locations["lake"] = new MapLocation
+                    {
+                        Id = "lake",
+                        Name = "Misty Lake",
+                        Description = "A small lake surrounded by mist.",
+                        IsDiscovered = false
+                    };
+                }
 
-                _locations["cabin"] = new MapLocation
+                if (!_locations.ContainsKey("cabin"))
                 {
-                    Id = "cabin",
-                    Name = "Old Cabin",
-                    Description = "A weathered wooden cabin in the woods.",
-                    IsDiscovered = false
-                };
+                    _locations["cabin"] = new MapLocation
+                    {
+                        Id = "cabin",
+                        Name = "Old Cabin",
+                        Description = "A weathered wooden cabin in the woods.",
+                        IsDiscovered = false
+                    };
+                }
             }
             catch (Exception ex)
             {
@@ -103,11 +118,30 @@ namespace SignalLost.Tests
             try
             {
                 // Add connections
-                _connections["bunker"] = new List<string> { "forest", "road" };
-                _connections["forest"] = new List<string> { "bunker", "lake", "cabin" };
-                _connections["road"] = new List<string> { "bunker", "cabin" };
-                _connections["lake"] = new List<string> { "forest" };
-                _connections["cabin"] = new List<string> { "forest", "road" };
+                if (!_connections.ContainsKey("bunker"))
+                {
+                    _connections["bunker"] = new List<string> { "forest", "road" };
+                }
+
+                if (!_connections.ContainsKey("forest"))
+                {
+                    _connections["forest"] = new List<string> { "bunker", "lake", "cabin" };
+                }
+
+                if (!_connections.ContainsKey("road"))
+                {
+                    _connections["road"] = new List<string> { "bunker", "cabin" };
+                }
+
+                if (!_connections.ContainsKey("lake"))
+                {
+                    _connections["lake"] = new List<string> { "forest" };
+                }
+
+                if (!_connections.ContainsKey("cabin"))
+                {
+                    _connections["cabin"] = new List<string> { "forest", "road" };
+                }
             }
             catch (Exception ex)
             {
