@@ -1,12 +1,10 @@
 using Godot;
 using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
     [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
-    public partial class QuestSystemTests : Node
+    public partial class QuestSystemTests : GUT.Test
     {
         private QuestSystem _questSystem;
         private GameState _gameState;
@@ -14,7 +12,7 @@ namespace SignalLost.Tests
         private MapSystem _mapSystem;
 
         // Setup method called before each test
-        public void Setup()
+        public void Before()
         {
             // Create a new GameState
             _gameState = new GameState();
@@ -45,7 +43,7 @@ namespace SignalLost.Tests
         }
 
         // Teardown method called after each test
-        public void Teardown()
+        public void After()
         {
             // Clean up
             if (_questSystem != null)
@@ -75,7 +73,7 @@ namespace SignalLost.Tests
         public void TestGetQuest()
         {
             // Arrange
-            Setup();
+            Before();
 
             try
             {
@@ -92,7 +90,7 @@ namespace SignalLost.Tests
             }
             finally
             {
-                Teardown();
+                After();
             }
         }
 
@@ -101,7 +99,7 @@ namespace SignalLost.Tests
         public void TestActivateQuest()
         {
             // Arrange
-            Setup();
+            Before();
 
             try
             {
@@ -118,7 +116,7 @@ namespace SignalLost.Tests
             }
             finally
             {
-                Teardown();
+                After();
             }
         }
 
@@ -127,7 +125,7 @@ namespace SignalLost.Tests
         public void TestUpdateQuestObjective()
         {
             // Arrange
-            Setup();
+            Before();
             _questSystem.ActivateQuest("quest_radio_repair");
 
             try
@@ -152,7 +150,7 @@ namespace SignalLost.Tests
             }
             finally
             {
-                Teardown();
+                After();
             }
         }
 
@@ -161,7 +159,7 @@ namespace SignalLost.Tests
         public void TestQuestPrerequisites()
         {
             // Arrange
-            Setup();
+            Before();
 
             try
             {
@@ -190,7 +188,7 @@ namespace SignalLost.Tests
             }
             finally
             {
-                Teardown();
+                After();
             }
         }
 
@@ -199,7 +197,7 @@ namespace SignalLost.Tests
         public void TestLocationBasedQuestDiscovery()
         {
             // Arrange
-            Setup();
+            Before();
             _questSystem.ActivateQuest("quest_explore_forest");
             // Discover and visit the forest location
             _mapSystem.DiscoverLocation("forest");
@@ -223,7 +221,7 @@ namespace SignalLost.Tests
             }
             finally
             {
-                Teardown();
+                After();
             }
         }
 
