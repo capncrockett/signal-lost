@@ -31,6 +31,7 @@ This directory contains documentation for the Signal Lost game project, a C# God
 - **testing-guide.md**: Guidelines for testing the implementation.
 - **logging.md**: Documentation for the logging system.
 - **README-pixel-ui.md**: Quick start guide for the pixel-based UI system.
+- **ai-screenshot-tool.md**: Documentation for the AI agent screenshot tool.
 
 ## Godot Project
 

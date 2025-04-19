@@ -160,8 +160,16 @@ public class ScreenshotTaker : Node
         GD.Print($"Screenshot saved to: {fullPath}");
         return fullPath;
     }
+```
 
-    private string GetScreenshotDirectory()
+### AI Screenshot Tool
+
+For AI agent development, we've created a specialized screenshot tool that loads the main game scene and takes a screenshot. This tool is essential for AI agents to visually verify their work.
+
+See [AI Screenshot Tool](ai-screenshot-tool.md) for more details.
+
+```csharp
+private string GetScreenshotDirectory()
     {
         string basePath;
 
@@ -185,7 +193,9 @@ public class ScreenshotTaker : Node
 
         return basePath;
     }
+
 }
+
 ```
 
 ## Conclusion
@@ -193,3 +203,7 @@ public class ScreenshotTaker : Node
 By following these guidelines, you can ensure that Signal Lost works consistently across both Windows and macOS platforms. Regular testing on both platforms is essential to catch and fix any platform-specific issues early in development.
 
 The test runner has been updated to work on both platforms, and platform-specific code has been implemented for file system access and screenshots. Continue to test on both platforms regularly to ensure compatibility.
+
+```
+
+```
