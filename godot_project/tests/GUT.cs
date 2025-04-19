@@ -1,6 +1,4 @@
 using Godot;
-using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 // This file provides stub implementations of GUT classes for C# tests
 // It allows tests written for GUT to run without the actual GUT framework

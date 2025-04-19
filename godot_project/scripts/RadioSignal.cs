@@ -1,6 +1,3 @@
-using Godot;
-using System;
-
 namespace SignalLost
 {
     public enum RadioSignalType

@@ -1,8 +1,5 @@
 using Godot;
 using System;
-using System.Collections.Generic;
-using SignalLost;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
