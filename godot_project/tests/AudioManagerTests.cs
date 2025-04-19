@@ -10,7 +10,7 @@ namespace SignalLost.Tests
 		private AudioManager _audioManager = null;
 
 		// Called before each test
-		public override void Before()
+		public new void Before()
 		{
 			try
 			{
@@ -85,7 +85,7 @@ namespace SignalLost.Tests
 		}
 
 		// Called after each test
-		public override void After()
+		public new void After()
 		{
 			// Clean up
 			if (_audioManager != null)
@@ -96,14 +96,14 @@ namespace SignalLost.Tests
 		}
 
 		// Test volume setting
-		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+		[TestMethod]
 		public void TestSetVolume()
 		{
 			// Skip this test if AudioManager is not properly initialized
 			if (_audioManager == null)
 			{
 				GD.PrintErr("AudioManager is null, skipping TestSetVolume");
-				Pass("Test skipped due to initialization issues");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped due to initialization issues");
 				return;
 			}
 
@@ -116,7 +116,7 @@ namespace SignalLost.Tests
 				_audioManager.SetVolume(newVolume);
 
 				// We can't directly test private fields, so we'll just verify the method doesn't crash
-				Pass("SetVolume method executed without errors");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "SetVolume method executed without errors");
 			}
 			catch (System.Exception ex)
 			{
@@ -126,14 +126,14 @@ namespace SignalLost.Tests
 		}
 
 		// Test volume limits
-		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+		[TestMethod]
 		public void TestVolumeLimits()
 		{
 			// Skip this test if AudioManager is not properly initialized
 			if (_audioManager == null)
 			{
 				GD.PrintErr("AudioManager is null, skipping TestVolumeLimits");
-				Pass("Test skipped due to initialization issues");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped due to initialization issues");
 				return;
 			}
 
@@ -148,7 +148,7 @@ namespace SignalLost.Tests
 				_audioManager.SetVolume(aboveMax);
 
 				// We can't directly test private fields, so we'll just verify the method doesn't crash
-				Pass("Volume limits handled correctly without errors");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Volume limits handled correctly without errors");
 			}
 			catch (System.Exception ex)
 			{
@@ -158,14 +158,14 @@ namespace SignalLost.Tests
 		}
 
 		// Test mute toggle
-		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+		[TestMethod]
 		public void TestToggleMute()
 		{
 			// Skip this test if AudioManager is not properly initialized
 			if (_audioManager == null)
 			{
 				GD.PrintErr("AudioManager is null, skipping TestToggleMute");
-				Pass("Test skipped due to initialization issues");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped due to initialization issues");
 				return;
 			}
 
@@ -176,7 +176,7 @@ namespace SignalLost.Tests
 				_audioManager.ToggleMute();
 
 				// We can't directly test private fields, so we'll just verify the method doesn't crash
-				Pass("ToggleMute method executed without errors");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "ToggleMute method executed without errors");
 			}
 			catch (System.Exception ex)
 			{
@@ -186,14 +186,14 @@ namespace SignalLost.Tests
 		}
 
 		// Test noise type setting
-		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+		[TestMethod]
 		public void TestSetNoiseType()
 		{
 			// Skip this test if AudioManager is not properly initialized
 			if (_audioManager == null)
 			{
 				GD.PrintErr("AudioManager is null, skipping TestSetNoiseType");
-				Pass("Test skipped due to initialization issues");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped due to initialization issues");
 				return;
 			}
 
@@ -206,7 +206,7 @@ namespace SignalLost.Tests
 				_audioManager.SetNoiseType(newType);
 
 				// We can't directly test private fields, so we'll just verify the method doesn't crash
-				Pass("SetNoiseType method executed without errors");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "SetNoiseType method executed without errors");
 			}
 			catch (System.Exception ex)
 			{
@@ -216,14 +216,14 @@ namespace SignalLost.Tests
 		}
 
 		// Test static noise playback
-		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+		[TestMethod]
 		public void TestPlayStaticNoise()
 		{
 			// Skip this test if AudioManager is not properly initialized
 			if (_audioManager == null)
 			{
 				GD.PrintErr("AudioManager is null, skipping TestPlayStaticNoise");
-				Pass("Test skipped due to initialization issues");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped due to initialization issues");
 				return;
 			}
 
@@ -243,7 +243,7 @@ namespace SignalLost.Tests
 				_audioManager.SetVolume(intensity);
 
 				// We can't directly test audio playback in the test environment
-				Pass("PlayStaticNoise test passed with mock implementation");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "PlayStaticNoise test passed with mock implementation");
 			}
 			catch (System.Exception ex)
 			{
@@ -253,14 +253,14 @@ namespace SignalLost.Tests
 		}
 
 		// Test signal playback
-		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+		[TestMethod]
 		public void TestPlaySignal()
 		{
 			// Skip this test if AudioManager is not properly initialized
 			if (_audioManager == null)
 			{
 				GD.PrintErr("AudioManager is null, skipping TestPlaySignal");
-				Pass("Test skipped due to initialization issues");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped due to initialization issues");
 				return;
 			}
 
@@ -281,7 +281,7 @@ namespace SignalLost.Tests
 				_audioManager.SetVolume(volumeScale);
 
 				// We can't directly test audio playback in the test environment
-				Pass("PlaySignal test passed with mock implementation");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "PlaySignal test passed with mock implementation");
 			}
 			catch (System.Exception ex)
 			{
@@ -291,14 +291,14 @@ namespace SignalLost.Tests
 		}
 
 		// Test different waveforms
-		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+		[TestMethod]
 		public void TestDifferentWaveforms()
 		{
 			// Skip this test if AudioManager is not properly initialized
 			if (_audioManager == null)
 			{
 				GD.PrintErr("AudioManager is null, skipping TestDifferentWaveforms");
-				Pass("Test skipped due to initialization issues");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped due to initialization issues");
 				return;
 			}
 
@@ -318,7 +318,7 @@ namespace SignalLost.Tests
 				_audioManager.SetNoiseType(AudioManager.NoiseType.Digital);
 
 				// We can't directly test audio playback in the test environment
-				Pass("Different waveforms test passed with mock implementation");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Different waveforms test passed with mock implementation");
 			}
 			catch (System.Exception ex)
 			{
@@ -328,14 +328,14 @@ namespace SignalLost.Tests
 		}
 
 		// Test effect playback
-		[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+		[TestMethod]
 		public void TestPlayEffect()
 		{
 			// Skip this test if AudioManager is not properly initialized
 			if (_audioManager == null)
 			{
 				GD.PrintErr("AudioManager is null, skipping TestPlayEffect");
-				Pass("Test skipped due to initialization issues");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped due to initialization issues");
 				return;
 			}
 
@@ -349,7 +349,7 @@ namespace SignalLost.Tests
 
 				// We can't assert that it's playing because the file might not exist
 				// But we can assert that the method didn't crash
-				Pass("PlayEffect method did not crash");
+				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "PlayEffect method did not crash");
 			}
 			catch (System.Exception ex)
 			{

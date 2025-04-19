@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://82wd4sk8xucw"]
-
-[ext_resource type="Script" path="res://tests/SimpleTest.cs" id="1_0xnvs"]
-
-[node name="AgentBetaTestScene" type="Node"]
-script = ExtResource("1_0xnvs")

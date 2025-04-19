@@ -96,11 +96,11 @@ if [ ! -d "$DIR/addons/gut" ]; then
     "$DIR/install_gut.sh"
 fi
 
-# Run the simple test scene directly instead of using GUT
-echo "Running tests using SimpleTestScene.tscn..."
+# Run the TestRunner.cs script
+echo "Running tests using TestRunner.cs..."
 
 # Use a background process with a timeout for macOS compatibility
-"$GODOT_EXECUTABLE" --path "$DIR" tests/SimpleTestScene.tscn --verbose &
+"$GODOT_EXECUTABLE" --path "$DIR" --headless --script tests/TestRunner.cs &
 GODOT_PID=$!
 
 # Wait for up to 60 seconds

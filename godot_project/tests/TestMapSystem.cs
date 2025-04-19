@@ -4,221 +4,183 @@ using System.Collections.Generic;
 
 namespace SignalLost.Tests
 {
+    /// <summary>
+    /// A simplified TestMapSystem class for testing
+    /// </summary>
     [GlobalClass]
     public partial class TestMapSystem : Node
     {
-        // Map data
-        public class LocationData
-        {
-            public string Id { get; set; }
-            public string Name { get; set; }
-            public string Description { get; set; }
-            public List<string> ConnectedLocations { get; set; } = new List<string>();
-            public Vector2 Position { get; set; } // Position on the map
-            public bool IsDiscovered { get; set; } = false;
-        }
-
-        // Dictionary of all locations in the game
-        private Dictionary<string, LocationData> _locations = new Dictionary<string, LocationData>();
-
         // Current location
         private string _currentLocation = "bunker";
-
-        // Signals
-        [Signal]
-        public delegate void LocationDiscoveredEventHandler(string locationId);
-
-        [Signal]
-        public delegate void LocationChangedEventHandler(string locationId);
-
+        
+        // Dictionary of locations
+        private Dictionary<string, MapLocation> _locations = new Dictionary<string, MapLocation>();
+        
+        // Dictionary of connections between locations
+        private Dictionary<string, List<string>> _connections = new Dictionary<string, List<string>>();
+        
         // Called when the node enters the scene tree for the first time
         public override void _Ready()
         {
             // Initialize locations
             InitializeLocations();
+            
+            // Initialize connections
+            InitializeConnections();
         }
-
-        // Initialize all locations in the game
+        
+        // Initialize test locations
         private void InitializeLocations()
         {
-            // Add locations
-            AddLocation(new LocationData
+            // Add test locations
+            _locations.Add("bunker", new MapLocation
             {
                 Id = "bunker",
                 Name = "Emergency Bunker",
-                Description = "A small underground bunker with basic supplies. This is where you start.",
-                Position = new Vector2(100, 100),
-                IsDiscovered = true, // Starting location is already discovered
-                ConnectedLocations = new List<string> { "forest", "road" }
+                Description = "A concrete bunker built for emergencies.",
+                IsDiscovered = true
             });
-
-            AddLocation(new LocationData
+            
+            _locations.Add("forest", new MapLocation
             {
                 Id = "forest",
                 Name = "Dense Forest",
-                Description = "A thick forest with tall trees. It's easy to get lost here.",
-                Position = new Vector2(200, 50),
-                ConnectedLocations = new List<string> { "bunker", "lake", "cabin" }
+                Description = "A thick forest with tall trees.",
+                IsDiscovered = false
             });
-
-            AddLocation(new LocationData
+            
+            _locations.Add("road", new MapLocation
             {
                 Id = "road",
                 Name = "Abandoned Road",
-                Description = "An old road with abandoned vehicles. It leads to the town.",
-                Position = new Vector2(150, 200),
-                ConnectedLocations = new List<string> { "bunker", "town" }
+                Description = "An old road that hasn't been used in years.",
+                IsDiscovered = false
             });
-
-            AddLocation(new LocationData
+            
+            _locations.Add("lake", new MapLocation
             {
                 Id = "lake",
-                Name = "Mountain Lake",
-                Description = "A serene lake surrounded by mountains. There's a small dock.",
-                Position = new Vector2(300, 100),
-                ConnectedLocations = new List<string> { "forest", "cabin" }
+                Name = "Misty Lake",
+                Description = "A small lake surrounded by mist.",
+                IsDiscovered = false
             });
-
-            AddLocation(new LocationData
+            
+            _locations.Add("cabin", new MapLocation
             {
                 Id = "cabin",
-                Name = "Hunter's Cabin",
-                Description = "An old cabin that belonged to a hunter. It might have useful supplies.",
-                Position = new Vector2(250, 150),
-                ConnectedLocations = new List<string> { "forest", "lake" }
-            });
-
-            AddLocation(new LocationData
-            {
-                Id = "town",
-                Name = "Abandoned Town",
-                Description = "A small town that has been abandoned. Many buildings are damaged.",
-                Position = new Vector2(200, 300),
-                ConnectedLocations = new List<string> { "road", "factory" }
-            });
-
-            AddLocation(new LocationData
-            {
-                Id = "factory",
-                Name = "Old Factory",
-                Description = "An industrial factory that has been repurposed as a shelter by survivors.",
-                Position = new Vector2(300, 350),
-                ConnectedLocations = new List<string> { "town" }
+                Name = "Old Cabin",
+                Description = "A weathered wooden cabin in the woods.",
+                IsDiscovered = false
             });
         }
-
-        // Add a location to the map
-        private void AddLocation(LocationData location)
+        
+        // Initialize connections between locations
+        private void InitializeConnections()
         {
-            _locations[location.Id] = location;
+            // Add connections
+            _connections.Add("bunker", new List<string> { "forest", "road" });
+            _connections.Add("forest", new List<string> { "bunker", "lake", "cabin" });
+            _connections.Add("road", new List<string> { "bunker", "cabin" });
+            _connections.Add("lake", new List<string> { "forest" });
+            _connections.Add("cabin", new List<string> { "forest", "road" });
         }
-
+        
         // Get a location by ID
-        public LocationData GetLocation(string locationId)
+        public MapLocation GetLocation(string locationId)
         {
             if (_locations.ContainsKey(locationId))
             {
                 return _locations[locationId];
             }
+            
             return null;
         }
-
-        // Get all locations
-        public Dictionary<string, LocationData> GetAllLocations()
-        {
-            return _locations;
-        }
-
-        // Get all discovered locations
-        public Dictionary<string, LocationData> GetDiscoveredLocations()
-        {
-            var discoveredLocations = new Dictionary<string, LocationData>();
-            foreach (var location in _locations)
-            {
-                if (location.Value.IsDiscovered)
-                {
-                    discoveredLocations[location.Key] = location.Value;
-                }
-            }
-            return discoveredLocations;
-        }
-
-        // Discover a location
-        public bool DiscoverLocation(string locationId)
-        {
-            if (_locations.ContainsKey(locationId) && !_locations[locationId].IsDiscovered)
-            {
-                _locations[locationId].IsDiscovered = true;
-                EmitSignal(SignalName.LocationDiscovered, locationId);
-                return true;
-            }
-            return false;
-        }
-
-        // Change the current location
-        public bool ChangeLocation(string locationId)
-        {
-            // Check if the location exists and is discovered
-            if (!_locations.ContainsKey(locationId) || !_locations[locationId].IsDiscovered)
-            {
-                return false;
-            }
-
-            // Check if the location is connected to the current location
-            if (_currentLocation != null && 
-                _locations.ContainsKey(_currentLocation) && 
-                !_locations[_currentLocation].ConnectedLocations.Contains(locationId))
-            {
-                return false;
-            }
-
-            // Change the location
-            _currentLocation = locationId;
-            EmitSignal(SignalName.LocationChanged, locationId);
-            return true;
-        }
-
-        // Check if a location is connected to the current location
-        public bool IsLocationConnected(string locationId)
-        {
-            if (_currentLocation != null && 
-                _locations.ContainsKey(_currentLocation) && 
-                _locations.ContainsKey(locationId))
-            {
-                return _locations[_currentLocation].ConnectedLocations.Contains(locationId);
-            }
-            return false;
-        }
-
-        // Get connected locations to the current location
-        public List<LocationData> GetConnectedLocations()
-        {
-            var connectedLocations = new List<LocationData>();
-            
-            if (_currentLocation != null && _locations.ContainsKey(_currentLocation))
-            {
-                foreach (var connectedId in _locations[_currentLocation].ConnectedLocations)
-                {
-                    if (_locations.ContainsKey(connectedId))
-                    {
-                        connectedLocations.Add(_locations[connectedId]);
-                    }
-                }
-            }
-            
-            return connectedLocations;
-        }
-
-        // Get the current location
+        
+        // Get the current location ID
         public string GetCurrentLocation()
         {
             return _currentLocation;
         }
-
-        // Set the current location directly (for testing)
-        public void SetCurrentLocation(string locationId)
+        
+        // Get all locations
+        public List<MapLocation> GetAllLocations()
         {
-            _currentLocation = locationId;
+            List<MapLocation> result = new List<MapLocation>();
+            
+            foreach (var location in _locations.Values)
+            {
+                result.Add(location);
+            }
+            
+            return result;
         }
+        
+        // Get locations connected to the current location
+        public List<MapLocation> GetConnectedLocations()
+        {
+            List<MapLocation> result = new List<MapLocation>();
+            
+            if (_connections.ContainsKey(_currentLocation))
+            {
+                foreach (var locationId in _connections[_currentLocation])
+                {
+                    if (_locations.ContainsKey(locationId))
+                    {
+                        result.Add(_locations[locationId]);
+                    }
+                }
+            }
+            
+            return result;
+        }
+        
+        // Check if a location is connected to the current location
+        public bool IsLocationConnected(string locationId)
+        {
+            if (_connections.ContainsKey(_currentLocation))
+            {
+                return _connections[_currentLocation].Contains(locationId);
+            }
+            
+            return false;
+        }
+        
+        // Discover a location
+        public bool DiscoverLocation(string locationId)
+        {
+            if (_locations.ContainsKey(locationId))
+            {
+                _locations[locationId].IsDiscovered = true;
+                return true;
+            }
+            
+            return false;
+        }
+        
+        // Change the current location
+        public bool ChangeLocation(string locationId)
+        {
+            // Check if the location exists and is discovered
+            if (_locations.ContainsKey(locationId) && _locations[locationId].IsDiscovered)
+            {
+                // Check if the location is connected to the current location
+                if (IsLocationConnected(locationId))
+                {
+                    _currentLocation = locationId;
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+    }
+    
+    // MapLocation class
+    public class MapLocation
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public bool IsDiscovered { get; set; }
     }
 }

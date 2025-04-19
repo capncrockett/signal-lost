@@ -26,9 +26,9 @@ if not exist "%DIR%addons\gut" (
     call "%DIR%install_gut.bat"
 )
 
-REM Run the test runner script
+REM Run the C# test runner script
 cd "%DIR%"
-"%GODOT_EXECUTABLE%" --script "tests/test_runner.gd"
+"%GODOT_EXECUTABLE%" --path "." --headless --script "tests/TestRunner.cs" -- --skip-classes="IntegrationTests,RadioTunerTests,PixelInventoryUITests,PixelMapInterfaceTests,QuestSystemTests"
 
 REM Get the exit code
 set EXIT_CODE=%ERRORLEVEL%

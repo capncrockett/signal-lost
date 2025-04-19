@@ -1,5 +1,6 @@
 using GUT;
 using Godot;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SignalLost.Tests
 {
@@ -10,7 +11,7 @@ namespace SignalLost.Tests
         private GameState _gameState = null;
 
         // Called before each test
-        public override void Before()
+        public new void Before()
         {
             // Create a new instance of the GameState
             _gameState = new GameState();
@@ -19,7 +20,7 @@ namespace SignalLost.Tests
         }
 
         // Called after each test
-        public override void After()
+        public new void After()
         {
             // Clean up
             _gameState.QueueFree();
@@ -38,7 +39,7 @@ namespace SignalLost.Tests
             _gameState.SetFrequency(newFrequency);
 
             // Assert
-            AssertEqual(_gameState.CurrentFrequency, newFrequency,
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.CurrentFrequency, newFrequency,
                 "Frequency should be updated to the new value");
         }
 
@@ -54,14 +55,14 @@ namespace SignalLost.Tests
             _gameState.SetFrequency(belowMin);
 
             // Assert
-            AssertEqual(_gameState.CurrentFrequency, 88.0f,
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.CurrentFrequency, 88.0f,
                 "Frequency should be clamped to minimum value");
 
             // Act
             _gameState.SetFrequency(aboveMax);
 
             // Assert
-            AssertEqual(_gameState.CurrentFrequency, 108.0f,
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.CurrentFrequency, 108.0f,
                 "Frequency should be clamped to maximum value");
         }
 
@@ -76,14 +77,14 @@ namespace SignalLost.Tests
             _gameState.ToggleRadio();
 
             // Assert
-            AssertEqual(_gameState.IsRadioOn, !initialState,
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.IsRadioOn, !initialState,
                 "Radio state should be toggled");
 
             // Act
             _gameState.ToggleRadio();
 
             // Assert
-            AssertEqual(_gameState.IsRadioOn, initialState,
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.IsRadioOn, initialState,
                 "Radio state should be toggled back to initial state");
         }
 
@@ -100,9 +101,9 @@ namespace SignalLost.Tests
             var noSignal = _gameState.FindSignalAtFrequency(nonSignalFrequency);
 
             // Assert
-            AssertNotNull(signal, "Signal should be found at frequency 91.5");
-            AssertEqual(signal.Frequency, signalFrequency, "Signal frequency should match");
-            AssertNull(noSignal, "No signal should be found at frequency 92.5");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(signal, "Signal should be found at frequency 91.5");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(signal.Frequency, signalFrequency, "Signal frequency should match");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNull(noSignal, "No signal should be found at frequency 92.5");
         }
 
         // Test signal strength calculation
@@ -119,10 +120,10 @@ namespace SignalLost.Tests
             float farStrength = _gameState.CalculateSignalStrength(signalFrequency + 1.0f, signal);
 
             // Assert
-            AssertEqual(exactStrength, 1.0f, "Signal strength should be maximum when tuned exactly");
-            AssertLess(offsetStrength, 1.0f, "Signal strength should be less than maximum when slightly off-tune");
-            AssertGreater(offsetStrength, 0.0f, "Signal strength should be greater than zero when slightly off-tune");
-            AssertEqual(farStrength, 0.0f, "Signal strength should be zero when far off-tune");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(exactStrength, 1.0f, "Signal strength should be maximum when tuned exactly");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(offsetStrength < 1.0f, "Signal strength should be less than maximum when slightly off-tune");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(offsetStrength > 0.0f, "Signal strength should be greater than zero when slightly off-tune");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(farStrength, 0.0f, "Signal strength should be zero when far off-tune");
         }
 
         // Test discovered frequencies
@@ -137,16 +138,16 @@ namespace SignalLost.Tests
             _gameState.AddDiscoveredFrequency(newFrequency);
 
             // Assert
-            AssertEqual(_gameState.DiscoveredFrequencies.Count, initialCount + 1,
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.DiscoveredFrequencies.Count, initialCount + 1,
                 "Discovered frequencies count should increase");
-            AssertTrue(_gameState.DiscoveredFrequencies.Contains(newFrequency),
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(_gameState.DiscoveredFrequencies.Contains(newFrequency),
                 "Discovered frequencies should contain the new frequency");
 
             // Act - Add the same frequency again
             _gameState.AddDiscoveredFrequency(newFrequency);
 
             // Assert
-            AssertEqual(_gameState.DiscoveredFrequencies.Count, initialCount + 1,
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.DiscoveredFrequencies.Count, initialCount + 1,
                 "Discovered frequencies count should not increase when adding a duplicate");
         }
 
@@ -161,14 +162,14 @@ namespace SignalLost.Tests
             bool result = _gameState.DecodeMessage(messageId);
 
             // Assert
-            AssertTrue(result, "Message should be successfully decoded");
-            AssertTrue(_gameState.Messages[messageId].Decoded, "Message should be marked as decoded");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(result, "Message should be successfully decoded");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(_gameState.Messages[messageId].Decoded, "Message should be marked as decoded");
 
             // Act - Try to decode the same message again
             bool secondResult = _gameState.DecodeMessage(messageId);
 
             // Assert
-            AssertFalse(secondResult, "Already decoded message should not be decoded again");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(secondResult, "Already decoded message should not be decoded again");
         }
 
         // Test static intensity
@@ -184,9 +185,9 @@ namespace SignalLost.Tests
             float intensity2 = _gameState.GetStaticIntensity(frequency2);
 
             // Assert
-            AssertGreater(intensity1, 0.0f, "Static intensity should be greater than zero");
-            AssertLess(intensity1, 1.0f, "Static intensity should be less than one");
-            AssertNotEqual(intensity1, intensity2,
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(intensity1 > 0.0f, "Static intensity should be greater than zero");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(intensity1 < 1.0f, "Static intensity should be less than one");
+            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreNotEqual(intensity1, intensity2,
                 "Static intensity should be different for different frequencies");
         }
     }
