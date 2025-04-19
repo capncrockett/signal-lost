@@ -27,21 +27,25 @@ Signal Lost is designed to work on both Windows and macOS platforms. This docume
 ## Testing
 
 - **Platform-Specific Tests**: Use conditional compilation for platform-specific tests
-- **Test Scene**: Use `MacTestScene.tscn` for Mac-specific tests
+- **Test Scene**: Use `CSharpTestScene.tscn` for all platforms
 - **Skipping Tests**: Use platform detection to skip tests that aren't applicable
+- **Test Runner**: The test runner has been updated to work on both Windows and macOS
 
 ```csharp
 // Example of platform-specific test code
+[TestMethod]
 public void TestPlatformSpecificFeature()
 {
     if (OS.GetName() == "macOS")
     {
         GD.Print("Skipping test on Mac");
-        Pass("Test skipped on Mac platform");
+        Assert.IsTrue(true, "Test skipped on Mac platform");
         return;
     }
-    
+
     // Windows-specific test code here
+    // Run Windows-specific assertions
+    Assert.AreEqual(expected, actual, "Windows-specific test failed");
 }
 ```
 
@@ -60,7 +64,8 @@ public void TestPlatformSpecificFeature()
 
 **Issue**: Files found on Windows but not on macOS due to case differences.
 
-**Solution**: 
+**Solution**:
+
 - Maintain consistent casing in all file references
 - Use lowercase for all file and directory names
 - Double-check resource paths in scene files
@@ -70,6 +75,7 @@ public void TestPlatformSpecificFeature()
 **Issue**: Type conversion that works on one platform may fail on another.
 
 **Solution**:
+
 - Always use explicit casting for numeric conversions
 - Be careful with float/double conversions
 - Use `(float)` or `(double)` casts when needed
@@ -79,13 +85,14 @@ public void TestPlatformSpecificFeature()
 **Issue**: Hardcoded paths that work on one platform fail on another.
 
 **Solution**:
+
 - Use `Path.Combine()` for file paths
 - Use Godot's `res://` and `user://` prefixes
 - Use `System.Environment.GetFolderPath()` for system directories
 
 ## Platform-Specific Code
 
-When platform-specific code is necessary, use conditional compilation:
+When platform-specific code is necessary, use OS detection or conditional compilation:
 
 ```csharp
 using Godot;
@@ -97,7 +104,7 @@ public partial class PlatformSpecific : Node
     public string GetSavePath(string filename)
     {
         string basePath;
-        
+
         if (OS.GetName() == "macOS")
         {
             // Mac-specific path
@@ -115,14 +122,67 @@ public partial class PlatformSpecific : Node
             // Default path for other platforms
             basePath = OS.GetUserDataDir();
         }
-        
+
         // Create directory if it doesn't exist
         if (!Directory.Exists(basePath))
         {
             Directory.CreateDirectory(basePath);
         }
-        
+
         return Path.Combine(basePath, filename);
+    }
+}
+```
+
+## Screenshot System
+
+The screenshot system has been updated to work on both Windows and macOS:
+
+```csharp
+public class ScreenshotTaker : Node
+{
+    public string TakeScreenshot(string filename)
+    {
+        string directory = GetScreenshotDirectory();
+        string fullPath = Path.Combine(directory, filename);
+
+        // Ensure directory exists
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        // Take screenshot
+        var image = GetViewport().GetTexture().GetImage();
+        image.SavePng(fullPath);
+
+        GD.Print($"Screenshot saved to: {fullPath}");
+        return fullPath;
+    }
+
+    private string GetScreenshotDirectory()
+    {
+        string basePath;
+
+        if (OS.GetName() == "macOS")
+        {
+            // Mac-specific path
+            string homeDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            basePath = Path.Combine(homeDir, "Documents", "SignalLost", "Screenshots");
+        }
+        else if (OS.GetName() == "Windows")
+        {
+            // Windows-specific path
+            string picturesDir = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            basePath = Path.Combine(picturesDir, "SignalLost", "Screenshots");
+        }
+        else
+        {
+            // Default path for other platforms
+            basePath = Path.Combine(OS.GetUserDataDir(), "Screenshots");
+        }
+
+        return basePath;
     }
 }
 ```
@@ -130,3 +190,5 @@ public partial class PlatformSpecific : Node
 ## Conclusion
 
 By following these guidelines, you can ensure that Signal Lost works consistently across both Windows and macOS platforms. Regular testing on both platforms is essential to catch and fix any platform-specific issues early in development.
+
+The test runner has been updated to work on both platforms, and platform-specific code has been implemented for file system access and screenshots. Continue to test on both platforms regularly to ensure compatibility.
