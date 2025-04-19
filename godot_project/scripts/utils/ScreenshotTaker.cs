@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.IO;
+using Environment = System.Environment;
 
 namespace SignalLost.Utils
 {
@@ -38,7 +39,7 @@ namespace SignalLost.Utils
             // Get platform-specific directory
             string directory = GetScreenshotDirectory();
             string fullPath = Path.Combine(directory, filename);
-            
+
             // Ensure directory exists
             if (!Directory.Exists(directory))
             {
@@ -53,28 +54,28 @@ namespace SignalLost.Utils
                     return string.Empty;
                 }
             }
-            
+
             try
             {
                 // Take screenshot
                 var viewport = GetViewport();
                 var image = viewport.GetTexture().GetImage();
                 Error error = image.SavePng(fullPath);
-                
+
                 if (error != Error.Ok)
                 {
                     GD.PrintErr($"Failed to save screenshot: {error}");
                     return string.Empty;
                 }
-                
+
                 GD.Print($"Screenshot saved to: {fullPath}");
-                
+
                 // Clean up resources if needed
                 if (CleanupAfterScreenshot)
                 {
                     image.Dispose();
                 }
-                
+
                 return fullPath;
             }
             catch (Exception ex)
@@ -83,7 +84,7 @@ namespace SignalLost.Utils
                 return string.Empty;
             }
         }
-        
+
         /// <summary>
         /// Gets the platform-specific directory for saving screenshots.
         /// </summary>
@@ -91,7 +92,7 @@ namespace SignalLost.Utils
         private string GetScreenshotDirectory()
         {
             string basePath;
-            
+
             if (OS.GetName() == "macOS")
             {
                 // Mac-specific path: ~/Documents/SignalLost/Screenshots
@@ -110,10 +111,10 @@ namespace SignalLost.Utils
                 string userDir = OS.GetUserDataDir();
                 basePath = Path.Combine(userDir, ScreenshotDirectoryName);
             }
-            
+
             return basePath;
         }
-        
+
         /// <summary>
         /// Takes a screenshot with a timestamp in the filename.
         /// </summary>
