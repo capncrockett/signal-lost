@@ -1,4 +1,5 @@
 using Godot;
+using SignalLost.Utils;
 
 namespace SignalLost
 {
@@ -26,6 +27,9 @@ namespace SignalLost
         // Called when the node enters the scene tree
         public override void _Ready()
         {
+            // Register utility autoloads
+            UtilsAutoload.RegisterAutoloads();
+
             // Get references to UI components
             _radioInterface = GetNode<PixelRadioInterface>("PixelRadioInterface");
             _inventoryUI = GetNode<PixelInventoryUI>("PixelInventoryUI");
