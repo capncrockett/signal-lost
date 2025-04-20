@@ -13,6 +13,7 @@ namespace SignalLost
         private PixelMapInterface _mapInterface;
         private PixelQuestUI _questUI;
         private SaveLoadMenu _saveLoadMenu;
+        private ProgressionUI _progressionUI;
 
         // References to UI control buttons
         private Button _radioButton;
@@ -20,6 +21,7 @@ namespace SignalLost
         private Button _mapButton;
         private Button _questButton;
         private Button _saveLoadButton;
+        private Button _progressionButton;
 
         // References to game systems
         private GameState _gameState;
@@ -40,6 +42,7 @@ namespace SignalLost
             _mapInterface = GetNode<PixelMapInterface>("PixelMapInterface");
             _questUI = GetNode<PixelQuestUI>("PixelQuestUI");
             _saveLoadMenu = GetNode<SaveLoadMenu>("SaveLoadMenu");
+            _progressionUI = GetNode<ProgressionUI>("ProgressionUI");
 
             // Get references to UI control buttons
             _radioButton = GetNode<Button>("UIControls/RadioButton");
@@ -47,6 +50,7 @@ namespace SignalLost
             _mapButton = GetNode<Button>("UIControls/MapButton");
             _questButton = GetNode<Button>("UIControls/QuestButton");
             _saveLoadButton = GetNode<Button>("UIControls/SaveLoadButton");
+            _progressionButton = GetNode<Button>("UIControls/ProgressionButton");
 
             // Get references to game systems
             _gameState = GetNode<GameState>("/root/GameState");
@@ -61,6 +65,7 @@ namespace SignalLost
             _mapButton.Pressed += () => ShowInterface("map");
             _questButton.Pressed += () => ShowInterface("quest");
             _saveLoadButton.Pressed += ToggleSaveLoadMenu;
+            _progressionButton.Pressed += ToggleProgressionUI;
 
             // Set up keyboard shortcuts
             SetProcessInput(true);
@@ -94,12 +99,23 @@ namespace SignalLost
                 {
                     ToggleSaveLoadMenu();
                 }
+                else if (keyEvent.Keycode == Key.P)
+                {
+                    ToggleProgressionUI();
+                }
                 else if (keyEvent.Keycode == Key.Escape)
                 {
                     // If save/load menu is visible, hide it
                     if (_saveLoadMenu.Visible)
                     {
                         _saveLoadMenu.Visible = false;
+                        return;
+                    }
+
+                    // If progression UI is visible, hide it
+                    if (_progressionUI.Visible)
+                    {
+                        _progressionUI.Visible = false;
                         return;
                     }
 
@@ -121,6 +137,7 @@ namespace SignalLost
             _mapInterface.SetVisible(false);
             _questUI.SetVisible(false);
             _saveLoadMenu.Visible = false;
+            _progressionUI.Visible = false;
 
             // Show the specified interface
             switch (interfaceName.ToLower())
@@ -145,6 +162,7 @@ namespace SignalLost
             _mapButton.Disabled = string.Equals(interfaceName, "map", StringComparison.OrdinalIgnoreCase);
             _questButton.Disabled = string.Equals(interfaceName, "quest", StringComparison.OrdinalIgnoreCase);
             _saveLoadButton.Disabled = false; // Save/load button is always enabled
+            _progressionButton.Disabled = false; // Progression button is always enabled
         }
 
         // Toggle the save/load menu
@@ -157,6 +175,19 @@ namespace SignalLost
             if (_saveLoadMenu.Visible)
             {
                 _saveLoadMenu.RefreshSaveSlotList();
+            }
+        }
+
+        // Toggle the progression UI
+        private void ToggleProgressionUI()
+        {
+            // Toggle visibility
+            _progressionUI.Visible = !_progressionUI.Visible;
+
+            // If showing the UI, update it
+            if (_progressionUI.Visible)
+            {
+                // The ProgressionUI will update itself in _Ready
             }
         }
     }

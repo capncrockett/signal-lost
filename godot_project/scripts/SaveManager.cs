@@ -292,6 +292,41 @@ namespace SignalLost
                 }
             }
 
+            // Get progression data
+            var questSystem = GetNode<QuestSystem>("/root/QuestSystem");
+            var mapSystem = GetNode<MapSystem>("/root/MapSystem");
+            var progressionManager = GetNode<GameProgressionManager>("/root/GameProgressionManager");
+
+            if (questSystem != null)
+            {
+                // Save completed quests
+                saveData.CompletedQuests = new List<string>(questSystem.GetCompletedQuests().Keys);
+            }
+
+            if (mapSystem != null)
+            {
+                // Save discovered locations
+                saveData.DiscoveredLocations = new List<string>();
+                foreach (var location in mapSystem.GetAllLocations())
+                {
+                    if (location.Value.IsDiscovered)
+                    {
+                        saveData.DiscoveredLocations.Add(location.Key);
+                    }
+                }
+            }
+
+            if (progressionManager != null)
+            {
+                // Save progression stage
+                saveData.ProgressionStage = (int)progressionManager.CurrentStage;
+            }
+            else
+            {
+                // If progression manager is not available, use GameState's progress
+                saveData.ProgressionStage = gameState.GameProgress;
+            }
+
             // Add timestamp
             saveData.Timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -341,6 +376,56 @@ namespace SignalLost
                         gameState.DecodeMessage(message.Key);
                     }
                 }
+            }
+
+            // Get progression data
+            var questSystem = GetNode<QuestSystem>("/root/QuestSystem");
+            var mapSystem = GetNode<MapSystem>("/root/MapSystem");
+            var progressionManager = GetNode<GameProgressionManager>("/root/GameProgressionManager");
+
+            // Restore completed quests
+            if (questSystem != null && saveData.CompletedQuests != null)
+            {
+                // This is a simplified approach - in a real implementation, you would need to
+                // properly restore the quest state including objectives
+                foreach (var questId in saveData.CompletedQuests)
+                {
+                    if (questSystem.GetQuest(questId) != null && !questSystem.IsQuestCompleted(questId))
+                    {
+                        // Discover and activate the quest first
+                        questSystem.DiscoverQuest(questId);
+                        questSystem.ActivateQuest(questId);
+
+                        // Complete all objectives and the quest
+                        var quest = questSystem.GetQuest(questId);
+                        if (quest != null)
+                        {
+                            foreach (var objective in quest.Objectives)
+                            {
+                                objective.IsCompleted = true;
+                                objective.CurrentAmount = objective.RequiredAmount;
+                            }
+
+                            // Force complete the quest
+                            questSystem.CompleteQuest(questId);
+                        }
+                    }
+                }
+            }
+
+            // Restore discovered locations
+            if (mapSystem != null && saveData.DiscoveredLocations != null)
+            {
+                foreach (var locationId in saveData.DiscoveredLocations)
+                {
+                    mapSystem.DiscoverLocation(locationId);
+                }
+            }
+
+            // Restore progression stage
+            if (progressionManager != null)
+            {
+                progressionManager.SetProgression((GameProgressionManager.ProgressionStage)saveData.ProgressionStage);
             }
 
             // Get the field exploration scene
