@@ -304,5 +304,58 @@ namespace SignalLost
         {
             return _isMuted;
         }
+
+        // Set GameState reference (for testing)
+        public void SetGameState(GameState gameState)
+        {
+            _gameState = gameState;
+        }
+
+        // Set AudioManager reference (for testing)
+        public void SetAudioManager(AudioManager audioManager)
+        {
+            _audioManager = audioManager;
+        }
+
+        // Update signal strength for a specific frequency (used by SignalSourceManager)
+        public void UpdateSignalSourceStrength(float frequency, float strength)
+        {
+            // Find the signal at this frequency
+            var signal = FindSignalAtFrequency(frequency);
+
+            // If found, update its strength
+            if (signal != null)
+            {
+                signal.Strength = strength;
+            }
+        }
+
+        // Register a signal source (used by SignalSourceObject)
+        public void RegisterSignalSource(float frequency, float strength, string messageId, object source)
+        {
+            // Check if a signal already exists at this frequency
+            var existingSignal = FindSignalAtFrequency(frequency);
+
+            if (existingSignal == null)
+            {
+                // Create a new signal
+                var signal = new RadioSignal
+                {
+                    Id = messageId.Length > 0 ? messageId : $"signal_{frequency}",
+                    Frequency = frequency,
+                    Message = $"Signal at {frequency} MHz",
+                    Type = RadioSignalType.Morse,
+                    Strength = strength
+                };
+
+                // Add the signal
+                AddSignal(signal);
+            }
+            else
+            {
+                // Update the existing signal
+                existingSignal.Strength = strength;
+            }
+        }
     }
 }

@@ -11,13 +11,13 @@ namespace SignalLost.Field
     {
         // List of signal sources in the field
         private List<SignalSourceObject> _signalSources = new List<SignalSourceObject>();
-        
+
         // Reference to the radio system
         private RadioSystem _radioSystem;
-        
+
         // Reference to the player controller
         private PlayerController _playerController;
-        
+
         /// <summary>
         /// Called when the node enters the scene tree.
         /// </summary>
@@ -26,23 +26,23 @@ namespace SignalLost.Field
             // Get references
             _radioSystem = GetNode<RadioSystem>("/root/GameState/RadioSystem");
             _playerController = GetNode<PlayerController>("/root/FieldExplorationScene/PlayerController");
-            
+
             if (_radioSystem == null)
             {
                 GD.PrintErr("SignalSourceManager: Failed to find RadioSystem node");
             }
-            
+
             if (_playerController == null)
             {
                 GD.PrintErr("SignalSourceManager: Failed to find PlayerController node");
             }
-            
+
             // Find all signal sources in the scene
             FindSignalSources();
-            
+
             GD.Print($"SignalSourceManager: Initialized with {_signalSources.Count} signal sources");
         }
-        
+
         /// <summary>
         /// Called every frame.
         /// </summary>
@@ -55,7 +55,7 @@ namespace SignalLost.Field
                 UpdateSignalStrengths();
             }
         }
-        
+
         /// <summary>
         /// Finds all signal sources in the scene.
         /// </summary>
@@ -63,7 +63,7 @@ namespace SignalLost.Field
         {
             // Clear the list
             _signalSources.Clear();
-            
+
             // Find all signal sources in the scene
             var signalSources = GetTree().GetNodesInGroup("SignalSource");
             foreach (var source in signalSources)
@@ -75,7 +75,7 @@ namespace SignalLost.Field
                 }
             }
         }
-        
+
         /// <summary>
         /// Updates signal strengths based on player position.
         /// </summary>
@@ -83,18 +83,18 @@ namespace SignalLost.Field
         {
             // Get player position
             Vector2I playerPosition = _playerController.GetGridPosition();
-            
+
             // Update signal strengths for each signal source
             foreach (var source in _signalSources)
             {
                 // Calculate signal strength based on distance
                 float strength = source.CalculateSignalStrengthAtPosition(playerPosition);
-                
+
                 // Update the signal strength in the radio system
                 _radioSystem.UpdateSignalSourceStrength(source.Frequency, strength);
             }
         }
-        
+
         /// <summary>
         /// Adds a signal source to the manager.
         /// </summary>
@@ -107,7 +107,7 @@ namespace SignalLost.Field
                 GD.Print($"SignalSourceManager: Added signal source at frequency {source.Frequency} MHz");
             }
         }
-        
+
         /// <summary>
         /// Removes a signal source from the manager.
         /// </summary>
@@ -120,7 +120,7 @@ namespace SignalLost.Field
                 GD.Print($"SignalSourceManager: Removed signal source at frequency {source.Frequency} MHz");
             }
         }
-        
+
         /// <summary>
         /// Gets all signal sources.
         /// </summary>
@@ -128,6 +128,22 @@ namespace SignalLost.Field
         public List<SignalSourceObject> GetSignalSources()
         {
             return _signalSources;
+        }
+
+        /// <summary>
+        /// Set RadioSystem reference (for testing)
+        /// </summary>
+        public void SetRadioSystem(RadioSystem radioSystem)
+        {
+            _radioSystem = radioSystem;
+        }
+
+        /// <summary>
+        /// Set PlayerController reference (for testing)
+        /// </summary>
+        public void SetPlayerController(PlayerController playerController)
+        {
+            _playerController = playerController;
         }
     }
 }

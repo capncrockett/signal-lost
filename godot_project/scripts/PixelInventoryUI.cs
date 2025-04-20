@@ -89,6 +89,18 @@ namespace SignalLost
             return _isVisible;
         }
 
+        // Set InventorySystem reference (for testing)
+        public void SetInventorySystem(InventorySystem inventorySystem)
+        {
+            _inventorySystem = inventorySystem;
+        }
+
+        // Set GameState reference (for testing)
+        public void SetGameState(GameState gameState)
+        {
+            _gameState = gameState;
+        }
+
         // Process input events
         public override void _Input(InputEvent @event)
         {

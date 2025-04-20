@@ -469,5 +469,45 @@ namespace SignalLost
             // Periodically check if we can advance progression
             CheckProgressionRequirements();
         }
+
+        /// <summary>
+        /// Set GameState reference (for testing)
+        /// </summary>
+        public void SetGameState(GameState gameState)
+        {
+            _gameState = gameState;
+        }
+
+        /// <summary>
+        /// Set QuestSystem reference (for testing)
+        /// </summary>
+        public void SetQuestSystem(QuestSystem questSystem)
+        {
+            _questSystem = questSystem;
+        }
+
+        /// <summary>
+        /// Set MapSystem reference (for testing)
+        /// </summary>
+        public void SetMapSystem(MapSystem mapSystem)
+        {
+            _mapSystem = mapSystem;
+        }
+
+        /// <summary>
+        /// Set InventorySystem reference (for testing)
+        /// </summary>
+        public void SetInventorySystem(InventorySystem inventorySystem)
+        {
+            _inventorySystem = inventorySystem;
+        }
+
+        /// <summary>
+        /// Set MessageManager reference (for testing)
+        /// </summary>
+        public void SetMessageManager(MessageManager messageManager)
+        {
+            _messageManager = messageManager;
+        }
     }
 }

@@ -568,5 +568,23 @@ namespace SignalLost
                 }
             }
         }
+
+        // Set GameState reference (for testing)
+        public void SetGameState(GameState gameState)
+        {
+            _gameState = gameState;
+        }
+
+        // Set InventorySystem reference (for testing)
+        public void SetInventorySystem(InventorySystem inventorySystem)
+        {
+            _inventorySystem = inventorySystem;
+        }
+
+        // Set MapSystem reference (for testing)
+        public void SetMapSystem(MapSystem mapSystem)
+        {
+            _mapSystem = mapSystem;
+        }
     }
 }

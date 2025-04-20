@@ -476,5 +476,17 @@ namespace SignalLost
         {
             QueueRedraw();
         }
+
+        // Set QuestSystem reference (for testing)
+        public void SetQuestSystem(QuestSystem questSystem)
+        {
+            _questSystem = questSystem;
+        }
+
+        // Set GameState reference (for testing)
+        public void SetGameState(GameState gameState)
+        {
+            _gameState = gameState;
+        }
     }
 }
