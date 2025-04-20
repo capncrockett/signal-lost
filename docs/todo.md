@@ -86,7 +86,7 @@ The pixel-based approach offers several advantages:
    - ✅ Grid-based movement
    - ✅ Player character with pixel-based rendering
    - ✅ Interactable objects
-2. ⬜ Connect field exploration with radio signals
+2. ✅ Connect field exploration with radio signals
 3. ⬜ Add game progression mechanics
 4. ⬜ Implement save/load system
 

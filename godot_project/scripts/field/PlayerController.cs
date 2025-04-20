@@ -10,42 +10,72 @@ namespace SignalLost.Field
     {
         // Current position on grid
         private Vector2I _gridPosition = new Vector2I(1, 1);
-        
-        // Reference to grid system
+
+        // References
         private GridSystem _gridSystem;
-        
+        private SignalLost.GameState _gameState;
+
         // Movement properties
         [Export]
         private float _moveSpeed = 4.0f; // Cells per second
-        
+
         // Movement state
         private bool _isMoving = false;
         private Vector2 _targetPosition;
         private Vector2 _startPosition;
         private float _movementProgress = 0.0f;
         private Vector2I _facingDirection = new Vector2I(0, 1); // Default facing down
-        
+
         /// <summary>
         /// Called when the node enters the scene tree.
         /// </summary>
         public override void _Ready()
         {
             // Find the grid system
-            _gridSystem = GetNode<GridSystem>("/root/FieldExplorationScene/GridSystem");
-            if (_gridSystem == null)
+            // Try to get the grid system from the scene
+            var gridSystemNode = GetNodeOrNull("/root/FieldExplorationScene/GridSystem");
+            if (gridSystemNode != null && gridSystemNode is GridSystem gs)
             {
-                GD.PrintErr("PlayerController: Failed to find GridSystem node");
-                return;
+                _gridSystem = gs;
             }
-            
+            else
+            {
+                // In tests, we might have a direct parent that's a GridSystem
+                var parentGridSystem = GetParentOrNull<GridSystem>();
+                if (parentGridSystem != null)
+                {
+                    _gridSystem = parentGridSystem;
+                }
+                else
+                {
+                    GD.PrintErr("PlayerController: Failed to find GridSystem node");
+                    return;
+                }
+            }
+
+            // Find the game state
+            var gameStateNode = GetNodeOrNull("/root/GameState");
+            if (gameStateNode != null)
+            {
+                // Try to cast to our GameState type
+                if (gameStateNode is SignalLost.GameState gameState)
+                {
+                    _gameState = gameState;
+                }
+                else
+                {
+                    GD.PrintErr("PlayerController: GameState node is not of the expected type");
+                }
+            }
+
             // Set initial position
             Position = _gridSystem.GridToWorldPosition(_gridPosition);
             _targetPosition = Position;
             _startPosition = Position;
-            
+
             GD.Print($"PlayerController: Initialized at grid position {_gridPosition}");
         }
-        
+
         /// <summary>
         /// Called every frame.
         /// </summary>
@@ -74,11 +104,11 @@ namespace SignalLost.Field
                 // Handle input
                 HandleInput();
             }
-            
+
             // Draw the player
             QueueRedraw();
         }
-        
+
         /// <summary>
         /// Handles player input.
         /// </summary>
@@ -86,7 +116,7 @@ namespace SignalLost.Field
         {
             // Movement input
             Vector2I direction = Vector2I.Zero;
-            
+
             if (Input.IsActionPressed("ui_up"))
             {
                 direction = new Vector2I(0, -1);
@@ -103,14 +133,14 @@ namespace SignalLost.Field
             {
                 direction = new Vector2I(1, 0);
             }
-            
+
             // Try to move in the input direction
             if (direction != Vector2I.Zero)
             {
                 TryMove(direction);
             }
         }
-        
+
         /// <summary>
         /// Tries to move the player in the specified direction.
         /// </summary>
@@ -120,10 +150,10 @@ namespace SignalLost.Field
         {
             // Set facing direction
             _facingDirection = direction;
-            
+
             // Calculate new position
             Vector2I newPosition = _gridPosition + direction;
-            
+
             // Check if the new position is valid
             if (_gridSystem.IsValidPosition(newPosition))
             {
@@ -133,13 +163,13 @@ namespace SignalLost.Field
                 _targetPosition = _gridSystem.GridToWorldPosition(_gridPosition);
                 _isMoving = true;
                 _movementProgress = 0.0f;
-                
+
                 return true;
             }
-            
+
             return false;
         }
-        
+
         /// <summary>
         /// Gets the current grid position of the player.
         /// </summary>
@@ -148,7 +178,7 @@ namespace SignalLost.Field
         {
             return _gridPosition;
         }
-        
+
         /// <summary>
         /// Sets the grid position of the player.
         /// </summary>
@@ -165,7 +195,7 @@ namespace SignalLost.Field
                 _movementProgress = 0.0f;
             }
         }
-        
+
         /// <summary>
         /// Custom drawing function for the player character.
         /// </summary>
@@ -173,24 +203,24 @@ namespace SignalLost.Field
         {
             // Get cell size
             int cellSize = _gridSystem.GetCellSize();
-            
+
             // Draw player character (simple pixel art style)
             Color playerColor = new Color(0.0f, 0.7f, 1.0f); // Cyan-blue
-            
+
             // Draw body (rectangle)
             Vector2 bodySize = new Vector2(cellSize * 0.6f, cellSize * 0.6f);
             Vector2 bodyPosition = new Vector2(-bodySize.X / 2, -bodySize.Y / 2);
             DrawRect(new Rect2(bodyPosition, bodySize), playerColor);
-            
+
             // Draw head (circle)
             float headRadius = cellSize * 0.2f;
             Vector2 headPosition = new Vector2(0, -bodySize.Y / 2 - headRadius * 0.8f);
             DrawCircle(headPosition, headRadius, playerColor);
-            
+
             // Draw direction indicator (eyes)
             Color eyeColor = new Color(0.1f, 0.1f, 0.1f); // Dark gray
             float eyeRadius = cellSize * 0.05f;
-            
+
             // Position eyes based on facing direction
             if (_facingDirection.X == 0 && _facingDirection.Y == -1) // Facing up
             {
@@ -213,6 +243,49 @@ namespace SignalLost.Field
             {
                 // Eyes on right side of head
                 DrawCircle(headPosition + new Vector2(headRadius * 0.4f, 0), eyeRadius, eyeColor);
+            }
+
+            // Draw signal strength indicator if game state is available
+            if (_gameState != null && _gridSystem != null)
+            {
+                float signalStrength = 0.0f;
+                float frequency = 90.0f;
+
+                // Check if radio is on
+                if (_gameState.IsRadioOn)
+                {
+                    // Get current frequency and signal strength
+                    frequency = _gameState.CurrentFrequency;
+
+                    // Find signal at current frequency
+                    var signalData = _gameState.FindSignalAtFrequency(frequency);
+                    if (signalData != null)
+                    {
+                        signalStrength = _gameState.CalculateSignalStrength(frequency, signalData);
+                    }
+
+                    // Draw signal strength indicator
+                    if (signalStrength > 0.0f)
+                    {
+                    // Draw signal indicator above player
+                    float indicatorSize = cellSize * 0.4f;
+                    Vector2 indicatorPosition = new Vector2(-indicatorSize / 2, -bodySize.Y / 2 - headRadius * 2 - indicatorSize);
+
+                    // Background
+                    Color bgColor = new Color(0.1f, 0.1f, 0.1f, 0.7f);
+                    DrawRect(new Rect2(indicatorPosition, new Vector2(indicatorSize, indicatorSize)), bgColor);
+
+                    // Signal strength bar
+                    Color signalColor = new Color(0.0f, 0.8f, 0.0f, 0.8f); // Green
+                    float barHeight = indicatorSize * signalStrength;
+                    Vector2 barPosition = new Vector2(indicatorPosition.X, indicatorPosition.Y + indicatorSize - barHeight);
+                    DrawRect(new Rect2(barPosition, new Vector2(indicatorSize, barHeight)), signalColor);
+
+                    // Draw frequency text
+                    DrawString(null, new Vector2(indicatorPosition.X - indicatorSize, indicatorPosition.Y - indicatorSize * 0.5f),
+                        $"{frequency:F1} MHz", HorizontalAlignment.Left, -1, 8, new Color(1.0f, 1.0f, 1.0f, 0.8f));
+                    }
+                }
             }
         }
     }
