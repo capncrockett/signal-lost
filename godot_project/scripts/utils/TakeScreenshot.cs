@@ -33,7 +33,8 @@ namespace SignalLost.Utils
             // Wait a few frames for the scene to initialize
             for (int i = 0; i < 5; i++)
             {
-                root.ProcessFrame();
+                // Process a frame manually
+                root.Process(0.016f); // Simulate a frame at 60fps
             }
             
             // Take the screenshot
