@@ -87,8 +87,8 @@ The pixel-based approach offers several advantages:
    - ✅ Player character with pixel-based rendering
    - ✅ Interactable objects
 2. ✅ Connect field exploration with radio signals
-3. ⬜ Add game progression mechanics
-4. ⬜ Implement save/load system
+3. ✅ Add game progression mechanics
+4. ✅ Implement save/load system
 
 ## Future Sprints
 
@@ -138,8 +138,8 @@ The pixel-based approach offers several advantages:
 ### In Progress
 
 1. ✅ Field exploration system
-2. ⬜ Game progression mechanics
-3. ⬜ Save/load system
+2. ✅ Game progression mechanics
+3. ✅ Save/load system
 
 ### Upcoming
 
