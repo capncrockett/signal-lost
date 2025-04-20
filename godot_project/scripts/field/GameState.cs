@@ -16,6 +16,10 @@ namespace SignalLost.Field
         private InventorySystem _inventorySystem;
         private QuestSystem _questSystem;
 
+        // Radio state
+        public bool IsRadioOn { get; private set; } = false;
+        public float CurrentFrequency { get; private set; } = 90.0f;
+
         /// <summary>
         /// Called when the node enters the scene tree.
         /// </summary>
@@ -71,6 +75,25 @@ namespace SignalLost.Field
         public QuestSystem GetQuestSystem()
         {
             return _questSystem;
+        }
+
+        /// <summary>
+        /// Toggles the radio power state.
+        /// </summary>
+        public void ToggleRadio()
+        {
+            IsRadioOn = !IsRadioOn;
+            GD.Print($"GameState: Radio power toggled to {IsRadioOn}");
+        }
+
+        /// <summary>
+        /// Sets the radio frequency.
+        /// </summary>
+        /// <param name="frequency">The new frequency</param>
+        public void SetFrequency(float frequency)
+        {
+            CurrentFrequency = Mathf.Clamp(frequency, 88.0f, 108.0f);
+            GD.Print($"GameState: Frequency set to {CurrentFrequency} MHz");
         }
     }
 }

@@ -11,7 +11,7 @@ namespace SignalLost.Tests
         private GameState _gameState;
 
         // Setup method called before each test
-        public new void Before()
+        public void Before()
         {
             // Create a mock GameState
             _gameState = new GameState();
@@ -33,7 +33,7 @@ namespace SignalLost.Tests
         }
 
         // Teardown method called after each test
-        public new void After()
+        public void After()
         {
             // Remove nodes
             _mapInterface.QueueFree();

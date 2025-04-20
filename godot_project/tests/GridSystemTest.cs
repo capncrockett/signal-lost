@@ -11,7 +11,7 @@ namespace SignalLost.Tests
     {
         private GridSystem _gridSystem;
         
-        public new void Before()
+        public void Before()
         {
             _gridSystem = new GridSystem();
             AddChild(_gridSystem);
@@ -20,7 +20,7 @@ namespace SignalLost.Tests
             _gridSystem.Initialize(10, 10);
         }
         
-        public new void After()
+        public void After()
         {
             _gridSystem.QueueFree();
             _gridSystem = null;

@@ -287,7 +287,7 @@ namespace SignalLost
         }
 
         // Generate digital noise from a provided white noise sample
-        private float GenerateDigitalNoiseFromSample(float raw)
+        private static float GenerateDigitalNoiseFromSample(float raw)
         {
             // Quantize to fewer steps for digital sound
             int steps = 8;

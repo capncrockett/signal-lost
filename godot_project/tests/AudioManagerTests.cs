@@ -11,7 +11,7 @@ namespace SignalLost.Tests
 		private AudioManager _audioManager = null;
 
 		// Called before each test
-		public new void Before()
+		public void Before()
 		{
 			try
 			{
@@ -19,8 +19,8 @@ namespace SignalLost.Tests
 				_audioManager = new AudioManager();
 				AddChild(_audioManager);
 
-				// Create audio bus indices before calling _Ready
-				SetupAudioBuses();
+                // Create audio bus indices before calling _Ready
+                SetupAudioBuses();
 
 				// Create mock audio players
 				SetupMockAudioPlayers();
@@ -55,7 +55,7 @@ namespace SignalLost.Tests
 		}
 
 		// Set up audio buses for testing
-		private void SetupAudioBuses()
+		private static void SetupAudioBuses()
 		{
 			// Make sure we have the Master bus
 			if (AudioServer.GetBusCount() == 0)
@@ -86,7 +86,7 @@ namespace SignalLost.Tests
 		}
 
 		// Called after each test
-		public new void After()
+		public void After()
 		{
 			// Clean up
 			if (_audioManager != null)

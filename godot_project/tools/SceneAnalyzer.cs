@@ -55,7 +55,7 @@ namespace SignalLost.Tools
             GD.Print("Scene analysis complete!");
         }
 
-        private List<string> FindAllSceneFiles(string rootPath)
+        private static List<string> FindAllSceneFiles(string rootPath)
         {
             var sceneFiles = new List<string>();
             var dir = DirAccess.Open(rootPath);
@@ -270,7 +270,7 @@ namespace SignalLost.Tools
             }
         }
 
-        private string GetNodeId(string path)
+        private static string GetNodeId(string path)
         {
             // Convert path to a valid mermaid node ID
             return "node_" + path.Replace(":", "_").Replace("/", "_").Replace(".", "_");

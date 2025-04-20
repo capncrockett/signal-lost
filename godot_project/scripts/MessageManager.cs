@@ -66,7 +66,7 @@ namespace SignalLost
                 var signalData = _gameState.FindSignalAtFrequency(_gameState.CurrentFrequency);
                 if (signalData != null)
                 {
-                    float signalStrength = _gameState.CalculateSignalStrength(_gameState.CurrentFrequency, signalData);
+                    float signalStrength = GameState.CalculateSignalStrength(_gameState.CurrentFrequency, signalData);
                     interference = 1.0f - signalStrength;
                 }
 

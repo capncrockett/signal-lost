@@ -59,7 +59,7 @@ namespace SignalLost
             if (signalData != null)
             {
                 // Calculate signal strength
-                float strength = _gameState.CalculateSignalStrength(frequency, signalData);
+                float strength = GameState.CalculateSignalStrength(frequency, signalData);
                 
                 // Update state
                 _signalStrength = strength;

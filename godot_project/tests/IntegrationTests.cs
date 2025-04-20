@@ -14,7 +14,7 @@ namespace SignalLost.Tests
         private PackedScene _radioTunerScene;
 
         // Called before each test
-        public new void Before()
+        public void Before()
         {
             try
             {
@@ -66,7 +66,7 @@ namespace SignalLost.Tests
         }
 
         // Set up audio buses for testing
-        private void SetupAudioBuses()
+        private static void SetupAudioBuses()
         {
             // Make sure we have the Master bus
             if (AudioServer.GetBusCount() == 0)
@@ -97,7 +97,7 @@ namespace SignalLost.Tests
         }
 
         // Create a mock RadioTuner for testing
-        private RadioTuner CreateMockRadioTuner()
+        private static RadioTuner CreateMockRadioTuner()
         {
             var radioTuner = new RadioTuner();
 
@@ -150,7 +150,7 @@ namespace SignalLost.Tests
         }
 
         // Called after each test
-        public new void After()
+        public void After()
         {
             // Clean up
             _radioTuner.QueueFree();
@@ -189,7 +189,7 @@ namespace SignalLost.Tests
                 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(signalData, "Signal should be found at frequency 91.5");
 
                 // Calculate signal strength
-                float signalStrength = _gameState.CalculateSignalStrength(_gameState.CurrentFrequency, signalData);
+                float signalStrength = GameState.CalculateSignalStrength(_gameState.CurrentFrequency, signalData);
 
                 // Verify signal strength is high when tuned correctly
                 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(signalStrength > 0.9f, "Signal strength should be high when tuned correctly");
@@ -230,54 +230,6 @@ namespace SignalLost.Tests
             GD.Print("Skipping TestRadioTunerGameStateIntegration on Mac");
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped on Mac platform");
             return;
-
-            /* Skip this test if components are not properly initialized
-            if (_gameState == null || _radioTuner == null)
-            {
-                GD.PrintErr("GameState or RadioTuner is null, skipping TestRadioTunerGameStateIntegration");
-                Pass("Test skipped due to initialization issues");
-                return;
-            }*/
-
-            try
-            {
-                // Initialize the RadioTuner
-                _radioTuner._Ready();
-
-                // Test 1: Radio power toggle
-                // Turn radio on
-                _gameState.ToggleRadio();
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(_gameState.IsRadioOn, "Radio should be on after toggling");
-
-                // Test 2: Frequency change via GameState
-                float initialFreq = 95.5f;
-                _gameState.SetFrequency(initialFreq);
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.CurrentFrequency, initialFreq,
-                    "GameState frequency should be updated");
-
-                // Test 3: Frequency change via RadioTuner
-                float changeAmount = 0.5f;
-                _radioTuner.ChangeFrequency(changeAmount);
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.CurrentFrequency, initialFreq + changeAmount,
-                    "GameState frequency should update when changed via RadioTuner");
-
-                // Test 4: Radio power toggle via RadioTuner
-                _radioTuner.TogglePower();
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse(_gameState.IsRadioOn,
-                    "GameState radio state should update when toggled via RadioTuner");
-
-                // Test 5: Radio power toggle again
-                _radioTuner.TogglePower();
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(_gameState.IsRadioOn,
-                    "GameState radio state should update when toggled via RadioTuner again");
-
-                Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "RadioTuner and GameState integration tests passed");
-            }
-            catch (Exception ex)
-            {
-                GD.PrintErr($"Error in TestRadioTunerGameStateIntegration: {ex.Message}");
-                throw; // Re-throw to fail the test
-            }
         }
 
         // Test signal discovery and message decoding
@@ -598,7 +550,7 @@ namespace SignalLost.Tests
                     if (signalData != null)
                     {
                         // Set signal strength and static intensity manually
-                        float signalStrength = _gameState.CalculateSignalStrength(_gameState.CurrentFrequency, signalData);
+                        float signalStrength = GameState.CalculateSignalStrength(_gameState.CurrentFrequency, signalData);
                         _radioTuner.Set("_signalStrength", signalStrength);
                         _radioTuner.Set("_staticIntensity", 1.0f - signalStrength);
                         _radioTuner.Set("_currentSignalId", signalData.MessageId);
@@ -711,7 +663,7 @@ namespace SignalLost.Tests
                 if (signalData != null)
                 {
                     // Calculate signal strength
-                    float strength = _gameState.CalculateSignalStrength(_gameState.CurrentFrequency, signalData);
+                    float strength = GameState.CalculateSignalStrength(_gameState.CurrentFrequency, signalData);
                     _radioTuner.Set("_signalStrength", strength);
                     _radioTuner.Set("_staticIntensity", 1.0f - strength);
                 }

@@ -526,7 +526,7 @@ namespace SignalLost
         }
 
         // Get the pixel font resource
-        private PixelFont GetPixelFont()
+        private static PixelFont GetPixelFont()
         {
             // Try to get a shared instance from the resource cache
             var font = ResourceLoader.Load<PixelFont>("res://resources/pixel_font.tres");
