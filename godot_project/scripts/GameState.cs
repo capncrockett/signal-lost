@@ -142,6 +142,25 @@ namespace SignalLost
             }
         }
 
+        /// <summary>
+        /// Clears all discovered frequencies.
+        /// </summary>
+        public void ClearDiscoveredFrequencies()
+        {
+            DiscoveredFrequencies.Clear();
+        }
+
+
+
+        /// <summary>
+        /// Sets the game progress.
+        /// </summary>
+        /// <param name="progress">The new progress value</param>
+        public void SetGameProgress(int progress)
+        {
+            GameProgress = progress;
+        }
+
         // Signals (Godot's events, not radio signals)
         [Signal]
         public delegate void FrequencyChangedEventHandler(float newFrequency);
@@ -221,6 +240,14 @@ namespace SignalLost
         // Save and load functions
         public bool SaveGame()
         {
+            // Use the SaveManager instead
+            var saveManager = GetNode<SaveManager>("/root/SaveManager");
+            if (saveManager != null)
+            {
+                return saveManager.SaveGame();
+            }
+
+            // Fallback to legacy saving if SaveManager is not available
             var saveData = new Dictionary<string, object>
             {
                 ["current_frequency"] = CurrentFrequency,
@@ -246,6 +273,14 @@ namespace SignalLost
 
         public bool LoadGame()
         {
+            // Use the SaveManager instead
+            var saveManager = GetNode<SaveManager>("/root/SaveManager");
+            if (saveManager != null)
+            {
+                return saveManager.LoadGame();
+            }
+
+            // Fallback to legacy loading if SaveManager is not available
             if (!FileAccess.FileExists("user://savegame.save"))
             {
                 return false;
