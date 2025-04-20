@@ -180,6 +180,24 @@ namespace SignalLost.Field
         }
 
         /// <summary>
+        /// Gets the current facing direction of the player.
+        /// </summary>
+        /// <returns>The current facing direction</returns>
+        public Vector2I GetFacingDirection()
+        {
+            return _facingDirection;
+        }
+
+        /// <summary>
+        /// Sets the facing direction of the player.
+        /// </summary>
+        /// <param name="direction">The new facing direction</param>
+        public void SetFacingDirection(Vector2I direction)
+        {
+            _facingDirection = direction;
+        }
+
+        /// <summary>
         /// Sets the grid position of the player.
         /// </summary>
         /// <param name="position">The new grid position</param>

@@ -1,5 +1,6 @@
 using Godot;
 using SignalLost.Utils;
+using System;
 
 namespace SignalLost
 {
@@ -11,18 +12,21 @@ namespace SignalLost
         private PixelInventoryUI _inventoryUI;
         private PixelMapInterface _mapInterface;
         private PixelQuestUI _questUI;
+        private SaveLoadMenu _saveLoadMenu;
 
         // References to UI control buttons
         private Button _radioButton;
         private Button _inventoryButton;
         private Button _mapButton;
         private Button _questButton;
+        private Button _saveLoadButton;
 
         // References to game systems
         private GameState _gameState;
         private RadioSystem _radioSystem;
         private InventorySystem _inventorySystem;
         private MapSystem _mapSystem;
+        private SaveManager _saveManager;
 
         // Called when the node enters the scene tree
         public override void _Ready()
@@ -35,24 +39,28 @@ namespace SignalLost
             _inventoryUI = GetNode<PixelInventoryUI>("PixelInventoryUI");
             _mapInterface = GetNode<PixelMapInterface>("PixelMapInterface");
             _questUI = GetNode<PixelQuestUI>("PixelQuestUI");
+            _saveLoadMenu = GetNode<SaveLoadMenu>("SaveLoadMenu");
 
             // Get references to UI control buttons
             _radioButton = GetNode<Button>("UIControls/RadioButton");
             _inventoryButton = GetNode<Button>("UIControls/InventoryButton");
             _mapButton = GetNode<Button>("UIControls/MapButton");
             _questButton = GetNode<Button>("UIControls/QuestButton");
+            _saveLoadButton = GetNode<Button>("UIControls/SaveLoadButton");
 
             // Get references to game systems
             _gameState = GetNode<GameState>("/root/GameState");
             _radioSystem = GetNode<RadioSystem>("/root/RadioSystem");
             _inventorySystem = GetNode<InventorySystem>("/root/InventorySystem");
             _mapSystem = GetNode<MapSystem>("/root/MapSystem");
+            _saveManager = GetNode<SaveManager>("/root/SaveManager");
 
             // Connect button signals
             _radioButton.Pressed += () => ShowInterface("radio");
             _inventoryButton.Pressed += () => ShowInterface("inventory");
             _mapButton.Pressed += () => ShowInterface("map");
             _questButton.Pressed += () => ShowInterface("quest");
+            _saveLoadButton.Pressed += ToggleSaveLoadMenu;
 
             // Set up keyboard shortcuts
             SetProcessInput(true);
@@ -82,8 +90,19 @@ namespace SignalLost
                 {
                     ShowInterface("quest");
                 }
+                else if (keyEvent.Keycode == Key.S)
+                {
+                    ToggleSaveLoadMenu();
+                }
                 else if (keyEvent.Keycode == Key.Escape)
                 {
+                    // If save/load menu is visible, hide it
+                    if (_saveLoadMenu.Visible)
+                    {
+                        _saveLoadMenu.Visible = false;
+                        return;
+                    }
+
                     // If any interface is visible, hide it
                     if (_inventoryUI.IsVisible() || _mapInterface.IsVisible() || _questUI.IsVisible())
                     {
@@ -101,6 +120,7 @@ namespace SignalLost
             _inventoryUI.SetVisible(false);
             _mapInterface.SetVisible(false);
             _questUI.SetVisible(false);
+            _saveLoadMenu.Visible = false;
 
             // Show the specified interface
             switch (interfaceName.ToLower())
@@ -120,10 +140,24 @@ namespace SignalLost
             }
 
             // Update button states
-            _radioButton.Disabled = interfaceName.ToLower() == "radio";
-            _inventoryButton.Disabled = interfaceName.ToLower() == "inventory";
-            _mapButton.Disabled = interfaceName.ToLower() == "map";
-            _questButton.Disabled = interfaceName.ToLower() == "quest";
+            _radioButton.Disabled = string.Equals(interfaceName, "radio", StringComparison.OrdinalIgnoreCase);
+            _inventoryButton.Disabled = string.Equals(interfaceName, "inventory", StringComparison.OrdinalIgnoreCase);
+            _mapButton.Disabled = string.Equals(interfaceName, "map", StringComparison.OrdinalIgnoreCase);
+            _questButton.Disabled = string.Equals(interfaceName, "quest", StringComparison.OrdinalIgnoreCase);
+            _saveLoadButton.Disabled = false; // Save/load button is always enabled
+        }
+
+        // Toggle the save/load menu
+        private void ToggleSaveLoadMenu()
+        {
+            // Toggle visibility
+            _saveLoadMenu.Visible = !_saveLoadMenu.Visible;
+
+            // If showing the menu, refresh the save slot list
+            if (_saveLoadMenu.Visible)
+            {
+                _saveLoadMenu.RefreshSaveSlotList();
+            }
         }
     }
 }

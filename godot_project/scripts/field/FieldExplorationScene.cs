@@ -100,7 +100,7 @@ namespace SignalLost.Field
         /// <param name="messageId">The ID of the message associated with the signal</param>
         /// <param name="strength">The strength of the signal</param>
         /// <param name="range">The range of the signal in grid cells</param>
-        private void CreateSignalSource(Vector2I position, float frequency, string messageId, float strength, float range)
+        public void CreateSignalSource(Vector2I position, float frequency, string messageId, float strength, float range)
         {
             // Create the signal source object
             var signalSource = new SignalSourceObject();
