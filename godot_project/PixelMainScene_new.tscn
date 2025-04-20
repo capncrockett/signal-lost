@@ -1,0 +1,284 @@
+[gd_scene load_steps=13 format=3 uid="uid://c8j6y8o4n8qxp"]
+
+[ext_resource type="Script" path="res://scripts/PixelMainScene.cs" id="1_main"]
+[ext_resource type="Script" path="res://scripts/PixelRadioInterface.cs" id="2_radio"]
+[ext_resource type="Script" path="res://scripts/PixelInventoryUI.cs" id="3_inventory"]
+[ext_resource type="Script" path="res://scripts/PixelMapInterface.cs" id="4_map"]
+[ext_resource type="Script" path="res://scripts/PixelQuestUI.cs" id="5_quest"]
+[ext_resource type="Script" path="res://scripts/SaveLoadMenu.cs" id="6_save"]
+[ext_resource type="Script" path="res://scripts/ProgressionUI.cs" id="7_progression"]
+[ext_resource type="Script" path="res://scripts/PixelPanel.cs" id="8_panel"]
+[ext_resource type="Script" path="res://scripts/PixelButton.cs" id="9_button"]
+[ext_resource type="Script" path="res://scripts/PixelSlider.cs" id="10_slider"]
+[ext_resource type="Script" path="res://scripts/PixelProgressBar.cs" id="11_progress"]
+[ext_resource type="Resource" uid="uid://b8j6y8o4n8qxp" path="res://resources/pixel_theme.tres" id="12_theme"]
+
+[node name="PixelMainScene" type="Node"]
+script = ExtResource("1_main")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.05, 1.0)
+
+[node name="PixelRadioInterface" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_radio")
+
+[node name="PixelInventoryUI" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_inventory")
+
+[node name="PixelMapInterface" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_map")
+
+[node name="PixelQuestUI" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_quest")
+
+[node name="UIControls" type="HBoxContainer" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+
+[node name="RadioButton" type="Control" parent="UIControls"]
+custom_minimum_size = Vector2(100, 30)
+layout_mode = 2
+script = ExtResource("9_button")
+Text = "Radio"
+
+[node name="InventoryButton" type="Control" parent="UIControls"]
+custom_minimum_size = Vector2(100, 30)
+layout_mode = 2
+script = ExtResource("9_button")
+Text = "Inventory"
+
+[node name="MapButton" type="Control" parent="UIControls"]
+custom_minimum_size = Vector2(100, 30)
+layout_mode = 2
+script = ExtResource("9_button")
+Text = "Map"
+
+[node name="QuestButton" type="Control" parent="UIControls"]
+custom_minimum_size = Vector2(100, 30)
+layout_mode = 2
+script = ExtResource("9_button")
+Text = "Quests"
+
+[node name="SaveLoadButton" type="Control" parent="UIControls"]
+custom_minimum_size = Vector2(100, 30)
+layout_mode = 2
+script = ExtResource("9_button")
+Text = "Save/Load"
+
+[node name="ProgressionButton" type="Control" parent="UIControls"]
+custom_minimum_size = Vector2(100, 30)
+layout_mode = 2
+script = ExtResource("9_button")
+Text = "Progress"
+
+[node name="SaveLoadMenu" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("8_panel")
+Title = "Save/Load Game"
+ShowTitle = true
+ShowCloseButton = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SaveLoadMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -150.0
+offset_right = 150.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SaveSlotList" type="ItemList" parent="SaveLoadMenu/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+allow_reselect = true
+auto_height = true
+item_count = 1
+item_0/text = "autosave"
+
+[node name="StatusLabel" type="Label" parent="SaveLoadMenu/VBoxContainer"]
+layout_mode = 2
+text = "Select a save slot"
+horizontal_alignment = 1
+
+[node name="ButtonContainer" type="HBoxContainer" parent="SaveLoadMenu/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="SaveButton" type="Control" parent="SaveLoadMenu/VBoxContainer/ButtonContainer"]
+custom_minimum_size = Vector2(100, 30)
+layout_mode = 2
+script = ExtResource("9_button")
+Text = "Save"
+
+[node name="LoadButton" type="Control" parent="SaveLoadMenu/VBoxContainer/ButtonContainer"]
+custom_minimum_size = Vector2(100, 30)
+layout_mode = 2
+script = ExtResource("9_button")
+Text = "Load"
+
+[node name="CloseButton" type="Control" parent="SaveLoadMenu/VBoxContainer/ButtonContainer"]
+custom_minimum_size = Vector2(100, 30)
+layout_mode = 2
+script = ExtResource("9_button")
+Text = "Close"
+
+[node name="ProgressionUI" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("8_panel")
+Title = "Game Progression"
+ShowTitle = true
+ShowCloseButton = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ProgressionUI"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="StageLabel" type="Label" parent="ProgressionUI/VBoxContainer"]
+layout_mode = 2
+text = "Stage: Beginning"
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="Control" parent="ProgressionUI/VBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+script = ExtResource("11_progress")
+Value = 0.1
+ShowPercentage = true
+Label = "Progress"
+
+[node name="DescriptionLabel" type="Label" parent="ProgressionUI/VBoxContainer"]
+layout_mode = 2
+text = "You've just arrived at the emergency bunker. Your radio is damaged and needs repair."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="ObjectiveLabel" type="Label" parent="ProgressionUI/VBoxContainer"]
+layout_mode = 2
+text = "Next Objective: Repair your radio by finding the necessary components."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="StatusPanel" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 120.0
+grow_horizontal = 0
+script = ExtResource("8_panel")
+Title = "Status"
+ShowTitle = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="StatusPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 30.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HealthBar" type="Control" parent="StatusPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+script = ExtResource("11_progress")
+Value = 1.0
+Label = "Health"
+
+[node name="HungerBar" type="Control" parent="StatusPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+script = ExtResource("11_progress")
+Value = 0.8
+Label = "Hunger"
+
+[node name="ThirstBar" type="Control" parent="StatusPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+script = ExtResource("11_progress")
+Value = 0.7
+Label = "Thirst"
+
+[connection signal="Pressed" from="UIControls/RadioButton" to="." method="_on_radio_button_pressed"]
+[connection signal="Pressed" from="UIControls/InventoryButton" to="." method="_on_inventory_button_pressed"]
+[connection signal="Pressed" from="UIControls/MapButton" to="." method="_on_map_button_pressed"]
+[connection signal="Pressed" from="UIControls/QuestButton" to="." method="_on_quest_button_pressed"]
+[connection signal="Pressed" from="UIControls/SaveLoadButton" to="." method="_on_save_load_button_pressed"]
+[connection signal="Pressed" from="UIControls/ProgressionButton" to="." method="_on_progression_button_pressed"]
+[connection signal="CloseRequested" from="SaveLoadMenu" to="." method="_on_save_load_menu_close_requested"]
+[connection signal="Pressed" from="SaveLoadMenu/VBoxContainer/ButtonContainer/SaveButton" to="SaveLoadMenu" method="_on_save_button_pressed"]
+[connection signal="Pressed" from="SaveLoadMenu/VBoxContainer/ButtonContainer/LoadButton" to="SaveLoadMenu" method="_on_load_button_pressed"]
+[connection signal="Pressed" from="SaveLoadMenu/VBoxContainer/ButtonContainer/CloseButton" to="SaveLoadMenu" method="_on_close_button_pressed"]
+[connection signal="CloseRequested" from="ProgressionUI" to="." method="_on_progression_ui_close_requested"]
