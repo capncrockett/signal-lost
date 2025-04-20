@@ -261,7 +261,7 @@ namespace SignalLost.Field
                     var signalData = _gameState.FindSignalAtFrequency(frequency);
                     if (signalData != null)
                     {
-                        signalStrength = _gameState.CalculateSignalStrength(frequency, signalData);
+                        signalStrength = SignalLost.GameState.CalculateSignalStrength(frequency, signalData);
                     }
 
                     // Draw signal strength indicator

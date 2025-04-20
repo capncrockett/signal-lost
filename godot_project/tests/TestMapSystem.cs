@@ -39,7 +39,7 @@ namespace SignalLost.Tests
         }
 
         // Initialize test locations
-        private void InitializeLocations()
+        private static void InitializeLocations()
         {
             // Clear existing locations first to avoid duplicate key errors
             _locations.Clear();
@@ -109,7 +109,7 @@ namespace SignalLost.Tests
         }
 
         // Initialize connections between locations
-        private void InitializeConnections()
+        private static void InitializeConnections()
         {
             // Clear existing connections first to avoid duplicate key errors
             _connections.Clear();
@@ -149,7 +149,7 @@ namespace SignalLost.Tests
         }
 
         // Get a location by ID
-        public MapLocation GetLocation(string locationId)
+        public static MapLocation GetLocation(string locationId)
         {
             if (_locations.ContainsKey(locationId))
             {
@@ -166,7 +166,7 @@ namespace SignalLost.Tests
         }
 
         // Get all locations
-        public List<MapLocation> GetAllLocations()
+        public static List<MapLocation> GetAllLocations()
         {
             List<MapLocation> result = new List<MapLocation>();
 
@@ -209,7 +209,7 @@ namespace SignalLost.Tests
         }
 
         // Discover a location
-        public bool DiscoverLocation(string locationId)
+        public static bool DiscoverLocation(string locationId)
         {
             if (_locations.ContainsKey(locationId))
             {

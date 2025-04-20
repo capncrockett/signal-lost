@@ -17,7 +17,7 @@ namespace SignalLost.Tests
 		private const float MaxFrequency = 108.0f;
 
 		// Called before each test
-		public new void Before()
+		public void Before()
 		{
 			try
 			{
@@ -60,7 +60,7 @@ namespace SignalLost.Tests
 		}
 
 		// Create a mock RadioTuner for testing
-		private RadioTuner CreateMockRadioTuner()
+		private static RadioTuner CreateMockRadioTuner()
 		{
 			var radioTuner = new RadioTuner();
 
@@ -120,7 +120,7 @@ namespace SignalLost.Tests
 		}
 
 		// Called after each test
-		public new void After()
+		public void After()
 		{
 			// Clean up
 			_radioTuner.QueueFree();
@@ -262,7 +262,7 @@ namespace SignalLost.Tests
 				if (signalData != null)
 				{
 					// Calculate signal strength
-					float signalStrength = _gameState.CalculateSignalStrength(_gameState.CurrentFrequency, signalData);
+					float signalStrength = GameState.CalculateSignalStrength(_gameState.CurrentFrequency, signalData);
 
 					// Set values in RadioTuner
 					_radioTuner.Set("_currentSignalId", signalData.MessageId);
@@ -429,65 +429,6 @@ namespace SignalLost.Tests
 			GD.Print("Skipping TestRadioOffBehavior on Mac");
 			Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(true, "Test skipped on Mac platform");
 			return;
-
-			/* Skip this test if components are not properly initialized
-			if (_gameState == null || _radioTuner == null)
-			{
-				GD.PrintErr("GameState or RadioTuner is null, skipping TestRadioOffBehavior");
-				Pass("Test skipped due to initialization issues");
-				return;
-			}*/
-
-			try
-			{
-				// Initialize the RadioTuner
-				_radioTuner._Ready();
-
-				// Set the GameState reference directly
-				_radioTuner.Set("_gameState", _gameState);
-
-				// Add debug output
-				GD.Print($"GameState reference set in TestRadioOffBehavior: {_gameState != null}");
-				GD.Print($"Initial radio state: {_gameState.IsRadioOn}");
-
-				// Turn radio on initially
-				_gameState.ToggleRadio();
-
-				// Notify the RadioTuner that the radio was toggled
-				_radioTuner.OnRadioToggled(true);
-
-				// Start scanning (set the state manually)
-				_radioTuner.Set("_isScanning", true);
-
-				// Turn radio off
-				_radioTuner.TogglePower();
-
-				// Notify the RadioTuner that the radio was toggled
-				_radioTuner.OnRadioToggled(false);
-
-				// Add debug output
-				GD.Print($"After TogglePower in TestRadioOffBehavior: {_gameState.IsRadioOn}");
-
-				// Set scanning state manually (this would normally be done in the RadioTuner.OnRadioToggled method)
-				_radioTuner.Set("_isScanning", false);
-
-				// Check if scanning stopped
-				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsFalse((bool)_radioTuner.Get("_isScanning"), "Scanning should stop when radio is turned off");
-
-				// Try to change frequency when radio is off
-				float initialFreq = _gameState.CurrentFrequency;
-				GD.Print($"Initial frequency before change: {initialFreq}");
-				_radioTuner.ChangeFrequency(0.1f);
-				GD.Print($"After ChangeFrequency: {_gameState.CurrentFrequency}");
-
-				// Frequency should still change even when radio is off
-				Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(_gameState.CurrentFrequency, initialFreq + 0.1f, "Frequency should change even when radio is off");
-			}
-			catch (Exception ex)
-			{
-				GD.PrintErr($"Error in TestRadioOffBehavior: {ex.Message}");
-				throw; // Re-throw to fail the test
-			}
 		}
 	}
 }

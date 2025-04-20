@@ -10,7 +10,7 @@ namespace SignalLost.Tests
         private GameState _gameState = null;
 
         // Called before each test
-        public new void Before()
+        public void Before()
         {
             // Create a new instance of the GameState
             _gameState = new GameState();
@@ -19,7 +19,7 @@ namespace SignalLost.Tests
         }
 
         // Called after each test
-        public new void After()
+        public void After()
         {
             // Clean up
             _gameState.QueueFree();
@@ -114,9 +114,9 @@ namespace SignalLost.Tests
             var signal = _gameState.FindSignalAtFrequency(signalFrequency);
 
             // Act
-            float exactStrength = _gameState.CalculateSignalStrength(signalFrequency, signal);
-            float offsetStrength = _gameState.CalculateSignalStrength(signalFrequency + 0.1f, signal);
-            float farStrength = _gameState.CalculateSignalStrength(signalFrequency + 1.0f, signal);
+            float exactStrength = GameState.CalculateSignalStrength(signalFrequency, signal);
+            float offsetStrength = GameState.CalculateSignalStrength(signalFrequency + 0.1f, signal);
+            float farStrength = GameState.CalculateSignalStrength(signalFrequency + 1.0f, signal);
 
             // Assert
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(exactStrength, 1.0f, "Signal strength should be maximum when tuned exactly");
@@ -180,8 +180,8 @@ namespace SignalLost.Tests
             float frequency2 = 95.0f;
 
             // Act
-            float intensity1 = _gameState.GetStaticIntensity(frequency1);
-            float intensity2 = _gameState.GetStaticIntensity(frequency2);
+            float intensity1 = GameState.GetStaticIntensity(frequency1);
+            float intensity2 = GameState.GetStaticIntensity(frequency2);
 
             // Assert
             Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(intensity1 > 0.0f, "Static intensity should be greater than zero");

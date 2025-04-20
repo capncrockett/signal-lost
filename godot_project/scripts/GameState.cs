@@ -98,7 +98,7 @@ namespace SignalLost
             return null;
         }
 
-        public float CalculateSignalStrength(float freq, SignalData signalData)
+        public static float CalculateSignalStrength(float freq, SignalData signalData)
         {
             float distance = Math.Abs(freq - signalData.Frequency);
             float maxDistance = signalData.Bandwidth;
@@ -115,7 +115,7 @@ namespace SignalLost
             }
         }
 
-        public float GetStaticIntensity(float freq)
+        public static float GetStaticIntensity(float freq)
         {
             // Generate a static intensity based on the frequency
             // This creates "dead zones" and "noisy areas" on the radio spectrum

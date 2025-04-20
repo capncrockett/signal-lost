@@ -576,7 +576,7 @@ namespace SignalLost
         }
 
         // Get a color for an item based on its category
-        private Color GetItemColor(string category)
+        private static Color GetItemColor(string category)
         {
             switch (category.ToLower())
             {

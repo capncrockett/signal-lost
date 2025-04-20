@@ -13,7 +13,7 @@ namespace SignalLost.Tests
         private SignalSourceObject _testSignalSource;
         private GridSystem _gridSystem;
 
-        public new void Before()
+        public void Before()
         {
             // Create a grid system
             _gridSystem = new GridSystem();
@@ -34,7 +34,7 @@ namespace SignalLost.Tests
             AddChild(_testSignalSource);
         }
 
-        public new void After()
+        public void After()
         {
             _gridSystem.QueueFree();
             _gridSystem = null;

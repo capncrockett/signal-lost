@@ -242,7 +242,7 @@ namespace SignalLost.Tests
         }
 
         // Assertion methods
-        protected void AssertTrue(bool condition, string message = null)
+        protected static void AssertTrue(bool condition, string message = null)
         {
             if (!condition)
             {
@@ -251,7 +251,7 @@ namespace SignalLost.Tests
             }
         }
 
-        protected void AssertFalse(bool condition, string message = null)
+        protected static void AssertFalse(bool condition, string message = null)
         {
             if (condition)
             {
@@ -260,7 +260,7 @@ namespace SignalLost.Tests
             }
         }
 
-        protected void AssertEqual<T>(T actual, T expected, string message = null)
+        protected static void AssertEqual<T>(T actual, T expected, string message = null)
         {
             if (!actual.Equals(expected))
             {
@@ -269,7 +269,7 @@ namespace SignalLost.Tests
             }
         }
 
-        protected void AssertNotNull(object obj, string message = null)
+        protected static void AssertNotNull(object obj, string message = null)
         {
             if (obj == null)
             {
