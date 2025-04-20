@@ -270,5 +270,11 @@ namespace SignalLost
             GD.Print($"GetConnectedLocations - Returning {connectedLocations.Count} connected locations");
             return connectedLocations;
         }
+
+        // Set GameState reference (for testing)
+        public void SetGameState(GameState gameState)
+        {
+            _gameState = gameState;
+        }
     }
 }

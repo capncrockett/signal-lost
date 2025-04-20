@@ -373,5 +373,11 @@ namespace SignalLost
         {
             return _maxInventorySize;
         }
+
+        // Set GameState reference (for testing)
+        public void SetGameState(GameState gameState)
+        {
+            _gameState = gameState;
+        }
     }
 }

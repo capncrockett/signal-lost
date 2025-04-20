@@ -96,5 +96,13 @@ namespace SignalLost
             };
             timer.Start();
         }
+
+        /// <summary>
+        /// Set ProgressionManager reference (for testing)
+        /// </summary>
+        public void SetProgressionManager(GameProgressionManager progressionManager)
+        {
+            _progressionManager = progressionManager;
+        }
     }
 }

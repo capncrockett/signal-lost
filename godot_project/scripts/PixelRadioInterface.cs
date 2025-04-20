@@ -578,5 +578,17 @@ namespace SignalLost
         {
             return Visible;
         }
+
+        // Set GameState reference (for testing)
+        public void SetGameState(GameState gameState)
+        {
+            _gameState = gameState;
+        }
+
+        // Set RadioSystem reference (for testing)
+        public void SetRadioSystem(RadioSystem radioSystem)
+        {
+            _radioSystem = radioSystem;
+        }
     }
 }
