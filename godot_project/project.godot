@@ -25,6 +25,7 @@ InventorySystem="*res://scripts/InventorySystem.cs"
 QuestSystem="*res://scripts/QuestSystem.cs"
 RadioSystem="*res://scripts/RadioSystem.cs"
 SaveManager="*res://scripts/SaveManager.cs"
+GameProgressionManager="*res://scripts/GameProgressionManager.cs"
 
 [display]
 

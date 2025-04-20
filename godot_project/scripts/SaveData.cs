@@ -18,19 +18,24 @@ namespace SignalLost
         public string CurrentLocation { get; set; } = "bunker";
         public List<string> Inventory { get; set; } = new List<string>();
         public int GameProgress { get; set; } = 0;
-        
+
         // Messages
         public Dictionary<string, MessageInfo> Messages { get; set; } = new Dictionary<string, MessageInfo>();
-        
+
         // Field exploration state
         public Vector2I PlayerPosition { get; set; } = new Vector2I(1, 1);
         public Vector2I PlayerFacingDirection { get; set; } = new Vector2I(0, 1);
         public List<SignalSourceInfo> SignalSources { get; set; } = new List<SignalSourceInfo>();
-        
+
+        // Progression data
+        public int ProgressionStage { get; set; } = 0;
+        public List<string> CompletedQuests { get; set; } = new List<string>();
+        public List<string> DiscoveredLocations { get; set; } = new List<string>();
+
         // Metadata
         public string Timestamp { get; set; } = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         public string GameVersion { get; set; } = "1.0.0";
-        
+
         /// <summary>
         /// Represents a message in the save data.
         /// </summary>
@@ -41,7 +46,7 @@ namespace SignalLost
             public string Content { get; set; }
             public bool Decoded { get; set; }
         }
-        
+
         /// <summary>
         /// Represents a signal source in the save data.
         /// </summary>

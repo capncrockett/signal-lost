@@ -165,6 +165,12 @@ namespace SignalLost
             return false;
         }
 
+        // Check if a location is discovered
+        public bool IsLocationDiscovered(string locationId)
+        {
+            return _locations.ContainsKey(locationId) && _locations[locationId].IsDiscovered;
+        }
+
         // Change the current location
         public bool ChangeLocation(string locationId)
         {
