@@ -5,6 +5,7 @@ namespace SignalLost.UI
 {
     /// <summary>
     /// Defines a consistent visual theme for the game's pixel-based UI.
+    /// This theme system provides a centralized way to manage colors, dimensions, and visual effects.
     /// </summary>
     [GlobalClass]
     public partial class PixelTheme : Resource
@@ -18,7 +19,7 @@ namespace SignalLost.UI
         [Export] public Color BorderColor { get; set; } = new Color(0.2f, 0.2f, 0.2f, 1.0f);       // Border color (gray)
         [Export] public Color TextColor { get; set; } = new Color(0.9f, 0.9f, 0.9f, 1.0f);         // Text color (white)
         [Export] public Color DisabledColor { get; set; } = new Color(0.3f, 0.3f, 0.3f, 1.0f);     // Disabled color (gray)
-        
+
         // UI element colors
         [Export] public Color ButtonColor { get; set; } = new Color(0.2f, 0.2f, 0.2f, 1.0f);
         [Export] public Color ButtonHighlightColor { get; set; } = new Color(0.3f, 0.3f, 0.3f, 1.0f);
@@ -27,14 +28,14 @@ namespace SignalLost.UI
         [Export] public Color SliderColor { get; set; } = new Color(0.0f, 0.6f, 0.0f, 1.0f);
         [Export] public Color ProgressBarColor { get; set; } = new Color(0.0f, 0.7f, 0.0f, 1.0f);
         [Export] public Color ProgressBarBgColor { get; set; } = new Color(0.1f, 0.1f, 0.1f, 1.0f);
-        
+
         // Visual effects
         [Export] public Color ScanlineColor { get; set; } = new Color(0.0f, 0.0f, 0.0f, 0.2f);
         [Export] public float NoiseIntensity { get; set; } = 0.05f;
         [Export] public bool EnableScanlines { get; set; } = true;
         [Export] public bool EnableScreenFlicker { get; set; } = true;
         [Export] public bool EnablePixelSnapping { get; set; } = true;
-        
+
         // Dimensions
         [Export] public int BorderWidth { get; set; } = 1;
         [Export] public int CornerRadius { get; set; } = 0; // 0 for sharp corners, >0 for rounded
@@ -42,16 +43,16 @@ namespace SignalLost.UI
         [Export] public int LineSpacing { get; set; } = 2;
         [Export] public int ButtonPadding { get; set; } = 10;
         [Export] public int PanelPadding { get; set; } = 20;
-        
+
         // Animation
         [Export] public float TypewriterSpeed { get; set; } = 0.05f;
         [Export] public float TypewriterSpeedVariation { get; set; } = 0.02f;
         [Export] public float CursorBlinkSpeed { get; set; } = 0.5f;
         [Export] public float TransitionSpeed { get; set; } = 0.3f;
-        
+
         // Singleton instance
         private static PixelTheme _instance;
-        
+
         /// <summary>
         /// Gets the singleton instance of the PixelTheme.
         /// </summary>
@@ -63,18 +64,18 @@ namespace SignalLost.UI
                 {
                     // Try to load from resources
                     _instance = ResourceLoader.Load<PixelTheme>("res://resources/pixel_theme.tres");
-                    
+
                     // If not found, create a new instance
                     if (_instance == null)
                     {
                         _instance = new PixelTheme();
                     }
                 }
-                
+
                 return _instance;
             }
         }
-        
+
         /// <summary>
         /// Applies a color variation to simulate screen flicker.
         /// </summary>
@@ -85,13 +86,13 @@ namespace SignalLost.UI
         {
             if (!EnableScreenFlicker)
                 return baseColor;
-                
+
             Random random = new Random();
             float flickerAmount = (float)random.NextDouble() * intensity;
-            
+
             if (random.NextDouble() < 0.5)
                 flickerAmount = -flickerAmount;
-                
+
             return new Color(
                 Mathf.Clamp(baseColor.R + flickerAmount, 0, 1),
                 Mathf.Clamp(baseColor.G + flickerAmount, 0, 1),
@@ -99,7 +100,7 @@ namespace SignalLost.UI
                 baseColor.A
             );
         }
-        
+
         /// <summary>
         /// Draws scanlines on a Control node.
         /// </summary>
@@ -109,16 +110,16 @@ namespace SignalLost.UI
         {
             if (!EnableScanlines)
                 return;
-                
+
             int scanlineSpacing = 4; // Space between scanlines
             Vector2 size = control.Size;
-            
+
             for (int y = (int)offset % scanlineSpacing; y < size.Y; y += scanlineSpacing)
             {
                 control.DrawRect(new Rect2(0, y, size.X, 1), ScanlineColor);
             }
         }
-        
+
         /// <summary>
         /// Draws a pixel-style button.
         /// </summary>
@@ -132,19 +133,19 @@ namespace SignalLost.UI
             // Determine button colors based on state
             Color bgColor = isDisabled ? DisabledColor : (isHighlighted ? ButtonHighlightColor : ButtonColor);
             Color textCol = isDisabled ? DisabledColor : ButtonTextColor;
-            
+
             // Draw button background
             control.DrawRect(rect, bgColor);
-            
+
             // Draw button border
             control.DrawRect(rect, BorderColor, false, BorderWidth);
-            
+
             // Draw button text
-            control.DrawString(ThemeDB.FallbackFont, 
+            control.DrawString(ThemeDB.FallbackFont,
                 new Vector2(rect.Position.X + rect.Size.X / 2, rect.Position.Y + rect.Size.Y / 2 + 6),
                 text, HorizontalAlignment.Center, -1, 14, textCol);
         }
-        
+
         /// <summary>
         /// Draws a pixel-style panel.
         /// </summary>
@@ -154,11 +155,11 @@ namespace SignalLost.UI
         {
             // Draw panel background
             control.DrawRect(rect, PanelColor);
-            
+
             // Draw panel border
             control.DrawRect(rect, BorderColor, false, BorderWidth);
         }
-        
+
         /// <summary>
         /// Draws a pixel-style progress bar.
         /// </summary>
@@ -170,10 +171,10 @@ namespace SignalLost.UI
         {
             // Clamp value to 0-1 range
             value = Mathf.Clamp(value, 0, 1);
-            
+
             // Draw background
             control.DrawRect(rect, ProgressBarBgColor);
-            
+
             // Draw progress
             if (vertical)
             {
@@ -195,11 +196,11 @@ namespace SignalLost.UI
                     rect.Size.Y
                 ), ProgressBarColor);
             }
-            
+
             // Draw border
             control.DrawRect(rect, BorderColor, false, BorderWidth);
         }
-        
+
         /// <summary>
         /// Draws a pixel-style slider.
         /// </summary>
@@ -211,14 +212,14 @@ namespace SignalLost.UI
         {
             // Clamp value to 0-1 range
             value = Mathf.Clamp(value, 0, 1);
-            
+
             // Draw background
             control.DrawRect(rect, ProgressBarBgColor);
-            
+
             // Calculate handle position
             float handleSize = vertical ? rect.Size.X : rect.Size.Y;
             Vector2 handlePos;
-            
+
             if (vertical)
             {
                 float availableHeight = rect.Size.Y - handleSize;
@@ -231,13 +232,13 @@ namespace SignalLost.UI
                 float xPos = rect.Position.X + availableWidth * value;
                 handlePos = new Vector2(xPos, rect.Position.Y);
             }
-            
+
             // Draw handle
             control.DrawRect(new Rect2(
                 handlePos,
                 new Vector2(vertical ? rect.Size.X : handleSize, vertical ? handleSize : rect.Size.Y)
             ), SliderColor);
-            
+
             // Draw border
             control.DrawRect(rect, BorderColor, false, BorderWidth);
         }
