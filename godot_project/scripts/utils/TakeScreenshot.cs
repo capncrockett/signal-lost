@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.IO;
+using System.Threading;
 
 namespace SignalLost.Utils
 {
@@ -30,12 +31,8 @@ namespace SignalLost.Utils
             
             root.Root.AddChild(mainInstance);
             
-            // Wait a few frames for the scene to initialize
-            for (int i = 0; i < 5; i++)
-            {
-                // Process a frame manually
-                root.Process(0.016f); // Simulate a frame at 60fps
-            }
+            // Wait a moment for the scene to initialize
+            Thread.Sleep(500); // Wait 500ms
             
             // Take the screenshot
             var screenshotTaker = new ScreenshotTaker();
