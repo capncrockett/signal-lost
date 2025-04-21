@@ -67,46 +67,29 @@ namespace SignalLost
                 return;
             }
 
-            // Clear existing locations
-            mapSystem.ClearLocations();
-
-            // Add some sample locations
-            mapSystem.AddLocation("location1", "Base Camp", new Vector2(0, 0), "shelter");
-            mapSystem.AddLocation("location2", "Forest", new Vector2(100, -50), "standard");
-            mapSystem.AddLocation("location3", "Mountain", new Vector2(200, -100), "standard");
-            mapSystem.AddLocation("location4", "Cave", new Vector2(150, 50), "danger");
-            mapSystem.AddLocation("location5", "Radio Tower", new Vector2(50, 100), "signal_source");
-            mapSystem.AddLocation("location6", "Lake", new Vector2(-50, 50), "standard");
-            mapSystem.AddLocation("location7", "Abandoned Building", new Vector2(-100, -50), "danger");
-            mapSystem.AddLocation("location8", "Signal Source", new Vector2(-150, -100), "signal_source");
-
-            // Add connections between locations
-            mapSystem.AddConnection("location1", "location2");
-            mapSystem.AddConnection("location1", "location5");
-            mapSystem.AddConnection("location1", "location6");
-            mapSystem.AddConnection("location2", "location3");
-            mapSystem.AddConnection("location2", "location4");
-            mapSystem.AddConnection("location3", "location4");
-            mapSystem.AddConnection("location5", "location4");
-            mapSystem.AddConnection("location5", "location6");
-            mapSystem.AddConnection("location6", "location7");
-            mapSystem.AddConnection("location7", "location8");
-
-            // Discover all locations for demonstration
-            mapSystem.DiscoverLocation("location1");
-            mapSystem.DiscoverLocation("location2");
-            mapSystem.DiscoverLocation("location3");
-            mapSystem.DiscoverLocation("location4");
-            mapSystem.DiscoverLocation("location5");
-            mapSystem.DiscoverLocation("location6");
-            mapSystem.DiscoverLocation("location7");
-            mapSystem.DiscoverLocation("location8");
-
-            // Set current location
-            var gameState = GetNode<GameState>("/root/GameState");
-            if (gameState != null)
+            // We'll use the existing map system's locations
+            // Just discover all locations for demonstration
+            var locations = mapSystem.GetAllLocations();
+            foreach (var location in locations.Values)
             {
-                gameState.SetCurrentLocation("location1");
+                mapSystem.DiscoverLocation(location.Id);
+            }
+
+            // Set current location to the first discovered location
+            var gameState = GetNode<GameState>("/root/GameState");
+            if (gameState != null && locations.Count > 0)
+            {
+                // Find the first location (usually the bunker)
+                string firstLocationId = "bunker";
+                if (locations.ContainsKey(firstLocationId))
+                {
+                    gameState.SetCurrentLocation(firstLocationId);
+                }
+                else if (locations.Count > 0)
+                {
+                    // Just use the first location in the dictionary
+                    gameState.SetCurrentLocation(locations.Keys.GetEnumerator().Current);
+                }
             }
         }
 

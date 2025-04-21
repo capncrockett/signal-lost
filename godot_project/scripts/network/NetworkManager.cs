@@ -265,8 +265,19 @@ namespace SignalLost.Network
             var radioSystem = GetNode<RadioSystem>("/root/RadioSystem");
             if (radioSystem != null)
             {
-                // Add or update the signal
-                radioSystem.AddOrUpdateSignal(signalId, frequency, strength);
+                // Create a new radio signal
+                var signal = new RadioSignal
+                {
+                    Id = signalId,
+                    Frequency = frequency,
+                    Strength = strength,
+                    Message = $"Shared signal at {frequency} MHz",
+                    Type = RadioSignalType.Morse,
+                    IsActive = true
+                };
+
+                // Add the signal
+                radioSystem.AddSignal(signal);
             }
         }
 
