@@ -166,6 +166,33 @@ namespace SignalLost
                 _isPowerOn = _gameState.IsRadioOn;
                 _isScanning = false; // TODO: Add scanning state to RadioSystem
                 _signalStrength = _radioSystem.GetSignalStrength();
+
+                // Update audio based on state
+                var audioManager = GetNode<AudioManager>("/root/AudioManager");
+                if (audioManager != null)
+                {
+                    if (_isPowerOn)
+                    {
+                        if (_signalStrength > 0.1f)
+                        {
+                            // Play signal with appropriate volume
+                            audioManager.PlaySignal(_currentFrequency * 10, _signalStrength, "sine", _signalStrength > 0.7f);
+                            audioManager.PlayStaticNoise(1.0f - _signalStrength);
+                        }
+                        else
+                        {
+                            // Just play static
+                            audioManager.StopSignal();
+                            audioManager.PlayStaticNoise(1.0f);
+                        }
+                    }
+                    else
+                    {
+                        // Stop all audio when radio is off
+                        audioManager.StopSignal();
+                        audioManager.StopStaticNoise();
+                    }
+                }
             }
 
             // Calculate knob rotation based on frequency
@@ -355,8 +382,40 @@ namespace SignalLost
             // Draw meter fill
             if (_isPowerOn)
             {
+                Color meterColor = SignalMeterColor;
+
+                // Change color based on signal strength
+                if (_signalStrength > 0.7f)
+                {
+                    // Strong signal - bright green
+                    meterColor = new Color(0.0f, 1.0f, 0.0f, 1.0f);
+                }
+                else if (_signalStrength > 0.3f)
+                {
+                    // Medium signal - yellow-green
+                    meterColor = new Color(0.5f, 0.8f, 0.0f, 1.0f);
+                }
+                else if (_signalStrength > 0.1f)
+                {
+                    // Weak signal - yellow
+                    meterColor = new Color(0.8f, 0.8f, 0.0f, 1.0f);
+                }
+                else
+                {
+                    // No signal - gray
+                    meterColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+                }
+
                 float fillWidth = meterWidth * _signalStrength;
-                DrawRect(new Rect2(meterX, meterY, fillWidth, meterHeight), SignalMeterColor);
+                DrawRect(new Rect2(meterX, meterY, fillWidth, meterHeight), meterColor);
+
+                // Add pulsing effect for strong signals
+                if (_signalStrength > 0.7f)
+                {
+                    float pulseIntensity = (float)Mathf.Sin(Time.GetTicksMsec() / 200.0) * 0.2f + 0.8f;
+                    DrawRect(new Rect2(meterX, meterY, fillWidth, meterHeight),
+                        new Color(meterColor.R, meterColor.G, meterColor.B, pulseIntensity));
+                }
             }
 
             // Draw meter border
@@ -456,6 +515,16 @@ namespace SignalLost
                         if (_powerButtonRect.HasPoint(mousePos))
                         {
                             _gameState?.ToggleRadio();
+
+                            // Play power button sound
+                            var audioManager = GetNode<AudioManager>("/root/AudioManager");
+                            if (audioManager != null)
+                            {
+                                if (_gameState.IsRadioOn)
+                                    audioManager.PlaySquelchOn();
+                                else
+                                    audioManager.PlaySquelchOff();
+                            }
                         }
                         else if (_scanButtonRect.HasPoint(mousePos))
                         {
@@ -465,20 +534,36 @@ namespace SignalLost
                         else if (_tuneDownButtonRect.HasPoint(mousePos))
                         {
                             ChangeFrequency(-0.1f);
+
+                            // Play button click sound
+                            var audioManager = GetNode<AudioManager>("/root/AudioManager");
+                            audioManager?.PlayEffect("click");
                         }
                         else if (_tuneUpButtonRect.HasPoint(mousePos))
                         {
                             ChangeFrequency(0.1f);
+
+                            // Play button click sound
+                            var audioManager = GetNode<AudioManager>("/root/AudioManager");
+                            audioManager?.PlayEffect("click");
                         }
                         else if (_knobRect.HasPoint(mousePos))
                         {
                             _isDraggingKnob = true;
                             _lastMousePosition = mousePos;
+
+                            // Play knob interaction sound
+                            var audioManager = GetNode<AudioManager>("/root/AudioManager");
+                            audioManager?.PlayEffect("knob");
                         }
                         else if (_frequencySliderRect.HasPoint(mousePos))
                         {
                             _isDraggingSlider = true;
                             UpdateFrequencyFromSliderPosition(mousePos.X);
+
+                            // Play slider interaction sound
+                            var audioManager = GetNode<AudioManager>("/root/AudioManager");
+                            audioManager?.PlayEffect("slider");
                         }
                     }
                     else
@@ -496,23 +581,27 @@ namespace SignalLost
 
                 if (_isDraggingKnob)
                 {
-                    // Calculate rotation based on mouse movement
+                    // Calculate rotation based on mouse position relative to knob center
                     Vector2 knobCenter = new Vector2(
                         _knobRect.Position.X + _knobRect.Size.X / 2,
                         _knobRect.Position.Y + _knobRect.Size.Y / 2
                     );
 
-                    Vector2 prevDir = (_lastMousePosition - knobCenter).Normalized();
-                    Vector2 newDir = (mousePos - knobCenter).Normalized();
+                    // Calculate previous and current angles
+                    float prevAngle = Mathf.Atan2(_lastMousePosition.Y - knobCenter.Y, _lastMousePosition.X - knobCenter.X);
+                    float newAngle = Mathf.Atan2(mousePos.Y - knobCenter.Y, mousePos.X - knobCenter.X);
 
-                    float angle = Mathf.Atan2(
-                        newDir.Y - prevDir.Y,
-                        newDir.X - prevDir.X
-                    );
+                    // Calculate angle difference (handle wrapping around 2π)
+                    float angleDiff = newAngle - prevAngle;
+                    if (angleDiff > Mathf.Pi) angleDiff -= Mathf.Pi * 2;
+                    if (angleDiff < -Mathf.Pi) angleDiff += Mathf.Pi * 2;
 
-                    // Convert angle to frequency change
-                    float angleInDegrees = Mathf.RadToDeg(angle);
-                    float frequencyChange = angleInDegrees * 0.05f;
+                    // Apply dampening factor to make control less sensitive
+                    float dampening = 0.3f;
+                    float frequencyChange = Mathf.RadToDeg(angleDiff) * dampening * 0.01f;
+
+                    // Limit maximum change per frame
+                    frequencyChange = Mathf.Clamp(frequencyChange, -0.2f, 0.2f);
 
                     // Apply frequency change
                     ChangeFrequency(frequencyChange);
@@ -534,6 +623,24 @@ namespace SignalLost
 
             float newFreq = _currentFrequency + amount;
             newFreq = Mathf.Clamp(newFreq, _minFrequency, _maxFrequency);
+
+            // Check if we're close to a signal frequency
+            if (_radioSystem != null)
+            {
+                var nearbySignal = _radioSystem.FindSignalAtFrequency(newFreq);
+                if (nearbySignal != null)
+                {
+                    float distance = Mathf.Abs(newFreq - nearbySignal.Frequency);
+                    if (distance < 0.2f)
+                    {
+                        // Apply subtle snapping effect
+                        float snapStrength = 1.0f - (distance / 0.2f);
+                        snapStrength *= 0.5f; // Reduce snap strength to make it subtle
+                        newFreq = Mathf.Lerp(newFreq, nearbySignal.Frequency, snapStrength);
+                    }
+                }
+            }
+
             newFreq = Mathf.Snapped(newFreq, 0.1f);  // Round to nearest 0.1
 
             _gameState.SetFrequency(newFreq);
