@@ -20,6 +20,8 @@ namespace SignalLost
         private Button _closeButton;
         private ItemList _saveSlotList;
         private Label _statusLabel;
+        private ConfirmationDialog _confirmationDialog;
+        private ColorRect _feedbackOverlay;
 
         /// <summary>
         /// Called when the node enters the scene tree.
@@ -36,6 +38,23 @@ namespace SignalLost
             _closeButton = GetNode<Button>("VBoxContainer/ButtonContainer/CloseButton");
             _saveSlotList = GetNode<ItemList>("VBoxContainer/SaveSlotList");
             _statusLabel = GetNode<Label>("VBoxContainer/StatusLabel");
+
+            // Create confirmation dialog
+            _confirmationDialog = new ConfirmationDialog();
+            _confirmationDialog.Title = "Confirmation";
+            _confirmationDialog.DialogText = "Are you sure?";
+            _confirmationDialog.MinSize = new Vector2I(200, 100);
+            _confirmationDialog.GetOkButton().Text = "Yes";
+            _confirmationDialog.GetCancelButton().Text = "No";
+            AddChild(_confirmationDialog);
+
+            // Create feedback overlay
+            _feedbackOverlay = new ColorRect();
+            _feedbackOverlay.Color = new Color(0, 0.7f, 0, 0.3f); // Green for success
+            _feedbackOverlay.Size = Size;
+            _feedbackOverlay.ZIndex = 100;
+            _feedbackOverlay.Visible = false;
+            AddChild(_feedbackOverlay);
 
             // Connect signals
             _saveButton.Pressed += OnSaveButtonPressed;
@@ -70,19 +89,30 @@ namespace SignalLost
                     slotName = _saveSlotList.GetItemText(_saveSlotList.GetSelectedItems()[0]);
                 }
 
-                // Save game
-                bool success = _saveManager.SaveGame(slotName);
-                if (success)
-                {
-                    _statusLabel.Text = $"Game saved to slot '{slotName}'";
-                }
-                else
-                {
-                    _statusLabel.Text = $"Failed to save game to slot '{slotName}'";
-                }
+                // Show confirmation dialog
+                _confirmationDialog.DialogText = $"Save game to slot '{slotName}'?";
+                // Store the action in a variable so we can disconnect it later
+                Action saveAction = null;
+                saveAction = () => {
+                    // Save game
+                    bool success = _saveManager.SaveGame(slotName);
+                    if (success)
+                    {
+                        ShowFeedback(true, $"Game saved to slot '{slotName}'");
+                    }
+                    else
+                    {
+                        ShowFeedback(false, $"Failed to save game to slot '{slotName}'");
+                    }
 
-                // Refresh save slot list
-                RefreshSaveSlotList();
+                    // Refresh save slot list
+                    RefreshSaveSlotList();
+
+                    // Disconnect the signal to prevent multiple connections
+                    _confirmationDialog.Confirmed -= saveAction;
+                };
+                _confirmationDialog.Confirmed += saveAction;
+                _confirmationDialog.PopupCentered();
             }
         }
 
@@ -94,19 +124,31 @@ namespace SignalLost
             if (_saveManager != null && _saveSlotList.GetSelectedItems().Length > 0)
             {
                 string slotName = _saveSlotList.GetItemText(_saveSlotList.GetSelectedItems()[0]);
-                bool success = _saveManager.LoadGame(slotName);
-                if (success)
-                {
-                    _statusLabel.Text = $"Game loaded from slot '{slotName}'";
-                }
-                else
-                {
-                    _statusLabel.Text = $"Failed to load game from slot '{slotName}'";
-                }
+
+                // Show confirmation dialog
+                _confirmationDialog.DialogText = $"Load game from slot '{slotName}'? Any unsaved progress will be lost.";
+                // Store the action in a variable so we can disconnect it later
+                Action loadAction = null;
+                loadAction = () => {
+                    bool success = _saveManager.LoadGame(slotName);
+                    if (success)
+                    {
+                        ShowFeedback(true, $"Game loaded from slot '{slotName}'");
+                    }
+                    else
+                    {
+                        ShowFeedback(false, $"Failed to load game from slot '{slotName}'");
+                    }
+
+                    // Disconnect the signal to prevent multiple connections
+                    _confirmationDialog.Confirmed -= loadAction;
+                };
+                _confirmationDialog.Confirmed += loadAction;
+                _confirmationDialog.PopupCentered();
             }
             else
             {
-                _statusLabel.Text = "No save slot selected";
+                ShowFeedback(false, "No save slot selected");
             }
         }
 
@@ -138,11 +180,11 @@ namespace SignalLost
         {
             if (success)
             {
-                _statusLabel.Text = $"Game saved to slot '{saveName}'";
+                ShowFeedback(true, $"Game saved to slot '{saveName}'");
             }
             else
             {
-                _statusLabel.Text = $"Failed to save game to slot '{saveName}'";
+                ShowFeedback(false, $"Failed to save game to slot '{saveName}'");
             }
 
             // Refresh save slot list
@@ -158,14 +200,16 @@ namespace SignalLost
         {
             if (success)
             {
-                _statusLabel.Text = $"Game loaded from slot '{saveName}'";
+                ShowFeedback(true, $"Game loaded from slot '{saveName}'");
 
-                // Hide the menu after loading
-                Visible = false;
+                // Hide the menu after loading with a delay
+                GetTree().CreateTimer(1.0f).Timeout += () => {
+                    Visible = false;
+                };
             }
             else
             {
-                _statusLabel.Text = $"Failed to load game from slot '{saveName}'";
+                ShowFeedback(false, $"Failed to load game from slot '{saveName}'");
             }
         }
 
@@ -206,6 +250,28 @@ namespace SignalLost
 
             // Show the menu
             Visible = true;
+        }
+
+        /// <summary>
+        /// Shows feedback to the user.
+        /// </summary>
+        /// <param name="success">Whether the operation was successful</param>
+        /// <param name="message">The message to display</param>
+        private void ShowFeedback(bool success, string message)
+        {
+            // Update status label
+            _statusLabel.Text = message;
+
+            // Show feedback overlay
+            _feedbackOverlay.Color = success ? new Color(0, 0.7f, 0, 0.3f) : new Color(0.7f, 0, 0, 0.3f);
+            _feedbackOverlay.Visible = true;
+
+            // Create tween for fade out
+            var tween = CreateTween();
+            tween.TweenProperty(_feedbackOverlay, "color:a", 0.0f, 1.0f);
+            tween.TweenCallback(Callable.From(() => {
+                _feedbackOverlay.Visible = false;
+            }));
         }
     }
 }
