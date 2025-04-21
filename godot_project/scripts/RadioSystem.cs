@@ -175,7 +175,7 @@ namespace SignalLost
         }
 
         // Find a signal at the given frequency
-        private RadioSignal FindSignalAtFrequency(float frequency)
+        public RadioSignal FindSignalAtFrequency(float frequency)
         {
             RadioSignal bestSignal = null;
             float closestDistance = float.MaxValue;
