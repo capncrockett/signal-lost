@@ -62,7 +62,7 @@ namespace SignalLost.Gameplay
             }
 
             // Load the main gameplay scene
-            GetTree().ChangeSceneToFile("res://scenes/gameplay/MainGameplay.tscn");
+            GetTree().ChangeSceneToFile("res://scenes/MainGameScene.tscn");
         }
 
         private void OnLoadGameButtonPressed()
@@ -75,7 +75,7 @@ namespace SignalLost.Gameplay
             }
 
             // Load the main gameplay scene
-            GetTree().ChangeSceneToFile("res://scenes/gameplay/MainGameplay.tscn");
+            GetTree().ChangeSceneToFile("res://scenes/MainGameScene.tscn");
         }
 
         private void OnOptionsButtonPressed()
