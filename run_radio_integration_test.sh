@@ -77,7 +77,8 @@ echo "Created test scene at $TEST_SCENE_PATH"
 
 # Run the test scene
 cd "$DIR"
-"$GODOT_EXECUTABLE" --path . --headless tests/RadioIntegrationTestScene.tscn
+echo "Running test scene with verbose output..."
+"$GODOT_EXECUTABLE" --path . --headless --verbose tests/RadioIntegrationTestScene.tscn
 
 # Get the exit code
 EXIT_CODE=$?
