@@ -342,13 +342,28 @@ namespace SignalLost
                     if (_isDragging && _draggedItemId == itemId)
                         continue;
 
-                    // Draw item icon (simplified as a colored square for now)
-                    Color itemColor = GetItemColor(item.Category);
-                    DrawRect(new Rect2(slotX + 4, slotY + 4, slotSize - 8, slotSize - 8), itemColor);
+                                // Draw item icon from atlas if available
+                    var iconAtlas = GetNode<ItemIconAtlas>("/root/ItemIconAtlas");
+                    if (iconAtlas != null && iconAtlas.GetAtlasTexture() != null)
+                    {
+                        // Draw icon from atlas
+                        Rect2 iconRegion = iconAtlas.GetIconRegion(item.IconIndex);
+                        DrawTextureRectRegion(
+                            iconAtlas.GetAtlasTexture(),
+                            new Rect2(slotX + 4, slotY + 4, slotSize - 8, slotSize - 8),
+                            iconRegion
+                        );
+                    }
+                    else
+                    {
+                        // Fallback to colored square
+                        Color itemColor = GetItemColor(item.Category);
+                        DrawRect(new Rect2(slotX + 4, slotY + 4, slotSize - 8, slotSize - 8), itemColor);
 
-                    // Draw item initial
-                    string initial = item.Name.Length > 0 ? item.Name[0].ToString() : "?";
-                    DrawPixelText(initial, new Vector2(slotX + slotSize / 2 - 3, slotY + slotSize / 2 + 3), TextColor, 1);
+                        // Draw item initial
+                        string initial = item.Name.Length > 0 ? item.Name[0].ToString() : "?";
+                        DrawPixelText(initial, new Vector2(slotX + slotSize / 2 - 3, slotY + slotSize / 2 + 3), TextColor, 1);
+                    }
 
                     // Draw quantity if more than 1
                     if (item.Quantity > 1)
@@ -382,9 +397,41 @@ namespace SignalLost
             string quantityText = $"QTY: {item.Quantity}";
             DrawPixelText(quantityText, new Vector2(x + width - 5 - quantityText.Length * 6, y + 15), TextColor, 1);
 
-            // Draw item category
+            // Draw item category with appropriate color
+            Color categoryColor = GetItemColor(item.Category);
             string categoryText = $"[{item.Category.ToUpper()}]";
-            DrawPixelText(categoryText, new Vector2(x + 5, y + 30), new Color(0.7f, 0.7f, 0.7f, 1.0f), 1);
+            DrawPixelText(categoryText, new Vector2(x + 5, y + 30), categoryColor, 1);
+
+            // Draw item properties
+            float propY = y + 30;
+
+            // Show if item is usable
+            if (item.IsUsable)
+            {
+                propY += 15;
+                DrawPixelText("USABLE", new Vector2(x + width - 60, propY), new Color(0.0f, 0.8f, 0.0f, 1.0f), 1);
+            }
+
+            // Show if item is consumable
+            if (item.IsConsumable)
+            {
+                propY += 15;
+                DrawPixelText("CONSUMABLE", new Vector2(x + width - 90, propY), new Color(0.8f, 0.4f, 0.0f, 1.0f), 1);
+            }
+
+            // Show if item is equippable
+            if (item.IsEquippable)
+            {
+                propY += 15;
+                DrawPixelText("EQUIPPABLE", new Vector2(x + width - 90, propY), new Color(0.0f, 0.4f, 0.8f, 1.0f), 1);
+            }
+
+            // Show if item is combineable
+            if (item.IsCombineable)
+            {
+                propY += 15;
+                DrawPixelText("COMBINEABLE", new Vector2(x + width - 90, propY), new Color(0.8f, 0.0f, 0.8f, 1.0f), 1);
+            }
         }
 
         // Draw action buttons
@@ -489,13 +536,28 @@ namespace SignalLost
             // Draw item background
             DrawRect(new Rect2(itemX, itemY, itemSize, itemSize), new Color(0.15f, 0.15f, 0.15f, 0.8f));
 
-            // Draw item icon
-            Color itemColor = GetItemColor(item.Category);
-            DrawRect(new Rect2(itemX + 4, itemY + 4, itemSize - 8, itemSize - 8), itemColor);
+            // Draw item icon from atlas if available
+            var iconAtlas = GetNode<ItemIconAtlas>("/root/ItemIconAtlas");
+            if (iconAtlas != null && iconAtlas.GetAtlasTexture() != null)
+            {
+                // Draw icon from atlas
+                Rect2 iconRegion = iconAtlas.GetIconRegion(item.IconIndex);
+                DrawTextureRectRegion(
+                    iconAtlas.GetAtlasTexture(),
+                    new Rect2(itemX + 4, itemY + 4, itemSize - 8, itemSize - 8),
+                    iconRegion
+                );
+            }
+            else
+            {
+                // Fallback to colored square
+                Color itemColor = GetItemColor(item.Category);
+                DrawRect(new Rect2(itemX + 4, itemY + 4, itemSize - 8, itemSize - 8), itemColor);
 
-            // Draw item initial
-            string initial = item.Name.Length > 0 ? item.Name[0].ToString() : "?";
-            DrawPixelText(initial, new Vector2(itemX + itemSize / 2 - 3, itemY + itemSize / 2 + 3), TextColor, 1);
+                // Draw item initial
+                string initial = item.Name.Length > 0 ? item.Name[0].ToString() : "?";
+                DrawPixelText(initial, new Vector2(itemX + itemSize / 2 - 3, itemY + itemSize / 2 + 3), TextColor, 1);
+            }
 
             // Draw quantity if more than 1
             if (item.Quantity > 1)
@@ -620,7 +682,38 @@ namespace SignalLost
                 if (_itemSlotRects[itemId].HasPoint(_mousePosition))
                 {
                     var item = _inventorySystem.GetInventory()[itemId];
-                    _tooltipText = $"{item.Name}\n[{item.Category}]\n{item.Description}";
+
+                    // Build tooltip text with more details
+                    _tooltipText = $"{item.Name}\n[{item.Category.ToUpper()}]\n{item.Description}";
+
+                    // Add properties
+                    var properties = new List<string>();
+                    if (item.IsUsable) properties.Add("Usable");
+                    if (item.IsConsumable) properties.Add("Consumable");
+                    if (item.IsEquippable) properties.Add("Equippable");
+                    if (item.IsCombineable) properties.Add("Combineable");
+
+                    if (properties.Count > 0)
+                    {
+                        _tooltipText += $"\nProperties: {string.Join(", ", properties)}";
+                    }
+
+                    // Add effects if any
+                    if (item.Effects.Count > 0)
+                    {
+                        _tooltipText += "\nEffects:";
+                        foreach (var effect in item.Effects)
+                        {
+                            _tooltipText += $"\n- {effect.Key}: {effect.Value}";
+                        }
+                    }
+
+                    // Add content if it's a document
+                    if (item.Category == "document" && !string.IsNullOrEmpty(item.Content))
+                    {
+                        _tooltipText += $"\n\nContent: {item.Content}";
+                    }
+
                     _showTooltip = true;
                     return;
                 }
