@@ -28,6 +28,7 @@ This directory contains documentation for the Signal Lost game project, a C# God
 - **game-progression-system.md**: Documentation for the game progression system.
 - **gameplay-implementation.md**: Documentation for the gameplay implementation.
 - **gameplay-content.md**: Documentation for the gameplay content.
+- **inventory-system-enhancements.md**: Documentation for the inventory system enhancements.
 
 ### Development
 
