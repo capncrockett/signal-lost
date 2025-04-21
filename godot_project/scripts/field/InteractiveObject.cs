@@ -1,6 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 using SignalLost;
+using SignalLost.Inventory;
 
 namespace SignalLost.Field
 {
@@ -24,6 +25,11 @@ namespace SignalLost.Field
         [Export] public string QuestId { get; set; } = "";
         [Export] public string QuestObjectiveId { get; set; } = "";
 
+        // Item placement properties
+        [Export] public bool ContainsPlacedItem { get; set; } = false;
+        [Export] public string PlacedItemId { get; set; } = "";
+        [Export] public string ContainerName { get; set; } = "";
+
         // Visual properties
         [Export] public Color ObjectColor { get; set; } = new Color(0.0f, 0.7f, 0.0f); // Green
         [Export] public int ObjectSize { get; set; } = 16;
@@ -36,8 +42,9 @@ namespace SignalLost.Field
         // References
         private SignalLost.GameState _gameState;
         private QuestSystem _questSystem;
-        private InventorySystem _inventorySystem;
+        private InventorySystemAdapter _inventorySystem;
         private MessageManager _messageManager;
+        private ItemPlacement _itemPlacement;
 
         // Signals
         [Signal]
@@ -52,8 +59,9 @@ namespace SignalLost.Field
             // Get references to game systems
             _gameState = GetNode<SignalLost.GameState>("/root/GameState");
             _questSystem = GetNode<QuestSystem>("/root/QuestSystem");
-            _inventorySystem = GetNode<InventorySystem>("/root/InventorySystem");
+            _inventorySystem = GetNode<InventorySystemAdapter>("/root/InventorySystem");
             _messageManager = GetNode<MessageManager>("/root/MessageManager");
+            _itemPlacement = GetNode<ItemPlacement>("/root/ItemPlacement");
 
             if (_gameState == null || _questSystem == null || _inventorySystem == null || _messageManager == null)
             {
@@ -150,6 +158,26 @@ namespace SignalLost.Field
             if (IsOneTimeInteraction)
             {
                 _gameState.SetObjectInteractedWith(ObjectId);
+            }
+
+            // Handle placed items
+            if (ContainsPlacedItem && !string.IsNullOrEmpty(PlacedItemId) && _itemPlacement != null)
+            {
+                string fullPlacedItemId = $"{_gameState.CurrentLocation}_{ContainerName}_{PlacedItemId}";
+                bool collected = _itemPlacement.CollectItem(fullPlacedItemId);
+
+                if (collected)
+                {
+                    var itemData = _inventorySystem.GetItem(PlacedItemId);
+                    if (itemData != null)
+                    {
+                        ShowMessage($"You found {itemData.Name}!");
+                    }
+                    else
+                    {
+                        ShowMessage($"You found an item!");
+                    }
+                }
             }
 
             // Grant item if applicable
