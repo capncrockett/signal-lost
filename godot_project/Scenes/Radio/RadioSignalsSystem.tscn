@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://c8q6y8j3xj3qv"]
+
+[ext_resource type="Script" path="res://scripts/radio/RadioSignalsManager.cs" id="1_8j3qv"]
+[ext_resource type="Script" path="res://scripts/radio/RadioEquipmentHandler.cs" id="2_j4k5l"]
+
+[node name="RadioSignalsSystem" type="Node"]
+
+[node name="RadioSignalsManager" type="Node" parent="."]
+script = ExtResource("1_8j3qv")
+
+[node name="RadioEquipmentHandler" type="Node" parent="."]
+script = ExtResource("2_j4k5l")
