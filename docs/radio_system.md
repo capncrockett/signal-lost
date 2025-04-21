@@ -1,6 +1,6 @@
 # Radio System
 
-This document provides an overview of the radio system in Signal Lost, including its functionality, implementation, and how to use it in gameplay.
+This document provides an overview of the radio system in Signal Lost, including its functionality, implementation, and how to use it in gameplay. The radio system has been significantly enhanced with the recent implementation of the PixelRadioInterface and related components.
 
 ## Table of Contents
 
@@ -58,12 +58,14 @@ The game features several types of radio signals:
 Morse code signals transmit encoded messages using dots and dashes. Players need to decode these messages to uncover important information.
 
 Example Morse code patterns:
+
 - SOS: `... --- ...`
 - TEST: `- . ... -`
 
 ### Voice Transmissions
 
 Voice transmissions contain spoken messages from NPCs. These may be:
+
 - Clear transmissions with important instructions
 - Distorted transmissions that need to be interpreted
 - Looping emergency broadcasts
@@ -71,6 +73,7 @@ Voice transmissions contain spoken messages from NPCs. These may be:
 ### Data Signals
 
 Data signals represent digital information being transmitted. These appear as:
+
 - Distinctive patterns in the static
 - Regular pulses or beeps
 - Unique visual patterns on the frequency scanner
@@ -78,6 +81,7 @@ Data signals represent digital information being transmitted. These appear as:
 ### Environmental Signals
 
 Environmental signals come from the game world itself:
+
 - Electrical interference from power sources
 - Weather-related static
 - Signals from hidden locations
@@ -96,38 +100,122 @@ public class RadioTuner : Node
     // Frequency range
     public float MinFrequency = 88.0f;
     public float MaxFrequency = 108.0f;
-    
+
     // Get/set the current frequency
     public float GetCurrentFrequency();
     public void SetFrequency(float frequency);
-    
+
     // Control radio state
     public void TogglePower();
     public void ToggleScanning();
     public bool IsPowerOn();
     public bool IsScanning();
-    
+
     // Get signal information
     public float GetSignalStrength();
 }
 ```
 
-### Audio System
+### RadioSystem
 
-The audio system handles:
-- Continuous white noise generation
-- Signal fading based on strength
-- Squelch effects when tuning
-- Transitions between static and signals
+The `RadioSystem` class manages the overall radio functionality and integrates with the game state:
+
+```csharp
+public class RadioSystem : Node
+{
+    // Signal management
+    public void RegisterSignal(RadioSignal signal);
+    public void UnregisterSignal(RadioSignal signal);
+    public RadioSignal FindSignalAtFrequency(float frequency, float tolerance = 0.1f);
+
+    // Signal detection
+    public float GetSignalStrength(float frequency);
+    public bool IsSignalDetected(float frequency);
+
+    // Events
+    [Signal] public delegate void SignalDetectedEventHandler(string signalId, float frequency);
+    [Signal] public delegate void SignalLostEventHandler(string signalId);
+}
+```
+
+### RadioAudioManager
+
+The `RadioAudioManager` class handles all audio aspects of the radio system:
+
+```csharp
+public class RadioAudioManager : Node
+{
+    // Audio control
+    public void StartTuning();
+    public void StopTuning();
+    public void SetFrequencyAndSignal(float frequency, float signalStrength);
+    public void SetRadioPower(bool isOn);
+
+    // Sound effects
+    public void PlayButtonClick();
+    public void PlayDialTurn();
+    public void PlaySliderSound();
+}
+```
 
 ### Visual Interface
 
 The visual interface is implemented using:
-- `PixelRadioInterface`: Basic radio controls
-- `EnhancedRadioInterface`: Advanced visual features
-- `StaticNoiseVisualizer`: Visual representation of static
-- `MorseCodeVisualizer`: Visual representation of Morse code
-- `FrequencyScannerVisualizer`: Frequency spectrum display
+
+#### PixelRadioInterface
+
+The `PixelRadioInterface` class provides a pixel-art style radio interface:
+
+```csharp
+public class PixelRadioInterface : Control
+{
+    // Radio state
+    [Export] public float MinFrequency { get; set; } = 88.0f;
+    [Export] public float MaxFrequency { get; set; } = 108.0f;
+    [Export] public float CurrentFrequency { get; set; } = 98.0f;
+    [Export] public float SignalStrength { get; set; } = 0.0f;
+    [Export] public bool IsPoweredOn { get; set; } = false;
+
+    // Interface methods
+    public void SetSignalStrength(float strength);
+    public void SetMessageAvailable(bool available);
+    public void SetFrequency(float frequency);
+
+    // Signals
+    [Signal] public delegate void FrequencyChangedEventHandler(float frequency);
+    [Signal] public delegate void PowerToggleEventHandler(bool isPoweredOn);
+    [Signal] public delegate void ScanRequestedEventHandler();
+    [Signal] public delegate void MessageRequestedEventHandler();
+}
+```
+
+#### RadioInterfaceManager
+
+The `RadioInterfaceManager` class connects the radio interface with the game systems:
+
+```csharp
+public class RadioInterfaceManager : Node
+{
+    // References
+    [Export] public NodePath RadioInterfacePath { get; set; }
+
+    // Methods
+    private void SyncWithGameState();
+    private void CheckMessageAvailability();
+
+    // Event handlers
+    private void OnFrequencyChanged(float frequency);
+    private void OnPowerToggle(bool isPoweredOn);
+    private void OnScanRequested();
+    private void OnMessageRequested();
+}
+```
+
+Other visual components include:
+
+- `EnhancedRadioDial`: Advanced tuning dial with visual feedback
+- `RadioSignalDisplay`: Visual representation of detected signals
+- `RadioSignalsDemo`: Demo scene for testing radio signals
 
 ## Integration with Gameplay
 
@@ -151,15 +239,52 @@ The radio system integrates with other gameplay systems:
 - Signal strength increases as players approach sources
 - Some areas may block or distort radio signals
 
+## Running the Radio System
+
+Several scripts have been created to run different aspects of the radio system:
+
+### Main Game with Radio
+
+```bash
+./run_game_with_radio.sh
+```
+
+This script runs the main game scene with the radio interface visible.
+
+### Radio Demo
+
+```bash
+./run_radio_demo.sh
+```
+
+This script runs the RadioSignalsDemo scene, which provides a comprehensive interface for testing radio signals.
+
+### Radio Dial Test
+
+```bash
+./run_radio_dial.sh
+```
+
+This script runs the EnhancedRadioDial scene for testing the radio dial interface.
+
+### Radio System Integration Test
+
+```bash
+./run_radio_test.sh
+```
+
+This script runs the RadioSystemIntegrationTest scene for testing the integration of radio components.
+
 ## Future Enhancements
 
 Planned enhancements for the radio system include:
 
 ### Technical Improvements
 
-- More realistic audio processing
-- Advanced signal visualization
-- Improved performance for mobile platforms
+- 8-bit/16-bit sound generation for authentic radio sounds
+- Advanced signal visualization with spectrum analysis
+- Memory optimization for better performance
+- Cross-platform compatibility improvements
 
 ### Gameplay Enhancements
 
@@ -174,3 +299,10 @@ Planned enhancements for the radio system include:
 - Visual signal analyzer
 - Morse code decoder tool
 - Signal strength map overlay
+
+## Known Issues
+
+- Memory leaks may occur during extended radio usage
+- Audio latency issues on some platforms
+- UI scaling issues on different screen resolutions
+- Signal detection may be inconsistent at edge frequencies
