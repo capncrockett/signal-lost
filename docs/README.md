@@ -13,8 +13,7 @@ This directory contains documentation for the Signal Lost game project, a C# God
 ### UI System
 
 - **pixel-based-approach.md**: Overview of the pixel-based UI approach.
-- **pixel-ui-system.md**: Documentation for the pixel-based UI system.
-- **pixel-ui-development.md**: Guidelines for extending the pixel-based UI system.
+- **pixel-ui-guide.md**: Comprehensive guide for the pixel-based UI system, including components, implementation, and development guidelines.
 - **pixel-message-display.md**: Documentation for the pixel-based message display system.
 
 ### Game Systems

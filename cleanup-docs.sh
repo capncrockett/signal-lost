@@ -20,6 +20,10 @@ FILES_TO_ARCHIVE=(
   "docs/audio-system-implementation-plan.md"
   "docs/game-content-and-progression-plan.md"
   "docs/user_documentation.md"
+  # Consolidated pixel UI documentation
+  "docs/pixel-ui-system.md"
+  "docs/pixel-ui-development.md"
+  "docs/README-pixel-ui.md"
 )
 
 # Move files to backup directory
