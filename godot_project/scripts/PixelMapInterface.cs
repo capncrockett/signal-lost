@@ -1,5 +1,7 @@
 using Godot;
+using System;
 using System.Collections.Generic;
+using SignalLost.UI;
 
 namespace SignalLost
 {
@@ -20,10 +22,118 @@ namespace SignalLost
         [Export] public float ZoomLevel { get; set; } = 1.0f;
         [Export] public Vector2 MapOffset { get; set; } = Vector2.Zero;
 
+        // Visual effects configuration
+        [Export] public bool EnableWeatherEffects { get; set; } = true;
+        [Export] public bool EnableDayNightCycle { get; set; } = true;
+        [Export] public bool EnableAnimations { get; set; } = true;
+        [Export] public float AnimationSpeed { get; set; } = 1.0f;
+
         // References to game systems
         private MapSystem _mapSystem;
         private GameState _gameState;
         private PixelFont _pixelFont;
+        private PixelVisualizationManager _visualManager;
+
+        // Visual effects state
+        private float _timeOfDay = 0.5f; // 0.0 = midnight, 0.5 = noon, 1.0 = midnight
+        private int _currentWeather = 0; // 0 = Clear, 1 = Cloudy, 2 = Rainy, 3 = Stormy, 4 = Foggy
+        private float _weatherIntensity = 0.0f;
+        private List<RainDrop> _raindrops = new List<RainDrop>();
+        private List<CloudParticle> _cloudParticles = new List<CloudParticle>();
+        private List<LightningBolt> _lightningBolts = new List<LightningBolt>();
+        private float _fogDensity = 0.0f;
+        private float _animationTimer = 0.0f;
+        private float _lightningTimer = 0.0f;
+        private Random _random = new Random();
+
+        // Visual effect classes
+        private class RainDrop
+        {
+            public Vector2 Position;
+            public float Speed;
+            public float Length;
+            public float Alpha;
+
+            public RainDrop(Vector2 position, float speed, float length, float alpha)
+            {
+                Position = position;
+                Speed = speed;
+                Length = length;
+                Alpha = alpha;
+            }
+        }
+
+        private class CloudParticle
+        {
+            public Vector2 Position;
+            public float Size;
+            public float Speed;
+            public float Alpha;
+
+            public CloudParticle(Vector2 position, float size, float speed, float alpha)
+            {
+                Position = position;
+                Size = size;
+                Speed = speed;
+                Alpha = alpha;
+            }
+        }
+
+        private class LightningBolt
+        {
+            public Vector2 Start;
+            public Vector2 End;
+            public float Width;
+            public float Alpha;
+            public float Duration;
+            public float ElapsedTime;
+            public List<Vector2> Points;
+
+            public LightningBolt(Vector2 start, Vector2 end, float width, float alpha, float duration)
+            {
+                Start = start;
+                End = end;
+                Width = width;
+                Alpha = alpha;
+                Duration = duration;
+                ElapsedTime = 0.0f;
+                Points = GenerateLightningPoints(start, end, 0.3f, 4);
+            }
+
+            private List<Vector2> GenerateLightningPoints(Vector2 start, Vector2 end, float jaggedness, int iterations)
+            {
+                List<Vector2> points = new List<Vector2> { start };
+                Vector2 direction = end - start;
+                float distance = direction.Length();
+                Vector2 normal = new Vector2(-direction.Y, direction.X).Normalized();
+
+                Random random = new Random();
+
+                // Start with a line from start to end
+                List<Vector2> currentPoints = new List<Vector2> { start, end };
+
+                // Iteratively add jaggedness
+                for (int i = 0; i < iterations; i++)
+                {
+                    List<Vector2> newPoints = new List<Vector2>();
+                    newPoints.Add(currentPoints[0]); // Always keep the start point
+
+                    for (int j = 0; j < currentPoints.Count - 1; j++)
+                    {
+                        Vector2 midPoint = (currentPoints[j] + currentPoints[j + 1]) / 2;
+                        float scale = distance * jaggedness * ((float)random.NextDouble() - 0.5f) * (1.0f / (i + 1));
+                        midPoint += normal * scale;
+
+                        newPoints.Add(midPoint);
+                        newPoints.Add(currentPoints[j + 1]);
+                    }
+
+                    currentPoints = newPoints;
+                }
+
+                return currentPoints;
+            }
+        }
 
         // UI state
         private bool _isVisible = false;
@@ -39,6 +149,7 @@ namespace SignalLost
             // Get references to game systems
             _mapSystem = GetNode<MapSystem>("/root/MapSystem");
             _gameState = GetNode<GameState>("/root/GameState");
+            _visualManager = GetNode<PixelVisualizationManager>("/root/PixelVisualizationManager");
 
             if (_mapSystem == null || _gameState == null)
             {
@@ -54,8 +165,297 @@ namespace SignalLost
             _mapSystem.LocationChanged += OnLocationChanged;
             _gameState.LocationChanged += OnLocationChanged;
 
+            // Connect to visualization manager if available
+            if (_visualManager != null)
+            {
+                _visualManager.TimeOfDayChanged += OnTimeOfDayChanged;
+                _visualManager.WeatherChanged += OnWeatherChanged;
+                _visualManager.WeatherTransitioning += OnWeatherTransitioning;
+
+                // Initialize with current values
+                _timeOfDay = _visualManager.GetTimeOfDay();
+                _currentWeather = _visualManager.GetCurrentWeather();
+                _weatherIntensity = _visualManager.GetWeatherIntensity();
+
+                // Initialize weather effects
+                InitializeWeatherEffects();
+            }
+
             // Set up input processing
             SetProcessInput(true);
+            SetProcess(true);
+        }
+
+        // Initialize weather effects based on current weather
+        private void InitializeWeatherEffects()
+        {
+            // Clear existing effects
+            _raindrops.Clear();
+            _cloudParticles.Clear();
+            _lightningBolts.Clear();
+
+            // Initialize based on weather type
+            switch (_currentWeather)
+            {
+                case 1: // Cloudy
+                    InitializeClouds();
+                    break;
+                case 2: // Rainy
+                    InitializeClouds();
+                    InitializeRain();
+                    break;
+                case 3: // Stormy
+                    InitializeClouds();
+                    InitializeRain();
+                    _lightningTimer = 0.0f;
+                    break;
+                case 4: // Foggy
+                    _fogDensity = _weatherIntensity * 0.5f;
+                    break;
+            }
+        }
+
+        // Initialize cloud particles
+        private void InitializeClouds()
+        {
+            int cloudCount = (int)(20 * _weatherIntensity);
+            Vector2 size = Size;
+
+            for (int i = 0; i < cloudCount; i++)
+            {
+                float cloudSize = 20.0f + (float)_random.NextDouble() * 40.0f;
+                float cloudSpeed = 5.0f + (float)_random.NextDouble() * 10.0f;
+                float cloudAlpha = 0.1f + (float)_random.NextDouble() * 0.3f;
+
+                Vector2 position = new Vector2(
+                    (float)_random.NextDouble() * size.X,
+                    (float)_random.NextDouble() * size.Y * 0.5f
+                );
+
+                _cloudParticles.Add(new CloudParticle(position, cloudSize, cloudSpeed, cloudAlpha));
+            }
+        }
+
+        // Initialize raindrops
+        private void InitializeRain()
+        {
+            int rainCount = (int)(100 * _weatherIntensity);
+            Vector2 size = Size;
+
+            for (int i = 0; i < rainCount; i++)
+            {
+                float rainSpeed = 200.0f + (float)_random.NextDouble() * 300.0f;
+                float rainLength = 10.0f + (float)_random.NextDouble() * 20.0f;
+                float rainAlpha = 0.3f + (float)_random.NextDouble() * 0.5f;
+
+                Vector2 position = new Vector2(
+                    (float)_random.NextDouble() * size.X,
+                    (float)_random.NextDouble() * size.Y
+                );
+
+                _raindrops.Add(new RainDrop(position, rainSpeed, rainLength, rainAlpha));
+            }
+        }
+
+        // Process function called every frame
+        public override void _Process(double delta)
+        {
+            if (!_isVisible) return;
+
+            // Update animation timer
+            _animationTimer += (float)delta * AnimationSpeed;
+
+            // Update weather effects
+            if (EnableWeatherEffects)
+            {
+                UpdateWeatherEffects(delta);
+            }
+
+            // Redraw
+            QueueRedraw();
+        }
+
+        // Update weather effects
+        private void UpdateWeatherEffects(double delta)
+        {
+            // Update based on weather type
+            switch (_currentWeather)
+            {
+                case 1: // Cloudy
+                    UpdateClouds(delta);
+                    break;
+                case 2: // Rainy
+                    UpdateClouds(delta);
+                    UpdateRain(delta);
+                    break;
+                case 3: // Stormy
+                    UpdateClouds(delta);
+                    UpdateRain(delta);
+                    UpdateLightning(delta);
+                    break;
+                case 4: // Foggy
+                    // Fog is static, just ensure density is correct
+                    _fogDensity = _weatherIntensity * 0.5f;
+                    break;
+            }
+        }
+
+        // Update cloud particles
+        private void UpdateClouds(double delta)
+        {
+            Vector2 size = Size;
+            List<CloudParticle> cloudsToRemove = new List<CloudParticle>();
+
+            foreach (var cloud in _cloudParticles)
+            {
+                // Move cloud
+                cloud.Position = new Vector2(
+                    cloud.Position.X + cloud.Speed * (float)delta,
+                    cloud.Position.Y
+                );
+
+                // Check if cloud is off-screen
+                if (cloud.Position.X > size.X + cloud.Size)
+                {
+                    cloudsToRemove.Add(cloud);
+                }
+            }
+
+            // Remove clouds that are off-screen
+            foreach (var cloud in cloudsToRemove)
+            {
+                _cloudParticles.Remove(cloud);
+            }
+
+            // Add new clouds if needed
+            if (_cloudParticles.Count < 20 * _weatherIntensity)
+            {
+                float cloudSize = 20.0f + (float)_random.NextDouble() * 40.0f;
+                float cloudSpeed = 5.0f + (float)_random.NextDouble() * 10.0f;
+                float cloudAlpha = 0.1f + (float)_random.NextDouble() * 0.3f;
+
+                Vector2 position = new Vector2(
+                    -cloudSize,
+                    (float)_random.NextDouble() * size.Y * 0.5f
+                );
+
+                _cloudParticles.Add(new CloudParticle(position, cloudSize, cloudSpeed, cloudAlpha));
+            }
+        }
+
+        // Update raindrops
+        private void UpdateRain(double delta)
+        {
+            Vector2 size = Size;
+            List<RainDrop> dropsToRemove = new List<RainDrop>();
+
+            foreach (var drop in _raindrops)
+            {
+                // Move raindrop
+                drop.Position = new Vector2(
+                    drop.Position.X + drop.Speed * 0.1f * (float)delta,
+                    drop.Position.Y + drop.Speed * (float)delta
+                );
+
+                // Check if raindrop is off-screen
+                if (drop.Position.Y > size.Y || drop.Position.X > size.X)
+                {
+                    dropsToRemove.Add(drop);
+                }
+            }
+
+            // Remove raindrops that are off-screen
+            foreach (var drop in dropsToRemove)
+            {
+                _raindrops.Remove(drop);
+            }
+
+            // Add new raindrops if needed
+            if (_raindrops.Count < 100 * _weatherIntensity)
+            {
+                float rainSpeed = 200.0f + (float)_random.NextDouble() * 300.0f;
+                float rainLength = 10.0f + (float)_random.NextDouble() * 20.0f;
+                float rainAlpha = 0.3f + (float)_random.NextDouble() * 0.5f;
+
+                Vector2 position = new Vector2(
+                    (float)_random.NextDouble() * size.X,
+                    -rainLength
+                );
+
+                _raindrops.Add(new RainDrop(position, rainSpeed, rainLength, rainAlpha));
+            }
+        }
+
+        // Update lightning effects
+        private void UpdateLightning(double delta)
+        {
+            // Update existing lightning bolts
+            List<LightningBolt> boltsToRemove = new List<LightningBolt>();
+
+            foreach (var bolt in _lightningBolts)
+            {
+                bolt.ElapsedTime += (float)delta;
+
+                if (bolt.ElapsedTime >= bolt.Duration)
+                {
+                    boltsToRemove.Add(bolt);
+                }
+                else
+                {
+                    // Update alpha based on time
+                    float progress = bolt.ElapsedTime / bolt.Duration;
+                    if (progress < 0.2f)
+                    {
+                        // Fade in
+                        bolt.Alpha = progress / 0.2f;
+                    }
+                    else
+                    {
+                        // Fade out
+                        bolt.Alpha = 1.0f - ((progress - 0.2f) / 0.8f);
+                    }
+                }
+            }
+
+            // Remove expired lightning bolts
+            foreach (var bolt in boltsToRemove)
+            {
+                _lightningBolts.Remove(bolt);
+            }
+
+            // Create new lightning bolts randomly
+            _lightningTimer += (float)delta;
+
+            if (_lightningTimer > 2.0f + (1.0f - _weatherIntensity) * 8.0f)
+            {
+                _lightningTimer = 0.0f;
+
+                if (_random.NextDouble() < _weatherIntensity * 0.5f)
+                {
+                    CreateLightningBolt();
+                }
+            }
+        }
+
+        // Create a new lightning bolt
+        private void CreateLightningBolt()
+        {
+            Vector2 size = Size;
+
+            // Random start position at top of screen
+            Vector2 start = new Vector2(
+                (float)_random.NextDouble() * size.X,
+                0
+            );
+
+            // Random end position at bottom of screen
+            Vector2 end = new Vector2(
+                start.X + ((float)_random.NextDouble() * 200.0f - 100.0f),
+                size.Y
+            );
+
+            // Create lightning bolt
+            _lightningBolts.Add(new LightningBolt(start, end, 2.0f, 1.0f, 0.5f));
         }
 
         // Show or hide the map interface
@@ -157,30 +557,52 @@ namespace SignalLost
 
             Vector2 size = Size;
 
+            // Get ambient light color based on time of day
+            Color ambientColor = GetAmbientLightColor();
+            float ambientIntensity = GetAmbientLightIntensity();
+
+            // Apply ambient light to background color
+            Color adjustedBackgroundColor = BackgroundColor * ambientColor * ambientIntensity;
+
             // Draw background
-            DrawRect(new Rect2(0, 0, size.X, size.Y), BackgroundColor);
+            DrawRect(new Rect2(0, 0, size.X, size.Y), adjustedBackgroundColor);
 
             // Draw grid
             if (ShowGrid)
             {
-                DrawGrid();
+                DrawGrid(ambientColor, ambientIntensity);
+            }
+
+            // Draw weather effects (background layer)
+            if (EnableWeatherEffects)
+            {
+                DrawWeatherBackground(ambientColor, ambientIntensity);
             }
 
             // Draw connections between locations
-            DrawConnections();
+            DrawConnections(ambientColor, ambientIntensity);
 
             // Draw locations
-            DrawLocations();
+            DrawLocations(ambientColor, ambientIntensity);
+
+            // Draw weather effects (foreground layer)
+            if (EnableWeatherEffects)
+            {
+                DrawWeatherForeground(ambientColor, ambientIntensity);
+            }
 
             // Draw UI elements (title, info panel, etc.)
             DrawUI();
         }
 
         // Draw the grid
-        private void DrawGrid()
+        private void DrawGrid(Color ambientColor, float ambientIntensity)
         {
             Vector2 size = Size;
             float scaledGridSize = GridSize * ZoomLevel;
+
+            // Apply ambient light to grid color
+            Color adjustedGridColor = GridColor * ambientColor * ambientIntensity;
 
             // Calculate grid offset based on map offset
             float offsetX = (MapOffset.X * ZoomLevel) % scaledGridSize;
@@ -189,20 +611,23 @@ namespace SignalLost
             // Draw vertical grid lines
             for (float x = offsetX; x < size.X; x += scaledGridSize)
             {
-                DrawLine(new Vector2(x, 0), new Vector2(x, size.Y), GridColor, 1);
+                DrawLine(new Vector2(x, 0), new Vector2(x, size.Y), adjustedGridColor, 1);
             }
 
             // Draw horizontal grid lines
             for (float y = offsetY; y < size.Y; y += scaledGridSize)
             {
-                DrawLine(new Vector2(0, y), new Vector2(size.X, y), GridColor, 1);
+                DrawLine(new Vector2(0, y), new Vector2(size.X, y), adjustedGridColor, 1);
             }
         }
 
         // Draw connections between locations
-        private void DrawConnections()
+        private void DrawConnections(Color ambientColor, float ambientIntensity)
         {
             var locations = _mapSystem.GetAllLocations();
+
+            // Apply ambient light to connection color
+            Color adjustedConnectionColor = ConnectionColor * ambientColor * ambientIntensity;
 
             foreach (var location in locations.Values)
             {
@@ -225,13 +650,36 @@ namespace SignalLost
                     Vector2 endPos = GetScreenPosition(connectedLocation.Position);
 
                     // Draw the connection line
-                    DrawLine(startPos, endPos, ConnectionColor, 2);
+                    DrawLine(startPos, endPos, adjustedConnectionColor, 2);
+
+                    // Add animated pulse effect along the connection
+                    if (EnableAnimations)
+                    {
+                        float distance = (endPos - startPos).Length();
+                        Vector2 direction = (endPos - startPos).Normalized();
+
+                        // Calculate pulse position based on animation timer
+                        float pulsePos = (_animationTimer % 2.0f) / 2.0f; // 0.0 to 1.0
+
+                        // Draw pulse if it's within the line segment
+                        if (pulsePos <= 1.0f)
+                        {
+                            Vector2 pulseCenter = startPos + direction * distance * pulsePos;
+                            float pulseSize = 4.0f * ZoomLevel;
+
+                            // Draw pulse circle
+                            Color pulseColor = adjustedConnectionColor;
+                            pulseColor.A = 0.7f * (1.0f - Mathf.Abs(pulsePos - 0.5f) * 2.0f); // Fade at start and end
+
+                            DrawCircle(pulseCenter, pulseSize, pulseColor);
+                        }
+                    }
                 }
             }
         }
 
         // Draw locations
-        private void DrawLocations()
+        private void DrawLocations(Color ambientColor, float ambientIntensity)
         {
             _locationRects.Clear();
 
@@ -264,6 +712,16 @@ namespace SignalLost
                     default:
                         color = LocationColor; // Default color for standard locations
                         break;
+                }
+
+                // Apply ambient light to location color
+                Color adjustedColor = color * ambientColor * ambientIntensity;
+
+                // Add pulsing effect for current location
+                if (location.Id == currentLocationId && EnableAnimations)
+                {
+                    float pulse = 0.7f + 0.3f * Mathf.Sin(_animationTimer * 3.0f);
+                    adjustedColor = adjustedColor * pulse;
                 }
 
                 if (location.Id == currentLocationId)
@@ -598,6 +1056,189 @@ namespace SignalLost
             }
         }
 
+        // Draw weather effects (background layer)
+        private void DrawWeatherBackground(Color ambientColor, float ambientIntensity)
+        {
+            Vector2 size = Size;
+
+            // Draw clouds
+            if (_currentWeather >= 1) // Cloudy, Rainy, or Stormy
+            {
+                foreach (var cloud in _cloudParticles)
+                {
+                    // Draw cloud as a soft circle
+                    Color cloudColor = new Color(0.9f, 0.9f, 0.9f, cloud.Alpha * ambientIntensity);
+                    DrawCircle(cloud.Position, cloud.Size, cloudColor);
+
+                    // Add some detail to the cloud
+                    for (int i = 0; i < 3; i++)
+                    {
+                        float offset = cloud.Size * 0.4f;
+                        Vector2 detailPos = cloud.Position + new Vector2(
+                            (float)_random.NextDouble() * offset - offset/2,
+                            (float)_random.NextDouble() * offset - offset/2
+                        );
+                        DrawCircle(detailPos, cloud.Size * 0.6f, cloudColor);
+                    }
+                }
+            }
+
+            // Draw fog overlay
+            if (_currentWeather == 4) // Foggy
+            {
+                // Draw semi-transparent fog overlay
+                Color fogColor = new Color(0.8f, 0.8f, 0.8f, _fogDensity * 0.5f);
+                DrawRect(new Rect2(0, 0, size.X, size.Y), fogColor);
+
+                // Add some fog particles for texture
+                int fogParticleCount = (int)(50 * _weatherIntensity);
+                for (int i = 0; i < fogParticleCount; i++)
+                {
+                    float x = (float)_random.NextDouble() * size.X;
+                    float y = (float)_random.NextDouble() * size.Y;
+                    float fogSize = 20.0f + (float)_random.NextDouble() * 40.0f;
+                    float fogAlpha = 0.05f + (float)_random.NextDouble() * 0.1f;
+
+                    Color particleColor = new Color(0.9f, 0.9f, 0.9f, fogAlpha);
+                    DrawCircle(new Vector2(x, y), fogSize, particleColor);
+                }
+            }
+        }
+
+        // Draw weather effects (foreground layer)
+        private void DrawWeatherForeground(Color ambientColor, float ambientIntensity)
+        {
+            // Draw rain
+            if (_currentWeather >= 2) // Rainy or Stormy
+            {
+                foreach (var drop in _raindrops)
+                {
+                    // Draw raindrop as a line
+                    Vector2 start = drop.Position;
+                    Vector2 end = new Vector2(
+                        start.X - drop.Length * 0.2f,
+                        start.Y - drop.Length
+                    );
+
+                    Color rainColor = new Color(0.7f, 0.7f, 0.9f, drop.Alpha * ambientIntensity);
+                    DrawLine(start, end, rainColor, 1);
+                }
+            }
+
+            // Draw lightning
+            if (_currentWeather == 3) // Stormy
+            {
+                foreach (var bolt in _lightningBolts)
+                {
+                    // Draw lightning as a series of connected lines
+                    Color lightningColor = new Color(0.9f, 0.9f, 1.0f, bolt.Alpha);
+
+                    for (int i = 0; i < bolt.Points.Count - 1; i++)
+                    {
+                        DrawLine(bolt.Points[i], bolt.Points[i + 1], lightningColor, bolt.Width);
+                    }
+
+                    // Add a glow effect
+                    if (bolt.Alpha > 0.5f)
+                    {
+                        // Flash the entire screen briefly
+                        Color flashColor = new Color(0.9f, 0.9f, 1.0f, bolt.Alpha * 0.2f);
+                        DrawRect(new Rect2(0, 0, Size.X, Size.Y), flashColor);
+                    }
+                }
+            }
+        }
+
+        // Get ambient light color based on time of day
+        private Color GetAmbientLightColor()
+        {
+            if (_visualManager != null && EnableDayNightCycle)
+            {
+                return _visualManager.GetAmbientLightColor();
+            }
+
+            // Default implementation if visualization manager is not available
+            if (_timeOfDay < 0.25f)
+            {
+                // Night to morning transition
+                float t = _timeOfDay / 0.25f;
+                return new Color(
+                    Mathf.Lerp(0.1f, 1.0f, t),
+                    Mathf.Lerp(0.1f, 0.8f, t),
+                    Mathf.Lerp(0.3f, 0.6f, t),
+                    1.0f
+                );
+            }
+            else if (_timeOfDay < 0.5f)
+            {
+                // Morning to noon transition
+                float t = (_timeOfDay - 0.25f) / 0.25f;
+                return new Color(
+                    Mathf.Lerp(1.0f, 1.0f, t),
+                    Mathf.Lerp(0.8f, 1.0f, t),
+                    Mathf.Lerp(0.6f, 1.0f, t),
+                    1.0f
+                );
+            }
+            else if (_timeOfDay < 0.75f)
+            {
+                // Noon to evening transition
+                float t = (_timeOfDay - 0.5f) / 0.25f;
+                return new Color(
+                    Mathf.Lerp(1.0f, 1.0f, t),
+                    Mathf.Lerp(1.0f, 0.8f, t),
+                    Mathf.Lerp(1.0f, 0.6f, t),
+                    1.0f
+                );
+            }
+            else
+            {
+                // Evening to night transition
+                float t = (_timeOfDay - 0.75f) / 0.25f;
+                return new Color(
+                    Mathf.Lerp(1.0f, 0.1f, t),
+                    Mathf.Lerp(0.8f, 0.1f, t),
+                    Mathf.Lerp(0.6f, 0.3f, t),
+                    1.0f
+                );
+            }
+        }
+
+        // Get ambient light intensity based on time of day
+        private float GetAmbientLightIntensity()
+        {
+            if (_visualManager != null && EnableDayNightCycle)
+            {
+                return _visualManager.GetAmbientLightIntensity();
+            }
+
+            // Default implementation if visualization manager is not available
+            if (_timeOfDay < 0.25f)
+            {
+                // Night to morning transition
+                float t = _timeOfDay / 0.25f;
+                return Mathf.Lerp(0.2f, 0.5f, t);
+            }
+            else if (_timeOfDay < 0.5f)
+            {
+                // Morning to noon transition
+                float t = (_timeOfDay - 0.25f) / 0.25f;
+                return Mathf.Lerp(0.5f, 1.0f, t);
+            }
+            else if (_timeOfDay < 0.75f)
+            {
+                // Noon to evening transition
+                float t = (_timeOfDay - 0.5f) / 0.25f;
+                return Mathf.Lerp(1.0f, 0.5f, t);
+            }
+            else
+            {
+                // Evening to night transition
+                float t = (_timeOfDay - 0.75f) / 0.25f;
+                return Mathf.Lerp(0.5f, 0.2f, t);
+            }
+        }
+
         // Event handlers
         private void OnLocationDiscovered(string locationId)
         {
@@ -607,6 +1248,29 @@ namespace SignalLost
         private void OnLocationChanged(string locationId)
         {
             _selectedLocationId = locationId;
+            QueueRedraw();
+        }
+
+        private void OnTimeOfDayChanged(float timeOfDay)
+        {
+            _timeOfDay = timeOfDay;
+            QueueRedraw();
+        }
+
+        private void OnWeatherChanged(int weatherType, float intensity)
+        {
+            _currentWeather = weatherType;
+            _weatherIntensity = intensity;
+
+            // Initialize weather effects
+            InitializeWeatherEffects();
+
+            QueueRedraw();
+        }
+
+        private void OnWeatherTransitioning(int fromWeather, int toWeather, float progress)
+        {
+            // Handle weather transition if needed
             QueueRedraw();
         }
 
