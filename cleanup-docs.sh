@@ -1,27 +1,29 @@
 #!/bin/bash
 
-# Script to clean up outdated documentation files
-# This script removes migration-related documentation that is no longer needed
+# Enhanced script to clean up outdated documentation files
+# This script handles redundant and outdated documentation
 
 echo "Cleaning up outdated documentation files..."
 
-# List of files to remove
-FILES_TO_REMOVE=(
-  "docs/godot-migration.md"
-  "docs/csharp-migration.md"
-  "docs/csharp-migration-tasks.md"
-  "docs/files-to-remove.md"
-  "docs/godot-cleanup-plan.md"
-  "docs/sprint-godot-migration.md"
-)
-
-# Create a backup directory
-BACKUP_DIR="docs/archive/$(date +%Y%m%d)"
+# Today's date for backup directory
+TODAY=$(date +%Y%m%d)
+BACKUP_DIR="docs/archive/$TODAY"
 mkdir -p "$BACKUP_DIR"
 echo "Created backup directory: $BACKUP_DIR"
 
+# List of potentially redundant or outdated files to archive
+FILES_TO_ARCHIVE=(
+  # Files that might be redundant or outdated
+  "docs/memory-leak-detection.md"
+  "docs/radio-dial-fix-plan.md"
+  "docs/component_integration.md"
+  "docs/audio-system-implementation-plan.md"
+  "docs/game-content-and-progression-plan.md"
+  "docs/user_documentation.md"
+)
+
 # Move files to backup directory
-for file in "${FILES_TO_REMOVE[@]}"; do
+for file in "${FILES_TO_ARCHIVE[@]}"; do
   if [ -f "$file" ]; then
     echo "Moving $file to backup directory..."
     cp "$file" "$BACKUP_DIR/$(basename "$file")"
@@ -31,5 +33,35 @@ for file in "${FILES_TO_REMOVE[@]}"; do
   fi
 done
 
-echo "Cleanup complete. Outdated files have been moved to $BACKUP_DIR"
-echo "You can safely delete the backup directory if you no longer need these files."
+# Clean up redundant archive folders
+echo "Checking for redundant archive folders..."
+
+# Get a list of archive folders older than 30 days
+OLD_ARCHIVES=$(find docs/archive -type d -name "2025*" -mtime +30 2>/dev/null)
+
+if [ -n "$OLD_ARCHIVES" ]; then
+  echo "Found old archive folders to clean up:"
+  echo "$OLD_ARCHIVES"
+
+  # Ask for confirmation
+  read -p "Do you want to remove these old archive folders? (y/n): " CONFIRM
+  if [ "$CONFIRM" = "y" ]; then
+    echo "$OLD_ARCHIVES" | xargs rm -rf
+    echo "Old archive folders removed."
+  else
+    echo "Skipping removal of old archive folders."
+  fi
+else
+  echo "No old archive folders found."
+fi
+
+# Update docs/README.md to reflect current state
+echo "Updating documentation index..."
+
+# Create a list of current documentation files
+DOC_LIST=$(find docs -maxdepth 1 -type f -name "*.md" | sort | grep -v "README.md")
+
+echo "Documentation cleanup complete."
+echo "Outdated files have been moved to $BACKUP_DIR"
+echo "You may want to update docs/README.md to reflect the current documentation state."
+
