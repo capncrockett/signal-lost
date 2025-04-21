@@ -1,0 +1,94 @@
+[gd_scene load_steps=3 format=3 uid="uid://c8q6y8j3xj3qv"]
+
+[ext_resource type="Script" path="res://scripts/progression/GameProgressionSystem.cs" id="1_8j3qv"]
+[ext_resource type="PackedScene" path="res://scenes/progression/GameProgressionDisplay.tscn" id="2_j4k5l"]
+
+[node name="GameProgressionTest" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameProgressionSystem" type="Node" parent="."]
+script = ExtResource("1_8j3qv")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="ControlPanel" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+text = "Test Controls:"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+
+[node name="MilestoneButtons" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/ControlPanel/MilestoneButtons"]
+layout_mode = 2
+text = "Beginning Stage Milestones:"
+
+[node name="FindRadioPartsButton" type="Button" parent="VBoxContainer/HBoxContainer/ControlPanel/MilestoneButtons"]
+layout_mode = 2
+text = "Complete: Find Radio Parts"
+
+[node name="RepairRadioButton" type="Button" parent="VBoxContainer/HBoxContainer/ControlPanel/MilestoneButtons"]
+layout_mode = 2
+text = "Complete: Repair Radio"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer/HBoxContainer/ControlPanel/MilestoneButtons"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer/ControlPanel/MilestoneButtons"]
+layout_mode = 2
+text = "Exploration Stage Milestones:"
+
+[node name="DiscoverEmergencyBroadcastButton" type="Button" parent="VBoxContainer/HBoxContainer/ControlPanel/MilestoneButtons"]
+layout_mode = 2
+text = "Complete: Discover Emergency Broadcast"
+
+[node name="DiscoverSurvivorSignalButton" type="Button" parent="VBoxContainer/HBoxContainer/ControlPanel/MilestoneButtons"]
+layout_mode = 2
+text = "Complete: Discover Survivor Signal"
+
+[node name="VisitOldMillButton" type="Button" parent="VBoxContainer/HBoxContainer/ControlPanel/MilestoneButtons"]
+layout_mode = 2
+text = "Complete: Visit Old Mill"
+
+[node name="HSeparator2" type="HSeparator" parent="VBoxContainer/HBoxContainer/ControlPanel/MilestoneButtons"]
+layout_mode = 2
+
+[node name="AdvanceStageButton" type="Button" parent="VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+text = "Advance Stage"
+
+[node name="GameProgressionDisplay" parent="VBoxContainer/HBoxContainer" instance=ExtResource("2_j4k5l")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="StatusLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Click buttons to test game progression"
+horizontal_alignment = 1
