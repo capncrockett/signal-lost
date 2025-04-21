@@ -9,7 +9,7 @@ Signal Lost has a solid technical foundation with a pixel-based UI approach in G
 1. ✅ Fix radio dial control - currently "flies all over the place"
 2. ✅ Implement audio system properly - missing static, beeps, and radio sounds
 3. ✅ Add content to the map interface
-4. ⬜ Add items to the inventory system
+4. ✅ Add items to the inventory system
 5. ✅ Create a clear gameplay progression system
 
 ## Game Development Roadmap
@@ -52,11 +52,11 @@ Signal Lost has a solid technical foundation with a pixel-based UI approach in G
    - ✅ Implement fog of war / exploration mechanics
    - ✅ Create visual indicators for signal sources
 
-3. ⬜ Inventory System
-   - ⬜ Create a set of collectible and usable items
-   - ⬜ Implement item functionality (tools, keys, documents)
-   - ⬜ Add item descriptions and usage instructions
-   - ⬜ Create an item discovery system
+3. ✅ Inventory System
+   - ✅ Create a set of collectible and usable items
+   - ✅ Implement item functionality (tools, keys, documents)
+   - ✅ Add item descriptions and usage instructions
+   - ✅ Create an item discovery system
 
 ### Phase 3: Gameplay Implementation
 

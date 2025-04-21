@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8q6y8j3xj3qv"]
+
+[ext_resource type="Script" path="res://scripts/field/ItemPlacementSetup.cs" id="1_8j3qv"]
+
+[node name="ItemPlacementSetup" type="Node"]
+script = ExtResource("1_8j3qv")
