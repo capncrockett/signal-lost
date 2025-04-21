@@ -1,10 +1,11 @@
+// Moved to tests/e2e/
 using Godot;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SignalLost.Tests
+namespace SignalLost.Tests.E2E
 {
     /// <summary>
     /// Base class for end-to-end tests in the Signal Lost game.
