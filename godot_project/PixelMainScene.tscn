@@ -1,10 +1,12 @@
-[gd_scene load_steps=6 format=3 uid="uid://c8j6y8o4n8qxp"]
+[gd_scene load_steps=8 format=3 uid="uid://c8j6y8o4n8qxp"]
 
 [ext_resource type="Script" path="res://scripts/PixelMainScene.cs" id="1_main"]
 [ext_resource type="Script" path="res://scripts/PixelRadioInterface.cs" id="2_radio"]
 [ext_resource type="Script" path="res://scripts/PixelInventoryUI.cs" id="3_inventory"]
 [ext_resource type="Script" path="res://scripts/PixelMapInterface.cs" id="4_map"]
 [ext_resource type="Script" path="res://scripts/PixelQuestUI.cs" id="5_quest"]
+[ext_resource type="Script" path="res://scripts/SaveLoadMenu.cs" id="6_save"]
+[ext_resource type="Script" path="res://scripts/ProgressionUI.cs" id="7_progression"]
 
 [node name="PixelMainScene" type="Node"]
 script = ExtResource("1_main")
@@ -81,3 +83,121 @@ text = "Map"
 [node name="QuestButton" type="Button" parent="UIControls"]
 layout_mode = 2
 text = "Quests"
+
+[node name="SaveLoadButton" type="Button" parent="UIControls"]
+layout_mode = 2
+text = "Save/Load"
+
+[node name="ProgressionButton" type="Button" parent="UIControls"]
+layout_mode = 2
+text = "Progress"
+
+[node name="SaveLoadMenu" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_save")
+
+[node name="ProgressionUI" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("7_progression")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ProgressionUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="StageLabel" type="Label" parent="ProgressionUI/VBoxContainer"]
+layout_mode = 2
+text = "Stage: Beginning"
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="ProgressionUI/VBoxContainer"]
+layout_mode = 2
+value = 10.0
+
+[node name="DescriptionLabel" type="Label" parent="ProgressionUI/VBoxContainer"]
+layout_mode = 2
+text = "You've just arrived at the emergency bunker. Your radio is damaged and needs repair."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="ObjectiveLabel" type="Label" parent="ProgressionUI/VBoxContainer"]
+layout_mode = 2
+text = "Next Objective: Repair your radio by finding the necessary components."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="SaveLoadMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.1, 0.8)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SaveLoadMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -150.0
+offset_right = 150.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="SaveLoadMenu/VBoxContainer"]
+layout_mode = 2
+text = "Save/Load Game"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="SaveLoadMenu/VBoxContainer"]
+layout_mode = 2
+
+[node name="SaveSlotList" type="ItemList" parent="SaveLoadMenu/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+allow_reselect = true
+auto_height = true
+item_count = 1
+item_0/text = "autosave"
+
+[node name="StatusLabel" type="Label" parent="SaveLoadMenu/VBoxContainer"]
+layout_mode = 2
+text = "Select a save slot"
+horizontal_alignment = 1
+
+[node name="ButtonContainer" type="HBoxContainer" parent="SaveLoadMenu/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="SaveButton" type="Button" parent="SaveLoadMenu/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Save"
+
+[node name="LoadButton" type="Button" parent="SaveLoadMenu/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Load"
+
+[node name="CloseButton" type="Button" parent="SaveLoadMenu/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Close"

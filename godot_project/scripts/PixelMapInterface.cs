@@ -393,5 +393,17 @@ namespace SignalLost
             _selectedLocationId = locationId;
             QueueRedraw();
         }
+
+        // Set MapSystem reference (for testing)
+        public void SetMapSystem(MapSystem mapSystem)
+        {
+            _mapSystem = mapSystem;
+        }
+
+        // Set GameState reference (for testing)
+        public void SetGameState(GameState gameState)
+        {
+            _gameState = gameState;
+        }
     }
 }

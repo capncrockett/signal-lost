@@ -56,7 +56,7 @@ namespace SignalLost
             string signalStrength = "0";
             if (signalData != null)
             {
-                signalStrength = (gameState.CalculateSignalStrength(gameState.CurrentFrequency, signalData) * 100).ToString("F0");
+                signalStrength = (GameState.CalculateSignalStrength(gameState.CurrentFrequency, signalData) * 100).ToString("F0");
             }
 
             // Update the state display

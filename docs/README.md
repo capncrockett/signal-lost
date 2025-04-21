@@ -8,6 +8,7 @@ This directory contains documentation for the Signal Lost game project, a C# God
 
 - **todo.md**: Current and upcoming tasks for the project.
 - **agent-roles.md**: Defines the roles and responsibilities of Agent Alpha and Beta agents.
+- **user-guide.md**: Comprehensive guide for players on how to play the game.
 
 ### UI System
 
@@ -21,13 +22,16 @@ This directory contains documentation for the Signal Lost game project, a C# God
 - **audio-system.md**: Details the audio system implementation.
 - **radio_system.md**: Documentation for the radio system.
 - **radio-ui-improvements.md**: Planned improvements for the radio UI.
+- **field-exploration-system.md**: Documentation for the new field exploration system.
 
 ### Development
 
 - **cross-platform-compatibility.md**: Guidelines for compatibility between Windows and macOS.
+- **platform-specific-testing.md**: Detailed guide for testing on different platforms.
 - **testing-guide.md**: Guidelines for testing the implementation.
 - **logging.md**: Documentation for the logging system.
 - **README-pixel-ui.md**: Quick start guide for the pixel-based UI system.
+- **ai-screenshot-tool.md**: Documentation for the AI agent screenshot tool.
 
 ## Godot Project
 
@@ -35,7 +39,9 @@ The Godot project is located in the `godot_project` directory at the root of the
 
 ## Current Development Focus
 
-- Field exploration system implementation
+- Field exploration system implementation (in progress)
+- Cross-platform compatibility improvements
+- Documentation updates and maintenance
 - Game progression mechanics
 - Save/load system
 - Visual polish and optimization

@@ -137,7 +137,7 @@ namespace SignalLost
         }
 
         // Generate noise value at a specific position and time
-        private float NoiseAt(int posIndex, float time)
+        private static float NoiseAt(int posIndex, float time)
         {
             float p = posIndex * 0.1f;
             float t = time * 2.0f;

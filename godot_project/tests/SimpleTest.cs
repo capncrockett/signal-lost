@@ -80,7 +80,7 @@ namespace SignalLost.Tests
             }
         }
 
-        private void ContinueAfterTimeout()
+        private static void ContinueAfterTimeout()
         {
             // This method is called after a test times out
             // It will be implemented in the test runner classes
@@ -243,7 +243,7 @@ namespace SignalLost.Tests
             }
         }
 
-        private List<MethodInfo> FindTestMethods(Type testClass)
+        private static List<MethodInfo> FindTestMethods(Type testClass)
         {
             var testMethods = new List<MethodInfo>();
 

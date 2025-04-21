@@ -55,6 +55,7 @@ namespace SignalLost
         // References to other systems
         private GameState _gameState;
         private InventorySystem _inventorySystem;
+        private GameProgressionManager _progressionManager;
         private MapSystem _mapSystem;
 
         // Signals
@@ -80,6 +81,9 @@ namespace SignalLost
             _gameState = GetNode<GameState>("/root/GameState");
             _inventorySystem = GetNode<InventorySystem>("/root/InventorySystem");
             _mapSystem = GetNode<MapSystem>("/root/MapSystem");
+
+            // Get reference to progression manager (may not exist yet during initialization)
+            _progressionManager = GetNodeOrNull<GameProgressionManager>("/root/GameProgressionManager");
 
             if (_gameState == null || _inventorySystem == null || _mapSystem == null)
             {
@@ -293,6 +297,12 @@ namespace SignalLost
             return _completedQuests;
         }
 
+        // Check if a quest is completed
+        public bool IsQuestCompleted(string questId)
+        {
+            return _completedQuests.ContainsKey(questId);
+        }
+
         // Discover a quest
         public bool DiscoverQuest(string questId)
         {
@@ -311,7 +321,7 @@ namespace SignalLost
             }
 
             // Check if the prerequisite quest is completed
-            if (!string.IsNullOrEmpty(quest.PrerequisiteQuestId) && 
+            if (!string.IsNullOrEmpty(quest.PrerequisiteQuestId) &&
                 (!_completedQuests.ContainsKey(quest.PrerequisiteQuestId)))
             {
                 return false;
@@ -395,6 +405,13 @@ namespace SignalLost
             }
 
             EmitSignal(SignalName.QuestCompleted, questId);
+
+            // Check if this quest completion should trigger progression advancement
+            if (_progressionManager != null)
+            {
+                _progressionManager.CheckProgressionRequirements();
+            }
+
             return true;
         }
 
@@ -444,7 +461,7 @@ namespace SignalLost
                 if (quest.LocationId == locationId && !quest.IsDiscovered)
                 {
                     // Check if the prerequisite quest is completed
-                    if (string.IsNullOrEmpty(quest.PrerequisiteQuestId) || 
+                    if (string.IsNullOrEmpty(quest.PrerequisiteQuestId) ||
                         _completedQuests.ContainsKey(quest.PrerequisiteQuestId))
                     {
                         DiscoverQuest(quest.Id);
@@ -457,8 +474,8 @@ namespace SignalLost
             {
                 foreach (var objective in quest.Objectives)
                 {
-                    if (objective.Type == QuestObjectiveType.VisitLocation && 
-                        objective.TargetId == locationId && 
+                    if (objective.Type == QuestObjectiveType.VisitLocation &&
+                        objective.TargetId == locationId &&
                         !objective.IsCompleted)
                     {
                         UpdateQuestObjective(quest.Id, objective.Id);
@@ -475,8 +492,8 @@ namespace SignalLost
             {
                 foreach (var objective in quest.Objectives)
                 {
-                    if (objective.Type == QuestObjectiveType.DecodeSignal && 
-                        objective.TargetId == messageId && 
+                    if (objective.Type == QuestObjectiveType.DecodeSignal &&
+                        objective.TargetId == messageId &&
                         !objective.IsCompleted)
                     {
                         UpdateQuestObjective(quest.Id, objective.Id);
@@ -497,8 +514,8 @@ namespace SignalLost
             {
                 foreach (var objective in quest.Objectives)
                 {
-                    if (objective.Type == QuestObjectiveType.VisitLocation && 
-                        objective.TargetId == locationId && 
+                    if (objective.Type == QuestObjectiveType.VisitLocation &&
+                        objective.TargetId == locationId &&
                         !objective.IsCompleted)
                     {
                         UpdateQuestObjective(quest.Id, objective.Id);
@@ -542,14 +559,32 @@ namespace SignalLost
             {
                 foreach (var objective in quest.Objectives)
                 {
-                    if (objective.Type == QuestObjectiveType.UseItem && 
-                        objective.TargetId == itemId && 
+                    if (objective.Type == QuestObjectiveType.UseItem &&
+                        objective.TargetId == itemId &&
                         !objective.IsCompleted)
                     {
                         UpdateQuestObjective(quest.Id, objective.Id);
                     }
                 }
             }
+        }
+
+        // Set GameState reference (for testing)
+        public void SetGameState(GameState gameState)
+        {
+            _gameState = gameState;
+        }
+
+        // Set InventorySystem reference (for testing)
+        public void SetInventorySystem(InventorySystem inventorySystem)
+        {
+            _inventorySystem = inventorySystem;
+        }
+
+        // Set MapSystem reference (for testing)
+        public void SetMapSystem(MapSystem mapSystem)
+        {
+            _mapSystem = mapSystem;
         }
     }
 }

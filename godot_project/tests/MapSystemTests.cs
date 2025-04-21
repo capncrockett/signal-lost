@@ -40,7 +40,7 @@ namespace SignalLost.Tests
             try
             {
                 // Act
-                var location = _mapSystem.GetLocation("bunker");
+                var location = TestMapSystem.GetLocation("bunker");
 
                 // Assert
                 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(location, "Location should not be null");
@@ -64,8 +64,8 @@ namespace SignalLost.Tests
             try
             {
                 // Act
-                bool result = _mapSystem.DiscoverLocation("forest");
-                var location = _mapSystem.GetLocation("forest");
+                bool result = TestMapSystem.DiscoverLocation("forest");
+                var location = TestMapSystem.GetLocation("forest");
 
                 // Assert
                 Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsTrue(result, "DiscoverLocation should return true");
@@ -90,7 +90,7 @@ namespace SignalLost.Tests
                 GD.Print($"Initial location: {_mapSystem.GetCurrentLocation()}");
 
                 // Discover the forest location first
-                bool discovered = _mapSystem.DiscoverLocation("forest");
+                bool discovered = TestMapSystem.DiscoverLocation("forest");
                 GD.Print($"Forest discovered: {discovered}");
 
                 // Change to the forest location
@@ -164,7 +164,7 @@ namespace SignalLost.Tests
                 GD.Print($"Current location: {_mapSystem.GetCurrentLocation()}");
 
                 // Get all locations
-                var locations = _mapSystem.GetAllLocations();
+                var locations = TestMapSystem.GetAllLocations();
                 GD.Print($"All locations count: {locations.Count}");
 
                 // Check if forest is connected
@@ -191,7 +191,7 @@ namespace SignalLost.Tests
         }
 
         // Assertion methods
-        protected void AssertTrue(bool condition, string message = null)
+        protected static void AssertTrue(bool condition, string message = null)
         {
             if (!condition)
             {
@@ -199,7 +199,7 @@ namespace SignalLost.Tests
             }
         }
 
-        protected void AssertFalse(bool condition, string message = null)
+        protected static void AssertFalse(bool condition, string message = null)
         {
             if (condition)
             {
@@ -207,7 +207,7 @@ namespace SignalLost.Tests
             }
         }
 
-        protected void AssertEqual<T>(T actual, T expected, string message = null)
+        protected static void AssertEqual<T>(T actual, T expected, string message = null)
         {
             if (!actual.Equals(expected))
             {
@@ -215,7 +215,7 @@ namespace SignalLost.Tests
             }
         }
 
-        protected void AssertNotEqual<T>(T actual, T expected, string message = null)
+        protected static void AssertNotEqual<T>(T actual, T expected, string message = null)
         {
             if (actual.Equals(expected))
             {
@@ -223,7 +223,7 @@ namespace SignalLost.Tests
             }
         }
 
-        protected void AssertNull(object obj, string message = null)
+        protected static void AssertNull(object obj, string message = null)
         {
             if (obj != null)
             {
@@ -231,7 +231,7 @@ namespace SignalLost.Tests
             }
         }
 
-        protected void AssertNotNull(object obj, string message = null)
+        protected static void AssertNotNull(object obj, string message = null)
         {
             if (obj == null)
             {
