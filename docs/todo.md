@@ -1,148 +1,130 @@
-# Signal Lost: Pixel-Based Godot Implementation
+# Signal Lost: Game Development Plan
 
-## Overview
+## Current Status
 
-Signal Lost has been successfully migrated to the Godot Engine with a pixel-based UI approach. This document outlines the current state of the project, upcoming tasks, and technical considerations.
+Signal Lost has a solid technical foundation with a pixel-based UI approach in Godot, but lacks actual gameplay content and has several issues that need to be addressed. This document outlines the plan to transform the framework into a playable game.
 
-The pixel-based approach offers several advantages:
+## Critical Issues to Fix
 
-1. Better performance and resource usage
-2. More authentic retro aesthetic
-3. Easier to maintain and extend
-4. Better cross-platform compatibility
-5. More consistent visual style
+1. ✅ Fix radio dial control - currently "flies all over the place"
+2. ✅ Implement audio system properly - missing static, beeps, and radio sounds
+3. ✅ Add content to the map interface
+4. ⬜ Add items to the inventory system
+5. ⬜ Create a clear gameplay progression system
 
-## Project Goals
+## Game Development Roadmap
 
-1. ✅ Create a fully testable game using Godot Engine
-2. ✅ Maintain the core gameplay mechanics and narrative
-3. ✅ Improve performance and stability
-4. ✅ Establish a clean, maintainable architecture
-5. ⬜ Ensure comprehensive test coverage
-6. ⬜ Enable cross-platform deployment
-7. ✅ Complete the pixel-based field exploration system
+### Phase 1: Core Functionality Fixes
 
-## Technical Stack
+1. ✅ Radio Interface Improvements
 
-- **Engine**: Godot 4.x
-- **Language**: C# (Mono)
-- **State Management**: Godot's built-in signals and autoloaded singletons
-- **UI**: Pixel-based UI using Godot's drawing primitives
-- **Testing**: C# test framework with custom test runner
-- **Audio**: Godot's built-in audio system
-- **Build**: Godot's export system with .NET build pipeline
+   - ✅ Fix tuning dial sensitivity and control
+   - ✅ Implement proper audio feedback (static, beeps)
+   - ✅ Add visual feedback for signal detection
+   - ✅ Create a more intuitive frequency selection mechanism
 
-## Completed Milestones
+2. ✅ Audio System Implementation
 
-### Milestone 1: Godot Migration Foundation
+   - ✅ Fix static noise generation
+   - ✅ Implement signal tones
+   - ✅ Add audio effects for different signal types
+   - ✅ Create ambient background sounds
 
-1. ✅ Create migration plan for Godot
-2. ✅ Set up initial Godot project structure
-3. ✅ Clean up repository by removing React code
-4. ✅ Update documentation for Godot development
-5. ✅ Create GameState singleton
-6. ✅ Create AudioManager singleton
-7. ✅ Create RadioTuner scene and script
-8. ✅ Set up testing infrastructure
+3. ⬜ UI Polishing
+   - ⬜ Improve visual feedback across all interfaces
+   - ⬜ Ensure consistent styling
+   - ⬜ Add tooltips and help text
+   - ⬜ Fix any layout issues
 
-### Milestone 2: Core Game Systems
+### Phase 2: Content Creation
 
-1. ✅ Implement radio tuner component
-   - ✅ Frequency dial interaction
-   - ✅ Signal detection
-   - ✅ Static/noise visualization
-2. ✅ Create audio system
-   - ✅ Noise generation
-   - ✅ Signal processing
-   - ✅ Audio effects
-3. ✅ Implement basic narrative system
-   - ✅ Message display
-   - ✅ Progressive decoding
-4. ✅ Set up unit testing with C# test framework
-   - ✅ Create test runner
-   - ✅ Write tests for core systems
-5. ✅ Fix C# test framework and build errors
-6. ✅ Fix test runner hanging issues
+1. ⬜ Radio Signals
 
-### Milestone 3: Pixel-Based UI Implementation
+   - ⬜ Create a set of meaningful radio signals at different frequencies
+   - ⬜ Implement different signal types (Morse, voice, data)
+   - ⬜ Add narrative content to signals
+   - ⬜ Create a signal discovery system
 
-1. ✅ Implement pixel-based radio interface
-   - ✅ Replace image-based assets with programmatic drawing
-   - ✅ Create interactive radio controls using drawing primitives
-   - ✅ Implement realistic radio tuning experience
-2. ✅ Extend pixel-based approach to other UI elements
-   - ✅ Create pixel-based inventory UI
-   - ✅ Implement pixel-based message display
-   - ✅ Design pixel-based map interface
-   - ✅ Clean up obsolete UI components
-3. ✅ Clean up obsolete code and tests
-   - ✅ Remove old UI components
-   - ✅ Archive obsolete documentation
-   - ✅ Update test runner to skip obsolete tests
+2. ✅ Map Implementation
 
-## Current Sprint: Field Exploration
+   - ✅ Design a game world map with key locations
+   - ✅ Add points of interest that relate to radio signals
+   - ✅ Implement fog of war / exploration mechanics
+   - ✅ Create visual indicators for signal sources
 
-1. ✅ Implement field exploration
-   - ✅ Grid-based movement
-   - ✅ Player character with pixel-based rendering
-   - ✅ Interactable objects
-2. ✅ Connect field exploration with radio signals
-3. ✅ Add game progression mechanics
-4. ✅ Implement save/load system
+3. ⬜ Inventory System
+   - ⬜ Create a set of collectible and usable items
+   - ⬜ Implement item functionality (tools, keys, documents)
+   - ⬜ Add item descriptions and usage instructions
+   - ⬜ Create an item discovery system
 
-## Future Sprints
+### Phase 3: Gameplay Implementation
 
-### Polish and Optimization
+1. ⬜ Field Exploration
 
-1. ⬜ Enhance visual design
-2. ⬜ Optimize performance
-3. ⬜ Add sound effects and audio polish
-4. ⬜ Implement accessibility features
+   - ⬜ Implement player movement in the field
+   - ⬜ Add interactable objects and environments
+   - ⬜ Create environmental effects on radio signals
+   - ⬜ Implement day/night cycle or time progression
 
-### Testing and Deployment
+2. ⬜ Quest System
 
-1. ✅ Write comprehensive unit tests
-2. ✅ Create manual test procedures
-3. ✅ Document codebase
-4. ✅ Create user documentation
-5. ⬜ Set up export templates for multiple platforms
-6. ⬜ Final bug fixes and polish
+   - ⬜ Design main storyline quests
+   - ⬜ Create side quests and optional objectives
+   - ⬜ Implement quest tracking and completion
+   - ⬜ Add rewards and progression mechanics
 
-## Development Workflow
+3. ⬜ Game Progression
+   - ⬜ Implement a clear game progression system
+   - ⬜ Create milestones and achievements
+   - ⬜ Add difficulty scaling
+   - ⬜ Implement an ending or conclusion
 
-1. Create feature branches from `develop`
-2. Implement features with tests
-3. Submit PRs for review
-4. Merge to `develop` branch
-5. Once stable, merge to `main`
+### Phase 4: Polish and Testing
+
+1. ⬜ Visual Polish
+
+   - ⬜ Enhance all visual elements
+   - ⬜ Add animations and transitions
+   - ⬜ Implement visual effects for key actions
+   - ⬜ Ensure consistent pixel art style
+
+2. ⬜ Audio Polish
+
+   - ⬜ Create a complete soundscape
+   - ⬜ Add ambient sounds and effects
+   - ⬜ Implement music where appropriate
+   - ⬜ Fine-tune audio mixing
+
+3. ⬜ Comprehensive Testing
+   - ⬜ Develop end-to-end tests for game scenarios
+   - ⬜ Test on different platforms
+   - ⬜ Perform performance optimization
+   - ⬜ Fix bugs and issues
+
+## Implementation Priorities
+
+1. **Highest Priority**: Fix radio dial control and audio system
+2. **High Priority**: Add basic content (signals, map locations, items)
+3. **Medium Priority**: Implement gameplay progression
+4. **Lower Priority**: Visual and audio polish
+
+## Development Approach
+
+1. Work in small, focused iterations
+2. Implement one feature at a time
+3. Test thoroughly before moving to the next feature
+4. Maintain cross-platform compatibility throughout
+5. Keep code clean and well-documented
 
 ## Testing Strategy
 
-1. Unit tests for all C# scripts and scenes
+1. Unit tests for all new functionality
 2. Integration tests for feature combinations
-3. Manual tests for gameplay and user experience
-4. Performance tests for resource usage
-5. Visual verification for pixel-based UI elements
-6. Cross-platform tests for deployment targets
+3. End-to-end tests for gameplay scenarios
+4. Manual testing for user experience
+5. Cross-platform testing
 
-## Project Status Summary
+## Conclusion
 
-### Completed
-
-1. ✅ Migration from browser-based to Godot Engine
-2. ✅ Implementation of core game systems
-3. ✅ Pixel-based UI for all major components
-4. ✅ Testing infrastructure with custom test runner
-5. ✅ Cleanup of obsolete code and documentation
-
-### In Progress
-
-1. ✅ Field exploration system
-2. ✅ Game progression mechanics
-3. ✅ Save/load system
-
-### Upcoming
-
-1. ⬜ Visual polish and optimization
-2. ✅ Comprehensive testing
-3. ⬜ Cross-platform deployment
+By following this plan, we will transform Signal Lost from a technical framework into a fully playable game with engaging content and mechanics. The focus will be on creating a cohesive experience that leverages the existing technical foundation while adding meaningful gameplay elements.

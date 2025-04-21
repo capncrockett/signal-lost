@@ -150,7 +150,51 @@ namespace SignalLost
             DiscoveredFrequencies.Clear();
         }
 
+        // Dictionary to store discovered signals
+        private Dictionary<string, float> _discoveredSignals = new Dictionary<string, float>();
 
+        /// <summary>
+        /// Adds a discovered signal to the game state.
+        /// </summary>
+        /// <param name="signalId">The ID of the discovered signal</param>
+        /// <param name="frequency">The frequency of the discovered signal</param>
+        public void AddDiscoveredSignal(string signalId, float frequency)
+        {
+            if (!_discoveredSignals.ContainsKey(signalId))
+            {
+                _discoveredSignals[signalId] = frequency;
+                AddDiscoveredFrequency(frequency);
+                EmitSignal(SignalName.SignalDiscovered, signalId, frequency);
+                GD.Print($"Signal discovered: {signalId} at {frequency} MHz");
+            }
+        }
+
+        /// <summary>
+        /// Checks if a signal has been discovered.
+        /// </summary>
+        /// <param name="signalId">The ID of the signal to check</param>
+        /// <returns>True if the signal has been discovered, false otherwise</returns>
+        public bool IsSignalDiscovered(string signalId)
+        {
+            return _discoveredSignals.ContainsKey(signalId);
+        }
+
+        /// <summary>
+        /// Gets all discovered signals.
+        /// </summary>
+        /// <returns>A dictionary of discovered signals (ID -> frequency)</returns>
+        public Dictionary<string, float> GetDiscoveredSignals()
+        {
+            return _discoveredSignals;
+        }
+
+        /// <summary>
+        /// Clears all discovered signals.
+        /// </summary>
+        public void ClearDiscoveredSignals()
+        {
+            _discoveredSignals.Clear();
+        }
 
         /// <summary>
         /// Sets the game progress.
@@ -159,6 +203,29 @@ namespace SignalLost
         public void SetGameProgress(int progress)
         {
             GameProgress = progress;
+        }
+
+        /// <summary>
+        /// Checks progression triggers based on the current game state.
+        /// </summary>
+        public void CheckProgressionTriggers()
+        {
+            // This method will be called when significant events occur
+            // (discovering signals, locations, completing quests, etc.)
+            // It should check if any progression triggers have been met
+
+            // For now, just log that we're checking triggers
+            GD.Print("Checking progression triggers...");
+
+            // In a real implementation, this would check various conditions
+            // and potentially advance the game progression
+
+            // Example:
+            // var progressionManager = GetNode<GameProgressionManager>("/root/GameProgressionManager");
+            // if (progressionManager != null)
+            // {
+            //     progressionManager.CheckProgressionRequirements();
+            // }
         }
 
         // Signals (Godot's events, not radio signals)
@@ -179,6 +246,9 @@ namespace SignalLost
 
         [Signal]
         public delegate void InventoryChangedEventHandler();
+
+        [Signal]
+        public delegate void SignalDiscoveredEventHandler(string signalId, float frequency);
 
         // Functions to modify state
         public void SetFrequency(float freq)
