@@ -22,6 +22,7 @@ This directory contains documentation for the Signal Lost game project, a C# God
 - **audio-system.md**: Details the audio system implementation.
 - **radio_system.md**: Documentation for the radio system.
 - **enhanced-radio-signals-system.md**: Documentation for the enhanced radio signals system.
+- **radio-signals-implementation.md**: Documentation for the radio signals implementation.
 - **radio-ui-improvements.md**: Planned improvements for the radio UI.
 - **field-exploration-system.md**: Documentation for the new field exploration system.
 - **game-progression-system.md**: Documentation for the game progression system.
@@ -46,10 +47,12 @@ The Godot project is located in the `godot_project` directory at the root of the
 - ✅ Enhanced radio signals system implementation
 - ✅ Radio dial integration and fixes
 - ✅ Cross-platform compatibility improvements
-- ⬜ Game progression mechanics implementation
+- ✅ Game progression mechanics implementation
+- ✅ Field exploration system implementation
+- ✅ Gameplay implementation and content
 - ⬜ Inventory system enhancements
-- ⬜ Field exploration system implementation
 - ⬜ End-to-end testing improvements
+- ⬜ Save/load system
 - ⬜ Visual polish and optimization
 
 ## Documentation Guidelines
