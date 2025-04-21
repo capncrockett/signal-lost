@@ -102,7 +102,6 @@ namespace SignalLost.Tests
                         IsDiscovered = false
                     };
                 }
->>>>>>> develop
             }
             catch (Exception ex)
             {
@@ -143,7 +142,6 @@ namespace SignalLost.Tests
                 {
                     _connections["cabin"] = new List<string> { "forest", "road" };
                 }
->>>>>>> develop
             }
             catch (Exception ex)
             {
