@@ -1,137 +1,144 @@
-# Signal Lost: Game Development Plan
+# Signal Lost: Game Development Plan (Updated)
 
 ## Current Status
 
-Signal Lost has a solid technical foundation with a pixel-based UI approach in Godot, but lacks actual gameplay content and has several issues that need to be addressed. This document outlines the plan to transform the framework into a playable game.
+Signal Lost has made significant progress with the implementation of the radio interface and various system components. The game now has a functional radio system with proper audio feedback, and the foundation for gameplay mechanics is in place. This document outlines the next steps to enhance the game and add more content.
 
-## Critical Issues to Fix
+## Immediate Priorities
 
-1. ✅ Fix radio dial control - currently "flies all over the place"
-2. ✅ Implement audio system properly - missing static, beeps, and radio sounds
-3. ✅ Add content to the map interface
-4. ✅ Add items to the inventory system
-5. ✅ Create a clear gameplay progression system
+1. **Cross-Platform Testing**
 
-## Game Development Roadmap
+   - Test all radio interface components on both Windows and Mac
+   - Ensure consistent behavior across platforms
+   - Fix any platform-specific issues
 
-### Phase 1: Core Functionality Fixes
+2. **Memory Leak Resolution**
 
-1. ✅ Radio Interface Improvements
+   - Identify and fix memory leaks in the radio system
+   - Implement proper resource cleanup for audio components
+   - Add memory profiling during gameplay
 
-   - ✅ Fix tuning dial sensitivity and control
-   - ✅ Implement proper audio feedback (static, beeps)
-   - ✅ Add visual feedback for signal detection
-   - ✅ Create a more intuitive frequency selection mechanism
+3. **Game Content Development**
+   - Create a cohesive storyline that ties radio signals together
+   - Develop a set of meaningful radio signals with narrative content
+   - Implement a progression system that guides the player through the story
 
-2. ✅ Audio System Implementation
+## Development Roadmap
 
-   - ✅ Fix static noise generation
-   - ✅ Implement signal tones
-   - ✅ Add audio effects for different signal types
-   - ✅ Create ambient background sounds
+### Phase 1: Technical Stability (Current Focus)
 
-3. ✅ UI Polishing
-   - ✅ Improve visual feedback across all interfaces
-   - ✅ Ensure consistent styling
-   - ✅ Add tooltips and help text
-   - ✅ Fix any layout issues
+1. **Performance Optimization**
 
-### Phase 2: Content Creation
+   - Profile the game to identify performance bottlenecks
+   - Optimize rendering for pixel-based UI elements
+   - Reduce memory usage and improve resource management
 
-1. ✅ Radio Signals
+2. **Audio System Enhancement**
 
-   - ✅ Create a set of meaningful radio signals at different frequencies
-   - ✅ Implement different signal types (Morse, voice, data)
-   - ✅ Add narrative content to signals
-   - ✅ Create a signal discovery system
+   - Implement 8-bit/16-bit sound generation for radio signals
+   - Create a more diverse range of radio static and interference effects
+   - Add environmental effects that influence radio reception
 
-2. ✅ Map Implementation
+3. **Save/Load System Improvement**
+   - Ensure all game state is properly saved and restored
+   - Implement auto-save functionality
+   - Add multiple save slots and save management
 
-   - ✅ Design a game world map with key locations
-   - ✅ Add points of interest that relate to radio signals
-   - ✅ Implement fog of war / exploration mechanics
-   - ✅ Create visual indicators for signal sources
+### Phase 2: Content Expansion
 
-3. ✅ Inventory System
-   - ✅ Create a set of collectible and usable items
-   - ✅ Implement item functionality (tools, keys, documents)
-   - ✅ Add item descriptions and usage instructions
-   - ✅ Create an item discovery system
+1. **Radio Signal Content**
 
-### Phase 3: Gameplay Implementation
+   - Create at least 20 unique radio signals with different types (voice, Morse, data)
+   - Implement a signal discovery system with player progression
+   - Add signal decoding mechanics for encrypted messages
 
-1. ✅ Field Exploration
+2. **World Building**
 
-   - ✅ Implement player movement in the field
-   - ✅ Add interactable objects and environments
-   - ✅ Create environmental effects on radio signals
-   - ✅ Implement day/night cycle or time progression
+   - Develop a detailed game world with locations tied to radio signals
+   - Create a map system that reveals locations as signals are discovered
+   - Implement environmental storytelling through map locations
 
-2. ✅ Quest System
+3. **Character Development**
+   - Create NPCs that communicate via radio
+   - Implement character progression for the player
+   - Add character-specific quests and storylines
 
-   - ✅ Design main storyline quests
-   - ✅ Create side quests and optional objectives
-   - ✅ Implement quest tracking and completion
-   - ✅ Add rewards and progression mechanics
+### Phase 3: Gameplay Depth
 
-3. ✅ Game Progression
+1. **Field Exploration System**
 
-   - ✅ Implement a clear game progression system
-   - ✅ Create milestones and achievements
-   - ✅ Add difficulty scaling
-   - ✅ Implement an ending or conclusion
+   - Implement a field exploration mode for visiting signal locations
+   - Add environmental hazards and challenges
+   - Create a day/night cycle that affects signal reception
 
-4. ✅ Gameplay Integration
-   - ✅ Create a cohesive gameplay loop
-   - ✅ Implement a clear player goal
-   - ✅ Add a tutorial system
-   - ✅ Create a main menu and game flow
+2. **Equipment System**
 
-### Phase 4: Polish and Testing
+   - Develop upgradable radio equipment
+   - Add tools for signal analysis and decoding
+   - Implement equipment crafting or modification
 
-1. ✅ Visual Polish
+3. **Quest System**
+   - Create a comprehensive quest system with main and side quests
+   - Implement quest tracking and rewards
+   - Add branching quest paths based on player choices
 
-   - ✅ Enhance all visual elements
-   - ✅ Add animations and transitions
-   - ✅ Implement visual effects for key actions
-   - ✅ Ensure consistent pixel art style
+### Phase 4: Polish and Release
 
-2. ✅ Audio Polish
+1. **Visual Polish**
 
-   - ✅ Create a complete soundscape
-   - ✅ Add ambient sounds and effects
-   - ✅ Implement music where appropriate
-   - ✅ Fine-tune audio mixing
+   - Enhance all UI elements with consistent pixel art style
+   - Add animations and visual effects
+   - Implement weather and environmental effects
 
-3. ✅ Comprehensive Testing
-   - ✅ Develop end-to-end tests for game scenarios
-   - ✅ Test on different platforms
-   - ✅ Perform performance optimization
-   - ✅ Fix bugs and issues
+2. **Audio Polish**
 
-## Implementation Priorities
+   - Create a complete soundscape for different game areas
+   - Implement dynamic music that responds to gameplay
+   - Fine-tune audio mixing and effects
 
-1. **Highest Priority**: Fix radio dial control and audio system
-2. **High Priority**: Add basic content (signals, map locations, items)
-3. **Medium Priority**: Implement gameplay progression
-4. **Lower Priority**: Visual and audio polish
+3. **Final Testing and Optimization**
+   - Conduct comprehensive testing across all platforms
+   - Optimize for different hardware configurations
+   - Fix any remaining bugs and issues
 
-## Development Approach
+## Implementation Approach
 
-1. Work in small, focused iterations
-2. Implement one feature at a time
-3. Test thoroughly before moving to the next feature
-4. Maintain cross-platform compatibility throughout
-5. Keep code clean and well-documented
+1. **Iterative Development**
+
+   - Work in small, focused iterations with clear goals
+   - Implement one feature at a time with thorough testing
+   - Regularly integrate new features into the main development branch
+
+2. **Cross-Platform Compatibility**
+
+   - Test all features on both Windows and Mac throughout development
+   - Use platform-agnostic code and resources whenever possible
+   - Document any platform-specific implementations
+
+3. **Documentation**
+   - Maintain up-to-date documentation for all systems
+   - Create user guides for complex features
+   - Document code with clear comments and explanations
 
 ## Testing Strategy
 
-1. Unit tests for all new functionality
-2. Integration tests for feature combinations
-3. End-to-end tests for gameplay scenarios
-4. Manual testing for user experience
-5. Cross-platform testing
+1. **Automated Testing**
+
+   - Expand unit tests for all new functionality
+   - Implement integration tests for system interactions
+   - Create end-to-end tests for gameplay scenarios
+
+2. **Manual Testing**
+
+   - Conduct regular playtesting sessions
+   - Test user experience and interface usability
+   - Verify cross-platform compatibility through manual testing
+
+3. **Performance Testing**
+   - Monitor memory usage and performance metrics
+   - Test on minimum specification hardware
+   - Optimize for both performance and memory efficiency
 
 ## Conclusion
 
-By following this plan, we will transform Signal Lost from a technical framework into a fully playable game with engaging content and mechanics. The focus will be on creating a cohesive experience that leverages the existing technical foundation while adding meaningful gameplay elements.
+With the radio interface now functional, the focus shifts to expanding game content and ensuring technical stability. By following this updated plan, Signal Lost will evolve into a rich, engaging game with a unique focus on radio communication and exploration.
