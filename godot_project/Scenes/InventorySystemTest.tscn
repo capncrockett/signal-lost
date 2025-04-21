@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://c8q6y8j3xj3qv"]
+
+[ext_resource type="Script" path="res://scripts/inventory/InventorySystemSetup.cs" id="1_8j3qv"]
+[ext_resource type="Script" path="res://scripts/inventory/InventorySystemTestScript.cs" id="2_j4k5l"]
+
+[node name="InventorySystemTest" type="Node"]
+script = ExtResource("1_8j3qv")
+
+[node name="Label" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Inventory System Test"
+
+[node name="TestRunner" type="Node" parent="."]
+script = ExtResource("2_j4k5l")

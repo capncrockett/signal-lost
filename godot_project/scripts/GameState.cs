@@ -14,7 +14,11 @@ namespace SignalLost
         public List<float> DiscoveredFrequencies { get; private set; } = new List<float>();
         public string CurrentLocation { get; set; } = "bunker";
         public List<string> Inventory { get; private set; } = new List<string>();
-        public int GameProgress { get; private set; } = 0;
+        public int GameProgress { get; set; } = 0;
+        public int StageProgress { get; set; } = 0;
+
+        // Dictionary to store completed milestones
+        private HashSet<string> _completedMilestones = new HashSet<string>();
 
         // Signal data
         public class SignalData
@@ -153,6 +157,9 @@ namespace SignalLost
         // Dictionary to store discovered signals
         private Dictionary<string, float> _discoveredSignals = new Dictionary<string, float>();
 
+        // Set of objects that have been interacted with
+        private HashSet<string> _interactedObjects = new HashSet<string>();
+
         /// <summary>
         /// Adds a discovered signal to the game state.
         /// </summary>
@@ -197,6 +204,46 @@ namespace SignalLost
         }
 
         /// <summary>
+        /// Sets an object as having been interacted with.
+        /// </summary>
+        /// <param name="objectId">The ID of the object</param>
+        public void SetObjectInteractedWith(string objectId)
+        {
+            if (!_interactedObjects.Contains(objectId))
+            {
+                _interactedObjects.Add(objectId);
+                GD.Print($"Object interacted with: {objectId}");
+            }
+        }
+
+        /// <summary>
+        /// Checks if an object has been interacted with.
+        /// </summary>
+        /// <param name="objectId">The ID of the object to check</param>
+        /// <returns>True if the object has been interacted with, false otherwise</returns>
+        public bool IsObjectInteractedWith(string objectId)
+        {
+            return _interactedObjects.Contains(objectId);
+        }
+
+        /// <summary>
+        /// Gets all objects that have been interacted with.
+        /// </summary>
+        /// <returns>A set of object IDs</returns>
+        public HashSet<string> GetInteractedObjects()
+        {
+            return _interactedObjects;
+        }
+
+        /// <summary>
+        /// Clears all interacted objects.
+        /// </summary>
+        public void ClearInteractedObjects()
+        {
+            _interactedObjects.Clear();
+        }
+
+        /// <summary>
         /// Sets the game progress.
         /// </summary>
         /// <param name="progress">The new progress value</param>
@@ -210,22 +257,65 @@ namespace SignalLost
         /// </summary>
         public void CheckProgressionTriggers()
         {
-            // This method will be called when significant events occur
-            // (discovering signals, locations, completing quests, etc.)
-            // It should check if any progression triggers have been met
+            // Get the game progression system
+            var progressionSystem = GetNode<SignalLost.Progression.GameProgressionSystem>("/root/GameProgressionSystem");
 
-            // For now, just log that we're checking triggers
-            GD.Print("Checking progression triggers...");
+            if (progressionSystem == null)
+            {
+                GD.PrintErr("GameState: GameProgressionSystem not found");
+                return;
+            }
 
-            // In a real implementation, this would check various conditions
-            // and potentially advance the game progression
+            // Check for progression triggers based on the current state
+            // This is just an example - in a real implementation, we would check various conditions
 
-            // Example:
-            // var progressionManager = GetNode<GameProgressionManager>("/root/GameProgressionManager");
-            // if (progressionManager != null)
-            // {
-            //     progressionManager.CheckProgressionRequirements();
-            // }
+            // Check if we have discovered enough signals to progress
+            if (_discoveredSignals.Count >= 3 && progressionSystem.GetCurrentStage() == SignalLost.Progression.GameProgressionSystem.GameStage.Exploration)
+            {
+                progressionSystem.IncrementProgress(10);
+            }
+
+            // Check if we have enough items to progress
+            if (Inventory.Count >= 5 && progressionSystem.GetCurrentStage() == SignalLost.Progression.GameProgressionSystem.GameStage.Discovery)
+            {
+                progressionSystem.IncrementProgress(10);
+            }
+        }
+
+        /// <summary>
+        /// Sets a milestone as completed.
+        /// </summary>
+        /// <param name="milestoneId">The ID of the milestone</param>
+        public void SetMilestoneCompleted(string milestoneId)
+        {
+            _completedMilestones.Add(milestoneId);
+        }
+
+        /// <summary>
+        /// Checks if a milestone is completed.
+        /// </summary>
+        /// <param name="milestoneId">The ID of the milestone</param>
+        /// <returns>True if the milestone is completed, false otherwise</returns>
+        public bool IsMilestoneCompleted(string milestoneId)
+        {
+            return _completedMilestones.Contains(milestoneId);
+        }
+
+        /// <summary>
+        /// Gets all completed milestones.
+        /// </summary>
+        /// <returns>A set of completed milestone IDs</returns>
+        public HashSet<string> GetCompletedMilestones()
+        {
+            return _completedMilestones;
+        }
+
+        /// <summary>
+        /// Clears all completed milestones.
+        /// </summary>
+        public void ClearCompletedMilestones()
+        {
+            _completedMilestones.Clear();
         }
 
         // Signals (Godot's events, not radio signals)
@@ -307,6 +397,35 @@ namespace SignalLost
             return Inventory.Contains(itemId);
         }
 
+        // Initialize the game state
+        public void Initialize()
+        {
+            // Initialize game state variables
+            CurrentFrequency = 90.0f;
+            IsRadioOn = false;
+            DiscoveredFrequencies.Clear();
+            CurrentLocation = "bunker";
+            Inventory.Clear();
+            GameProgress = 0;
+            _discoveredSignals.Clear();
+            _interactedObjects.Clear();
+            _completedMilestones.Clear();
+
+            GD.Print("GameState: Initialized");
+        }
+
+        // Start a new game
+        public void NewGame()
+        {
+            // Initialize game state
+            Initialize();
+
+            // Add initial items to inventory
+            Inventory.Add("flashlight");
+
+            GD.Print("GameState: New game started");
+        }
+
         // Save and load functions
         public bool SaveGame()
         {
@@ -326,7 +445,11 @@ namespace SignalLost
                 ["current_location"] = CurrentLocation,
                 ["inventory"] = Inventory,
                 ["game_progress"] = GameProgress,
-                ["messages"] = Messages
+                ["stage_progress"] = StageProgress,
+                ["completed_milestones"] = _completedMilestones,
+                ["messages"] = Messages,
+                ["discovered_signals"] = _discoveredSignals,
+                ["interacted_objects"] = _interactedObjects
             };
 
             string jsonString = JsonSerializer.Serialize(saveData);
@@ -371,7 +494,32 @@ namespace SignalLost
             CurrentLocation = saveData["current_location"].ToString();
             Inventory = JsonSerializer.Deserialize<List<string>>(saveData["inventory"].ToString());
             GameProgress = Convert.ToInt32(saveData["game_progress"]);
+
+            // Load stage progress if it exists
+            if (saveData.ContainsKey("stage_progress"))
+            {
+                StageProgress = Convert.ToInt32(saveData["stage_progress"]);
+            }
+
+            // Load completed milestones if they exist
+            if (saveData.ContainsKey("completed_milestones"))
+            {
+                _completedMilestones = JsonSerializer.Deserialize<HashSet<string>>(saveData["completed_milestones"].ToString());
+            }
+
             Messages = JsonSerializer.Deserialize<Dictionary<string, MessageData>>(saveData["messages"].ToString());
+
+            // Load discovered signals if they exist
+            if (saveData.ContainsKey("discovered_signals"))
+            {
+                _discoveredSignals = JsonSerializer.Deserialize<Dictionary<string, float>>(saveData["discovered_signals"].ToString());
+            }
+
+            // Load interacted objects if they exist
+            if (saveData.ContainsKey("interacted_objects"))
+            {
+                _interactedObjects = JsonSerializer.Deserialize<HashSet<string>>(saveData["interacted_objects"].ToString());
+            }
 
             return true;
         }
