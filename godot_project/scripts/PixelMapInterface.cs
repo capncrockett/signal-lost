@@ -247,8 +247,24 @@ namespace SignalLost
                 Vector2 pos = GetScreenPosition(location.Position);
                 float size = LocationSize * ZoomLevel;
 
-                // Determine location color
+                // Determine location color based on type
                 Color color = LocationColor;
+
+                switch (location.LocationType)
+                {
+                    case "shelter":
+                        color = new Color(0.0f, 0.7f, 0.0f, 1.0f); // Green for shelters
+                        break;
+                    case "danger":
+                        color = new Color(0.8f, 0.0f, 0.0f, 1.0f); // Red for dangerous areas
+                        break;
+                    case "signal_source":
+                        color = new Color(0.0f, 0.5f, 0.8f, 1.0f); // Blue for signal sources
+                        break;
+                    default:
+                        color = LocationColor; // Default color for standard locations
+                        break;
+                }
 
                 if (location.Id == currentLocationId)
                 {
@@ -259,18 +275,67 @@ namespace SignalLost
                 else if (location.Id == _selectedLocationId)
                 {
                     // Selected location
-                    color = new Color(0.7f, 0.3f, 0.3f, 1.0f);
+                    color = new Color(0.9f, 0.9f, 0.2f, 1.0f); // Bright yellow for selected
                 }
 
-                // Draw location marker
-                DrawCircle(pos, size, color);
+                // Draw location marker based on type
+                switch (location.LocationType)
+                {
+                    case "shelter":
+                        // Draw a house/shelter icon
+                        DrawRect(new Rect2(pos.X - size, pos.Y - size, size * 2, size * 2), color);
+                        DrawRect(new Rect2(pos.X - size * 0.8f, pos.Y - size * 0.5f, size * 1.6f, size), color.Darkened(0.3f));
+                        break;
+                    case "danger":
+                        // Draw a warning triangle
+                        Vector2[] trianglePoints = {
+                            new Vector2(pos.X, pos.Y - size),
+                            new Vector2(pos.X - size, pos.Y + size),
+                            new Vector2(pos.X + size, pos.Y + size)
+                        };
+                        DrawPolygon(trianglePoints, new Color[] { color });
+                        break;
+                    case "signal_source":
+                        // Draw a radio tower icon
+                        DrawRect(new Rect2(pos.X - size * 0.2f, pos.Y - size, size * 0.4f, size * 2), color);
+                        DrawLine(new Vector2(pos.X - size, pos.Y - size * 0.5f),
+                                new Vector2(pos.X + size, pos.Y - size * 0.5f), color, 2);
+                        DrawLine(new Vector2(pos.X - size * 0.7f, pos.Y - size * 0.8f),
+                                new Vector2(pos.X + size * 0.7f, pos.Y - size * 0.8f), color, 2);
+                        break;
+                    default:
+                        // Draw a circle for standard locations
+                        DrawCircle(pos, size, color);
+                        break;
+                }
 
                 // Draw location name
                 DrawString(ThemeDB.FallbackFont, pos + new Vector2(0, size + 10),
                     location.Name, HorizontalAlignment.Center, -1, (int)(12 * ZoomLevel), TextColor);
 
+                // Draw signal strength indicator if it's a signal source
+                if (location.SignalStrength > 0.0f)
+                {
+                    // Draw signal waves
+                    int waveCount = Mathf.CeilToInt(location.SignalStrength * 3);
+                    for (int i = 1; i <= waveCount; i++)
+                    {
+                        float waveSize = size * (1.0f + (i * 0.4f));
+                        float alpha = 1.0f - ((float)i / (waveCount + 1));
+                        DrawArc(pos, waveSize, 0, Mathf.Pi * 2, 32, new Color(color.R, color.G, color.B, alpha * 0.5f), 1);
+                    }
+                }
+
+                // Indicate if location requires an item
+                if (!location.IsAccessible && !string.IsNullOrEmpty(location.RequiredItem))
+                {
+                    DrawRect(new Rect2(pos.X - size * 0.5f, pos.Y - size * 1.5f, size, size), new Color(0.8f, 0.8f, 0.0f, 0.8f));
+                    DrawString(ThemeDB.FallbackFont, pos + new Vector2(0, -size * 1.2f),
+                        "🔒", HorizontalAlignment.Center, -1, (int)(16 * ZoomLevel), new Color(0.0f, 0.0f, 0.0f, 1.0f));
+                }
+
                 // Store location rect for interaction
-                _locationRects[location.Id] = new Rect2(pos.X - size, pos.Y - size, size * 2, size * 2);
+                _locationRects[location.Id] = new Rect2(pos.X - size * 1.5f, pos.Y - size * 1.5f, size * 3, size * 3);
             }
         }
 
@@ -283,6 +348,44 @@ namespace SignalLost
             DrawString(ThemeDB.FallbackFont, new Vector2(20, 30),
                 "SIGNAL LOST - MAP", HorizontalAlignment.Left, -1, 24, TextColor);
 
+            // Draw legend
+            float legendX = 20;
+            float legendY = 70;
+            float legendItemHeight = 25;
+
+            DrawString(ThemeDB.FallbackFont, new Vector2(legendX, legendY),
+                "Legend:", HorizontalAlignment.Left, -1, 16, TextColor);
+
+            // Standard location
+            DrawCircle(new Vector2(legendX + 15, legendY + legendItemHeight), 8, LocationColor);
+            DrawString(ThemeDB.FallbackFont, new Vector2(legendX + 30, legendY + legendItemHeight + 5),
+                "Standard Location", HorizontalAlignment.Left, -1, 12, TextColor);
+
+            // Shelter
+            DrawRect(new Rect2(legendX + 7, legendY + legendItemHeight * 2 - 8, 16, 16), new Color(0.0f, 0.7f, 0.0f, 1.0f));
+            DrawString(ThemeDB.FallbackFont, new Vector2(legendX + 30, legendY + legendItemHeight * 2 + 5),
+                "Shelter", HorizontalAlignment.Left, -1, 12, TextColor);
+
+            // Danger zone
+            Vector2[] trianglePoints = {
+                new Vector2(legendX + 15, legendY + legendItemHeight * 3 - 8),
+                new Vector2(legendX + 7, legendY + legendItemHeight * 3 + 8),
+                new Vector2(legendX + 23, legendY + legendItemHeight * 3 + 8)
+            };
+            DrawPolygon(trianglePoints, new Color[] { new Color(0.8f, 0.0f, 0.0f, 1.0f) });
+            DrawString(ThemeDB.FallbackFont, new Vector2(legendX + 30, legendY + legendItemHeight * 3 + 5),
+                "Danger Zone", HorizontalAlignment.Left, -1, 12, TextColor);
+
+            // Signal source
+            DrawRect(new Rect2(legendX + 13, legendY + legendItemHeight * 4 - 8, 4, 16), new Color(0.0f, 0.5f, 0.8f, 1.0f));
+            DrawString(ThemeDB.FallbackFont, new Vector2(legendX + 30, legendY + legendItemHeight * 4 + 5),
+                "Signal Source", HorizontalAlignment.Left, -1, 12, TextColor);
+
+            // Locked location
+            DrawRect(new Rect2(legendX + 7, legendY + legendItemHeight * 5 - 8, 16, 16), new Color(0.8f, 0.8f, 0.0f, 0.8f));
+            DrawString(ThemeDB.FallbackFont, new Vector2(legendX + 30, legendY + legendItemHeight * 5 + 5),
+                "Locked Location", HorizontalAlignment.Left, -1, 12, TextColor);
+
             // Draw selected location info if any
             if (_selectedLocationId != null)
             {
@@ -292,43 +395,156 @@ namespace SignalLost
                 {
                     // Draw info panel
                     float panelWidth = 300;
-                    float panelHeight = 200;
+                    float panelHeight = 300; // Increased height for more info
                     float panelX = size.X - panelWidth - 20;
                     float panelY = 20;
 
                     DrawRect(new Rect2(panelX, panelY, panelWidth, panelHeight),
                         new Color(0.15f, 0.15f, 0.15f, 0.9f));
 
-                    // Draw location name
+                    // Draw panel border
+                    DrawRect(new Rect2(panelX, panelY, panelWidth, 2), TextColor); // Top
+                    DrawRect(new Rect2(panelX, panelY + panelHeight - 2, panelWidth, 2), TextColor); // Bottom
+                    DrawRect(new Rect2(panelX, panelY, 2, panelHeight), TextColor); // Left
+                    DrawRect(new Rect2(panelX + panelWidth - 2, panelY, 2, panelHeight), TextColor); // Right
+
+                    // Draw location name with type indicator
+                    string typeIndicator = "";
+                    switch (location.LocationType)
+                    {
+                        case "shelter": typeIndicator = "[SHELTER]"; break;
+                        case "danger": typeIndicator = "[DANGER]"; break;
+                        case "signal_source": typeIndicator = "[SIGNAL SOURCE]"; break;
+                        default: typeIndicator = "[LOCATION]"; break;
+                    }
+
                     DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, panelY + 30),
                         location.Name, HorizontalAlignment.Left, -1, 18, TextColor);
+                    DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, panelY + 50),
+                        typeIndicator, HorizontalAlignment.Left, -1, 14, GetLocationTypeColor(location.LocationType));
 
                     // Draw location description
-                    DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, panelY + 60),
+                    DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, panelY + 80),
                         location.Description, HorizontalAlignment.Left, (int)panelWidth - 20, 14, TextColor);
 
+                    float y = panelY + 140;
+
+                    // Draw signal strength if applicable
+                    if (location.SignalStrength > 0.0f)
+                    {
+                        DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, y),
+                            "Signal Strength: " + (location.SignalStrength * 100).ToString("0") + "%",
+                            HorizontalAlignment.Left, -1, 14, TextColor);
+
+                        // Draw signal strength bar
+                        float barWidth = 150;
+                        float barHeight = 10;
+                        float barX = panelX + 10;
+                        float barY = y + 20;
+
+                        // Draw background
+                        DrawRect(new Rect2(barX, barY, barWidth, barHeight), new Color(0.3f, 0.3f, 0.3f, 1.0f));
+
+                        // Draw fill
+                        Color signalColor = new Color(0.0f, 0.5f, 0.8f, 1.0f);
+                        if (location.SignalStrength > 0.7f) signalColor = new Color(0.0f, 0.8f, 0.0f, 1.0f);
+                        else if (location.SignalStrength > 0.3f) signalColor = new Color(0.8f, 0.8f, 0.0f, 1.0f);
+
+                        DrawRect(new Rect2(barX, barY, barWidth * location.SignalStrength, barHeight), signalColor);
+
+                        y += 40;
+                    }
+
+                    // Draw available items if any
+                    if (location.AvailableItems.Count > 0)
+                    {
+                        DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, y),
+                            "Available Items:", HorizontalAlignment.Left, -1, 14, TextColor);
+
+                        y += 20;
+                        foreach (var item in location.AvailableItems)
+                        {
+                            DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 20, y),
+                                "• " + FormatItemName(item), HorizontalAlignment.Left, -1, 12, TextColor);
+                            y += 20;
+                        }
+
+                        y += 10;
+                    }
+
                     // Draw connected locations
-                    DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, panelY + 120),
+                    DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, y),
                         "Connected to:", HorizontalAlignment.Left, -1, 14, TextColor);
 
-                    float y = panelY + 140;
+                    y += 20;
                     foreach (var connectedId in location.ConnectedLocations)
                     {
                         var connectedLocation = _mapSystem.GetLocation(connectedId);
 
-                        if (connectedLocation != null && connectedLocation.IsDiscovered)
+                        if (connectedLocation != null)
                         {
-                            DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 20, y),
-                                "• " + connectedLocation.Name, HorizontalAlignment.Left, -1, 12, TextColor);
+                            if (connectedLocation.IsDiscovered)
+                            {
+                                DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 20, y),
+                                    "• " + connectedLocation.Name, HorizontalAlignment.Left, -1, 12, TextColor);
+                            }
+                            else
+                            {
+                                DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 20, y),
+                                    "• Unknown Location", HorizontalAlignment.Left, -1, 12, new Color(0.5f, 0.5f, 0.5f, 1.0f));
+                            }
                             y += 20;
                         }
+                    }
+
+                    // Draw notes if any
+                    if (!string.IsNullOrEmpty(location.Notes))
+                    {
+                        y += 10;
+                        DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, y),
+                            "Notes:", HorizontalAlignment.Left, -1, 14, TextColor);
+
+                        y += 20;
+                        DrawString(ThemeDB.FallbackFont, new Vector2(panelX + 10, y),
+                            location.Notes, HorizontalAlignment.Left, (int)panelWidth - 20, 12, TextColor);
                     }
                 }
             }
 
             // Draw help text
             DrawString(ThemeDB.FallbackFont, new Vector2(20, size.Y - 20),
-                "Drag to pan | Scroll to zoom | ESC to close", HorizontalAlignment.Left, -1, 12, TextColor);
+                "Drag to pan | Scroll to zoom | Click on locations | ESC to close", HorizontalAlignment.Left, -1, 12, TextColor);
+        }
+
+        // Helper method to get color for location type
+        private Color GetLocationTypeColor(string locationType)
+        {
+            switch (locationType)
+            {
+                case "shelter":
+                    return new Color(0.0f, 0.7f, 0.0f, 1.0f); // Green for shelters
+                case "danger":
+                    return new Color(0.8f, 0.0f, 0.0f, 1.0f); // Red for dangerous areas
+                case "signal_source":
+                    return new Color(0.0f, 0.5f, 0.8f, 1.0f); // Blue for signal sources
+                default:
+                    return LocationColor; // Default color for standard locations
+            }
+        }
+
+        // Helper method to format item names
+        private string FormatItemName(string itemId)
+        {
+            // Convert snake_case to Title Case
+            string[] words = itemId.Split('_');
+            for (int i = 0; i < words.Length; i++)
+            {
+                if (words[i].Length > 0)
+                {
+                    words[i] = char.ToUpper(words[i][0]) + words[i].Substring(1);
+                }
+            }
+            return string.Join(" ", words);
         }
 
         // Convert map position to screen position

@@ -6,9 +6,9 @@ Signal Lost has a solid technical foundation with a pixel-based UI approach in G
 
 ## Critical Issues to Fix
 
-1. ⬜ Fix radio dial control - currently "flies all over the place"
-2. ⬜ Implement audio system properly - missing static, beeps, and radio sounds
-3. ⬜ Add content to the map interface
+1. ✅ Fix radio dial control - currently "flies all over the place"
+2. ✅ Implement audio system properly - missing static, beeps, and radio sounds
+3. ✅ Add content to the map interface
 4. ⬜ Add items to the inventory system
 5. ⬜ Create a clear gameplay progression system
 
@@ -16,19 +16,19 @@ Signal Lost has a solid technical foundation with a pixel-based UI approach in G
 
 ### Phase 1: Core Functionality Fixes
 
-1. ⬜ Radio Interface Improvements
+1. ✅ Radio Interface Improvements
 
-   - ⬜ Fix tuning dial sensitivity and control
-   - ⬜ Implement proper audio feedback (static, beeps)
-   - ⬜ Add visual feedback for signal detection
-   - ⬜ Create a more intuitive frequency selection mechanism
+   - ✅ Fix tuning dial sensitivity and control
+   - ✅ Implement proper audio feedback (static, beeps)
+   - ✅ Add visual feedback for signal detection
+   - ✅ Create a more intuitive frequency selection mechanism
 
-2. ⬜ Audio System Implementation
+2. ✅ Audio System Implementation
 
-   - ⬜ Fix static noise generation
-   - ⬜ Implement signal tones
-   - ⬜ Add audio effects for different signal types
-   - ⬜ Create ambient background sounds
+   - ✅ Fix static noise generation
+   - ✅ Implement signal tones
+   - ✅ Add audio effects for different signal types
+   - ✅ Create ambient background sounds
 
 3. ⬜ UI Polishing
    - ⬜ Improve visual feedback across all interfaces
@@ -45,12 +45,12 @@ Signal Lost has a solid technical foundation with a pixel-based UI approach in G
    - ⬜ Add narrative content to signals
    - ⬜ Create a signal discovery system
 
-2. ⬜ Map Implementation
+2. ✅ Map Implementation
 
-   - ⬜ Design a game world map with key locations
-   - ⬜ Add points of interest that relate to radio signals
-   - ⬜ Implement fog of war / exploration mechanics
-   - ⬜ Create visual indicators for signal sources
+   - ✅ Design a game world map with key locations
+   - ✅ Add points of interest that relate to radio signals
+   - ✅ Implement fog of war / exploration mechanics
+   - ✅ Create visual indicators for signal sources
 
 3. ⬜ Inventory System
    - ⬜ Create a set of collectible and usable items
