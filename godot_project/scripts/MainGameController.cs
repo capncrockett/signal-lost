@@ -117,7 +117,7 @@ namespace SignalLost
                 _confirmationDialog = new ConfirmationDialog();
                 _confirmationDialog.Title = "Confirmation";
                 _confirmationDialog.DialogText = "Are you sure?";
-                _confirmationDialog.MinSize = new Vector2(200, 100);
+                _confirmationDialog.MinSize = new Vector2I(200, 100);
                 _confirmationDialog.GetOkButton().Text = "Yes";
                 _confirmationDialog.GetCancelButton().Text = "No";
                 AddChild(_confirmationDialog);

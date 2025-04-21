@@ -43,7 +43,7 @@ namespace SignalLost
             _confirmationDialog = new ConfirmationDialog();
             _confirmationDialog.Title = "Confirmation";
             _confirmationDialog.DialogText = "Are you sure?";
-            _confirmationDialog.MinSize = new Vector2(200, 100);
+            _confirmationDialog.MinSize = new Vector2I(200, 100);
             _confirmationDialog.GetOkButton().Text = "Yes";
             _confirmationDialog.GetCancelButton().Text = "No";
             AddChild(_confirmationDialog);
@@ -91,7 +91,9 @@ namespace SignalLost
 
                 // Show confirmation dialog
                 _confirmationDialog.DialogText = $"Save game to slot '{slotName}'?";
-                _confirmationDialog.Confirmed += () => {
+                // Store the action in a variable so we can disconnect it later
+                Action saveAction = null;
+                saveAction = () => {
                     // Save game
                     bool success = _saveManager.SaveGame(slotName);
                     if (success)
@@ -107,8 +109,9 @@ namespace SignalLost
                     RefreshSaveSlotList();
 
                     // Disconnect the signal to prevent multiple connections
-                    _confirmationDialog.Confirmed -= _confirmationDialog.Confirmed.GetConnections()[0].Callable.Target as Action;
+                    _confirmationDialog.Confirmed -= saveAction;
                 };
+                _confirmationDialog.Confirmed += saveAction;
                 _confirmationDialog.PopupCentered();
             }
         }
@@ -124,7 +127,9 @@ namespace SignalLost
 
                 // Show confirmation dialog
                 _confirmationDialog.DialogText = $"Load game from slot '{slotName}'? Any unsaved progress will be lost.";
-                _confirmationDialog.Confirmed += () => {
+                // Store the action in a variable so we can disconnect it later
+                Action loadAction = null;
+                loadAction = () => {
                     bool success = _saveManager.LoadGame(slotName);
                     if (success)
                     {
@@ -136,8 +141,9 @@ namespace SignalLost
                     }
 
                     // Disconnect the signal to prevent multiple connections
-                    _confirmationDialog.Confirmed -= _confirmationDialog.Confirmed.GetConnections()[0].Callable.Target as Action;
+                    _confirmationDialog.Confirmed -= loadAction;
                 };
+                _confirmationDialog.Confirmed += loadAction;
                 _confirmationDialog.PopupCentered();
             }
             else
