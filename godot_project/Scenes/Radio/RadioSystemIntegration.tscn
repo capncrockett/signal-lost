@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3 uid="uid://c8q6y8j3xj3qv"]
+
+[ext_resource type="PackedScene" path="res://scenes/radio/RadioSignalsSystem.tscn" id="1_8j3qv"]
+[ext_resource type="Script" path="res://scripts/radio/RadioSystemIntegration.cs" id="2_j4k5l"]
+[ext_resource type="Script" path="res://scripts/RadioSystem.cs" id="3_m5n6o"]
+
+[node name="RadioSystemIntegration" type="Node"]
+
+[node name="RadioSignalsSystem" parent="." instance=ExtResource("1_8j3qv")]
+
+[node name="RadioSystemIntegration" type="Node" parent="."]
+script = ExtResource("2_j4k5l")
+
+[node name="RadioSystem" type="Node" parent="."]
+script = ExtResource("3_m5n6o")]
