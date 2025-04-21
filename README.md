@@ -35,20 +35,23 @@ godot --path godot_project --script tests/test_runner.gd
 
 ## 📂 Project Structure
 
-| Folder                | Description                               |
-| --------------------- | ----------------------------------------- |
-| godot_project/        | Godot project files                       |
-| godot_project/scenes/ | Game scenes                               |
-| godot_project/scripts/| GDScript source files                     |
-| godot_project/assets/ | Pixel art, audio files, tilemaps          |
-| godot_project/tests/  | Test scripts                              |
-| docs/                 | Documentation and migration plans         |
+| Folder                       | Description                       |
+| ---------------------------- | --------------------------------- |
+| godot_project/               | Godot project files               |
+| godot_project/scenes/        | Game scenes                       |
+| godot_project/scripts/       | C# and GDScript source files      |
+| godot_project/scripts/ui/    | User interface components         |
+| godot_project/scripts/audio/ | Audio management components       |
+| godot_project/assets/        | Pixel art, audio files, tilemaps  |
+| godot_project/tests/         | Test scripts                      |
+| docs/                        | Documentation and migration plans |
 
 ## ✅ Development Rules
 
-- GDScript must be used for game logic
+- C# is used for game logic and UI components
 - Tests must cover ≥ 80% of code
-- Follow the [Godot style guide](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_styleguide.html)
+- Follow the [C# coding conventions](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions)
+- Maintain cross-platform compatibility (Windows and Mac)
 
 ## 🎮 Gameplay Instructions
 
@@ -57,13 +60,26 @@ godot --path godot_project --script tests/test_runner.gd
 - **Radio Tuning**: Use the mouse or keyboard to tune the radio frequency
   - **Tune Up**: Press `D` or right arrow key
   - **Tune Down**: Press `A` or left arrow key
-  - **Toggle Power**: Press `Space`
-  - **Scan**: Press `S` to start/stop automatic scanning
+  - **Toggle Power**: Press `Space` or click the power button
+  - **Scan**: Press `S` or click the scan button to find signals
+  - **Messages**: Click the message button when lit to view messages
+  - **Manual Tuning**: Click and drag the tuning dial for precise control
 - **Interact**: Press `E` to interact with objects
 - **Movement**: Use `W`, `A`, `S`, `D` or arrow keys to move in the field
 - **Inventory**: Press `I` to open/close the inventory
 
 ### Game Mechanics
+
+#### Radio Interface
+
+The game features a pixel-based radio interface with the following components:
+
+- **Tuning Dial**: Rotate to change frequency (88.0 MHz to 108.0 MHz)
+- **Frequency Display**: Shows the current frequency in real-time
+- **Signal Strength Meter**: Indicates how strong the current signal is
+- **Power Button**: Turns the radio on/off
+- **Scan Button**: Automatically finds the next available signal
+- **Message Button**: Lights up when a message is available at the current frequency
 
 #### Radio Signals
 
@@ -73,7 +89,7 @@ The game revolves around discovering and interpreting radio signals. Different f
 - **Message Signals**: Provide story elements and clues
 - **Item Signals**: Allow you to discover special items
 
-Tune the radio carefully to find the clearest signal. The signal strength indicator shows how close you are to a valid frequency.
+Tune the radio carefully to find the clearest signal. The signal strength meter shows how close you are to a valid frequency. Audio feedback (static, tones) helps you identify signal types and strength.
 
 #### Field Exploration
 
@@ -136,3 +152,4 @@ Refer to:
 - docs/cross-agent-communication.md
 - docs/cross-agent-workflow.md
 - docs/documentation-consolidation-plan.md
+- docs/radio_interface.md
