@@ -1,0 +1,140 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/PixelRadioInterface.cs" id="1_radio"]
+[ext_resource type="Script" path="res://scripts/ui/RadioInterfaceManager.cs" id="2_manager"]
+[ext_resource type="Script" path="res://scripts/audio/RadioAudioManager.cs" id="3_audio"]
+[ext_resource type="Script" path="res://scripts/MainGameController.cs" id="4_controller"]
+[ext_resource type="Script" path="res://scripts/PixelInventoryUI.cs" id="5_inventory"]
+[ext_resource type="Script" path="res://scripts/PixelMapInterface.cs" id="6_map"]
+[ext_resource type="Script" path="res://scripts/PixelQuestUI.cs" id="7_quest"]
+[ext_resource type="Script" path="res://scripts/SaveLoadMenu.cs" id="8_save"]
+[ext_resource type="Script" path="res://scripts/ProgressionUI.cs" id="9_progression"]
+
+[node name="MainGameScene" type="Node"]
+script = ExtResource("4_controller")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.1, 1.0)
+
+[node name="PixelRadioInterface" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_radio")
+
+[node name="RadioInterfaceManager" type="Node" parent="."]
+script = ExtResource("2_manager")
+RadioInterfacePath = NodePath("../PixelRadioInterface")
+
+[node name="RadioAudioManager" type="Node" parent="."]
+script = ExtResource("3_audio")
+
+[node name="PixelInventoryUI" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_inventory")
+
+[node name="PixelMapInterface" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_map")
+
+[node name="PixelQuestUI" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("7_quest")
+
+[node name="UIControls" type="HBoxContainer" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+
+[node name="RadioButton" type="Button" parent="UIControls"]
+layout_mode = 2
+text = "Radio"
+
+[node name="InventoryButton" type="Button" parent="UIControls"]
+layout_mode = 2
+text = "Inventory"
+
+[node name="MapButton" type="Button" parent="UIControls"]
+layout_mode = 2
+text = "Map"
+
+[node name="QuestButton" type="Button" parent="UIControls"]
+layout_mode = 2
+text = "Quests"
+
+[node name="SaveLoadButton" type="Button" parent="UIControls"]
+layout_mode = 2
+text = "Save/Load"
+
+[node name="ProgressionButton" type="Button" parent="UIControls"]
+layout_mode = 2
+text = "Progress"
+
+[node name="SaveLoadMenu" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("8_save")
+
+[node name="ProgressionUI" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("9_progression")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ProgressionUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="StageLabel" type="Label" parent="ProgressionUI/VBoxContainer"]
+layout_mode = 2
+text = "Stage: Beginning"
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="ProgressionUI/VBoxContainer"]
+layout_mode = 2
+value = 10.0
