@@ -354,6 +354,33 @@ namespace SignalLost
             return Inventory.Contains(itemId);
         }
 
+        // Initialize the game state
+        public void Initialize()
+        {
+            // Initialize game state variables
+            CurrentFrequency = 90.0f;
+            IsRadioOn = false;
+            DiscoveredFrequencies.Clear();
+            CurrentLocation = "bunker";
+            Inventory.Clear();
+            GameProgress = 0;
+            _discoveredSignals.Clear();
+
+            GD.Print("GameState: Initialized");
+        }
+
+        // Start a new game
+        public void NewGame()
+        {
+            // Initialize game state
+            Initialize();
+
+            // Add initial items to inventory
+            Inventory.Add("flashlight");
+
+            GD.Print("GameState: New game started");
+        }
+
         // Save and load functions
         public bool SaveGame()
         {
