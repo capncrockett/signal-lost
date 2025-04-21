@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="Quest" load_steps=2 format=3 uid="uid://c8q6y8j3xj3qv"]
+
+[ext_resource type="Script" path="res://scripts/Quest.cs" id="1_8j3qv"]
+
+[resource]
+script = ExtResource("1_8j3qv")
+Id = "quest_radio_signals"
+Title = "Mysterious Signals"
+Description = "Now that your radio is working, try to find and decode mysterious signals that might lead you to other survivors."
+IsActive = false
+IsCompleted = false
+IsDiscovered = false
+Objectives = {
+"find_signal_clue": {
+"description": "Find clues about radio signals",
+"is_completed": false,
+"progress": 0,
+"required_progress": 1
+},
+"find_signal_source": {
+"description": "Locate the source of a radio signal",
+"is_completed": false,
+"progress": 0,
+"required_progress": 1
+},
+"decode_signal": {
+"description": "Decode the mysterious signal",
+"is_completed": false,
+"progress": 0,
+"required_progress": 1
+}
+}
+Rewards = {
+"map_update": {
+"description": "Updated map with new locations",
+"is_granted": false,
+"item_id": "",
+"quantity": 0
+}
+}
+NextQuestId = "quest_explore_forest"

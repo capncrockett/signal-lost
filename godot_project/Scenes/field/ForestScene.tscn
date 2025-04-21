@@ -1,0 +1,115 @@
+[gd_scene load_steps=5 format=3 uid="uid://c8q6y8j3xj3qv"]
+
+[ext_resource type="Script" path="res://scripts/field/GridSystem.cs" id="1_8j3qv"]
+[ext_resource type="Script" path="res://scripts/field/PlayerController.cs" id="2_j4k5l"]
+[ext_resource type="Script" path="res://scripts/field/InteractiveObject.cs" id="3_m5n6o"]
+[ext_resource type="Script" path="res://scripts/field/FieldExplorationManager.cs" id="4_p7q8r"]
+
+[node name="ForestScene" type="Node2D"]
+
+[node name="GridSystem" type="Node2D" parent="."]
+script = ExtResource("1_8j3qv")
+
+[node name="Background" type="ColorRect" parent="GridSystem"]
+offset_right = 640.0
+offset_bottom = 480.0
+color = Color(0.0627451, 0.25098, 0.0627451, 1)
+
+[node name="GridLines" type="Node2D" parent="GridSystem"]
+
+[node name="Player" type="Node2D" parent="GridSystem"]
+position = Vector2(32, 32)
+script = ExtResource("2_j4k5l")
+
+[node name="InteractiveObjects" type="Node2D" parent="GridSystem"]
+
+[node name="ForestEntrance" type="Node2D" parent="GridSystem/InteractiveObjects"]
+position = Vector2(32, 32)
+script = ExtResource("3_m5n6o")
+ObjectId = "forest_entrance"
+ObjectName = "Forest Entrance"
+ObjectDescription = "The entrance to the forest from the bunker."
+InteractionMessage = "You've returned to the bunker."
+ObjectColor = Color(0.5, 0.25, 0, 1)
+
+[node name="ForestCabin" type="Node2D" parent="GridSystem/InteractiveObjects"]
+position = Vector2(480, 320)
+script = ExtResource("3_m5n6o")
+ObjectId = "forest_cabin"
+ObjectName = "Cabin"
+ObjectDescription = "A small cabin in the forest."
+RequiresItem = true
+RequiredItemId = "cabin_key"
+InteractionMessage = "You've entered the cabin."
+QuestId = "quest_explore_forest"
+QuestObjectiveId = "find_cabin"
+ObjectColor = Color(0.5, 0.25, 0, 1)
+
+[node name="CabinKey" type="Node2D" parent="GridSystem/InteractiveObjects"]
+position = Vector2(224, 192)
+script = ExtResource("3_m5n6o")
+ObjectId = "cabin_key_1"
+ObjectName = "Cabin Key"
+ObjectDescription = "A key that might open a cabin door."
+GrantsItemId = "cabin_key"
+IsOneTimeInteraction = true
+InteractionMessage = "You found a key! This might open a cabin door."
+QuestId = "quest_explore_forest"
+QuestObjectiveId = "find_cabin_key"
+ObjectColor = Color(0.8, 0.8, 0, 1)
+
+[node name="RadioSignal" type="Node2D" parent="GridSystem/InteractiveObjects"]
+position = Vector2(352, 128)
+script = ExtResource("3_m5n6o")
+ObjectId = "radio_signal_1"
+ObjectName = "Radio Signal"
+ObjectDescription = "A strong radio signal is coming from this area."
+InteractionMessage = "You've discovered a new radio frequency! Tune your radio to 107.5 MHz to hear the signal."
+QuestId = "quest_radio_signals"
+QuestObjectiveId = "find_signal_source"
+ObjectColor = Color(0, 0.7, 1, 1)
+
+[node name="FieldExplorationManager" type="Node" parent="."]
+script = ExtResource("4_p7q8r")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="InteractionPanel" type="Panel" parent="UI"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -100.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/InteractionPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/InteractionPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="InteractionNameLabel" type="Label" parent="UI/InteractionPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Object Name"
+
+[node name="InteractionDescriptionLabel" type="Label" parent="UI/InteractionPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Object description goes here."
+autowrap_mode = 3
+
+[node name="InteractionButton" type="Button" parent="UI/InteractionPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Interact"
