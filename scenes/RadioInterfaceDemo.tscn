@@ -1,0 +1,39 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/PixelRadioInterface.cs" id="1_radio"]
+[ext_resource type="Script" path="res://scripts/ui/RadioInterfaceManager.cs" id="2_manager"]
+[ext_resource type="Script" path="res://scripts/DemoInitializer.cs" id="3_init"]
+
+[node name="RadioInterfaceDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_init")
+
+[node name="PixelRadioInterface" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_radio")
+
+[node name="RadioInterfaceManager" type="Node" parent="."]
+script = ExtResource("2_manager")
+RadioInterfacePath = NodePath("../PixelRadioInterface")
+
+[node name="Instructions" type="Label" parent="."]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 400.0
+offset_bottom = 100.0
+text = "Radio Interface Demo
+- Click the power button to turn the radio on/off
+- Drag the tuning dial to change frequency
+- Click the scan button to automatically find signals
+- Click the message button when lit to view messages"
