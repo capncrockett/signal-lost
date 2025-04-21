@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="Quest" load_steps=2 format=3 uid="uid://c8q6y8j3xj3qv"]
+
+[ext_resource type="Script" path="res://scripts/Quest.cs" id="1_8j3qv"]
+
+[resource]
+script = ExtResource("1_8j3qv")
+Id = "quest_explore_forest"
+Title = "Explore the Forest"
+Description = "Explore the forest to find clues about what happened and look for other survivors."
+IsActive = false
+IsCompleted = false
+IsDiscovered = false
+Objectives = {
+"find_map_fragment": {
+"description": "Find a map fragment",
+"is_completed": false,
+"progress": 0,
+"required_progress": 1
+},
+"find_cabin_key": {
+"description": "Find the key to the cabin",
+"is_completed": false,
+"progress": 0,
+"required_progress": 1
+},
+"find_cabin": {
+"description": "Find and enter the cabin",
+"is_completed": false,
+"progress": 0,
+"required_progress": 1
+}
+}
+Rewards = {
+"cabin_access": {
+"description": "Access to the cabin",
+"is_granted": false,
+"item_id": "",
+"quantity": 0
+}
+}
+NextQuestId = ""
