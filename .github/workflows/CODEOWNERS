@@ -1,0 +1,17 @@
+# Repository-wide owners
+/main  @capncrockett @CSL-Beta
+/develop @capncrockett @CSL-Beta
+
+# Alpha agent is responsible for UI and visual components
+/godot_project/scripts/ui/ @CSL-Alpha
+/godot_project/resources/pixel_theme.tres @CSL-Alpha
+/godot_project/PixelMainScene_Enhanced.tscn @CSL-Alpha
+
+# Beta agent is responsible for testing and cross-platform compatibility
+/godot_project/tests/ @CSL-Beta
+/godot_project/scripts/utils/ @CSL-Beta
+/godot_project/run_*.sh @CSL-Beta
+/godot_project/run_*.bat @CSL-Beta
+
+# Shared ownership for core game systems
+/godot_project/scripts/*.cs @capncrockett @CSL-Alpha @CSL-Beta
