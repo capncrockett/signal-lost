@@ -1,0 +1,291 @@
+[gd_scene load_steps=7 format=3 uid="uid://c8q6y8j3xj3qv"]
+
+[ext_resource type="Script" path="res://scripts/radio/RadioSignalDisplay.cs" id="1_8j3qv"]
+[ext_resource type="Script" path="res://scripts/radio/RadioSignalsDemoController.cs" id="2_j4k5l"]
+
+[sub_resource type="Animation" id="Animation_voice"]
+resource_name = "voice_signal"
+length = 2.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SignalContentPanel/MarginContainer/SignalContentLabel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1, 1.5, 2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0.8), Color(1, 1, 1, 1), Color(1, 1, 1, 0.8), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_morse"]
+resource_name = "morse_signal"
+length = 3.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SignalContentPanel/MarginContainer/SignalContentLabel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 2.6, 2.8, 3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0.5), Color(1, 1, 1, 1), Color(1, 1, 1, 0.5), Color(1, 1, 1, 1), Color(1, 1, 1, 0.5), Color(1, 1, 1, 1), Color(1, 1, 1, 0.5), Color(1, 1, 1, 1), Color(1, 1, 1, 0.5), Color(1, 1, 1, 1), Color(1, 1, 1, 0.5), Color(1, 1, 1, 1), Color(1, 1, 1, 0.5), Color(1, 1, 1, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_data"]
+resource_name = "data_signal"
+length = 4.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SignalContentPanel/MarginContainer/SignalContentLabel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1, 2, 3, 4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(0.8, 1, 0.8, 1), Color(1, 1, 1, 1), Color(0.8, 1, 0.8, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_signals"]
+_data = {
+"data_signal": SubResource("Animation_data"),
+"morse_signal": SubResource("Animation_morse"),
+"voice_signal": SubResource("Animation_voice")
+}
+
+[node name="RadioSignalsDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_j4k5l")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12549, 0.12549, 0.12549, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HeaderLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "RADIO SIGNALS DEMO"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="ControlPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="RadioControls" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="RadioToggleButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/RadioControls"]
+layout_mode = 2
+text = "Turn Radio ON"
+
+[node name="FrequencyLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/RadioControls"]
+layout_mode = 2
+text = "Frequency: 100.0 MHz"
+horizontal_alignment = 1
+
+[node name="FrequencySlider" type="HSlider" parent="MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/RadioControls"]
+layout_mode = 2
+min_value = 80.0
+max_value = 180.0
+step = 0.1
+value = 100.0
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+
+[node name="EquipmentLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+text = "Equipment:"
+horizontal_alignment = 1
+
+[node name="EquipmentButtons" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AddRadioButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/EquipmentButtons"]
+layout_mode = 2
+text = "Add Radio"
+
+[node name="AddEnhancedRadioButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/EquipmentButtons"]
+layout_mode = 2
+text = "Add Enhanced Radio"
+
+[node name="AddCrystalButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ControlPanel/EquipmentButtons"]
+layout_mode = 2
+text = "Add Strange Crystal"
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+
+[node name="SignalsLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+text = "Discovered Signals:"
+horizontal_alignment = 1
+
+[node name="DiscoveredSignalsList" type="ItemList" parent="MarginContainer/VBoxContainer/HBoxContainer/ControlPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SignalDisplay" type="Control" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+script = ExtResource("1_8j3qv")
+
+[node name="SignalInfoPanel" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainer/SignalDisplay"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 100.0
+grow_horizontal = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/SignalDisplay/SignalInfoPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/SignalDisplay/SignalInfoPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="SignalNameLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/SignalDisplay/SignalInfoPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Signal Name"
+
+[node name="SignalTypeLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/SignalDisplay/SignalInfoPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Type: Voice"
+
+[node name="SignalStrengthLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/SignalDisplay/SignalInfoPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Strength: 75%"
+
+[node name="SignalStrengthIndicator" type="TextureRect" parent="MarginContainer/VBoxContainer/HBoxContainer/SignalDisplay/SignalInfoPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SignalContentPanel" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainer/SignalDisplay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/SignalDisplay/SignalContentPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="SignalContentLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HBoxContainer/SignalDisplay/SignalContentPanel/MarginContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "Signal content will be displayed here."
+
+[node name="NoSignalPanel" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainer/SignalDisplay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/SignalDisplay/NoSignalPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -43.5
+offset_top = -11.5
+offset_right = 43.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 24
+text = "NO SIGNAL"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="MarginContainer/VBoxContainer/HBoxContainer/SignalDisplay"]
+libraries = {
+"": SubResource("AnimationLibrary_signals")
+}
+
+[node name="FooterButtons" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="ResetButton" type="Button" parent="MarginContainer/VBoxContainer/FooterButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "RESET"
+
+[node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer/FooterButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "CLOSE"
+
+[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Turn on the radio and adjust the frequency to discover signals"
+horizontal_alignment = 1
