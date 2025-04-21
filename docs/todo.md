@@ -60,26 +60,26 @@ Signal Lost has a solid technical foundation with a pixel-based UI approach in G
 
 ### Phase 3: Gameplay Implementation
 
-1. ⬜ Field Exploration
+1. ✅ Field Exploration
 
-   - ⬜ Implement player movement in the field
-   - ⬜ Add interactable objects and environments
-   - ⬜ Create environmental effects on radio signals
+   - ✅ Implement player movement in the field
+   - ✅ Add interactable objects and environments
+   - ✅ Create environmental effects on radio signals
    - ⬜ Implement day/night cycle or time progression
 
-2. ⬜ Quest System
+2. ✅ Quest System
 
-   - ⬜ Design main storyline quests
-   - ⬜ Create side quests and optional objectives
-   - ⬜ Implement quest tracking and completion
-   - ⬜ Add rewards and progression mechanics
+   - ✅ Design main storyline quests
+   - ✅ Create side quests and optional objectives
+   - ✅ Implement quest tracking and completion
+   - ✅ Add rewards and progression mechanics
 
 3. ✅ Game Progression
 
    - ✅ Implement a clear game progression system
    - ✅ Create milestones and achievements
    - ⬜ Add difficulty scaling
-   - ⬜ Implement an ending or conclusion
+   - ✅ Implement an ending or conclusion
 
 4. ✅ Gameplay Integration
    - ✅ Create a cohesive gameplay loop

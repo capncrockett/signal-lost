@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="Quest" load_steps=2 format=3 uid="uid://c8q6y8j3xj3qv"]
+
+[ext_resource type="Script" path="res://scripts/Quest.cs" id="1_8j3qv"]
+
+[resource]
+script = ExtResource("1_8j3qv")
+Id = "quest_radio_repair"
+Title = "Repair the Radio"
+Description = "Your radio is damaged and needs repair. Find the necessary parts to fix it."
+IsActive = true
+IsCompleted = false
+IsDiscovered = true
+Objectives = {
+"find_radio_part": {
+"description": "Find radio parts (0/2)",
+"is_completed": false,
+"progress": 0,
+"required_progress": 2
+},
+"repair_radio": {
+"description": "Use the parts to repair the radio",
+"is_completed": false,
+"progress": 0,
+"required_progress": 1
+}
+}
+Rewards = {
+"radio_functionality": {
+"description": "Radio functionality",
+"is_granted": false,
+"item_id": "",
+"quantity": 0
+}
+}
+NextQuestId = "quest_radio_signals"
