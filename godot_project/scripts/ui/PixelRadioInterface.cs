@@ -164,7 +164,8 @@ namespace SignalLost.UI
                             // Play power button sound
                             if (_audioManager != null)
                             {
-                                _audioManager.OnRadioToggled(IsPoweredOn);
+                                _audioManager.SetRadioPower(IsPoweredOn);
+                                _audioManager.PlayButtonClick();
                             }
 
                             QueueRedraw();
@@ -238,7 +239,8 @@ namespace SignalLost.UI
                 // Update audio manager
                 if (_audioManager != null)
                 {
-                    _audioManager.OnFrequencyChanged(CurrentFrequency);
+                    _audioManager.SetFrequencyAndSignal(CurrentFrequency, SignalStrength);
+                    _audioManager.PlayDialTurn();
                 }
 
                 // Update last mouse position
@@ -461,7 +463,8 @@ namespace SignalLost.UI
             // Update audio manager
             if (_audioManager != null)
             {
-                _audioManager.OnFrequencyChanged(CurrentFrequency);
+                _audioManager.SetFrequencyAndSignal(CurrentFrequency, SignalStrength);
+                _audioManager.PlayDialTurn();
             }
 
             QueueRedraw();
