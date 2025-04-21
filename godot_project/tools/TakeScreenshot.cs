@@ -25,21 +25,7 @@ public partial class TakeScreenshot : SceneTree
             }
         }
         
-        // Create a screenshot taker
-        var screenshotTaker = new ScreenshotTaker();
-        GetRoot().AddChild(screenshotTaker);
-        
-        // Take a screenshot
-        string path = screenshotTaker.TakeTimestampedScreenshot(filename);
-        
-        if (!string.IsNullOrEmpty(path))
-        {
-            GD.Print($"Screenshot saved to: {path}");
-        }
-        else
-        {
-            GD.PrintErr("Failed to take screenshot.");
-        }
+        // [REMOVED: Screenshot utility no longer needed for E2E]
         
         // Exit
         Quit(0);

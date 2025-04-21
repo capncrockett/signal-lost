@@ -6,16 +6,7 @@ var _main_scene = null
 func _ready():
 	print("Game Scene Screenshot Tool - Starting...")
 	
-	# Load and instance the main scene
-	print("Loading main game scene...")
-	var main_scene_resource = load("res://PixelMainScene.tscn")
-	if main_scene_resource:
-		_main_scene = main_scene_resource.instantiate()
-		add_child(_main_scene)
-		print("Main scene added to tree")
-	else:
-		print("Failed to load main scene")
-		return
+	# [REMOVED: Screenshot Godot scene no longer needed for E2E]
 	
 	# Take a screenshot after a longer delay to ensure the scene is fully loaded and rendered
 	print("Waiting 5 seconds for the scene to fully render...")

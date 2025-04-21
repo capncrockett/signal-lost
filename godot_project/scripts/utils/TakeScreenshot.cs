@@ -34,11 +34,7 @@ namespace SignalLost.Utils
             // Wait a moment for the scene to initialize
             Thread.Sleep(500); // Wait 500ms
             
-            // Take the screenshot
-            var screenshotTaker = new ScreenshotTaker();
-            string screenshotPath = screenshotTaker.TakeTimestampedScreenshot("game_screenshot");
-            
-            GD.Print($"Screenshot saved to: {screenshotPath}");
+            // [REMOVED: Screenshot utility no longer needed for E2E]
             
             // Clean up
             mainInstance.QueueFree();
