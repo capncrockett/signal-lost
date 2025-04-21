@@ -55,5 +55,9 @@ builds/
 # Temporary directories
 temp_gut/
 
+# Screenshot files
+screenshots/
+e2e_screenshots/
+
 # Generated files
 godot_project/tools/scene_analysis.md
