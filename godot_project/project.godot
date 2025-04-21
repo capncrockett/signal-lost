@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Signal Lost"
-run/main_scene="res://PixelMainScene.tscn"
+run/main_scene="res://scenes/gameplay/Main.tscn"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -26,6 +26,8 @@ QuestSystem="*res://scripts/QuestSystem.cs"
 RadioSystem="*res://scripts/RadioSystem.cs"
 SaveManager="*res://scripts/SaveManager.cs"
 GameProgressionManager="*res://scripts/GameProgressionManager.cs"
+GameplayManager="*res://scripts/gameplay/GameplayManager.cs"
+RadioSignalsManager="*res://scripts/radio/RadioSignalsManager.cs"
 
 [display]
 

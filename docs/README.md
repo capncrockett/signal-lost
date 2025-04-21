@@ -46,10 +46,12 @@ The Godot project is located in the `godot_project` directory at the root of the
 
 - ✅ Enhanced radio signals system implementation
 - ✅ Radio dial integration and fixes
+- ✅ Cross-platform compatibility improvements
+- ✅ Game progression mechanics implementation
 - ✅ Field exploration system implementation
-- ✅ Game progression mechanics
 - ✅ Gameplay implementation and content
-- ⬜ Cross-platform compatibility improvements
+- ⬜ Inventory system enhancements
+- ⬜ End-to-end testing improvements
 - ⬜ Save/load system
 - ⬜ Visual polish and optimization
 

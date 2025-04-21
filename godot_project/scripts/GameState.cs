@@ -14,7 +14,11 @@ namespace SignalLost
         public List<float> DiscoveredFrequencies { get; private set; } = new List<float>();
         public string CurrentLocation { get; set; } = "bunker";
         public List<string> Inventory { get; private set; } = new List<string>();
-        public int GameProgress { get; private set; } = 0;
+        public int GameProgress { get; set; } = 0;
+        public int StageProgress { get; set; } = 0;
+
+        // Dictionary to store completed milestones
+        private HashSet<string> _completedMilestones = new HashSet<string>();
 
         // Signal data
         public class SignalData
@@ -210,22 +214,65 @@ namespace SignalLost
         /// </summary>
         public void CheckProgressionTriggers()
         {
-            // This method will be called when significant events occur
-            // (discovering signals, locations, completing quests, etc.)
-            // It should check if any progression triggers have been met
+            // Get the game progression system
+            var progressionSystem = GetNode<SignalLost.Progression.GameProgressionSystem>("/root/GameProgressionSystem");
 
-            // For now, just log that we're checking triggers
-            GD.Print("Checking progression triggers...");
+            if (progressionSystem == null)
+            {
+                GD.PrintErr("GameState: GameProgressionSystem not found");
+                return;
+            }
 
-            // In a real implementation, this would check various conditions
-            // and potentially advance the game progression
+            // Check for progression triggers based on the current state
+            // This is just an example - in a real implementation, we would check various conditions
 
-            // Example:
-            // var progressionManager = GetNode<GameProgressionManager>("/root/GameProgressionManager");
-            // if (progressionManager != null)
-            // {
-            //     progressionManager.CheckProgressionRequirements();
-            // }
+            // Check if we have discovered enough signals to progress
+            if (_discoveredSignals.Count >= 3 && progressionSystem.GetCurrentStage() == SignalLost.Progression.GameProgressionSystem.GameStage.Exploration)
+            {
+                progressionSystem.IncrementProgress(10);
+            }
+
+            // Check if we have enough items to progress
+            if (Inventory.Count >= 5 && progressionSystem.GetCurrentStage() == SignalLost.Progression.GameProgressionSystem.GameStage.Discovery)
+            {
+                progressionSystem.IncrementProgress(10);
+            }
+        }
+
+        /// <summary>
+        /// Sets a milestone as completed.
+        /// </summary>
+        /// <param name="milestoneId">The ID of the milestone</param>
+        public void SetMilestoneCompleted(string milestoneId)
+        {
+            _completedMilestones.Add(milestoneId);
+        }
+
+        /// <summary>
+        /// Checks if a milestone is completed.
+        /// </summary>
+        /// <param name="milestoneId">The ID of the milestone</param>
+        /// <returns>True if the milestone is completed, false otherwise</returns>
+        public bool IsMilestoneCompleted(string milestoneId)
+        {
+            return _completedMilestones.Contains(milestoneId);
+        }
+
+        /// <summary>
+        /// Gets all completed milestones.
+        /// </summary>
+        /// <returns>A set of completed milestone IDs</returns>
+        public HashSet<string> GetCompletedMilestones()
+        {
+            return _completedMilestones;
+        }
+
+        /// <summary>
+        /// Clears all completed milestones.
+        /// </summary>
+        public void ClearCompletedMilestones()
+        {
+            _completedMilestones.Clear();
         }
 
         // Signals (Godot's events, not radio signals)
@@ -307,6 +354,33 @@ namespace SignalLost
             return Inventory.Contains(itemId);
         }
 
+        // Initialize the game state
+        public void Initialize()
+        {
+            // Initialize game state variables
+            CurrentFrequency = 90.0f;
+            IsRadioOn = false;
+            DiscoveredFrequencies.Clear();
+            CurrentLocation = "bunker";
+            Inventory.Clear();
+            GameProgress = 0;
+            _discoveredSignals.Clear();
+
+            GD.Print("GameState: Initialized");
+        }
+
+        // Start a new game
+        public void NewGame()
+        {
+            // Initialize game state
+            Initialize();
+
+            // Add initial items to inventory
+            Inventory.Add("flashlight");
+
+            GD.Print("GameState: New game started");
+        }
+
         // Save and load functions
         public bool SaveGame()
         {
@@ -326,6 +400,8 @@ namespace SignalLost
                 ["current_location"] = CurrentLocation,
                 ["inventory"] = Inventory,
                 ["game_progress"] = GameProgress,
+                ["stage_progress"] = StageProgress,
+                ["completed_milestones"] = _completedMilestones,
                 ["messages"] = Messages
             };
 
@@ -371,6 +447,19 @@ namespace SignalLost
             CurrentLocation = saveData["current_location"].ToString();
             Inventory = JsonSerializer.Deserialize<List<string>>(saveData["inventory"].ToString());
             GameProgress = Convert.ToInt32(saveData["game_progress"]);
+
+            // Load stage progress if it exists
+            if (saveData.ContainsKey("stage_progress"))
+            {
+                StageProgress = Convert.ToInt32(saveData["stage_progress"]);
+            }
+
+            // Load completed milestones if they exist
+            if (saveData.ContainsKey("completed_milestones"))
+            {
+                _completedMilestones = JsonSerializer.Deserialize<HashSet<string>>(saveData["completed_milestones"].ToString());
+            }
+
             Messages = JsonSerializer.Deserialize<Dictionary<string, MessageData>>(saveData["messages"].ToString());
 
             return true;

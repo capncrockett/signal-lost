@@ -1,0 +1,141 @@
+[gd_scene load_steps=8 format=3 uid="uid://c8q6y8j3xj3qv"]
+
+[ext_resource type="Script" path="res://scripts/gameplay/GameplayManager.cs" id="1_8j3qv"]
+[ext_resource type="Script" path="res://scripts/gameplay/TutorialSystem.cs" id="2_j4k5l"]
+[ext_resource type="PackedScene" path="res://scenes/radio/RadioSignalsSystem.tscn" id="3_m5n6o"]
+[ext_resource type="PackedScene" path="res://scenes/radio/RadioSignalDisplay.tscn" id="4_p7q8r"]
+[ext_resource type="PackedScene" path="res://scenes/field/FieldExplorationScene.tscn" id="5_s9t0u"]
+[ext_resource type="PackedScene" path="res://scenes/inventory/InventoryUI.tscn" id="6_v1w2x"]
+[ext_resource type="PackedScene" path="res://scenes/quests/QuestUI.tscn" id="7_y3z4a"]
+
+[node name="MainGameplay" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameplayManager" type="Node" parent="."]
+script = ExtResource("1_8j3qv")
+
+[node name="TutorialSystem" type="Node" parent="."]
+script = ExtResource("2_j4k5l")
+
+[node name="RadioSignalsSystem" parent="." instance=ExtResource("3_m5n6o")]
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12549, 0.12549, 0.12549, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HeaderLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "SIGNAL LOST"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MainContent" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="LeftPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="FieldExplorationPanel" type="Panel" parent="MarginContainer/VBoxContainer/MainContent/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="FieldExplorationScene" parent="MarginContainer/VBoxContainer/MainContent/LeftPanel/FieldExplorationPanel" instance=ExtResource("5_s9t0u")]
+layout_mode = 1
+
+[node name="InventoryPanel" type="Panel" parent="MarginContainer/VBoxContainer/MainContent/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="InventoryUI" parent="MarginContainer/VBoxContainer/MainContent/LeftPanel/InventoryPanel" instance=ExtResource("6_v1w2x")]
+layout_mode = 1
+
+[node name="RightPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MainContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="RadioPanel" type="Panel" parent="MarginContainer/VBoxContainer/MainContent/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="RadioSignalDisplay" parent="MarginContainer/VBoxContainer/MainContent/RightPanel/RadioPanel" instance=ExtResource("4_p7q8r")]
+layout_mode = 1
+
+[node name="QuestPanel" type="Panel" parent="MarginContainer/VBoxContainer/MainContent/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="QuestUI" parent="MarginContainer/VBoxContainer/MainContent/RightPanel/QuestPanel" instance=ExtResource("7_y3z4a")]
+layout_mode = 1
+
+[node name="TutorialPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -100.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="TutorialPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TutorialPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TutorialLabel" type="Label" parent="TutorialPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Tutorial message goes here."
+autowrap_mode = 3
+
+[node name="TutorialDismissButton" type="Button" parent="TutorialPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Dismiss"
