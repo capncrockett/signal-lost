@@ -1,0 +1,128 @@
+[gd_scene load_steps=5 format=3 uid="uid://c8q6y8j3xj3qv"]
+
+[ext_resource type="Script" path="res://scripts/field/GridSystem.cs" id="1_8j3qv"]
+[ext_resource type="Script" path="res://scripts/field/PlayerController.cs" id="2_j4k5l"]
+[ext_resource type="Script" path="res://scripts/field/InteractiveObject.cs" id="3_m5n6o"]
+[ext_resource type="Script" path="res://scripts/field/FieldExplorationManager.cs" id="4_p7q8r"]
+
+[node name="BunkerScene" type="Node2D"]
+
+[node name="GridSystem" type="Node2D" parent="."]
+script = ExtResource("1_8j3qv")
+
+[node name="Background" type="ColorRect" parent="GridSystem"]
+offset_right = 640.0
+offset_bottom = 480.0
+color = Color(0.12549, 0.12549, 0.12549, 1)
+
+[node name="GridLines" type="Node2D" parent="GridSystem"]
+
+[node name="Player" type="Node2D" parent="GridSystem"]
+position = Vector2(32, 32)
+script = ExtResource("2_j4k5l")
+
+[node name="InteractiveObjects" type="Node2D" parent="GridSystem"]
+
+[node name="RadioPart" type="Node2D" parent="GridSystem/InteractiveObjects"]
+position = Vector2(96, 96)
+script = ExtResource("3_m5n6o")
+ObjectId = "radio_part_1"
+ObjectName = "Radio Part"
+ObjectDescription = "A component for repairing the radio."
+GrantsItemId = "radio_part"
+IsOneTimeInteraction = true
+InteractionMessage = "You found a radio part! This will help repair your radio."
+QuestId = "quest_radio_repair"
+QuestObjectiveId = "find_radio_part"
+ObjectColor = Color(0, 0.7, 1, 1)
+
+[node name="Flashlight" type="Node2D" parent="GridSystem/InteractiveObjects"]
+position = Vector2(160, 64)
+script = ExtResource("3_m5n6o")
+ObjectId = "flashlight_1"
+ObjectName = "Flashlight"
+ObjectDescription = "A flashlight for exploring dark areas."
+GrantsItemId = "flashlight"
+IsOneTimeInteraction = true
+InteractionMessage = "You found a flashlight! This will help you explore dark areas."
+ObjectColor = Color(1, 1, 0, 1)
+
+[node name="LockedCabinet" type="Node2D" parent="GridSystem/InteractiveObjects"]
+position = Vector2(224, 128)
+script = ExtResource("3_m5n6o")
+ObjectId = "locked_cabinet_1"
+ObjectName = "Locked Cabinet"
+ObjectDescription = "A locked cabinet that might contain useful items."
+RequiresItem = true
+RequiredItemId = "cabinet_key"
+GrantsItemId = "map_fragment"
+IsOneTimeInteraction = true
+InteractionMessage = "You unlocked the cabinet and found a map fragment!"
+QuestId = "quest_explore_forest"
+QuestObjectiveId = "find_map_fragment"
+ObjectColor = Color(0.5, 0.5, 0.5, 1)
+
+[node name="CabinetKey" type="Node2D" parent="GridSystem/InteractiveObjects"]
+position = Vector2(288, 192)
+script = ExtResource("3_m5n6o")
+ObjectId = "cabinet_key_1"
+ObjectName = "Cabinet Key"
+ObjectDescription = "A key that might open a locked cabinet."
+GrantsItemId = "cabinet_key"
+IsOneTimeInteraction = true
+InteractionMessage = "You found a key! This might open a locked cabinet."
+ObjectColor = Color(0.8, 0.8, 0, 1)
+
+[node name="BunkerExit" type="Node2D" parent="GridSystem/InteractiveObjects"]
+position = Vector2(32, 448)
+script = ExtResource("3_m5n6o")
+ObjectId = "bunker_exit"
+ObjectName = "Bunker Exit"
+ObjectDescription = "The exit from the bunker to the outside world."
+InteractionMessage = "You've left the bunker and entered the forest."
+ObjectColor = Color(0, 0.5, 0, 1)
+
+[node name="FieldExplorationManager" type="Node" parent="."]
+script = ExtResource("4_p7q8r")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="InteractionPanel" type="Panel" parent="UI"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -100.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/InteractionPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/InteractionPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="InteractionNameLabel" type="Label" parent="UI/InteractionPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Object Name"
+
+[node name="InteractionDescriptionLabel" type="Label" parent="UI/InteractionPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Object description goes here."
+autowrap_mode = 3
+
+[node name="InteractionButton" type="Button" parent="UI/InteractionPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Interact"

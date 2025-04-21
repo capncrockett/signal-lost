@@ -153,6 +153,9 @@ namespace SignalLost
         // Dictionary to store discovered signals
         private Dictionary<string, float> _discoveredSignals = new Dictionary<string, float>();
 
+        // Set of objects that have been interacted with
+        private HashSet<string> _interactedObjects = new HashSet<string>();
+
         /// <summary>
         /// Adds a discovered signal to the game state.
         /// </summary>
@@ -194,6 +197,46 @@ namespace SignalLost
         public void ClearDiscoveredSignals()
         {
             _discoveredSignals.Clear();
+        }
+
+        /// <summary>
+        /// Sets an object as having been interacted with.
+        /// </summary>
+        /// <param name="objectId">The ID of the object</param>
+        public void SetObjectInteractedWith(string objectId)
+        {
+            if (!_interactedObjects.Contains(objectId))
+            {
+                _interactedObjects.Add(objectId);
+                GD.Print($"Object interacted with: {objectId}");
+            }
+        }
+
+        /// <summary>
+        /// Checks if an object has been interacted with.
+        /// </summary>
+        /// <param name="objectId">The ID of the object to check</param>
+        /// <returns>True if the object has been interacted with, false otherwise</returns>
+        public bool IsObjectInteractedWith(string objectId)
+        {
+            return _interactedObjects.Contains(objectId);
+        }
+
+        /// <summary>
+        /// Gets all objects that have been interacted with.
+        /// </summary>
+        /// <returns>A set of object IDs</returns>
+        public HashSet<string> GetInteractedObjects()
+        {
+            return _interactedObjects;
+        }
+
+        /// <summary>
+        /// Clears all interacted objects.
+        /// </summary>
+        public void ClearInteractedObjects()
+        {
+            _interactedObjects.Clear();
         }
 
         /// <summary>
@@ -307,6 +350,34 @@ namespace SignalLost
             return Inventory.Contains(itemId);
         }
 
+        // Initialize the game state
+        public void Initialize()
+        {
+            // Initialize game state variables
+            CurrentFrequency = 90.0f;
+            IsRadioOn = false;
+            DiscoveredFrequencies.Clear();
+            CurrentLocation = "bunker";
+            Inventory.Clear();
+            GameProgress = 0;
+            _discoveredSignals.Clear();
+            _interactedObjects.Clear();
+
+            GD.Print("GameState: Initialized");
+        }
+
+        // Start a new game
+        public void NewGame()
+        {
+            // Initialize game state
+            Initialize();
+
+            // Add initial items to inventory
+            Inventory.Add("flashlight");
+
+            GD.Print("GameState: New game started");
+        }
+
         // Save and load functions
         public bool SaveGame()
         {
@@ -326,7 +397,9 @@ namespace SignalLost
                 ["current_location"] = CurrentLocation,
                 ["inventory"] = Inventory,
                 ["game_progress"] = GameProgress,
-                ["messages"] = Messages
+                ["messages"] = Messages,
+                ["discovered_signals"] = _discoveredSignals,
+                ["interacted_objects"] = _interactedObjects
             };
 
             string jsonString = JsonSerializer.Serialize(saveData);
@@ -372,6 +445,18 @@ namespace SignalLost
             Inventory = JsonSerializer.Deserialize<List<string>>(saveData["inventory"].ToString());
             GameProgress = Convert.ToInt32(saveData["game_progress"]);
             Messages = JsonSerializer.Deserialize<Dictionary<string, MessageData>>(saveData["messages"].ToString());
+
+            // Load discovered signals if they exist
+            if (saveData.ContainsKey("discovered_signals"))
+            {
+                _discoveredSignals = JsonSerializer.Deserialize<Dictionary<string, float>>(saveData["discovered_signals"].ToString());
+            }
+
+            // Load interacted objects if they exist
+            if (saveData.ContainsKey("interacted_objects"))
+            {
+                _interactedObjects = JsonSerializer.Deserialize<HashSet<string>>(saveData["interacted_objects"].ToString());
+            }
 
             return true;
         }

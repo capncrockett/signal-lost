@@ -21,8 +21,12 @@ This directory contains documentation for the Signal Lost game project, a C# God
 
 - **audio-system.md**: Details the audio system implementation.
 - **radio_system.md**: Documentation for the radio system.
+- **enhanced-radio-signals-system.md**: Documentation for the enhanced radio signals system.
 - **radio-ui-improvements.md**: Planned improvements for the radio UI.
 - **field-exploration-system.md**: Documentation for the new field exploration system.
+- **game-progression-system.md**: Documentation for the game progression system.
+- **gameplay-implementation.md**: Documentation for the gameplay implementation.
+- **gameplay-content.md**: Documentation for the gameplay content.
 
 ### Development
 
