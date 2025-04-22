@@ -1,0 +1,174 @@
+[gd_scene load_steps=4 format=3 uid="uid://c8q6y8j3xj3qv"]
+
+[ext_resource type="Script" path="res://scripts/equipment/EquipmentDemoController.cs" id="1_8j3qv"]
+[ext_resource type="PackedScene" path="res://Scenes/equipment/EquipmentUI.tscn" id="2_j4k5l"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yjnqe"]
+bg_color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="EquipmentDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8j3qv")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_yjnqe")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="HeaderLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "EQUIPMENT SYSTEM DEMO"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="ItemButtons" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Add Equipment:"
+horizontal_alignment = 1
+
+[node name="AddHeadphonesBasicButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Add Basic Headphones"
+
+[node name="AddHeadphonesAdvancedButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Add Advanced Headphones"
+
+[node name="AddRadioBasicButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Add Basic Radio"
+
+[node name="AddRadioAdvancedButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Add Advanced Radio"
+
+[node name="AddRadioMilitaryButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Add Military Radio"
+
+[node name="AddRadioBrokenButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Add Broken Radio"
+
+[node name="AddRadioPartButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Add Radio Part"
+
+[node name="CreateCustomRadioButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Create Custom Radio"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+
+[node name="AddSignalAnalyzerButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Add Signal Analyzer"
+
+[node name="AddSignalBoosterButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Add Signal Booster"
+
+[node name="AddCompassButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Add Compass"
+
+[node name="AddWeatherGearButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Add Weather Gear"
+
+[node name="AddRadiationSuitButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Add Radiation Suit"
+
+[node name="AddStrangeCrystalButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+text = "Add Strange Crystal"
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+
+[node name="ShowEquipmentButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/ItemButtons"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 18
+text = "SHOW EQUIPMENT"
+
+[node name="LogPanel" type="Panel" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/LogPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer/LogPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/LogPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Event Log:"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/HBoxContainer/LogPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="LogText" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HBoxContainer/LogPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+scroll_following = true
+
+[node name="ClearLogButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer/LogPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Clear Log"
+
+[node name="EquipmentUI" parent="." instance=ExtResource("2_j4k5l")]
+visible = false
+layout_mode = 1
