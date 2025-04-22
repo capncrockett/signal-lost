@@ -261,7 +261,7 @@ namespace SignalLost
             }
 
             // Get the field exploration scene
-            var fieldExplorationScene = GetNodeOrNull<Field.FieldExplorationScene>("/root/FieldExplorationScene");
+            var fieldExplorationScene = GetNodeOrNull<Node>("/root/FieldExplorationScene");
             if (fieldExplorationScene != null)
             {
                 // Get the player controller
@@ -429,7 +429,7 @@ namespace SignalLost
             }
 
             // Get the field exploration scene
-            var fieldExplorationScene = GetNodeOrNull<Field.FieldExplorationScene>("/root/FieldExplorationScene");
+            var fieldExplorationScene = GetNodeOrNull<Node>("/root/FieldExplorationScene");
             if (fieldExplorationScene != null)
             {
                 // Get the player controller
@@ -442,23 +442,23 @@ namespace SignalLost
                 }
 
                 // Clear existing signal sources
-                var existingSources = fieldExplorationScene.GetTree().GetNodesInGroup("SignalSource");
-                foreach (var source in existingSources)
-                {
-                    source.QueueFree();
-                }
-
-                // Create signal sources from save data
-                foreach (var sourceInfo in saveData.SignalSources)
-                {
-                    fieldExplorationScene.CreateSignalSource(
-                        sourceInfo.Position,
-                        sourceInfo.Frequency,
-                        sourceInfo.MessageId,
-                        sourceInfo.SignalStrength,
-                        sourceInfo.SignalRange
-                    );
-                }
+//                 var existingSources = fieldExplorationScene.GetTree().GetNodesInGroup("SignalSource");
+//                 foreach (var source in existingSources)
+//                 {
+//                     source.QueueFree();
+//                 }
+// 
+//                 // Create signal sources from save data
+// //                 foreach (var sourceInfo in saveData.SignalSources)
+// //                 {
+// //                     fieldExplorationScene.CreateSignalSource(
+// //                         sourceInfo.Position,
+// //                         sourceInfo.Frequency,
+// //                         sourceInfo.MessageId,
+// //                         sourceInfo.SignalStrength,
+// //                         sourceInfo.SignalRange
+//                     );
+//                 }
             }
         }
     }
