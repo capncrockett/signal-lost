@@ -88,6 +88,33 @@ Integration tests verify that the components work together correctly. This inclu
 2. RadioTuner and GameState integration
 3. Full radio workflow
 
+## Screenshot Analysis
+
+The project includes Python-based tools for analyzing screenshots to verify the visual state of the game:
+
+### Taking and Analyzing Screenshots
+
+```bash
+# Take a screenshot and analyze it
+py take_and_analyze_screenshot.py [test_name] [description]
+
+# Analyze an existing screenshot
+py analyze_existing_screenshot.py screenshots/your_screenshot.png
+```
+
+### Analysis Information
+
+The screenshot analysis provides the following information:
+
+- **Basic Information**: Filename, path, file size
+- **Image Properties**: Resolution, dimensions
+- **Color Analysis**: Average color, brightness, dominant colors
+- **UI Elements**: Potential UI elements based on color variance
+
+### Integration with Tests
+
+You can integrate screenshot analysis into your tests by taking screenshots at key points and analyzing them to verify the visual state of the game.
+
 ## Troubleshooting
 
 If tests are failing:
@@ -95,3 +122,4 @@ If tests are failing:
 1. Check the test output for specific failure messages
 2. Verify that the component being tested is working as expected
 3. Use print statements to debug if needed
+4. For visual issues, use the screenshot analysis tools to verify the visual state

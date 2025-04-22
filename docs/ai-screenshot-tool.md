@@ -1,67 +1,85 @@
-# AI Screenshot Tool
+# AI Screenshot Analysis Tool
 
 ## Overview
 
-The AI Screenshot Tool is a utility designed specifically for AI agents to visually verify the state of the game during development. It provides a reliable way to capture screenshots of the game and save them to a consistent location across platforms.
+The AI Screenshot Analysis Tool is a utility designed specifically for AI agents to analyze the state of the game during development. It provides a way to capture screenshots of the game and extract meaningful information from them, allowing AI agents to understand the visual state of the game without directly seeing the images.
 
 ## Purpose
 
 Unlike traditional screenshot features intended for end users, this tool serves as a development aid that allows AI agents to:
 
-1. Visually verify changes made to the game
+1. Extract information about the visual state of the game
 2. Understand the current state of the UI and game elements
 3. Document visual progress and changes over time
-4. Debug visual issues by capturing the current state
+4. Debug visual issues by analyzing the current state
+
+## Components
+
+The screenshot analysis system consists of several components:
+
+1. **Screenshot Capture**: Tools for taking screenshots of the game
+2. **Screenshot Analysis**: Python scripts for analyzing screenshots and extracting information
+3. **Documentation**: Detailed documentation of the analysis process and results
 
 ## Usage
 
-To take a screenshot of the main game scene:
+### Taking and Analyzing Screenshots
 
 ```bash
-# From the godot_project directory
-./take_game_screenshot.sh
+# Take a screenshot and analyze it
+py take_and_analyze_screenshot.py [test_name] [description]
+
+# Analyze an existing screenshot
+py analyze_existing_screenshot.py screenshots/your_screenshot.png
 ```
 
-This will:
-1. Load the main game scene (PixelMainScene.tscn)
-2. Wait 5 seconds for the scene to fully render
-3. Take a screenshot and save it to the user data directory
-4. Automatically exit after taking the screenshot
+### Creating Test Images
+
+```bash
+# Create a test image for analysis
+py create_test_image.py
+```
 
 ## Screenshot Location
 
-Screenshots are saved to Godot's user data directory, which provides cross-platform compatibility:
+Screenshots are saved to the `screenshots` directory in the project root, which provides easy access and version control:
 
-- On macOS: `~/Library/Application Support/Godot/app_userdata/Signal Lost/Screenshots/`
-- On Windows: `%APPDATA%\Godot\app_userdata\Signal Lost\Screenshots\`
-- On Linux: `~/.local/share/godot/app_userdata/[Project Name]/`
-
-The filenames include timestamps for easy identification: `game_screenshot_YYYYMMDD_HHMMSS.png`
+```
+screenshots/
+├── test_screenshot.png
+├── test_screenshot.analysis.json
+└── ...
+```
 
 ## Implementation Details
 
-The screenshot functionality is implemented using:
+The screenshot analysis functionality is implemented using:
 
-1. **game_scene_screenshot.gd**: A GDScript that loads the main game scene, waits for it to render, and takes a screenshot
-2. **game_scene_screenshot.tscn**: A scene that uses the script
-3. **take_game_screenshot.sh**: A shell script that runs the scene
+1. **analyze_screenshot.py**: The main Python script for analyzing screenshots
+2. **analyze_existing_screenshot.py**: A script for analyzing existing screenshots
+3. **take_and_analyze_screenshot.py**: A script for taking and analyzing screenshots
+4. **create_test_image.py**: A utility for creating test images
 
-The implementation uses Godot's `user://` directory for cross-platform compatibility, ensuring that screenshots can be taken and accessed without special permissions on any platform.
+The implementation uses Python's image processing libraries to extract information from screenshots, including:
+
+- Basic image properties (dimensions, file size)
+- Color analysis (average color, brightness, dominant colors)
+- UI element detection (regions with high color variance)
 
 ## Benefits for AI Development
 
 This tool is essential for AI-assisted development because:
 
-1. It provides visual feedback that text descriptions alone cannot convey
+1. It provides a way for AI agents to understand the visual state of the game without directly seeing the images
 2. It allows AI agents to verify that visual changes have been implemented correctly
 3. It helps identify UI issues that might not be apparent from code inspection
-4. It creates a visual record of development progress over time
+4. It creates a record of development progress over time
 
 ## Cross-Platform Considerations
 
-The screenshot tool is designed to work consistently across different platforms:
+The screenshot analysis tool is designed to work consistently across different platforms:
 
-- Uses Godot's `user://` directory instead of platform-specific paths
-- Doesn't require special permissions to save files
-- Creates directories if they don't exist
+- Uses Python's cross-platform image processing libraries
+- Saves screenshots to a directly accessible directory
 - Uses consistent naming conventions across platforms
+- Provides detailed documentation for setup and usage

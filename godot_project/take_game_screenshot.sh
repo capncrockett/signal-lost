@@ -1,15 +1,18 @@
 #!/bin/bash
 #
-# AI Agent Screenshot Tool
-# 
-# This script runs the game scene screenshot tool, which:
-# 1. Loads the main game scene (PixelMainScene.tscn)
-# 2. Waits 5 seconds for the scene to fully render
-# 3. Takes a screenshot and saves it to the user data directory
-# 4. Automatically exits after taking the screenshot
+# DEPRECATED: AI Agent Screenshot Tool
 #
-# The screenshots are saved to:
-# ~/Library/Application Support/Godot/app_userdata/Signal Lost/Screenshots/
-# with timestamped filenames like: game_screenshot_YYYYMMDD_HHMMSS.png
+# This script has been deprecated.
+# Please use the Python-based screenshot analysis tools instead:
+# - analyze_screenshot.py
+# - analyze_existing_screenshot.py
+# - take_and_analyze_screenshot.py
+#
+# See SCREENSHOT_ANALYSIS.md for more information.
 
-# [REMOVED: Screenshot shell script no longer needed for E2E]
+echo "This script is deprecated. Please use the Python-based screenshot analysis tools instead."
+echo "See SCREENSHOT_ANALYSIS.md for more information."
+
+# Run the new screenshot analysis tool instead
+cd ..
+py analyze_existing_screenshot.py screenshots/simple_test.png

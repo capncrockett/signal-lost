@@ -508,6 +508,108 @@ namespace SignalLost
             return Inventory.Contains(itemId);
         }
 
+        // Experience and progression system
+        private int _experience = 0;
+        private int _currency = 0;
+        private HashSet<string> _unlockedFeatures = new HashSet<string>();
+        private HashSet<string> _unlockedSkills = new HashSet<string>();
+
+        /// <summary>
+        /// Adds experience points to the player.
+        /// </summary>
+        /// <param name="amount">The amount of experience to add</param>
+        public void AddExperience(int amount)
+        {
+            _experience += amount;
+            GD.Print($"Added {amount} experience points. Total: {_experience}");
+        }
+
+        /// <summary>
+        /// Gets the current experience points.
+        /// </summary>
+        /// <returns>The current experience points</returns>
+        public int GetExperience()
+        {
+            return _experience;
+        }
+
+        /// <summary>
+        /// Adds currency to the player.
+        /// </summary>
+        /// <param name="amount">The amount of currency to add</param>
+        public void AddCurrency(int amount)
+        {
+            _currency += amount;
+            GD.Print($"Added {amount} currency. Total: {_currency}");
+        }
+
+        /// <summary>
+        /// Gets the current currency amount.
+        /// </summary>
+        /// <returns>The current currency amount</returns>
+        public int GetCurrency()
+        {
+            return _currency;
+        }
+
+        /// <summary>
+        /// Unlocks a feature.
+        /// </summary>
+        /// <param name="featureId">The ID of the feature to unlock</param>
+        public void UnlockFeature(string featureId)
+        {
+            _unlockedFeatures.Add(featureId);
+            GD.Print($"Unlocked feature: {featureId}");
+        }
+
+        /// <summary>
+        /// Checks if a feature is unlocked.
+        /// </summary>
+        /// <param name="featureId">The ID of the feature to check</param>
+        /// <returns>True if the feature is unlocked, false otherwise</returns>
+        public bool IsFeatureUnlocked(string featureId)
+        {
+            return _unlockedFeatures.Contains(featureId);
+        }
+
+        /// <summary>
+        /// Gets all unlocked features.
+        /// </summary>
+        /// <returns>A set of unlocked feature IDs</returns>
+        public HashSet<string> GetUnlockedFeatures()
+        {
+            return _unlockedFeatures;
+        }
+
+        /// <summary>
+        /// Unlocks a skill.
+        /// </summary>
+        /// <param name="skillId">The ID of the skill to unlock</param>
+        public void UnlockSkill(string skillId)
+        {
+            _unlockedSkills.Add(skillId);
+            GD.Print($"Unlocked skill: {skillId}");
+        }
+
+        /// <summary>
+        /// Checks if a skill is unlocked.
+        /// </summary>
+        /// <param name="skillId">The ID of the skill to check</param>
+        /// <returns>True if the skill is unlocked, false otherwise</returns>
+        public bool IsSkillUnlocked(string skillId)
+        {
+            return _unlockedSkills.Contains(skillId);
+        }
+
+        /// <summary>
+        /// Gets all unlocked skills.
+        /// </summary>
+        /// <returns>A set of unlocked skill IDs</returns>
+        public HashSet<string> GetUnlockedSkills()
+        {
+            return _unlockedSkills;
+        }
+
         // Initialize the game state
         public void Initialize()
         {
@@ -527,6 +629,12 @@ namespace SignalLost
             TotalSignalInterference = 0.0f;
             TimeOfDay = 12.0f;
             IsDaytime = true;
+
+            // Initialize progression system variables
+            _experience = 0;
+            _currency = 0;
+            _unlockedFeatures.Clear();
+            _unlockedSkills.Clear();
 
             GD.Print("GameState: Initialized");
         }
