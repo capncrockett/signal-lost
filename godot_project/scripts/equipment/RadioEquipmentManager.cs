@@ -41,8 +41,8 @@ namespace SignalLost.Radio
         private SignalLost.GameState _gameState;
 
         // Signals
-        [Signal] public delegate void RadioEquipmentChangedEventHandler(RadioType radioType);
-        [Signal] public delegate void ComponentUpgradedEventHandler(ComponentType componentType, int level);
+        [Signal] public delegate void RadioEquipmentChangedEventHandler(int radioTypeIndex);
+        [Signal] public delegate void ComponentUpgradedEventHandler(int componentTypeIndex, int level);
         [Signal] public delegate void RadioEffectsUpdatedEventHandler();
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace SignalLost.Radio
         {
             // Get the equipped radio
             string radioItemId = _equipmentSystem.GetEquippedItem(EquipmentSystem.EquipmentSlot.Radio);
-            
+
             // If no radio is equipped, use default values
             if (string.IsNullOrEmpty(radioItemId))
             {
@@ -186,18 +186,18 @@ namespace SignalLost.Radio
             {
                 // Antenna affects signal range
                 baseEffects["signal_range"] = 1.0f + (_componentLevels[ComponentType.Antenna] * 0.2f);
-                
+
                 // Tuner affects frequency precision and tuning speed
                 baseEffects["frequency_precision"] = 1.0f + (_componentLevels[ComponentType.Tuner] * 0.1f);
                 baseEffects["tuning_speed"] = 1.0f + (_componentLevels[ComponentType.Tuner] * 0.1f);
-                
+
                 // Amplifier affects signal clarity and signal boost
                 baseEffects["signal_clarity"] = 1.0f + (_componentLevels[ComponentType.Amplifier] * 0.1f);
                 baseEffects["signal_boost"] = 1.0f + (_componentLevels[ComponentType.Amplifier] * 0.1f);
-                
+
                 // Battery affects power consumption
                 baseEffects["battery_consumption"] = 1.0f - (_componentLevels[ComponentType.Battery] * 0.1f);
-                
+
                 // Decoder affects ability to decode encrypted signals
                 if (_componentLevels[ComponentType.Decoder] > 0)
                 {
@@ -207,7 +207,7 @@ namespace SignalLost.Radio
 
             // Apply effects from other equipped items
             Dictionary<string, float> totalEffects = new Dictionary<string, float>(baseEffects);
-            
+
             // Check for headphones
             string headphonesItemId = _equipmentSystem.GetEquippedItem(EquipmentSystem.EquipmentSlot.Head);
             if (!string.IsNullOrEmpty(headphonesItemId))
@@ -225,7 +225,7 @@ namespace SignalLost.Radio
                     }
                 }
             }
-            
+
             // Check for accessories
             string accessory1ItemId = _equipmentSystem.GetEquippedItem(EquipmentSystem.EquipmentSlot.Accessory1);
             if (!string.IsNullOrEmpty(accessory1ItemId))
@@ -243,7 +243,7 @@ namespace SignalLost.Radio
                     }
                 }
             }
-            
+
             string accessory2ItemId = _equipmentSystem.GetEquippedItem(EquipmentSystem.EquipmentSlot.Accessory2);
             if (!string.IsNullOrEmpty(accessory2ItemId))
             {
@@ -358,7 +358,7 @@ namespace SignalLost.Radio
             if (slot == EquipmentSystem.EquipmentSlot.Radio)
             {
                 _currentRadioType = RadioType.Basic;
-                
+
                 // Emit signal
                 EmitSignal(SignalName.RadioEquipmentChanged, (int)_currentRadioType);
             }
@@ -386,7 +386,7 @@ namespace SignalLost.Radio
             // Check if the component is already at max level
             int currentLevel = _componentLevels[componentType];
             int maxLevel = GetMaxComponentLevel(componentType);
-            
+
             if (currentLevel >= maxLevel)
             {
                 GD.PrintErr($"RadioEquipmentManager: Component {componentType} is already at max level");
@@ -461,7 +461,7 @@ namespace SignalLost.Radio
         {
             // Get the equipped radio
             string radioItemId = _equipmentSystem.GetEquippedItem(EquipmentSystem.EquipmentSlot.Radio);
-            
+
             // If no radio is equipped, return empty dictionary
             if (string.IsNullOrEmpty(radioItemId))
             {
@@ -480,18 +480,18 @@ namespace SignalLost.Radio
             {
                 // Antenna affects signal range
                 baseEffects["signal_range"] = 1.0f + (_componentLevels[ComponentType.Antenna] * 0.2f);
-                
+
                 // Tuner affects frequency precision and tuning speed
                 baseEffects["frequency_precision"] = 1.0f + (_componentLevels[ComponentType.Tuner] * 0.1f);
                 baseEffects["tuning_speed"] = 1.0f + (_componentLevels[ComponentType.Tuner] * 0.1f);
-                
+
                 // Amplifier affects signal clarity and signal boost
                 baseEffects["signal_clarity"] = 1.0f + (_componentLevels[ComponentType.Amplifier] * 0.1f);
                 baseEffects["signal_boost"] = 1.0f + (_componentLevels[ComponentType.Amplifier] * 0.1f);
-                
+
                 // Battery affects power consumption
                 baseEffects["battery_consumption"] = 1.0f - (_componentLevels[ComponentType.Battery] * 0.1f);
-                
+
                 // Decoder affects ability to decode encrypted signals
                 if (_componentLevels[ComponentType.Decoder] > 0)
                 {

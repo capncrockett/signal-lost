@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using SignalLost.Equipment;
 using SignalLost.Inventory;
+using SignalLost.Radio;
 
 namespace SignalLost.UI
 {
@@ -188,7 +189,7 @@ namespace SignalLost.UI
                 // Get the container for this component
                 string containerName = $"{componentType}Container";
                 Control container = _radioUpgradesTab.GetNodeOrNull<Control>(containerName);
-                
+
                 if (container == null)
                 {
                     GD.PrintErr($"EquipmentUI: Container {containerName} not found");
@@ -207,7 +208,7 @@ namespace SignalLost.UI
                 if (upgradeButton != null)
                 {
                     _upgradeButtons[componentType] = upgradeButton;
-                    
+
                     // Connect signal
                     upgradeButton.Pressed += () => OnUpgradeButtonPressed(componentType);
                 }
@@ -226,18 +227,18 @@ namespace SignalLost.UI
             foreach (var slot in _slotControls.Keys)
             {
                 TextureRect slotControl = _slotControls[slot];
-                
+
                 // Check if an item is equipped in this slot
                 if (equippedItems.ContainsKey(slot))
                 {
                     string itemId = equippedItems[slot];
                     ItemData item = _inventorySystem.GetItem(itemId);
-                    
+
                     if (item != null)
                     {
                         // Set the texture
                         slotControl.Texture = ResourceLoader.Load<Texture2D>(item.IconPath);
-                        
+
                         // Set the tooltip
                         slotControl.TooltipText = item.Name;
                     }
@@ -245,7 +246,7 @@ namespace SignalLost.UI
                     {
                         // Clear the texture
                         slotControl.Texture = null;
-                        
+
                         // Set the tooltip
                         slotControl.TooltipText = slot.ToString();
                     }
@@ -254,7 +255,7 @@ namespace SignalLost.UI
                 {
                     // Clear the texture
                     slotControl.Texture = null;
-                    
+
                     // Set the tooltip
                     slotControl.TooltipText = slot.ToString();
                 }
@@ -269,10 +270,10 @@ namespace SignalLost.UI
             // Check if a radio is equipped
             string radioItemId = _equipmentSystem.GetEquippedItem(EquipmentSystem.EquipmentSlot.Radio);
             bool isCustomRadio = radioItemId == "radio_custom";
-            
+
             // Enable/disable the radio upgrades tab
             _radioUpgradesTab.Visible = isCustomRadio;
-            
+
             if (!isCustomRadio)
             {
                 return;
@@ -284,13 +285,13 @@ namespace SignalLost.UI
                 // Get the current level
                 int currentLevel = _radioEquipmentManager.GetComponentLevel(componentType);
                 int maxLevel = _radioEquipmentManager.GetMaxComponentLevel(componentType);
-                
+
                 // Update the level label
                 if (_levelLabels.ContainsKey(componentType))
                 {
                     _levelLabels[componentType].Text = $"Level: {currentLevel}/{maxLevel}";
                 }
-                
+
                 // Update the upgrade button
                 if (_upgradeButtons.ContainsKey(componentType))
                 {
@@ -310,8 +311,18 @@ namespace SignalLost.UI
                 child.QueueFree();
             }
 
-            // Get all equippable items
-            List<ItemData> equippableItems = _inventorySystem.GetEquippableItems();
+            // Get all items in inventory
+            var inventory = _inventorySystem.GetInventory();
+
+            // Filter for equippable items
+            List<ItemData> equippableItems = new List<ItemData>();
+            foreach (var item in inventory.Values)
+            {
+                if (item.IsEquippable)
+                {
+                    equippableItems.Add(item);
+                }
+            }
 
             // Add each item to the grid
             foreach (ItemData item in equippableItems)
@@ -354,8 +365,8 @@ namespace SignalLost.UI
         private void OnSlotGuiInput(InputEvent @event, EquipmentSystem.EquipmentSlot slot)
         {
             // Check for left click
-            if (@event is InputEventMouseButton mouseButton && 
-                mouseButton.ButtonIndex == MouseButton.Left && 
+            if (@event is InputEventMouseButton mouseButton &&
+                mouseButton.ButtonIndex == MouseButton.Left &&
                 mouseButton.Pressed)
             {
                 // Select the slot
@@ -386,8 +397,8 @@ namespace SignalLost.UI
         private void OnItemGuiInput(InputEvent @event, string itemId)
         {
             // Check for left click
-            if (@event is InputEventMouseButton mouseButton && 
-                mouseButton.ButtonIndex == MouseButton.Left && 
+            if (@event is InputEventMouseButton mouseButton &&
+                mouseButton.ButtonIndex == MouseButton.Left &&
                 mouseButton.Pressed)
             {
                 // Select the item
@@ -409,7 +420,7 @@ namespace SignalLost.UI
         {
             // Get the item
             ItemData item = _inventorySystem.GetItem(itemId);
-            
+
             if (item == null)
             {
                 ClearItemInfo();
@@ -423,16 +434,16 @@ namespace SignalLost.UI
             // Set item effects
             Dictionary<string, float> effects = _equipmentSystem.GetItemEffects(itemId);
             string effectsText = "";
-            
+
             foreach (var effect in effects)
             {
                 string effectName = FormatEffectName(effect.Key);
                 string effectValue = FormatEffectValue(effect.Value);
                 string effectColor = effect.Value > 1.0f ? "green" : (effect.Value < 1.0f ? "red" : "white");
-                
+
                 effectsText += $"[color={effectColor}]{effectName}: {effectValue}[/color]\n";
             }
-            
+
             _itemEffectsLabel.Text = effectsText;
 
             // Show the panel
@@ -466,7 +477,7 @@ namespace SignalLost.UI
                     words[i] = char.ToUpper(words[i][0]) + words[i].Substring(1);
                 }
             }
-            
+
             return string.Join(" ", words);
         }
 
@@ -489,7 +500,7 @@ namespace SignalLost.UI
                     return $"{(effectValue - 1.0f) * 100:F0}%";
                 }
             }
-            
+
             // For boolean effects
             return "Yes";
         }
@@ -506,7 +517,7 @@ namespace SignalLost.UI
 
             // Get the valid slots for this item
             List<EquipmentSystem.EquipmentSlot> validSlots = _equipmentSystem.GetValidSlots(_selectedItemId);
-            
+
             if (validSlots.Count == 0)
             {
                 ShowStatus("This item cannot be equipped");
@@ -517,7 +528,7 @@ namespace SignalLost.UI
             if (_selectedSlot.HasValue && validSlots.Contains(_selectedSlot.Value))
             {
                 bool success = _equipmentSystem.EquipItem(_selectedItemId, _selectedSlot.Value);
-                
+
                 if (success)
                 {
                     ShowStatus($"Equipped {_selectedItemId} to {_selectedSlot.Value}");
@@ -531,7 +542,7 @@ namespace SignalLost.UI
             else
             {
                 bool success = _equipmentSystem.EquipItem(_selectedItemId, validSlots[0]);
-                
+
                 if (success)
                 {
                     ShowStatus($"Equipped {_selectedItemId} to {validSlots[0]}");
@@ -554,7 +565,7 @@ namespace SignalLost.UI
             }
 
             bool success = _equipmentSystem.UnequipItem(_selectedSlot.Value);
-            
+
             if (success)
             {
                 ShowStatus($"Unequipped item from {_selectedSlot.Value}");
@@ -581,7 +592,7 @@ namespace SignalLost.UI
         private void OnUpgradeButtonPressed(RadioEquipmentManager.ComponentType componentType)
         {
             bool success = _radioEquipmentManager.UpgradeComponent(componentType);
-            
+
             if (success)
             {
                 ShowStatus($"Upgraded {componentType}");
@@ -599,7 +610,7 @@ namespace SignalLost.UI
         private void ShowStatus(string message)
         {
             _statusLabel.Text = message;
-            
+
             // Reset the message after a delay
             GetTree().CreateTimer(3.0f).Timeout += () => _statusLabel.Text = "";
         }

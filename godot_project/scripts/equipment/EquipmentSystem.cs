@@ -32,8 +32,8 @@ namespace SignalLost.Equipment
         private SignalLost.GameState _gameState;
 
         // Signals
-        [Signal] public delegate void ItemEquippedEventHandler(string itemId, EquipmentSlot slot);
-        [Signal] public delegate void ItemUnequippedEventHandler(string itemId, EquipmentSlot slot);
+        [Signal] public delegate void ItemEquippedEventHandler(string itemId, int slotIndex);
+        [Signal] public delegate void ItemUnequippedEventHandler(string itemId, int slotIndex);
         [Signal] public delegate void EquipmentEffectsChangedEventHandler();
 
         /// <summary>
