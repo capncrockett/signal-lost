@@ -17,6 +17,12 @@ namespace SignalLost
         public int GameProgress { get; set; } = 0;
         public int StageProgress { get; set; } = 0;
 
+        // Environmental effects on signal reception
+        private Dictionary<string, float> _signalInterferences = new Dictionary<string, float>();
+        public float TotalSignalInterference { get; private set; } = 0.0f;
+        public bool IsDaytime { get; private set; } = true;
+        public float TimeOfDay { get; private set; } = 12.0f; // 0-24 hour format
+
         // Dictionary to store completed milestones
         private HashSet<string> _completedMilestones = new HashSet<string>();
 
@@ -117,6 +123,36 @@ namespace SignalLost
             {
                 return 0.0f;
             }
+        }
+
+        /// <summary>
+        /// Calculates the final signal strength with environmental interference applied.
+        /// </summary>
+        /// <param name="baseStrength">The base signal strength</param>
+        /// <returns>The final signal strength after applying interference</returns>
+        public float ApplyInterferenceToSignal(float baseStrength)
+        {
+            // Apply time of day effect
+            float timeOfDayFactor = 1.0f;
+            if (!IsDaytime)
+            {
+                // Night time improves signal reception (less interference)
+                timeOfDayFactor = 1.2f;
+            }
+            else
+            {
+                // Daytime has normal reception
+                timeOfDayFactor = 1.0f;
+            }
+
+            // Apply environmental interference
+            float interferenceEffect = 1.0f - TotalSignalInterference;
+
+            // Calculate final strength
+            float finalStrength = baseStrength * timeOfDayFactor * interferenceEffect;
+
+            // Clamp to valid range
+            return Mathf.Clamp(finalStrength, 0.0f, 1.0f);
         }
 
         public static float GetStaticIntensity(float freq)
@@ -318,6 +354,72 @@ namespace SignalLost
             _completedMilestones.Clear();
         }
 
+        /// <summary>
+        /// Adds signal interference from an environmental source.
+        /// </summary>
+        /// <param name="sourceId">The ID of the interference source</param>
+        /// <param name="interferenceAmount">The amount of interference (0.0 to 1.0)</param>
+        public void AddSignalInterference(string sourceId, float interferenceAmount)
+        {
+            _signalInterferences[sourceId] = Mathf.Clamp(interferenceAmount, 0.0f, 1.0f);
+            UpdateTotalInterference();
+            GD.Print($"Added signal interference: {sourceId} = {interferenceAmount}");
+        }
+
+        /// <summary>
+        /// Removes signal interference from an environmental source.
+        /// </summary>
+        /// <param name="sourceId">The ID of the interference source</param>
+        public void RemoveSignalInterference(string sourceId)
+        {
+            if (_signalInterferences.ContainsKey(sourceId))
+            {
+                _signalInterferences.Remove(sourceId);
+                UpdateTotalInterference();
+                GD.Print($"Removed signal interference: {sourceId}");
+            }
+        }
+
+        /// <summary>
+        /// Updates the total signal interference value.
+        /// </summary>
+        private void UpdateTotalInterference()
+        {
+            // Calculate total interference (capped at 1.0)
+            float total = 0.0f;
+            foreach (var interference in _signalInterferences.Values)
+            {
+                // Use a non-linear combination to prevent excessive stacking
+                total = total + interference * (1.0f - total);
+            }
+
+            TotalSignalInterference = Mathf.Clamp(total, 0.0f, 1.0f);
+            EmitSignal(SignalName.SignalInterferenceChanged, TotalSignalInterference);
+            GD.Print($"Total signal interference updated: {TotalSignalInterference}");
+        }
+
+        /// <summary>
+        /// Sets the time of day.
+        /// </summary>
+        /// <param name="time">The time in 24-hour format (0-24)</param>
+        public void SetTimeOfDay(float time)
+        {
+            TimeOfDay = Mathf.Clamp(time, 0.0f, 24.0f);
+
+            // Update day/night status
+            bool wasDaytime = IsDaytime;
+            IsDaytime = TimeOfDay >= 6.0f && TimeOfDay <= 18.0f;
+
+            // Emit signal if day/night status changed
+            if (wasDaytime != IsDaytime)
+            {
+                EmitSignal(SignalName.DayNightChanged, IsDaytime);
+            }
+
+            EmitSignal(SignalName.TimeOfDayChanged, TimeOfDay);
+            GD.Print($"Time of day set to {TimeOfDay}, is daytime: {IsDaytime}");
+        }
+
         // Signals (Godot's events, not radio signals)
         [Signal]
         public delegate void FrequencyChangedEventHandler(float newFrequency);
@@ -339,6 +441,15 @@ namespace SignalLost
 
         [Signal]
         public delegate void SignalDiscoveredEventHandler(string signalId, float frequency);
+
+        [Signal]
+        public delegate void SignalInterferenceChangedEventHandler(float interferenceLevel);
+
+        [Signal]
+        public delegate void TimeOfDayChangedEventHandler(float time);
+
+        [Signal]
+        public delegate void DayNightChangedEventHandler(bool isDaytime);
 
         // Functions to modify state
         public void SetFrequency(float freq)
@@ -397,6 +508,108 @@ namespace SignalLost
             return Inventory.Contains(itemId);
         }
 
+        // Experience and progression system
+        private int _experience = 0;
+        private int _currency = 0;
+        private HashSet<string> _unlockedFeatures = new HashSet<string>();
+        private HashSet<string> _unlockedSkills = new HashSet<string>();
+
+        /// <summary>
+        /// Adds experience points to the player.
+        /// </summary>
+        /// <param name="amount">The amount of experience to add</param>
+        public void AddExperience(int amount)
+        {
+            _experience += amount;
+            GD.Print($"Added {amount} experience points. Total: {_experience}");
+        }
+
+        /// <summary>
+        /// Gets the current experience points.
+        /// </summary>
+        /// <returns>The current experience points</returns>
+        public int GetExperience()
+        {
+            return _experience;
+        }
+
+        /// <summary>
+        /// Adds currency to the player.
+        /// </summary>
+        /// <param name="amount">The amount of currency to add</param>
+        public void AddCurrency(int amount)
+        {
+            _currency += amount;
+            GD.Print($"Added {amount} currency. Total: {_currency}");
+        }
+
+        /// <summary>
+        /// Gets the current currency amount.
+        /// </summary>
+        /// <returns>The current currency amount</returns>
+        public int GetCurrency()
+        {
+            return _currency;
+        }
+
+        /// <summary>
+        /// Unlocks a feature.
+        /// </summary>
+        /// <param name="featureId">The ID of the feature to unlock</param>
+        public void UnlockFeature(string featureId)
+        {
+            _unlockedFeatures.Add(featureId);
+            GD.Print($"Unlocked feature: {featureId}");
+        }
+
+        /// <summary>
+        /// Checks if a feature is unlocked.
+        /// </summary>
+        /// <param name="featureId">The ID of the feature to check</param>
+        /// <returns>True if the feature is unlocked, false otherwise</returns>
+        public bool IsFeatureUnlocked(string featureId)
+        {
+            return _unlockedFeatures.Contains(featureId);
+        }
+
+        /// <summary>
+        /// Gets all unlocked features.
+        /// </summary>
+        /// <returns>A set of unlocked feature IDs</returns>
+        public HashSet<string> GetUnlockedFeatures()
+        {
+            return _unlockedFeatures;
+        }
+
+        /// <summary>
+        /// Unlocks a skill.
+        /// </summary>
+        /// <param name="skillId">The ID of the skill to unlock</param>
+        public void UnlockSkill(string skillId)
+        {
+            _unlockedSkills.Add(skillId);
+            GD.Print($"Unlocked skill: {skillId}");
+        }
+
+        /// <summary>
+        /// Checks if a skill is unlocked.
+        /// </summary>
+        /// <param name="skillId">The ID of the skill to check</param>
+        /// <returns>True if the skill is unlocked, false otherwise</returns>
+        public bool IsSkillUnlocked(string skillId)
+        {
+            return _unlockedSkills.Contains(skillId);
+        }
+
+        /// <summary>
+        /// Gets all unlocked skills.
+        /// </summary>
+        /// <returns>A set of unlocked skill IDs</returns>
+        public HashSet<string> GetUnlockedSkills()
+        {
+            return _unlockedSkills;
+        }
+
         // Initialize the game state
         public void Initialize()
         {
@@ -410,6 +623,18 @@ namespace SignalLost
             _discoveredSignals.Clear();
             _interactedObjects.Clear();
             _completedMilestones.Clear();
+
+            // Initialize environmental effects
+            _signalInterferences.Clear();
+            TotalSignalInterference = 0.0f;
+            TimeOfDay = 12.0f;
+            IsDaytime = true;
+
+            // Initialize progression system variables
+            _experience = 0;
+            _currency = 0;
+            _unlockedFeatures.Clear();
+            _unlockedSkills.Clear();
 
             GD.Print("GameState: Initialized");
         }

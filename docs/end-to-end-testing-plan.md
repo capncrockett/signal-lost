@@ -48,62 +48,62 @@ namespace SignalLost.Testing
     {
         // Test results
         private List<TestResult> _testResults = new List<TestResult>();
-        
+
         // Current test
         private E2ETest _currentTest;
-        
+
         // Test timeout (in seconds)
         [Export]
         public float TestTimeout { get; set; } = 30.0f;
-        
+
         // Signal for test completion
         [Signal]
         public delegate void TestsCompletedEventHandler(bool allPassed);
-        
+
         // Run all tests
         public async Task RunAllTests(List<E2ETest> tests)
         {
             _testResults.Clear();
-            
+
             foreach (var test in tests)
             {
                 var result = await RunTest(test);
                 _testResults.Add(result);
             }
-            
+
             // Generate report
             GenerateTestReport();
-            
+
             // Emit completion signal
             bool allPassed = _testResults.TrueForAll(r => r.Passed);
             EmitSignal(nameof(TestsCompleted), allPassed);
-            
+
             return;
         }
-        
+
         // Run a single test
         public async Task<TestResult> RunTest(E2ETest test)
         {
             GD.Print($"Running test: {test.Name}");
-            
+
             _currentTest = test;
-            
+
             // Create result object
             var result = new TestResult
             {
                 TestName = test.Name,
                 StartTime = DateTime.Now
             };
-            
+
             try
             {
                 // Set up test
                 await test.Setup();
-                
+
                 // Run test with timeout
                 var timeoutTask = Task.Delay(TimeSpan.FromSeconds(TestTimeout));
                 var testTask = test.Execute();
-                
+
                 if (await Task.WhenAny(testTask, timeoutTask) == timeoutTask)
                 {
                     // Test timed out
@@ -114,13 +114,13 @@ namespace SignalLost.Testing
                 {
                     // Test completed
                     result.Passed = await testTask;
-                    
+
                     if (!result.Passed)
                     {
                         result.ErrorMessage = test.ErrorMessage;
                     }
                 }
-                
+
                 // Take screenshot
                 result.ScreenshotPath = TakeScreenshot(test.Name);
             }
@@ -135,11 +135,11 @@ namespace SignalLost.Testing
             {
                 // Clean up
                 await test.Cleanup();
-                
+
                 // Record end time
                 result.EndTime = DateTime.Now;
                 result.Duration = (result.EndTime - result.StartTime).TotalSeconds;
-                
+
                 // Log result
                 if (result.Passed)
                 {
@@ -150,45 +150,49 @@ namespace SignalLost.Testing
                     GD.PrintErr($"Test {test.Name} failed in {result.Duration:F2} seconds: {result.ErrorMessage}");
                 }
             }
-            
+
             return result;
         }
-        
-        // Take a screenshot
+
+        // Take a screenshot and analyze it
         private string TakeScreenshot(string testName)
         {
             string filename = $"test_{testName.ToLower().Replace(" ", "_")}_{DateTime.Now:yyyyMMdd_HHmmss}.png";
-            string directory = "user://test_screenshots";
+            string directory = "screenshots";
             string path = $"{directory}/{filename}";
-            
+
             // Ensure directory exists
-            var dir = DirAccess.Open("user://");
+            var dir = DirAccess.Open("res://");
             if (!dir.DirExists(directory))
             {
                 dir.MakeDir(directory);
             }
-            
+
             // Take screenshot
             var image = GetViewport().GetTexture().GetImage();
             image.SavePng(path);
-            
+
+            // Analyze the screenshot using the Python script
+            // This is done asynchronously to avoid blocking the test
+            OS.Execute("py", new string[] { "analyze_existing_screenshot.py", path }, output: false, blocking: false);
+
             return path;
         }
-        
+
         // Generate test report
         private void GenerateTestReport()
         {
             string reportPath = $"user://test_report_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
-            
+
             using (var file = FileAccess.Open(reportPath, FileAccess.ModeFlags.Write))
             {
                 file.StoreLine("E2E Test Report for Signal Lost");
                 file.StoreLine($"Date: {DateTime.Now}");
                 file.StoreLine("----------------------------------------");
-                
+
                 int passed = 0;
                 int failed = 0;
-                
+
                 foreach (var result in _testResults)
                 {
                     if (result.Passed)
@@ -199,28 +203,28 @@ namespace SignalLost.Testing
                     {
                         failed++;
                     }
-                    
+
                     file.StoreLine($"Test: {result.TestName}");
                     file.StoreLine($"Result: {(result.Passed ? "PASSED" : "FAILED")}");
                     file.StoreLine($"Duration: {result.Duration:F2} seconds");
-                    
+
                     if (!result.Passed)
                     {
                         file.StoreLine($"Error: {result.ErrorMessage}");
                     }
-                    
+
                     file.StoreLine($"Screenshot: {result.ScreenshotPath}");
                     file.StoreLine("----------------------------------------");
                 }
-                
+
                 file.StoreLine($"Summary: {passed} passed, {failed} failed");
                 file.StoreLine($"Total tests: {_testResults.Count}");
             }
-            
+
             GD.Print($"Test report generated at {reportPath}");
         }
     }
-    
+
     // Test result class
     public class TestResult
     {
@@ -250,25 +254,25 @@ namespace SignalLost.Testing
     {
         // Test name
         public abstract string Name { get; }
-        
+
         // Error message if test fails
         public string ErrorMessage { get; protected set; }
-        
+
         // Setup the test
         public virtual async Task Setup()
         {
             await Task.CompletedTask;
         }
-        
+
         // Execute the test
         public abstract Task<bool> Execute();
-        
+
         // Clean up after the test
         public virtual async Task Cleanup()
         {
             await Task.CompletedTask;
         }
-        
+
         // Helper method to simulate input
         protected void SimulateKeyPress(Key key)
         {
@@ -276,14 +280,14 @@ namespace SignalLost.Testing
             inputEvent.Keycode = key;
             inputEvent.Pressed = true;
             Input.ParseInputEvent(inputEvent);
-            
+
             // Release key
             inputEvent = new InputEventKey();
             inputEvent.Keycode = key;
             inputEvent.Pressed = false;
             Input.ParseInputEvent(inputEvent);
         }
-        
+
         // Helper method to simulate mouse click
         protected void SimulateMouseClick(Vector2 position)
         {
@@ -292,7 +296,7 @@ namespace SignalLost.Testing
             inputEvent.Pressed = true;
             inputEvent.Position = position;
             Input.ParseInputEvent(inputEvent);
-            
+
             // Release mouse button
             inputEvent = new InputEventMouseButton();
             inputEvent.ButtonIndex = MouseButton.Left;
@@ -300,7 +304,7 @@ namespace SignalLost.Testing
             inputEvent.Position = position;
             Input.ParseInputEvent(inputEvent);
         }
-        
+
         // Helper method to simulate mouse movement
         protected void SimulateMouseMovement(Vector2 fromPosition, Vector2 toPosition, int steps = 10)
         {
@@ -308,33 +312,33 @@ namespace SignalLost.Testing
             {
                 float t = (float)i / steps;
                 Vector2 position = fromPosition.Lerp(toPosition, t);
-                
+
                 var inputEvent = new InputEventMouseMotion();
                 inputEvent.Position = position;
                 Input.ParseInputEvent(inputEvent);
             }
         }
-        
+
         // Helper method to wait for a condition
         protected async Task<bool> WaitForCondition(Func<bool> condition, float timeout = 5.0f)
         {
             float elapsed = 0;
             float interval = 0.1f;
-            
+
             while (elapsed < timeout)
             {
                 if (condition())
                 {
                     return true;
                 }
-                
+
                 await Task.Delay((int)(interval * 1000));
                 elapsed += interval;
             }
-            
+
             return false;
         }
-        
+
         // Helper method to load a scene
         protected async Task<Node> LoadScene(string scenePath)
         {
@@ -344,16 +348,16 @@ namespace SignalLost.Testing
                 ErrorMessage = $"Failed to load scene: {scenePath}";
                 return null;
             }
-            
+
             var scene = packedScene.Instantiate();
             GetTree().Root.AddChild(scene);
-            
+
             // Wait one frame for the scene to initialize
             await ToSignal(GetTree(), "process_frame");
-            
+
             return scene;
         }
-        
+
         // Helper method to unload a scene
         protected void UnloadScene(Node scene)
         {
@@ -381,99 +385,99 @@ namespace SignalLost.Testing
     {
         // Test name
         public override string Name => "Radio Tuner Test";
-        
+
         // Scene to test
         private Node _mainScene;
-        
+
         // References to nodes
         private PixelRadioInterface _radioInterface;
         private GameState _gameState;
         private RadioSystem _radioSystem;
-        
+
         // Setup the test
         public override async Task Setup()
         {
             // Load the main scene
             _mainScene = await LoadScene("res://PixelMainScene.tscn");
-            
+
             // Get references to nodes
             _radioInterface = _mainScene.GetNode<PixelRadioInterface>("PixelRadioInterface");
             _gameState = GetNode<GameState>("/root/GameState");
             _radioSystem = GetNode<RadioSystem>("/root/RadioSystem");
-            
+
             // Ensure radio is visible
             _radioInterface.SetVisible(true);
-            
+
             // Wait for everything to initialize
             await Task.Delay(500);
         }
-        
+
         // Execute the test
         public override async Task<bool> Execute()
         {
             // Test 1: Turn on the radio
             GD.Print("Test 1: Turn on the radio");
-            
+
             // Find power button position
             var powerButtonRect = _radioInterface.GetNode<Control>("PowerButton").GetGlobalRect();
             var powerButtonCenter = powerButtonRect.Position + powerButtonRect.Size / 2;
-            
+
             // Click power button
             SimulateMouseClick(powerButtonCenter);
-            
+
             // Wait for radio to turn on
             bool radioTurnedOn = await WaitForCondition(() => _gameState.IsRadioOn);
-            
+
             if (!radioTurnedOn)
             {
                 ErrorMessage = "Failed to turn on the radio";
                 return false;
             }
-            
+
             // Test 2: Tune to a specific frequency
             GD.Print("Test 2: Tune to a specific frequency");
-            
+
             // Target frequency (one with a signal)
             float targetFrequency = 91.5f;
-            
+
             // Find frequency slider position
             var sliderRect = _radioInterface.GetNode<Control>("FrequencySlider").GetGlobalRect();
-            
+
             // Calculate position on slider for target frequency
             float frequencyRange = _radioSystem.MaxFrequency - _radioSystem.MinFrequency;
             float frequencyPercentage = (targetFrequency - _radioSystem.MinFrequency) / frequencyRange;
             float sliderX = sliderRect.Position.X + sliderRect.Size.X * frequencyPercentage;
             float sliderY = sliderRect.Position.Y + sliderRect.Size.Y / 2;
-            
+
             // Click on slider at the calculated position
             SimulateMouseClick(new Vector2(sliderX, sliderY));
-            
+
             // Wait for frequency to be set
-            bool frequencySet = await WaitForCondition(() => 
+            bool frequencySet = await WaitForCondition(() =>
                 Math.Abs(_gameState.CurrentFrequency - targetFrequency) < 0.2f);
-            
+
             if (!frequencySet)
             {
                 ErrorMessage = $"Failed to tune to frequency {targetFrequency}";
                 return false;
             }
-            
+
             // Test 3: Verify signal detection
             GD.Print("Test 3: Verify signal detection");
-            
+
             // Wait for signal to be detected
             bool signalDetected = await WaitForCondition(() => _radioSystem.GetSignalStrength() > 0.5f);
-            
+
             if (!signalDetected)
             {
                 ErrorMessage = "Failed to detect signal";
                 return false;
             }
-            
+
             // All tests passed
             return true;
         }
-        
+
         // Clean up after the test
         public override async Task Cleanup()
         {
@@ -482,10 +486,10 @@ namespace SignalLost.Testing
             {
                 _gameState.ToggleRadio();
             }
-            
+
             // Unload the scene
             UnloadScene(_mainScene);
-            
+
             await Task.CompletedTask;
         }
     }
@@ -509,23 +513,23 @@ var test_framework
 func _ready():
     # Initialize test framework
     test_framework = $E2ETestFramework
-    
+
     # Connect signals
     test_framework.connect("tests_completed", self, "_on_tests_completed")
-    
+
     # Add tests
     tests.append(load("res://tests/RadioTunerE2ETest.cs").new())
     tests.append(load("res://tests/InventoryE2ETest.cs").new())
     tests.append(load("res://tests/MapE2ETest.cs").new())
     tests.append(load("res://tests/QuestE2ETest.cs").new())
     tests.append(load("res://tests/GameProgressionE2ETest.cs").new())
-    
+
     # Run tests
     test_framework.run_all_tests(tests)
 
 func _on_tests_completed(all_passed):
     print("All tests completed. All passed: ", all_passed)
-    
+
     # Exit with appropriate code in headless mode
     if OS.has_feature("headless"):
         OS.exit(0 if all_passed else 1)

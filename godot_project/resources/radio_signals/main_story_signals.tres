@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="EnhancedSignalData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/radio/EnhancedSignalData.cs" id="1_xjnr2"]
+
+[resource]
+script = ExtResource("1_xjnr2")
+Id = "distress_call"
+Name = "Distress Call"
+Description = "An urgent distress call from the research facility."
+Frequency = 121.5
+Type = 1
+Content = "Mayday, mayday! This is Dr. Sarah Chen at the Signal Research Facility. We've encountered a critical anomaly in the quantum resonance chamber. The signal is... it's not just a transmission, it's something else. If anyone receives this, stay away from coordinates 47.2N, 122.5W. I repeat, stay away! The signal is becoming unstable and we can't contain it. We need immediate evacuation and containment specialists. This is not a drill."
+LocationId = "research_facility"
+IsStatic = false
+Bandwidth = 0.4
+MinSignalStrength = 0.4
+IsHidden = false
+IsDecoded = false
+RequiredItemToUnlock = ""
+NextSignalId = "research_data"
+StoryProgressRequired = 0
+StoryProgressUnlocked = 10
+AudioPath = "res://assets/audio/signals/distress_call.wav"
+ImagePath = ""
+NarrativeThreadId = "main_story"
+NarrativeSequence = 1
+NarrativeTrigger = "reveal_research_facility"
+IsKeyNarrativeSignal = true
+CharacterId = "Dr. Sarah Chen"
+EncodedContent = "[ENCRYPTED SIGNAL - REQUIRES DECODING]"
+DecodedContent = "Mayday, mayday! This is Dr. Sarah Chen at the Signal Research Facility. We've encountered a critical anomaly in the quantum resonance chamber. The signal is... it's not just a transmission, it's something else. If anyone receives this, stay away from coordinates 47.2N, 122.5W. I repeat, stay away! The signal is becoming unstable and we can't contain it. We need immediate evacuation and containment specialists. This is not a drill."
+AsciiArt = "  _____  _____  _____  _____  _____  _____  _____  _____  \n / ___/ /     \\|  _  \\|  _  \\|  _  \\|   __\\|   __\\|  _  \\ \n|  ___||  --  ||     ||     ||     ||  |  ||  |  ||     / \n \\___ \\|_____/|__|__||__|__||__|__||_____/|_____/|__|__\\ \n      \\                                                   \\"
+InterferenceLevel = 0.7
+HasVisualComponent = false

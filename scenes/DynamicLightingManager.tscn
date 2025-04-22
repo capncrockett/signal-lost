@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8j6y8q3xh2gv"]
+
+[ext_resource type="Script" path="res://scripts/ui/DynamicLightingManager.cs" id="1_8j4vd"]
+
+[node name="DynamicLightingManager" type="Node"]
+script = ExtResource("1_8j4vd")

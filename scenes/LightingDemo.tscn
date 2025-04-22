@@ -1,0 +1,92 @@
+[gd_scene load_steps=3 format=3 uid="uid://c8j6y8q3xh2gv"]
+
+[ext_resource type="Script" path="res://scripts/LightingDemoController.cs" id="1_8j4vd"]
+[ext_resource type="PackedScene" path="res://scenes/DynamicLightingManager.tscn" id="2_3f5gv"]
+
+[node name="LightingDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8j4vd")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.1, 1)
+
+[node name="DynamicLightingManager" parent="." instance=ExtResource("2_3f5gv")]
+
+[node name="Controls" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_bottom = 400.0
+grow_horizontal = 0
+
+[node name="Label" type="Label" parent="Controls"]
+layout_mode = 2
+text = "Light Properties"
+horizontal_alignment = 1
+
+[node name="LightColorPicker" type="ColorPickerButton" parent="Controls"]
+layout_mode = 2
+text = "Light Color"
+color = Color(1, 0.8, 0.2, 1)
+
+[node name="IntensityLabel" type="Label" parent="Controls"]
+layout_mode = 2
+text = "Intensity"
+
+[node name="IntensitySlider" type="HSlider" parent="Controls"]
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+value = 0.8
+
+[node name="RadiusLabel" type="Label" parent="Controls"]
+layout_mode = 2
+text = "Radius"
+
+[node name="RadiusSlider" type="HSlider" parent="Controls"]
+layout_mode = 2
+min_value = 50.0
+max_value = 300.0
+step = 10.0
+value = 100.0
+
+[node name="LightTypeLabel" type="Label" parent="Controls"]
+layout_mode = 2
+text = "Light Type"
+
+[node name="LightTypeOption" type="OptionButton" parent="Controls"]
+layout_mode = 2
+
+[node name="AddLightButton" type="Button" parent="Controls"]
+layout_mode = 2
+text = "Add Light"
+
+[node name="ClearLightsButton" type="Button" parent="Controls"]
+layout_mode = 2
+text = "Clear Lights"
+
+[node name="Instructions" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -100.0
+offset_right = 400.0
+grow_vertical = 0
+text = "Instructions:
+- Shift+Click to add a light at cursor position
+- Right-click to remove nearest light
+- Use controls to adjust light properties"

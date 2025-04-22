@@ -18,6 +18,8 @@ namespace SignalLost.Field
         // Movement properties
         [Export]
         private float _moveSpeed = 4.0f; // Cells per second
+        private float _baseMoveSpeed = 4.0f; // Base movement speed
+        private float _movementPenalty = 1.0f; // Movement penalty multiplier (1.0 = no penalty)
 
         // Movement state
         private bool _isMoving = false;
@@ -52,6 +54,9 @@ namespace SignalLost.Field
                     return;
                 }
             }
+
+            // Store base movement speed
+            _baseMoveSpeed = _moveSpeed;
 
             // Find the game state
             var gameStateNode = GetNodeOrNull("/root/GameState");
@@ -213,6 +218,29 @@ namespace SignalLost.Field
                 _movementProgress = 0.0f;
             }
         }
+
+        /// <summary>
+        /// Sets a movement penalty on the player.
+        /// </summary>
+        /// <param name="penaltyMultiplier">The movement speed multiplier (0.0 to 1.0)</param>
+        public void SetMovementPenalty(float penaltyMultiplier)
+        {
+            _movementPenalty = Mathf.Clamp(penaltyMultiplier, 0.1f, 1.0f);
+            _moveSpeed = _baseMoveSpeed * _movementPenalty;
+            GD.Print($"PlayerController: Movement penalty set to {_movementPenalty}, speed now {_moveSpeed}");
+        }
+
+        /// <summary>
+        /// Resets any movement penalties on the player.
+        /// </summary>
+        public void ResetMovementPenalty()
+        {
+            _movementPenalty = 1.0f;
+            _moveSpeed = _baseMoveSpeed;
+            GD.Print("PlayerController: Movement penalty reset");
+        }
+
+
 
         /// <summary>
         /// Custom drawing function for the player character.

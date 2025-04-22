@@ -11,6 +11,7 @@ This document outlines the testing strategy for the Signal Lost game, including 
 | Unit        | C# Tests   | Components, state management, logic  |
 | Integration | C# Tests   | Components working together          |
 | Scene       | Test Scenes | Visual components, scene interactions |
+| Visual      | Screenshot Analysis | UI state, visual verification     |
 | Manual      | Godot Editor | Gameplay, visuals, audio quality     |
 
 ## Running Tests
@@ -118,6 +119,33 @@ godot_project/
 - [ ] Game state is saved and loaded correctly
 - [ ] Narrative progression works as expected
 
+## Screenshot Analysis
+
+The project includes tools for analyzing screenshots to verify the visual state of the game:
+
+### Taking and Analyzing Screenshots
+
+```bash
+# Take a screenshot and analyze it
+py take_and_analyze_screenshot.py [test_name] [description]
+
+# Analyze an existing screenshot
+py analyze_existing_screenshot.py screenshots/your_screenshot.png
+```
+
+### Analysis Information
+
+The screenshot analysis provides the following information:
+
+- **Basic Information**: Filename, path, file size
+- **Image Properties**: Resolution, dimensions
+- **Color Analysis**: Average color, brightness, dominant colors
+- **UI Elements**: Potential UI elements based on color variance
+
+### Integration with E2E Tests
+
+The E2E test framework automatically takes and analyzes screenshots during test execution. The analysis results are included in the test report.
+
 ## Troubleshooting
 
 ### Common Issues
@@ -126,6 +154,7 @@ godot_project/
 2. **Node not found errors**: Ensure nodes are properly initialized
 3. **Signal connection errors**: Verify signal names and connections
 4. **Resource loading errors**: Check file paths and resource availability
+5. **Screenshot analysis errors**: Ensure Python and required packages are installed
 
 ### Debugging Tests
 
@@ -133,3 +162,4 @@ godot_project/
 2. Use the Godot debugger
 3. Run tests with verbose output: `./run_tests.bat -v`
 4. Check test logs in the `logs` directory
+5. Examine screenshot analysis JSON files in the `screenshots` directory

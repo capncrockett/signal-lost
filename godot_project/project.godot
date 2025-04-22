@@ -29,6 +29,9 @@ GameProgressionManager="*res://scripts/GameProgressionManager.cs"
 GameplayManager="*res://scripts/gameplay/GameplayManager.cs"
 RadioSignalsManager="*res://scripts/radio/RadioSignalsManager.cs"
 RadioAudioManager="*res://scripts/audio/RadioAudioManager.cs"
+EquipmentSystem="*res://scripts/equipment/EquipmentSystem.cs"
+RadioEquipmentManager="*res://scripts/equipment/RadioEquipmentManager.cs"
+
 
 [display]
 

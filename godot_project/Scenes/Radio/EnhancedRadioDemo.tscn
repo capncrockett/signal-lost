@@ -1,0 +1,131 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/radio/EnhancedRadioDemoController.cs" id="1_2xjnr"]
+[ext_resource type="Script" path="res://scripts/ui/PixelRadioInterface.cs" id="2_3xjnr"]
+[ext_resource type="Script" path="res://scripts/PixelMessageDisplay.cs" id="3_4xjnr"]
+[ext_resource type="Script" path="res://scripts/radio/RadioNarrativeManager.cs" id="4_5xjnr"]
+
+[node name="EnhancedRadioDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_2xjnr")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0784314, 0.0784314, 0.0784314, 1)
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 20.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 24
+text = "Enhanced Radio Interface Demo"
+horizontal_alignment = 1
+
+[node name="PixelRadioInterface" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_3xjnr")
+BackgroundColor = Color(0.12549, 0.12549, 0.12549, 1)
+BorderColor = Color(0.196078, 0.196078, 0.196078, 1)
+DialColor = Color(0.196078, 0.196078, 0.196078, 1)
+DialMarkerColor = Color(0, 0.784314, 0, 1)
+FrequencyTextColor = Color(0, 0.784314, 0, 1)
+SignalStrengthColor = Color(0, 0.784314, 0, 1)
+ButtonColor = Color(0.196078, 0.196078, 0.196078, 1)
+ButtonHoverColor = Color(0.294118, 0.294118, 0.294118, 1)
+ButtonTextColor = Color(0, 0.784314, 0, 1)
+MinFrequency = 88.0
+MaxFrequency = 108.0
+CurrentFrequency = 91.5
+SignalStrength = 0.0
+IsPoweredOn = true
+
+[node name="PixelMessageDisplay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -200.0
+offset_right = 300.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_4xjnr")
+BackgroundColor = Color(0.0509804, 0.0509804, 0.0509804, 1)
+BorderColor = Color(0.196078, 0.196078, 0.196078, 1)
+TextColor = Color(0, 0.784314, 0, 1)
+TitleColor = Color(0, 0.901961, 0, 1)
+ButtonColor = Color(0.196078, 0.196078, 0.196078, 1)
+ButtonHighlightColor = Color(0.294118, 0.294118, 0.294118, 1)
+ButtonTextColor = Color(0, 0.784314, 0, 1)
+ScanlineColor = Color(0, 0, 0, 0.2)
+NoiseIntensity = 0.2
+TypewriterSpeed = 0.05
+TypewriterSpeedVariation = 0.02
+CharacterSize = 8
+LineSpacing = 2
+EnableScanlines = true
+EnableScreenFlicker = true
+EnableTypewriterSound = true
+MessageType = "Radio"
+ShowTimestamp = true
+
+[node name="Instructions" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -80.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 16
+text = "Use the radio dial to tune to different frequencies.
+Try frequencies: 91.5, 95.7, 103.2, 121.5, 87.5"
+horizontal_alignment = 1
+
+[node name="RadioNarrativeManager" type="Node" parent="."]
+script = ExtResource("4_5xjnr")
+
+[node name="NarrativeInfo" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -120.0
+offset_right = 320.0
+offset_bottom = -20.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 14
+text = "Narrative Threads:
+- None discovered yet"
+</node>
