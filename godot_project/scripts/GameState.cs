@@ -17,6 +17,12 @@ namespace SignalLost
         public int GameProgress { get; set; } = 0;
         public int StageProgress { get; set; } = 0;
 
+        // Environmental effects on signal reception
+        private Dictionary<string, float> _signalInterferences = new Dictionary<string, float>();
+        public float TotalSignalInterference { get; private set; } = 0.0f;
+        public bool IsDaytime { get; private set; } = true;
+        public float TimeOfDay { get; private set; } = 12.0f; // 0-24 hour format
+
         // Dictionary to store completed milestones
         private HashSet<string> _completedMilestones = new HashSet<string>();
 
@@ -117,6 +123,36 @@ namespace SignalLost
             {
                 return 0.0f;
             }
+        }
+
+        /// <summary>
+        /// Calculates the final signal strength with environmental interference applied.
+        /// </summary>
+        /// <param name="baseStrength">The base signal strength</param>
+        /// <returns>The final signal strength after applying interference</returns>
+        public float ApplyInterferenceToSignal(float baseStrength)
+        {
+            // Apply time of day effect
+            float timeOfDayFactor = 1.0f;
+            if (!IsDaytime)
+            {
+                // Night time improves signal reception (less interference)
+                timeOfDayFactor = 1.2f;
+            }
+            else
+            {
+                // Daytime has normal reception
+                timeOfDayFactor = 1.0f;
+            }
+
+            // Apply environmental interference
+            float interferenceEffect = 1.0f - TotalSignalInterference;
+
+            // Calculate final strength
+            float finalStrength = baseStrength * timeOfDayFactor * interferenceEffect;
+
+            // Clamp to valid range
+            return Mathf.Clamp(finalStrength, 0.0f, 1.0f);
         }
 
         public static float GetStaticIntensity(float freq)
@@ -318,6 +354,72 @@ namespace SignalLost
             _completedMilestones.Clear();
         }
 
+        /// <summary>
+        /// Adds signal interference from an environmental source.
+        /// </summary>
+        /// <param name="sourceId">The ID of the interference source</param>
+        /// <param name="interferenceAmount">The amount of interference (0.0 to 1.0)</param>
+        public void AddSignalInterference(string sourceId, float interferenceAmount)
+        {
+            _signalInterferences[sourceId] = Mathf.Clamp(interferenceAmount, 0.0f, 1.0f);
+            UpdateTotalInterference();
+            GD.Print($"Added signal interference: {sourceId} = {interferenceAmount}");
+        }
+
+        /// <summary>
+        /// Removes signal interference from an environmental source.
+        /// </summary>
+        /// <param name="sourceId">The ID of the interference source</param>
+        public void RemoveSignalInterference(string sourceId)
+        {
+            if (_signalInterferences.ContainsKey(sourceId))
+            {
+                _signalInterferences.Remove(sourceId);
+                UpdateTotalInterference();
+                GD.Print($"Removed signal interference: {sourceId}");
+            }
+        }
+
+        /// <summary>
+        /// Updates the total signal interference value.
+        /// </summary>
+        private void UpdateTotalInterference()
+        {
+            // Calculate total interference (capped at 1.0)
+            float total = 0.0f;
+            foreach (var interference in _signalInterferences.Values)
+            {
+                // Use a non-linear combination to prevent excessive stacking
+                total = total + interference * (1.0f - total);
+            }
+
+            TotalSignalInterference = Mathf.Clamp(total, 0.0f, 1.0f);
+            EmitSignal(SignalName.SignalInterferenceChanged, TotalSignalInterference);
+            GD.Print($"Total signal interference updated: {TotalSignalInterference}");
+        }
+
+        /// <summary>
+        /// Sets the time of day.
+        /// </summary>
+        /// <param name="time">The time in 24-hour format (0-24)</param>
+        public void SetTimeOfDay(float time)
+        {
+            TimeOfDay = Mathf.Clamp(time, 0.0f, 24.0f);
+
+            // Update day/night status
+            bool wasDaytime = IsDaytime;
+            IsDaytime = TimeOfDay >= 6.0f && TimeOfDay <= 18.0f;
+
+            // Emit signal if day/night status changed
+            if (wasDaytime != IsDaytime)
+            {
+                EmitSignal(SignalName.DayNightChanged, IsDaytime);
+            }
+
+            EmitSignal(SignalName.TimeOfDayChanged, TimeOfDay);
+            GD.Print($"Time of day set to {TimeOfDay}, is daytime: {IsDaytime}");
+        }
+
         // Signals (Godot's events, not radio signals)
         [Signal]
         public delegate void FrequencyChangedEventHandler(float newFrequency);
@@ -339,6 +441,15 @@ namespace SignalLost
 
         [Signal]
         public delegate void SignalDiscoveredEventHandler(string signalId, float frequency);
+
+        [Signal]
+        public delegate void SignalInterferenceChangedEventHandler(float interferenceLevel);
+
+        [Signal]
+        public delegate void TimeOfDayChangedEventHandler(float time);
+
+        [Signal]
+        public delegate void DayNightChangedEventHandler(bool isDaytime);
 
         // Functions to modify state
         public void SetFrequency(float freq)
@@ -512,6 +623,12 @@ namespace SignalLost
             _discoveredSignals.Clear();
             _interactedObjects.Clear();
             _completedMilestones.Clear();
+
+            // Initialize environmental effects
+            _signalInterferences.Clear();
+            TotalSignalInterference = 0.0f;
+            TimeOfDay = 12.0f;
+            IsDaytime = true;
 
             // Initialize progression system variables
             _experience = 0;
