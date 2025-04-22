@@ -240,14 +240,7 @@ namespace SignalLost.Field
             GD.Print("PlayerController: Movement penalty reset");
         }
 
-        /// <summary>
-        /// Gets the current grid position of the player.
-        /// </summary>
-        /// <returns>The current grid position</returns>
-        public Vector2I GetGridPosition()
-        {
-            return _gridPosition;
-        }
+
 
         /// <summary>
         /// Custom drawing function for the player character.

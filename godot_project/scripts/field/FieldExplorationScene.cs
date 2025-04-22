@@ -94,7 +94,7 @@ namespace SignalLost.Field
         private void HandleKeyboardInput()
         {
             // Advance time by 1 hour when T is pressed
-            if (Input.IsActionJustPressed("ui_focus_next") || Input.IsKeyJustPressed(Key.T))
+            if (Input.IsActionJustPressed("ui_focus_next") || Input.IsKeyPressed(Key.T))
             {
                 if (_dayNightCycleManager != null)
                 {
@@ -104,7 +104,7 @@ namespace SignalLost.Field
             }
 
             // Toggle day/night cycle when D is pressed
-            if (Input.IsKeyJustPressed(Key.D))
+            if (Input.IsKeyPressed(Key.D))
             {
                 if (_dayNightCycleManager != null)
                 {

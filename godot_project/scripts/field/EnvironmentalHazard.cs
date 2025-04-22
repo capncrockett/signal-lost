@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using SignalLost.Inventory;
 
 namespace SignalLost.Field
 {
@@ -316,7 +317,7 @@ namespace SignalLost.Field
                     case HazardType.Radiation:
                         // Draw radiation symbol
                         DrawCircle(Vector2.Zero, radius, new Color(drawColor, 0.3f));
-                        DrawCircle(Vector2.Zero, radius * 0.8f, new Color(0, 0, 0, 0), 2.0f, true);
+                        DrawArc(Vector2.Zero, radius * 0.8f, 0, Mathf.Pi * 2, 32, new Color(0, 0, 0, 0), 2.0f);
                         DrawCircle(Vector2.Zero, radius * 0.2f, new Color(drawColor, 0.7f));
                         // Draw radiation "blades"
                         for (int i = 0; i < 3; i++)
@@ -350,7 +351,7 @@ namespace SignalLost.Field
                         // Draw chemical hazard
                         DrawCircle(Vector2.Zero, radius, new Color(drawColor, 0.3f));
                         // Draw chemical symbol (simplified)
-                        DrawCircle(Vector2.Zero, radius * 0.5f, new Color(0, 0, 0, 0), 2.0f, true);
+                        DrawArc(Vector2.Zero, radius * 0.5f, 0, Mathf.Pi * 2, 32, new Color(0, 0, 0, 0), 2.0f);
                         // Draw some bubbles
                         for (int i = 0; i < 10; i++)
                         {
@@ -416,12 +417,12 @@ namespace SignalLost.Field
         public void SetIntensity(float intensity)
         {
             Intensity = Mathf.Clamp(intensity, 0.0f, 1.0f);
-            
+
             // Update effects based on intensity
             DamagePerSecond = DamagePerSecond * (Intensity / 0.5f);
             MovementPenalty = Mathf.Lerp(1.0f, MovementPenalty, Intensity);
             SignalInterference = SignalInterference * Intensity;
-            
+
             GD.Print($"EnvironmentalHazard: {HazardName} intensity set to {Intensity}");
         }
     }
