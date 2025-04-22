@@ -306,10 +306,41 @@ namespace SignalLost
             // Show the message
             _isVisible = true;
 
+            // Adjust typewriter speed based on message type and interference
+            AdjustTypewriterSpeedForMessageType();
+
             // Play interface sound
             if (_interfaceSound != null && _interfaceSound.Stream != null)
             {
                 _interfaceSound.Play();
+            }
+        }
+
+        // Adjust typewriter speed based on message type
+        private void AdjustTypewriterSpeedForMessageType()
+        {
+            switch (MessageType)
+            {
+                case "Terminal":
+                    // Terminal messages type at a consistent speed
+                    TypewriterSpeed = 0.05f;
+                    TypewriterSpeedVariation = 0.01f;
+                    break;
+                case "Radio":
+                    // Radio messages vary more with interference
+                    TypewriterSpeed = 0.07f + (_interference * 0.1f);
+                    TypewriterSpeedVariation = 0.05f + (_interference * 0.1f);
+                    break;
+                case "Note":
+                    // Notes appear faster
+                    TypewriterSpeed = 0.03f;
+                    TypewriterSpeedVariation = 0.01f;
+                    break;
+                case "Computer":
+                    // Computer messages type quickly but with variation
+                    TypewriterSpeed = 0.04f;
+                    TypewriterSpeedVariation = 0.02f;
+                    break;
             }
         }
 
@@ -348,17 +379,47 @@ namespace SignalLost
 
             // Draw background with potential flicker effect
             Color bgColor = BackgroundColor;
-            if (EnableScreenFlicker && _random.NextDouble() < 0.05f * _interference)
+
+            // Enhanced flicker effect for radio messages
+            if (EnableScreenFlicker)
             {
-                // Add slight brightness variation for flicker effect
-                float flicker = (float)_random.NextDouble() * 0.2f;
-                bgColor = new Color(
-                    Mathf.Clamp(bgColor.R + flicker, 0, 1),
-                    Mathf.Clamp(bgColor.G + flicker, 0, 1),
-                    Mathf.Clamp(bgColor.B + flicker, 0, 1),
-                    bgColor.A
-                );
+                float flickerChance = 0.05f * _interference;
+
+                // Radio messages have more pronounced flicker
+                if (MessageType == "Radio")
+                {
+                    flickerChance *= 2.0f;
+                }
+
+                if (_random.NextDouble() < flickerChance)
+                {
+                    // Add brightness variation for flicker effect
+                    float flicker = (float)_random.NextDouble() * 0.2f;
+
+                    // Radio messages can have color tint in the flicker
+                    if (MessageType == "Radio" && _random.NextDouble() < 0.3f)
+                    {
+                        // Add a slight green or blue tint for radio messages
+                        bgColor = new Color(
+                            Mathf.Clamp(bgColor.R + flicker * 0.5f, 0, 1),
+                            Mathf.Clamp(bgColor.G + flicker * (_random.NextDouble() < 0.7f ? 1.2f : 0.5f), 0, 1),
+                            Mathf.Clamp(bgColor.B + flicker * (_random.NextDouble() < 0.3f ? 1.2f : 0.5f), 0, 1),
+                            bgColor.A
+                        );
+                    }
+                    else
+                    {
+                        // Standard brightness flicker
+                        bgColor = new Color(
+                            Mathf.Clamp(bgColor.R + flicker, 0, 1),
+                            Mathf.Clamp(bgColor.G + flicker, 0, 1),
+                            Mathf.Clamp(bgColor.B + flicker, 0, 1),
+                            bgColor.A
+                        );
+                    }
+                }
             }
+
             DrawRect(new Rect2(0, 0, width, height), bgColor);
 
             // Draw border
@@ -582,11 +643,58 @@ namespace SignalLost
         // Draw scanlines effect
         private void DrawScanlines(float width, float height)
         {
-            int scanlineSpacing = 4; // Space between scanlines
+            int scanlineSpacing = 4; // Default space between scanlines
+            Color scanlineColorToUse = ScanlineColor;
 
+            // Adjust scanlines based on message type and interference
+            if (MessageType == "Radio")
+            {
+                // Radio messages have variable scanline spacing based on interference
+                scanlineSpacing = Mathf.Max(2, 6 - (int)(_interference * 4));
+
+                // Radio scanlines can have a slight color tint
+                if (_interference > 0.5f)
+                {
+                    // Add a slight green tint for high interference radio messages
+                    scanlineColorToUse = new Color(
+                        ScanlineColor.R * 0.8f,
+                        ScanlineColor.G * 1.2f,
+                        ScanlineColor.B * 0.8f,
+                        ScanlineColor.A + (_interference * 0.1f)
+                    );
+                }
+            }
+            else if (MessageType == "Computer")
+            {
+                // Computer displays have tighter scanlines
+                scanlineSpacing = 3;
+            }
+
+            // Draw regular scanlines
             for (int y = (int)_scanlineOffset % scanlineSpacing; y < height; y += scanlineSpacing)
             {
-                DrawRect(new Rect2(0, y, width, 1), ScanlineColor);
+                DrawRect(new Rect2(0, y, width, 1), scanlineColorToUse);
+            }
+
+            // For radio with high interference, add some horizontal noise lines
+            if (MessageType == "Radio" && _interference > 0.6f)
+            {
+                int noiseLines = (int)(_interference * 5);
+                for (int i = 0; i < noiseLines; i++)
+                {
+                    int y = (int)(_random.NextDouble() * height);
+                    float noiseWidth = (float)_random.NextDouble() * width * 0.8f;
+                    float noiseX = (float)_random.NextDouble() * (width - noiseWidth);
+
+                    Color noiseColor = new Color(
+                        1.0f,
+                        1.0f,
+                        1.0f,
+                        (float)_random.NextDouble() * 0.3f
+                    );
+
+                    DrawRect(new Rect2(noiseX, y, noiseWidth, 1), noiseColor);
+                }
             }
         }
 
