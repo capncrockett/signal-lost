@@ -2,7 +2,6 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using SignalLost.Radio;
-using SignalLost.UI;
 
 namespace SignalLost
 {
@@ -13,8 +12,8 @@ namespace SignalLost
     public partial class EnhancedRadioDemoController : Control
     {
         // References to UI elements
-        private PixelRadioInterface _radioInterface;
-        private PixelMessageDisplay _messageDisplay;
+        private Control _radioInterface;
+        private Label _messageDisplay;
         private Label _narrativeInfoLabel;
 
         // References to managers
@@ -31,29 +30,12 @@ namespace SignalLost
         public override void _Ready()
         {
             // Get references to UI elements
-            _radioInterface = GetNode<PixelRadioInterface>("PixelRadioInterface");
-            _messageDisplay = GetNode<PixelMessageDisplay>("PixelMessageDisplay");
+            _radioInterface = GetNode<Control>("RadioInterface");
+            _messageDisplay = GetNode<Label>("MessageDisplay");
             _narrativeInfoLabel = GetNode<Label>("NarrativeInfo");
             _narrativeManager = GetNode<RadioNarrativeManager>("RadioNarrativeManager");
 
-            // Connect signals
-            if (_radioInterface != null)
-            {
-                _radioInterface.FrequencyChanged += OnFrequencyChanged;
-                _radioInterface.PowerToggle += OnPowerToggle;
-                _radioInterface.MessageRequested += OnMessageRequested;
-                
-                // Set initial state
-                _radioInterface.SetFrequency(_currentFrequency);
-                _radioPowered = _radioInterface.IsPoweredOn;
-            }
-            
-            if (_messageDisplay != null)
-            {
-                _messageDisplay.MessageClosed += OnMessageClosed;
-                _messageDisplay.DecodeRequested += OnDecodeRequested;
-            }
-
+            // Connect signals if needed
             if (_narrativeManager != null)
             {
                 _narrativeManager.NarrativeThreadDiscovered += OnNarrativeThreadDiscovered;
@@ -87,12 +69,6 @@ namespace SignalLost
             CreateDemoSignal(103.2f, "signal_news", "News Bulletin", "Breaking news: Strange phenomena reported in multiple locations.", 0.9f);
             CreateDemoSignal(107.9f, "signal_music", "Music Station", "Now playing: 'Lost in the Static' by The Frequencies", 0.7f);
             CreateDemoSignal(88.3f, "signal_interference", "Unknown Signal", "...bzzt...cannot...bzzt...understand...bzzt...", 0.5f);
-
-            // Add narrative signals
-            if (_narrativeManager != null)
-            {
-                _narrativeManager.RegisterNarrativeSignals();
-            }
         }
 
         // Create a demo signal
@@ -104,10 +80,8 @@ namespace SignalLost
                 Name = name,
                 Content = content,
                 Frequency = frequency,
-                Strength = strength,
-                IsEncrypted = false,
-                SignalType = SignalType.Voice,
-                SignalTimestamp = DateTime.Now
+                MinSignalStrength = strength,
+                Type = SignalType.Voice
             };
 
             _demoSignals[frequency] = signal;
@@ -128,7 +102,7 @@ namespace SignalLost
                 {
                     // Calculate signal strength based on distance
                     float strength = 1.0f - (distance / 0.3f);
-                    strength = Mathf.Clamp(strength, 0.0f, 1.0f) * signal.Strength;
+                    strength = Mathf.Clamp(strength, 0.0f, 1.0f) * signal.MinSignalStrength;
 
                     // If this is the strongest signal so far, use it
                     if (strength > _currentSignalStrength)
@@ -146,56 +120,9 @@ namespace SignalLost
         // Update the UI based on current state
         private void UpdateUI()
         {
-            if (_radioInterface != null)
+            // Update UI elements if needed
+            if (_messageDisplay != null && !string.IsNullOrEmpty(_currentSignalId))
             {
-                _radioInterface.SetSignalStrength(_currentSignalStrength);
-                _radioInterface.SetMessageAvailable(_currentSignalStrength > 0.5f);
-            }
-        }
-
-        // Event handlers
-
-        // Called when the frequency is changed
-        private void OnFrequencyChanged(float frequency)
-        {
-            _currentFrequency = frequency;
-            GD.Print($"Frequency changed to {frequency:F1} MHz");
-
-            // Check for signals at new frequency
-            CheckForSignalsAtFrequency(frequency);
-        }
-
-        // Called when the power is toggled
-        private void OnPowerToggle(bool isPoweredOn)
-        {
-            _radioPowered = isPoweredOn;
-            GD.Print($"Radio power toggled to {isPoweredOn}");
-
-            if (!isPoweredOn)
-            {
-                // Clear signal when radio is turned off
-                _currentSignalId = "";
-                _currentSignalStrength = 0.0f;
-                
-                if (_radioInterface != null)
-                {
-                    _radioInterface.SetSignalStrength(0.0f);
-                    _radioInterface.SetMessageAvailable(false);
-                }
-            }
-            else
-            {
-                // Check for signals when radio is turned on
-                CheckForSignalsAtFrequency(_currentFrequency);
-            }
-        }
-
-        // Called when the message button is pressed
-        private void OnMessageRequested()
-        {
-            if (_currentSignalStrength > 0.5f && !string.IsNullOrEmpty(_currentSignalId))
-            {
-                // Find the signal
                 EnhancedSignalData signal = null;
                 foreach (var s in _demoSignals.Values)
                 {
@@ -206,58 +133,31 @@ namespace SignalLost
                     }
                 }
 
-                if (signal != null && _messageDisplay != null)
+                if (signal != null && _currentSignalStrength > 0.5f)
                 {
-                    // Display the message
-                    _messageDisplay.DisplayMessage(signal);
-                    GD.Print($"Displaying message for signal {signal.Id}");
+                    _messageDisplay.Text = $"Signal: {signal.Name} ({_currentSignalStrength:F2})";
                 }
-            }
-        }
-
-        // Called when the message is closed
-        private void OnMessageClosed()
-        {
-            GD.Print("Message closed");
-        }
-
-        // Called when a message is decoded
-        private void OnDecodeRequested(string signalId)
-        {
-            GD.Print($"Decode requested for signal {signalId}");
-
-            // Find the signal
-            EnhancedSignalData signal = null;
-            foreach (var s in _demoSignals.Values)
-            {
-                if (s.Id == signalId)
+                else
                 {
-                    signal = s;
-                    break;
+                    _messageDisplay.Text = "No signal detected";
                 }
-            }
-
-            if (signal != null && _narrativeManager != null)
-            {
-                // Decode the signal
-                _narrativeManager.OnSignalDecoded(signalId);
             }
         }
 
         // Called when a narrative thread is discovered
-        private void OnNarrativeThreadDiscovered(string threadId, string threadName)
+        private void OnNarrativeThreadDiscovered(string threadId)
         {
             if (_narrativeInfoLabel != null)
             {
-                _narrativeInfoLabel.Text = $"Narrative Thread: {threadName}";
-                GD.Print($"Narrative thread discovered: {threadId} - {threadName}");
+                _narrativeInfoLabel.Text = $"Narrative Thread: {threadId}";
+                GD.Print($"Narrative thread discovered: {threadId}");
             }
         }
 
         // Called when a narrative signal is decoded
-        private void OnNarrativeSignalDecoded(string signalId, string threadId)
+        private void OnNarrativeSignalDecoded(string signalId)
         {
-            GD.Print($"Narrative signal decoded: {signalId} in thread {threadId}");
+            GD.Print($"Narrative signal decoded: {signalId}");
         }
     }
 }

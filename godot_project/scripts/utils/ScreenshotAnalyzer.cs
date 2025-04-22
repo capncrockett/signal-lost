@@ -87,7 +87,8 @@ namespace SignalLost.Utils
         private (Color AverageColor, float Brightness, bool IsDark, bool HasRed, bool HasGreen, bool HasBlue) AnalyzeColors(Image image)
         {
             // Resize the image to speed up processing
-            var resizedImage = image.GetResized(100, 100);
+            image.Resize(100, 100, Image.Interpolation.Bilinear);
+            var resizedImage = image;
             
             // Calculate average color
             int r = 0, g = 0, b = 0;
@@ -133,7 +134,7 @@ namespace SignalLost.Utils
             GD.Print("Screenshot Analyzer starting...");
             
             // Get command line arguments
-            string[] args = OS.GetCommandlineArgs();
+            string[] args = OS.GetCmdlineArgs();
             string screenshotPath = null;
             
             // Parse command line arguments
