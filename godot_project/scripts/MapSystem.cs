@@ -29,6 +29,20 @@ namespace SignalLost
         // Reference to the GameState
         private GameState _gameState;
 
+        // Quest marker data
+        public class QuestMarkerData
+        {
+            public string Id { get; set; }
+            public string LocationId { get; set; }
+            public Vector2 Position { get; set; }
+            public string MarkerType { get; set; } // quest, objective, turn_in, etc.
+            public string Description { get; set; }
+            public bool IsVisible { get; set; } = true;
+        }
+
+        // Dictionary of quest markers
+        private Dictionary<string, QuestMarkerData> _questMarkers = new Dictionary<string, QuestMarkerData>();
+
         // Signals
         [Signal]
         public delegate void LocationDiscoveredEventHandler(string locationId);
@@ -38,6 +52,15 @@ namespace SignalLost
 
         [Signal]
         public delegate void SignalDetectedEventHandler(string signalId, float frequency);
+
+        [Signal]
+        public delegate void QuestMarkerAddedEventHandler(string markerId, string locationId);
+
+        [Signal]
+        public delegate void QuestMarkerRemovedEventHandler(string markerId);
+
+        [Signal]
+        public delegate void QuestMarkerUpdatedEventHandler(string markerId);
 
         // Called when the node enters the scene tree for the first time
         public override void _Ready()
@@ -398,6 +421,103 @@ namespace SignalLost
                 _gameState.AddDiscoveredSignal(signalId, frequency);
                 _gameState.CheckProgressionTriggers();
             }
+        }
+
+        // Quest marker methods
+
+        // Add a quest marker
+        public void AddQuestMarker(string markerId, string locationId, Vector2 position, string markerType, string description)
+        {
+            // Create the marker
+            var marker = new QuestMarkerData
+            {
+                Id = markerId,
+                LocationId = locationId,
+                Position = position,
+                MarkerType = markerType,
+                Description = description,
+                IsVisible = true
+            };
+
+            // Add to dictionary
+            _questMarkers[markerId] = marker;
+
+            // Emit signal
+            EmitSignal(SignalName.QuestMarkerAdded, markerId, locationId);
+        }
+
+        // Remove a quest marker
+        public void RemoveQuestMarker(string markerId)
+        {
+            if (_questMarkers.ContainsKey(markerId))
+            {
+                _questMarkers.Remove(markerId);
+                EmitSignal(SignalName.QuestMarkerRemoved, markerId);
+            }
+        }
+
+        // Show a quest marker
+        public void ShowQuestMarker(string markerId)
+        {
+            if (_questMarkers.ContainsKey(markerId))
+            {
+                _questMarkers[markerId].IsVisible = true;
+                EmitSignal(SignalName.QuestMarkerUpdated, markerId);
+            }
+        }
+
+        // Hide a quest marker
+        public void HideQuestMarker(string markerId)
+        {
+            if (_questMarkers.ContainsKey(markerId))
+            {
+                _questMarkers[markerId].IsVisible = false;
+                EmitSignal(SignalName.QuestMarkerUpdated, markerId);
+            }
+        }
+
+        // Get a quest marker
+        public QuestMarkerData GetQuestMarker(string markerId)
+        {
+            if (_questMarkers.ContainsKey(markerId))
+            {
+                return _questMarkers[markerId];
+            }
+            return null;
+        }
+
+        // Get all quest markers
+        public Dictionary<string, QuestMarkerData> GetQuestMarkers()
+        {
+            return _questMarkers;
+        }
+
+        // Get quest markers for a location
+        public Dictionary<string, QuestMarkerData> GetQuestMarkersForLocation(string locationId)
+        {
+            var markers = new Dictionary<string, QuestMarkerData>();
+            foreach (var marker in _questMarkers.Values)
+            {
+                if (marker.LocationId == locationId && marker.IsVisible)
+                {
+                    markers[marker.Id] = marker;
+                }
+            }
+            return markers;
+        }
+
+        // Get visible quest markers
+        public Dictionary<string, QuestMarkerData> GetVisibleQuestMarkers()
+        {
+            var markers = new Dictionary<string, QuestMarkerData>();
+            foreach (var marker in _questMarkers.Values)
+            {
+                if (marker.IsVisible)
+                {
+                    markers[marker.Id] = marker;
+                }
+            }
+            return markers;
         }
     }
 }

@@ -7,6 +7,17 @@ namespace SignalLost
     [GlobalClass]
     public partial class QuestSystem : Node
     {
+        // Quest categories
+        public enum QuestCategory
+        {
+            Main,       // Main storyline quests
+            Side,       // Optional side quests
+            Exploration, // Exploration-focused quests
+            Collection,  // Item collection quests
+            Radio,      // Radio-related quests
+            Tutorial    // Tutorial quests
+        }
+
         // Quest data
         public class QuestData
         {
@@ -14,13 +25,66 @@ namespace SignalLost
             public string Title { get; set; }
             public string Description { get; set; }
             public List<QuestObjective> Objectives { get; set; } = new List<QuestObjective>();
-            public string RewardItemId { get; set; }
-            public int RewardQuantity { get; set; } = 1;
+            public Dictionary<string, QuestReward> Rewards { get; set; } = new Dictionary<string, QuestReward>();
             public bool IsCompleted { get; set; } = false;
             public bool IsActive { get; set; } = false;
             public bool IsDiscovered { get; set; } = false;
-            public string PrerequisiteQuestId { get; set; } // Quest that must be completed before this one becomes available
+            public bool IsFailed { get; set; } = false;
+            public QuestCategory Category { get; set; } = QuestCategory.Side;
+            public int Priority { get; set; } = 0; // Higher number = higher priority
+            public List<string> PrerequisiteQuestIds { get; set; } = new List<string>(); // Quests that must be completed before this one becomes available
             public string LocationId { get; set; } // Location where this quest is available
+
+            // Legacy support properties
+            public string RewardItemId { get; set; } // Legacy support - use Rewards dictionary instead
+            public int RewardQuantity { get; set; } = 1; // Legacy support - use Rewards dictionary instead
+            public string PrerequisiteQuestId { get; set; } // Legacy support - use PrerequisiteQuestIds list instead
+            public float TimeLimit { get; set; } = 0; // Time limit in seconds (0 = no limit)
+            public float TimeRemaining { get; set; } = 0; // Time remaining for timed quests
+            public bool HasTimedFailed { get; set; } = false; // Whether the quest has failed due to time running out
+            public List<string> NextQuestIds { get; set; } = new List<string>(); // Quests that become available after this one is completed
+            public List<QuestBranch> Branches { get; set; } = new List<QuestBranch>(); // Branching paths within the quest
+            public string QuestGiverId { get; set; } // ID of the NPC or object that gives the quest
+            public string QuestTurnInId { get; set; } // ID of the NPC or object to turn in the quest to
+            public string QuestLogEntry { get; set; } // Entry in the quest log
+            public Dictionary<string, string> QuestFlags { get; set; } = new Dictionary<string, string>(); // Custom flags for quest state
+        }
+
+        // Quest reward data
+        public class QuestReward
+        {
+            public enum RewardType
+            {
+                Item,       // Item reward
+                Experience, // Experience points
+                Equipment,  // Special equipment
+                Unlock,     // Unlock a feature or area
+                Currency,   // In-game currency
+                Skill,      // Skill points or new skill
+                Custom      // Custom reward type
+            }
+
+            public string Id { get; set; }
+            public string Description { get; set; }
+            public RewardType Type { get; set; } = RewardType.Item;
+            public string RewardId { get; set; } // ID of the item, equipment, etc.
+            public int Quantity { get; set; } = 1;
+            public bool IsDelivered { get; set; } = false;
+            public Dictionary<string, string> CustomData { get; set; } = new Dictionary<string, string>(); // Additional data for custom rewards
+        }
+
+        // Quest branch data
+        public class QuestBranch
+        {
+            public string Id { get; set; }
+            public string Description { get; set; }
+            public List<string> RequiredObjectiveIds { get; set; } = new List<string>(); // Objectives that must be completed to unlock this branch
+            public List<string> UnlockedObjectiveIds { get; set; } = new List<string>(); // Objectives that are unlocked by this branch
+            public List<string> NextQuestIds { get; set; } = new List<string>(); // Quests that are unlocked by this branch
+            public Dictionary<string, QuestReward> BranchRewards { get; set; } = new Dictionary<string, QuestReward>(); // Rewards specific to this branch
+            public bool IsUnlocked { get; set; } = false;
+            public bool IsCompleted { get; set; } = false;
+            public Dictionary<string, string> BranchFlags { get; set; } = new Dictionary<string, string>(); // Custom flags for branch state
         }
 
         // Quest objective data
@@ -29,20 +93,41 @@ namespace SignalLost
             public string Id { get; set; }
             public string Description { get; set; }
             public QuestObjectiveType Type { get; set; }
-            public string TargetId { get; set; } // Item ID, location ID, etc.
+            public string TargetId { get; set; } // ID of the item, location, or signal to interact with
             public int RequiredAmount { get; set; } = 1;
             public int CurrentAmount { get; set; } = 0;
             public bool IsCompleted { get; set; } = false;
+            public bool IsOptional { get; set; } = false;
+            public bool IsHidden { get; set; } = false; // Hidden until a certain condition is met
+            public string UnlockCondition { get; set; } // Condition that unlocks this objective
+            public List<string> NextObjectiveIds { get; set; } = new List<string>(); // Objectives that are unlocked when this one is completed
+            public string BranchId { get; set; } // ID of the branch this objective belongs to
+            public Dictionary<string, string> ObjectiveFlags { get; set; } = new Dictionary<string, string>(); // Custom flags for objective state
         }
 
         // Quest objective types
         public enum QuestObjectiveType
         {
-            CollectItem,
-            VisitLocation,
-            DecodeSignal,
-            UseItem,
-            Custom
+            CollectItem,     // Collect a specific item
+            VisitLocation,   // Visit a specific location
+            UseItem,         // Use a specific item
+            DecodeSignal,    // Decode a radio signal
+            TalkToNPC,       // Talk to a specific NPC
+            DefeatEnemy,     // Defeat a specific enemy
+            SolveRiddle,     // Solve a riddle or puzzle
+            FindSignal,      // Find a radio signal
+            ActivateDevice,  // Activate a device or mechanism
+            EscapeArea,      // Escape from an area
+            SurviveTime,     // Survive for a specific amount of time
+            ReachDestination,// Reach a specific destination within a time limit
+            ProtectTarget,   // Protect a target from enemies
+            StealthMission,  // Complete a mission without being detected
+            FindClue,        // Find a clue or evidence
+            CraftItem,       // Craft a specific item
+            RepairItem,      // Repair a specific item
+            UpgradeEquipment,// Upgrade a piece of equipment
+            CompleteQuest,   // Complete another quest
+            Custom           // Custom objective type
         }
 
         // Dictionary of all quests in the game
@@ -69,10 +154,47 @@ namespace SignalLost
         public delegate void QuestCompletedEventHandler(string questId);
 
         [Signal]
+        public delegate void QuestFailedEventHandler(string questId, string reason);
+
+        [Signal]
         public delegate void QuestObjectiveUpdatedEventHandler(string questId, string objectiveId, int currentAmount, int requiredAmount);
 
         [Signal]
         public delegate void QuestObjectiveCompletedEventHandler(string questId, string objectiveId);
+
+        [Signal]
+        public delegate void QuestObjectiveUnlockedEventHandler(string questId, string objectiveId);
+
+        [Signal]
+        public delegate void QuestBranchUnlockedEventHandler(string questId, string branchId);
+
+        [Signal]
+        public delegate void QuestBranchCompletedEventHandler(string questId, string branchId);
+
+        [Signal]
+        public delegate void QuestRewardDeliveredEventHandler(string questId, string rewardId);
+
+        [Signal]
+        public delegate void QuestTimerUpdatedEventHandler(string questId, float timeRemaining, float timeLimit);
+
+        [Signal]
+        public delegate void QuestLogUpdatedEventHandler();
+
+        // Quest marker data
+        public class QuestMarker
+        {
+            public string Id { get; set; }
+            public string QuestId { get; set; }
+            public string ObjectiveId { get; set; }
+            public string LocationId { get; set; }
+            public Vector2 Position { get; set; }
+            public string MarkerType { get; set; } = "quest"; // quest, objective, turn_in, etc.
+            public string Description { get; set; }
+            public bool IsVisible { get; set; } = true;
+        }
+
+        // Dictionary of quest markers
+        private Dictionary<string, QuestMarker> _questMarkers = new Dictionary<string, QuestMarker>();
 
         // Called when the node enters the scene tree for the first time
         public override void _Ready()
@@ -97,6 +219,13 @@ namespace SignalLost
             _gameState.InventoryChanged += OnInventoryChanged;
             _inventorySystem.ItemUsed += OnItemUsed;
             _mapSystem.LocationDiscovered += OnLocationDiscovered;
+
+            // Connect to our own signals
+            QuestActivated += OnQuestActivated;
+            QuestCompleted += OnQuestCompleted;
+            QuestFailed += OnQuestFailed;
+            QuestObjectiveCompleted += OnQuestObjectiveCompleted;
+            QuestObjectiveUnlocked += OnQuestObjectiveUnlocked;
 
             // Initialize quest database
             InitializeQuestDatabase();
@@ -297,6 +426,88 @@ namespace SignalLost
             return _completedQuests;
         }
 
+        // Get all failed quests
+        public Dictionary<string, QuestData> GetFailedQuests()
+        {
+            var failedQuests = new Dictionary<string, QuestData>();
+            foreach (var quest in _questDatabase.Values)
+            {
+                if (quest.IsFailed)
+                {
+                    failedQuests[quest.Id] = quest;
+                }
+            }
+            return failedQuests;
+        }
+
+        // Get quests by category
+        public Dictionary<string, QuestData> GetQuestsByCategory(QuestCategory category)
+        {
+            var categoryQuests = new Dictionary<string, QuestData>();
+            foreach (var quest in _questDatabase.Values)
+            {
+                if (quest.Category == category && quest.IsDiscovered)
+                {
+                    categoryQuests[quest.Id] = quest;
+                }
+            }
+            return categoryQuests;
+        }
+
+        // Get active quests by category
+        public Dictionary<string, QuestData> GetActiveQuestsByCategory(QuestCategory category)
+        {
+            var categoryQuests = new Dictionary<string, QuestData>();
+            foreach (var quest in _activeQuests.Values)
+            {
+                if (quest.Category == category)
+                {
+                    categoryQuests[quest.Id] = quest;
+                }
+            }
+            return categoryQuests;
+        }
+
+        // Get main storyline quests
+        public Dictionary<string, QuestData> GetMainQuests()
+        {
+            return GetQuestsByCategory(QuestCategory.Main);
+        }
+
+        // Get active main storyline quests
+        public Dictionary<string, QuestData> GetActiveMainQuests()
+        {
+            return GetActiveQuestsByCategory(QuestCategory.Main);
+        }
+
+        // Get side quests
+        public Dictionary<string, QuestData> GetSideQuests()
+        {
+            return GetQuestsByCategory(QuestCategory.Side);
+        }
+
+        // Get active side quests
+        public Dictionary<string, QuestData> GetActiveSideQuests()
+        {
+            return GetActiveQuestsByCategory(QuestCategory.Side);
+        }
+
+        // Get quests sorted by priority
+        public List<QuestData> GetQuestsByPriority()
+        {
+            var quests = GetDiscoveredQuests().Values.ToList();
+            quests.Sort((a, b) => b.Priority.CompareTo(a.Priority)); // Sort by priority (descending)
+            return quests;
+        }
+
+        // Get active quests sorted by priority
+        public List<QuestData> GetActiveQuestsByPriority()
+        {
+            var quests = _activeQuests.Values.ToList();
+            quests.Sort((a, b) => b.Priority.CompareTo(a.Priority)); // Sort by priority (descending)
+            return quests;
+        }
+
         // Check if a quest is completed
         public bool IsQuestCompleted(string questId)
         {
@@ -374,8 +585,8 @@ namespace SignalLost
 
             var quest = _activeQuests[questId];
 
-            // Check if all objectives are completed
-            foreach (var objective in quest.Objectives)
+            // Check if all required objectives are completed
+            foreach (var objective in quest.Objectives.Where(o => !o.IsOptional))
             {
                 if (!objective.IsCompleted)
                 {
@@ -390,21 +601,58 @@ namespace SignalLost
             _activeQuests.Remove(questId);
 
             // Give rewards
-            if (!string.IsNullOrEmpty(quest.RewardItemId))
+            if (quest.Rewards.Count > 0)
             {
+                foreach (var reward in quest.Rewards.Values)
+                {
+                    DeliverReward(questId, reward);
+                }
+            }
+            else if (!string.IsNullOrEmpty(quest.RewardItemId))
+            {
+                // Legacy reward system support
                 _inventorySystem.AddItemToInventory(quest.RewardItemId, quest.RewardQuantity);
             }
 
             // Check if completing this quest unlocks any other quests
             foreach (var otherQuest in _questDatabase.Values)
             {
-                if (otherQuest.PrerequisiteQuestId == questId && !otherQuest.IsDiscovered)
+                if (otherQuest.PrerequisiteQuestIds.Contains(questId) && !otherQuest.IsDiscovered)
                 {
+                    // Check if all prerequisites are completed
+                    bool allPrerequisitesCompleted = true;
+                    foreach (var prereqId in otherQuest.PrerequisiteQuestIds)
+                    {
+                        if (!_completedQuests.ContainsKey(prereqId))
+                        {
+                            allPrerequisitesCompleted = false;
+                            break;
+                        }
+                    }
+
+                    if (allPrerequisitesCompleted)
+                    {
+                        DiscoverQuest(otherQuest.Id);
+                    }
+                }
+                else if (otherQuest.PrerequisiteQuestId == questId && !otherQuest.IsDiscovered)
+                {
+                    // Legacy prerequisite system support
                     DiscoverQuest(otherQuest.Id);
                 }
             }
 
+            // Unlock next quests in the chain
+            foreach (var nextQuestId in quest.NextQuestIds)
+            {
+                if (_questDatabase.ContainsKey(nextQuestId) && !_questDatabase[nextQuestId].IsDiscovered)
+                {
+                    DiscoverQuest(nextQuestId);
+                }
+            }
+
             EmitSignal(SignalName.QuestCompleted, questId);
+            EmitSignal(SignalName.QuestLogUpdated);
 
             // Check if this quest completion should trigger progression advancement
             if (_progressionManager != null)
@@ -413,6 +661,62 @@ namespace SignalLost
             }
 
             return true;
+        }
+
+        // Deliver a quest reward
+        private void DeliverReward(string questId, QuestReward reward)
+        {
+            if (reward.IsDelivered)
+            {
+                return;
+            }
+
+            switch (reward.Type)
+            {
+                case QuestReward.RewardType.Item:
+                    _inventorySystem.AddItemToInventory(reward.RewardId, reward.Quantity);
+                    break;
+
+                case QuestReward.RewardType.Equipment:
+                    _inventorySystem.AddItemToInventory(reward.RewardId, reward.Quantity);
+                    break;
+
+                case QuestReward.RewardType.Experience:
+                    if (_gameState != null)
+                    {
+                        _gameState.AddExperience(reward.Quantity);
+                    }
+                    break;
+
+                case QuestReward.RewardType.Unlock:
+                    if (_gameState != null)
+                    {
+                        _gameState.UnlockFeature(reward.RewardId);
+                    }
+                    break;
+
+                case QuestReward.RewardType.Currency:
+                    if (_gameState != null)
+                    {
+                        _gameState.AddCurrency(reward.Quantity);
+                    }
+                    break;
+
+                case QuestReward.RewardType.Skill:
+                    if (_gameState != null)
+                    {
+                        _gameState.UnlockSkill(reward.RewardId);
+                    }
+                    break;
+
+                case QuestReward.RewardType.Custom:
+                    // Handle custom reward types
+                    GD.Print($"Delivering custom reward: {reward.Id} for quest {questId}");
+                    break;
+            }
+
+            reward.IsDelivered = true;
+            EmitSignal(SignalName.QuestRewardDelivered, questId, reward.Id);
         }
 
         // Update a quest objective
@@ -426,7 +730,7 @@ namespace SignalLost
             var quest = _activeQuests[questId];
             var objective = quest.Objectives.FirstOrDefault(o => o.Id == objectiveId);
 
-            if (objective == null || objective.IsCompleted)
+            if (objective == null || objective.IsCompleted || objective.IsHidden)
             {
                 return false;
             }
@@ -439,8 +743,14 @@ namespace SignalLost
                 objective.IsCompleted = true;
                 EmitSignal(SignalName.QuestObjectiveCompleted, questId, objectiveId);
 
-                // Check if all objectives are completed
-                if (quest.Objectives.All(o => o.IsCompleted))
+                // Check if this objective unlocks any branches
+                CheckBranchUnlocks(quest, objective.Id);
+
+                // Check if this objective unlocks any other objectives
+                UnlockNextObjectives(quest, objective.Id);
+
+                // Check if all required objectives are completed
+                if (quest.Objectives.Where(o => !o.IsOptional).All(o => o.IsCompleted))
                 {
                     CompleteQuest(questId);
                 }
@@ -451,6 +761,117 @@ namespace SignalLost
             }
 
             return true;
+        }
+
+        // Check if any branches should be unlocked
+        private void CheckBranchUnlocks(QuestData quest, string completedObjectiveId)
+        {
+            foreach (var branch in quest.Branches)
+            {
+                if (!branch.IsUnlocked && branch.RequiredObjectiveIds.Contains(completedObjectiveId))
+                {
+                    // Check if all required objectives for this branch are completed
+                    bool allRequiredCompleted = true;
+                    foreach (var requiredObjectiveId in branch.RequiredObjectiveIds)
+                    {
+                        var objective = quest.Objectives.FirstOrDefault(o => o.Id == requiredObjectiveId);
+                        if (objective == null || !objective.IsCompleted)
+                        {
+                            allRequiredCompleted = false;
+                            break;
+                        }
+                    }
+
+                    if (allRequiredCompleted)
+                    {
+                        // Unlock the branch
+                        branch.IsUnlocked = true;
+
+                        // Unlock objectives in this branch
+                        foreach (var objectiveId in branch.UnlockedObjectiveIds)
+                        {
+                            var objective = quest.Objectives.FirstOrDefault(o => o.Id == objectiveId);
+                            if (objective != null && objective.IsHidden)
+                            {
+                                objective.IsHidden = false;
+                                EmitSignal(SignalName.QuestObjectiveUnlocked, quest.Id, objectiveId);
+                            }
+                        }
+
+                        EmitSignal(SignalName.QuestBranchUnlocked, quest.Id, branch.Id);
+                        EmitSignal(SignalName.QuestLogUpdated);
+                    }
+                }
+            }
+        }
+
+        // Unlock objectives that should be unlocked after completing an objective
+        private void UnlockNextObjectives(QuestData quest, string completedObjectiveId)
+        {
+            var completedObjective = quest.Objectives.FirstOrDefault(o => o.Id == completedObjectiveId);
+            if (completedObjective == null || completedObjective.NextObjectiveIds.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var nextObjectiveId in completedObjective.NextObjectiveIds)
+            {
+                var nextObjective = quest.Objectives.FirstOrDefault(o => o.Id == nextObjectiveId);
+                if (nextObjective != null && nextObjective.IsHidden)
+                {
+                    nextObjective.IsHidden = false;
+                    EmitSignal(SignalName.QuestObjectiveUnlocked, quest.Id, nextObjectiveId);
+                    EmitSignal(SignalName.QuestLogUpdated);
+                }
+            }
+        }
+
+        // Fail a quest
+        public bool FailQuest(string questId, string reason = "")
+        {
+            if (!_activeQuests.ContainsKey(questId))
+            {
+                GD.PrintErr($"QuestSystem: Quest {questId} not found in active quests");
+                return false;
+            }
+
+            var quest = _activeQuests[questId];
+
+            // Fail the quest
+            quest.IsFailed = true;
+            quest.IsActive = false;
+            _activeQuests.Remove(questId);
+
+            EmitSignal(SignalName.QuestFailed, questId, reason);
+            EmitSignal(SignalName.QuestLogUpdated);
+
+            return true;
+        }
+
+        // Process for timed quests
+        public override void _Process(double delta)
+        {
+            // Update timed quests
+            foreach (var quest in _activeQuests.Values.ToList())
+            {
+                if (quest.TimeLimit > 0)
+                {
+                    quest.TimeRemaining -= (float)delta;
+
+                    // Check if time has run out
+                    if (quest.TimeRemaining <= 0)
+                    {
+                        quest.TimeRemaining = 0;
+                        quest.HasTimedFailed = true;
+                        FailQuest(quest.Id, "Time limit expired");
+                    }
+                    else if (quest.TimeRemaining <= quest.TimeLimit * 0.25f) // Warning at 25% time remaining
+                    {
+                        // Emit timer update signal for UI to show warning
+                        EmitSignal(SignalName.QuestTimerUpdated, quest.Id, quest.TimeRemaining, quest.TimeLimit);
+                    }
+                }
+            }
         }
 
         // Check for quests in the current location
@@ -566,6 +987,212 @@ namespace SignalLost
                         UpdateQuestObjective(quest.Id, objective.Id);
                     }
                 }
+            }
+        }
+
+        // Quest marker methods
+
+        // Add a quest marker
+        public void AddQuestMarker(QuestMarker marker)
+        {
+            _questMarkers[marker.Id] = marker;
+
+            // Add the marker to the map
+            if (_mapSystem != null && marker.IsVisible)
+            {
+                _mapSystem.AddQuestMarker(marker.Id, marker.LocationId, marker.Position, marker.MarkerType, marker.Description);
+            }
+        }
+
+        // Remove a quest marker
+        public void RemoveQuestMarker(string markerId)
+        {
+            if (_questMarkers.ContainsKey(markerId))
+            {
+                _questMarkers.Remove(markerId);
+
+                // Remove the marker from the map
+                if (_mapSystem != null)
+                {
+                    _mapSystem.RemoveQuestMarker(markerId);
+                }
+            }
+        }
+
+        // Show a quest marker
+        public void ShowQuestMarker(string markerId)
+        {
+            if (_questMarkers.ContainsKey(markerId))
+            {
+                var marker = _questMarkers[markerId];
+                marker.IsVisible = true;
+
+                // Show the marker on the map
+                if (_mapSystem != null)
+                {
+                    _mapSystem.ShowQuestMarker(markerId);
+                }
+            }
+        }
+
+        // Hide a quest marker
+        public void HideQuestMarker(string markerId)
+        {
+            if (_questMarkers.ContainsKey(markerId))
+            {
+                var marker = _questMarkers[markerId];
+                marker.IsVisible = false;
+
+                // Hide the marker on the map
+                if (_mapSystem != null)
+                {
+                    _mapSystem.HideQuestMarker(markerId);
+                }
+            }
+        }
+
+        // Get all quest markers
+        public Dictionary<string, QuestMarker> GetQuestMarkers()
+        {
+            return _questMarkers;
+        }
+
+        // Get quest markers for a specific quest
+        public Dictionary<string, QuestMarker> GetQuestMarkersForQuest(string questId)
+        {
+            var markers = new Dictionary<string, QuestMarker>();
+            foreach (var marker in _questMarkers.Values)
+            {
+                if (marker.QuestId == questId)
+                {
+                    markers[marker.Id] = marker;
+                }
+            }
+            return markers;
+        }
+
+        // Get quest markers for a specific objective
+        public Dictionary<string, QuestMarker> GetQuestMarkersForObjective(string questId, string objectiveId)
+        {
+            var markers = new Dictionary<string, QuestMarker>();
+            foreach (var marker in _questMarkers.Values)
+            {
+                if (marker.QuestId == questId && marker.ObjectiveId == objectiveId)
+                {
+                    markers[marker.Id] = marker;
+                }
+            }
+            return markers;
+        }
+
+        // Event handlers for our own signals
+
+        private void OnQuestActivated(string questId)
+        {
+            var quest = _activeQuests[questId];
+
+            // Add quest markers for the quest
+            if (quest.QuestGiverId != null)
+            {
+                // Add a marker for the quest giver
+                var marker = new QuestMarker
+                {
+                    Id = $"{questId}_giver",
+                    QuestId = questId,
+                    LocationId = quest.LocationId,
+                    MarkerType = "quest_giver",
+                    Description = $"Quest Giver: {quest.Title}"
+                };
+
+                AddQuestMarker(marker);
+            }
+
+            // Add markers for objectives
+            foreach (var objective in quest.Objectives)
+            {
+                if (!objective.IsHidden && objective.Type == QuestObjectiveType.VisitLocation)
+                {
+                    // Add a marker for the location objective
+                    var marker = new QuestMarker
+                    {
+                        Id = $"{questId}_{objective.Id}",
+                        QuestId = questId,
+                        ObjectiveId = objective.Id,
+                        LocationId = objective.TargetId,
+                        MarkerType = "objective",
+                        Description = objective.Description
+                    };
+
+                    AddQuestMarker(marker);
+                }
+            }
+        }
+
+        private void OnQuestCompleted(string questId)
+        {
+            // Remove all markers for this quest
+            var markers = GetQuestMarkersForQuest(questId);
+            foreach (var markerId in markers.Keys)
+            {
+                RemoveQuestMarker(markerId);
+            }
+
+            // Add a marker for the quest turn-in if needed
+            var quest = _completedQuests[questId];
+            if (quest.QuestTurnInId != null)
+            {
+                var marker = new QuestMarker
+                {
+                    Id = $"{questId}_turn_in",
+                    QuestId = questId,
+                    LocationId = quest.LocationId,
+                    MarkerType = "quest_turn_in",
+                    Description = $"Turn in: {quest.Title}"
+                };
+
+                AddQuestMarker(marker);
+            }
+        }
+
+        private void OnQuestFailed(string questId, string reason)
+        {
+            // Remove all markers for this quest
+            var markers = GetQuestMarkersForQuest(questId);
+            foreach (var markerId in markers.Keys)
+            {
+                RemoveQuestMarker(markerId);
+            }
+        }
+
+        private void OnQuestObjectiveCompleted(string questId, string objectiveId)
+        {
+            // Remove markers for this objective
+            var markers = GetQuestMarkersForObjective(questId, objectiveId);
+            foreach (var markerId in markers.Keys)
+            {
+                RemoveQuestMarker(markerId);
+            }
+        }
+
+        private void OnQuestObjectiveUnlocked(string questId, string objectiveId)
+        {
+            var quest = _activeQuests[questId];
+            var objective = quest.Objectives.FirstOrDefault(o => o.Id == objectiveId);
+
+            if (objective != null && objective.Type == QuestObjectiveType.VisitLocation)
+            {
+                // Add a marker for the location objective
+                var marker = new QuestMarker
+                {
+                    Id = $"{questId}_{objectiveId}",
+                    QuestId = questId,
+                    ObjectiveId = objectiveId,
+                    LocationId = objective.TargetId,
+                    MarkerType = "objective",
+                    Description = objective.Description
+                };
+
+                AddQuestMarker(marker);
             }
         }
 
