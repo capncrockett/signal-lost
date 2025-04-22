@@ -136,7 +136,7 @@ namespace SignalLost.Radio
             // Update game state
             if (_gameState != null)
             {
-                _gameState.AddDiscoveredSignal(signalId);
+                _gameState.AddDiscoveredSignal(signalId, _gameState.CurrentFrequency);
             }
 
             // Emit signal
@@ -144,18 +144,12 @@ namespace SignalLost.Radio
         }
 
         // Handle signal decoded
-        private void OnSignalDecoded(string signalId)
-        {
-            ProcessDecodedSignal(signalId);
-        }
-
-        // Public method for external systems to notify of signal decoding
         public void OnSignalDecoded(string signalId)
         {
             ProcessDecodedSignal(signalId);
         }
 
-        // Process a decoded signal
+        // Public method for external systems to notify of signal decoding
         private void ProcessDecodedSignal(string signalId)
         {
             if (_narrativeState.ContainsKey(signalId))

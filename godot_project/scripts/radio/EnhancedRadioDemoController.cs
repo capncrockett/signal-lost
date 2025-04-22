@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using SignalLost.Radio;
+using SignalLost.UI;
 
 namespace SignalLost
 {
@@ -36,11 +37,22 @@ namespace SignalLost
             _narrativeManager = GetNode<RadioNarrativeManager>("RadioNarrativeManager");
 
             // Connect signals
-            _radioInterface.FrequencyChanged += OnFrequencyChanged;
-            _radioInterface.PowerToggle += OnPowerToggle;
-            _radioInterface.MessageRequested += OnMessageRequested;
-            _messageDisplay.MessageClosed += OnMessageClosed;
-            _messageDisplay.DecodeRequested += OnDecodeRequested;
+            if (_radioInterface != null)
+            {
+                _radioInterface.FrequencyChanged += OnFrequencyChanged;
+                _radioInterface.PowerToggle += OnPowerToggle;
+                _radioInterface.MessageRequested += OnMessageRequested;
+                
+                // Set initial state
+                _radioInterface.SetFrequency(_currentFrequency);
+                _radioPowered = _radioInterface.IsPoweredOn;
+            }
+            
+            if (_messageDisplay != null)
+            {
+                _messageDisplay.MessageClosed += OnMessageClosed;
+                _messageDisplay.DecodeRequested += OnDecodeRequested;
+            }
 
             if (_narrativeManager != null)
             {
@@ -48,227 +60,172 @@ namespace SignalLost
                 _narrativeManager.NarrativeSignalDecoded += OnNarrativeSignalDecoded;
             }
 
-            // Initialize demo signals
-            InitializeDemoSignals();
+            // Create demo signals
+            CreateDemoSignals();
 
-            // Set initial state
-            _radioInterface.SetFrequency(_currentFrequency);
-            _radioInterface.IsPoweredOn = _radioPowered;
-            CheckForSignalAtFrequency(_currentFrequency);
+            // Update UI
+            UpdateUI();
         }
 
-        // Initialize demo signals
-        private void InitializeDemoSignals()
+        // Called every frame
+        public override void _Process(double delta)
         {
-            // Emergency Broadcast
-            var emergencySignal = new EnhancedSignalData
+            // Simulate signal strength changes
+            if (_radioPowered)
             {
-                Id = "emergency_broadcast",
-                Name = "Emergency Broadcast",
-                Description = "An automated emergency broadcast message.",
-                Frequency = 121.5f,
-                Type = SignalType.Voice,
-                Content = "This is an emergency broadcast. All civilians are advised to evacuate the area immediately. This is not a drill.",
-                LocationId = "emergency_center",
-                IsStatic = true,
-                Bandwidth = 0.3f,
-                MinSignalStrength = 0.3f,
-                NarrativeThreadId = "main_story",
-                NarrativeSequence = 0,
-                CharacterId = "Emergency System",
-                InterferenceLevel = 0.2f
-            };
-            _demoSignals[emergencySignal.Frequency] = emergencySignal;
-
-            // Mysterious Signal
-            var mysteriousSignal = new EnhancedSignalData
-            {
-                Id = "mysterious_signal",
-                Name = "Unknown Signal",
-                Description = "A strange signal of unknown origin.",
-                Frequency = 87.5f,
-                Type = SignalType.Morse,
-                Content = "... .. --. -. .- .-.. / .-.. --- ... -", // "SIGNAL LOST" in Morse
-                LocationId = "mysterious_tower",
-                IsStatic = false,
-                Bandwidth = 0.2f,
-                MinSignalStrength = 0.7f,
-                IsHidden = true,
-                NarrativeThreadId = "main_story",
-                NarrativeSequence = 2,
-                InterferenceLevel = 0.5f,
-                EncodedContent = "... .. --. -. .- .-.. / .-.. --- ... -",
-                DecodedContent = "SIGNAL LOST"
-            };
-            _demoSignals[mysteriousSignal.Frequency] = mysteriousSignal;
-
-            // Radio Station
-            var radioStationSignal = new EnhancedSignalData
-            {
-                Id = "radio_station",
-                Name = "Radio Station",
-                Description = "A local radio station broadcasting music and news.",
-                Frequency = 98.5f,
-                Type = SignalType.Voice,
-                Content = "You're listening to 98.5 FM. Our top story tonight: Strange atmospheric phenomena reported across the region. Scientists are baffled by the sudden appearance of...*static*",
-                LocationId = "radio_station",
-                IsStatic = true,
-                Bandwidth = 0.5f,
-                MinSignalStrength = 0.2f,
-                NarrativeThreadId = "local_radio",
-                NarrativeSequence = 0,
-                CharacterId = "Radio Host",
-                InterferenceLevel = 0.3f
-            };
-            _demoSignals[radioStationSignal.Frequency] = radioStationSignal;
-
-            // Weather Data
-            var weatherSignal = new EnhancedSignalData
-            {
-                Id = "weather_data",
-                Name = "Weather Station",
-                Description = "Automated weather data transmission.",
-                Frequency = 162.4f,
-                Type = SignalType.Data,
-                Content = "ATMOSPHERIC ANOMALY DETECTED: Unusual patterns in the upper atmosphere. Barometric pressure: 28.5 inHg, falling. Temperature: 42°F, falling. Wind: 25 mph, NE.",
-                LocationId = "weather_station",
-                IsStatic = true,
-                Bandwidth = 0.3f,
-                MinSignalStrength = 0.3f,
-                NarrativeThreadId = "weather_station",
-                NarrativeSequence = 0,
-                InterferenceLevel = 0.1f,
-                EncodedContent = "01000001 01010100 01001101 01001111 01010011 01010000 01001000 01000101 01010010 01001001 01000011",
-                DecodedContent = "ATMOSPHERIC ANOMALY DETECTED: Unusual patterns in the upper atmosphere. Barometric pressure: 28.5 inHg, falling. Temperature: 42°F, falling. Wind: 25 mph, NE."
-            };
-            _demoSignals[weatherSignal.Frequency] = weatherSignal;
-
-            // Research Facility
-            var researchSignal = new EnhancedSignalData
-            {
-                Id = "research_data",
-                Name = "Research Facility Data",
-                Description = "Data transmission from the research facility.",
-                Frequency = 152.25f,
-                Type = SignalType.Data,
-                Content = "PROJECT SIGNAL: Test sequence alpha-3 initiated. Quantum resonance detected at coordinates 47.2N, 122.5W. Temporal anomaly readings increasing.",
-                LocationId = "research_facility",
-                IsStatic = true,
-                Bandwidth = 0.3f,
-                MinSignalStrength = 0.5f,
-                NarrativeThreadId = "main_story",
-                NarrativeSequence = 3,
-                CharacterId = "Research Facility AI",
-                InterferenceLevel = 0.4f,
-                IsKeyNarrativeSignal = true
-            };
-            _demoSignals[researchSignal.Frequency] = researchSignal;
+                // Check for signals at current frequency
+                CheckForSignalsAtFrequency(_currentFrequency);
+            }
         }
 
-        // Handle frequency changed
+        // Create demo signals for testing
+        private void CreateDemoSignals()
+        {
+            // Create some demo signals
+            CreateDemoSignal(91.5f, "signal_emergency", "Emergency Broadcast", "This is an emergency broadcast. Please remain calm and follow instructions.", 1.0f);
+            CreateDemoSignal(95.7f, "signal_weather", "Weather Report", "Expect severe weather conditions in the following areas...", 0.8f);
+            CreateDemoSignal(103.2f, "signal_news", "News Bulletin", "Breaking news: Strange phenomena reported in multiple locations.", 0.9f);
+            CreateDemoSignal(107.9f, "signal_music", "Music Station", "Now playing: 'Lost in the Static' by The Frequencies", 0.7f);
+            CreateDemoSignal(88.3f, "signal_interference", "Unknown Signal", "...bzzt...cannot...bzzt...understand...bzzt...", 0.5f);
+
+            // Add narrative signals
+            if (_narrativeManager != null)
+            {
+                _narrativeManager.RegisterNarrativeSignals();
+            }
+        }
+
+        // Create a demo signal
+        private void CreateDemoSignal(float frequency, string id, string name, string content, float strength)
+        {
+            var signal = new EnhancedSignalData
+            {
+                Id = id,
+                Name = name,
+                Content = content,
+                Frequency = frequency,
+                Strength = strength,
+                IsEncrypted = false,
+                SignalType = SignalType.Voice,
+                SignalTimestamp = DateTime.Now
+            };
+
+            _demoSignals[frequency] = signal;
+        }
+
+        // Check for signals at the current frequency
+        private void CheckForSignalsAtFrequency(float frequency)
+        {
+            // Reset current signal
+            _currentSignalId = "";
+            _currentSignalStrength = 0.0f;
+
+            // Check for signals within range
+            foreach (var signal in _demoSignals.Values)
+            {
+                float distance = Math.Abs(frequency - signal.Frequency);
+                if (distance <= 0.3f)
+                {
+                    // Calculate signal strength based on distance
+                    float strength = 1.0f - (distance / 0.3f);
+                    strength = Mathf.Clamp(strength, 0.0f, 1.0f) * signal.Strength;
+
+                    // If this is the strongest signal so far, use it
+                    if (strength > _currentSignalStrength)
+                    {
+                        _currentSignalId = signal.Id;
+                        _currentSignalStrength = strength;
+                    }
+                }
+            }
+
+            // Update UI
+            UpdateUI();
+        }
+
+        // Update the UI based on current state
+        private void UpdateUI()
+        {
+            if (_radioInterface != null)
+            {
+                _radioInterface.SetSignalStrength(_currentSignalStrength);
+                _radioInterface.SetMessageAvailable(_currentSignalStrength > 0.5f);
+            }
+        }
+
+        // Event handlers
+
+        // Called when the frequency is changed
         private void OnFrequencyChanged(float frequency)
         {
             _currentFrequency = frequency;
-            CheckForSignalAtFrequency(frequency);
+            GD.Print($"Frequency changed to {frequency:F1} MHz");
+
+            // Check for signals at new frequency
+            CheckForSignalsAtFrequency(frequency);
         }
 
-        // Handle power toggle
-        private void OnPowerToggle(bool isPowered)
+        // Called when the power is toggled
+        private void OnPowerToggle(bool isPoweredOn)
         {
-            _radioPowered = isPowered;
+            _radioPowered = isPoweredOn;
+            GD.Print($"Radio power toggled to {isPoweredOn}");
 
-            if (!isPowered)
+            if (!isPoweredOn)
             {
-                // Turn off signal
-                _radioInterface.SetSignalStrength(0.0f);
-                _radioInterface.SetMessageAvailable(false);
+                // Clear signal when radio is turned off
                 _currentSignalId = "";
                 _currentSignalStrength = 0.0f;
+                
+                if (_radioInterface != null)
+                {
+                    _radioInterface.SetSignalStrength(0.0f);
+                    _radioInterface.SetMessageAvailable(false);
+                }
             }
             else
             {
-                // Check for signal at current frequency
-                CheckForSignalAtFrequency(_currentFrequency);
+                // Check for signals when radio is turned on
+                CheckForSignalsAtFrequency(_currentFrequency);
             }
         }
 
-        // Check for a signal at the specified frequency
-        private void CheckForSignalAtFrequency(float frequency)
-        {
-            if (!_radioPowered)
-            {
-                return;
-            }
-
-            // Reset signal
-            _currentSignalId = "";
-            _currentSignalStrength = 0.0f;
-            _radioInterface.SetSignalStrength(0.0f);
-            _radioInterface.SetMessageAvailable(false);
-
-            // Check each signal
-            foreach (var signal in _demoSignals.Values)
-            {
-                float signalStrength = signal.CalculateSignalStrength(frequency);
-
-                // Check if signal is detectable
-                if (signalStrength >= signal.MinSignalStrength)
-                {
-                    // This is a detectable signal
-                    _currentSignalId = signal.Id;
-                    _currentSignalStrength = signalStrength;
-                    _radioInterface.SetSignalStrength(signalStrength);
-                    _radioInterface.SetMessageAvailable(true);
-                    break;
-                }
-            }
-        }
-
-        // Handle message requested
+        // Called when the message button is pressed
         private void OnMessageRequested()
         {
-            if (string.IsNullOrEmpty(_currentSignalId) || _currentSignalStrength <= 0.0f)
+            if (_currentSignalStrength > 0.5f && !string.IsNullOrEmpty(_currentSignalId))
             {
-                return;
-            }
-
-            // Get the signal
-            EnhancedSignalData signal = null;
-            foreach (var s in _demoSignals.Values)
-            {
-                if (s.Id == _currentSignalId)
+                // Find the signal
+                EnhancedSignalData signal = null;
+                foreach (var s in _demoSignals.Values)
                 {
-                    signal = s;
-                    break;
+                    if (s.Id == _currentSignalId)
+                    {
+                        signal = s;
+                        break;
+                    }
+                }
+
+                if (signal != null && _messageDisplay != null)
+                {
+                    // Display the message
+                    _messageDisplay.DisplayMessage(signal);
+                    GD.Print($"Displaying message for signal {signal.Id}");
                 }
             }
-
-            if (signal == null)
-            {
-                return;
-            }
-
-            // Show the message
-            _messageDisplay.MessageType = "Radio";
-            _messageDisplay.SetMessage(
-                signal.Id,
-                signal.Name,
-                signal.GetFormattedContent(_currentSignalStrength),
-                signal.IsDecoded,
-                signal.InterferenceLevel
-            );
-            _messageDisplay.Visible = true;
         }
 
-        // Handle message closed
+        // Called when the message is closed
         private void OnMessageClosed()
         {
-            _messageDisplay.Visible = false;
+            GD.Print("Message closed");
         }
 
-        // Handle decode requested
+        // Called when a message is decoded
         private void OnDecodeRequested(string signalId)
         {
+            GD.Print($"Decode requested for signal {signalId}");
+
             // Find the signal
             EnhancedSignalData signal = null;
             foreach (var s in _demoSignals.Values)
@@ -280,73 +237,27 @@ namespace SignalLost
                 }
             }
 
-            if (signal == null)
+            if (signal != null && _narrativeManager != null)
             {
-                return;
-            }
-
-            // Decode the signal
-            signal.IsDecoded = true;
-
-            // Notify the narrative manager
-            if (_narrativeManager != null)
-            {
-                // This would normally be handled by the RadioSignalsManager
-                // but for the demo we'll call it directly
+                // Decode the signal
                 _narrativeManager.OnSignalDecoded(signalId);
             }
-
-            // Update the message display
-            _messageDisplay.SetMessage(
-                signal.Id,
-                signal.Name,
-                signal.GetFormattedContent(_currentSignalStrength),
-                true,
-                signal.InterferenceLevel
-            );
         }
 
-        // Handle narrative thread discovered
-        private void OnNarrativeThreadDiscovered(string threadId)
+        // Called when a narrative thread is discovered
+        private void OnNarrativeThreadDiscovered(string threadId, string threadName)
         {
-            UpdateNarrativeInfoLabel();
+            if (_narrativeInfoLabel != null)
+            {
+                _narrativeInfoLabel.Text = $"Narrative Thread: {threadName}";
+                GD.Print($"Narrative thread discovered: {threadId} - {threadName}");
+            }
         }
 
-        // Handle narrative signal decoded
-        private void OnNarrativeSignalDecoded(string signalId)
+        // Called when a narrative signal is decoded
+        private void OnNarrativeSignalDecoded(string signalId, string threadId)
         {
-            UpdateNarrativeInfoLabel();
-        }
-
-        // Update the narrative info label
-        private void UpdateNarrativeInfoLabel()
-        {
-            if (_narrativeManager == null)
-            {
-                return;
-            }
-
-            string text = "Narrative Threads:\n";
-            var discoveredThreads = _narrativeManager.GetDiscoveredThreads();
-
-            if (discoveredThreads.Count == 0)
-            {
-                text += "- None discovered yet";
-            }
-            else
-            {
-                foreach (string threadId in discoveredThreads)
-                {
-                    var thread = _narrativeManager.GetThreadInfo(threadId);
-                    if (thread != null)
-                    {
-                        float progress = _narrativeManager.GetThreadProgress(threadId);
-                        text += $"- {thread.Name} ({progress:P0} complete)\n";
-                    }
-                }
-            }
-
-            _narrativeInfoLabel.Text = text;
+            GD.Print($"Narrative signal decoded: {signalId} in thread {threadId}");
         }
     }
 }

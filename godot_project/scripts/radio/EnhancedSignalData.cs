@@ -39,7 +39,8 @@ namespace SignalLost.Radio
         [Export] public string NarrativeTrigger { get; set; } = ""; // Event to trigger when this signal is decoded
         [Export] public bool IsKeyNarrativeSignal { get; set; } = false; // Whether this signal is key to the main story
         [Export] public string CharacterId { get; set; } = ""; // ID of the character associated with this signal
-        [Export] public DateTime SignalTimestamp { get; set; } = DateTime.MinValue; // In-game timestamp of when the signal was sent
+        [Export] public string SignalTimestampStr { get; set; } = ""; // Exported string representation of timestamp
+        public DateTime SignalTimestamp { get => string.IsNullOrEmpty(SignalTimestampStr) ? DateTime.MinValue : DateTime.Parse(SignalTimestampStr); set => SignalTimestampStr = value.ToString("yyyy-MM-dd HH:mm:ss"); } // In-game timestamp of when the signal was sent
 
         // Enhanced content properties
         [Export] public string EncodedContent { get; set; } = ""; // Content before decoding
