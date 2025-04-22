@@ -1,0 +1,165 @@
+[gd_scene load_steps=8 format=3 uid="uid://c8q6y8j7x7q7q"]
+
+[ext_resource type="Script" path="res://scripts/field/FieldExplorationScene.cs" id="1_8j7vq"]
+[ext_resource type="Script" path="res://scripts/field/GridSystem.cs" id="2_n3r5t"]
+[ext_resource type="Script" path="res://scripts/field/PlayerController.cs" id="3_x2m4p"]
+[ext_resource type="Script" path="res://scripts/field/SignalSourceManager.cs" id="4_vk2lp"]
+[ext_resource type="Script" path="res://scripts/field/DayNightCycleManager.cs" id="5_d3r5t"]
+[ext_resource type="Script" path="res://scripts/field/EnvironmentalHazard.cs" id="6_f4r5t"]
+[ext_resource type="Script" path="res://scripts/field/FieldExplorationManager.cs" id="7_g5r6t"]
+
+[node name="EnhancedFieldExplorationScene" type="Node2D"]
+script = ExtResource("1_8j7vq")
+
+[node name="GridSystem" type="Node2D" parent="."]
+script = ExtResource("2_n3r5t")
+_width = 30
+_height = 20
+_cellSize = 32
+
+[node name="Background" type="ColorRect" parent="GridSystem"]
+offset_right = 960.0
+offset_bottom = 640.0
+color = Color(0.0627451, 0.25098, 0.0627451, 1)
+
+[node name="GridLines" type="Node2D" parent="GridSystem"]
+
+[node name="PlayerController" type="Node2D" parent="."]
+position = Vector2(48, 48)
+script = ExtResource("3_x2m4p")
+_moveSpeed = 4.0
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(48, 48)
+current = true
+
+[node name="SignalSourceManager" type="Node" parent="."]
+script = ExtResource("4_vk2lp")
+
+[node name="DayNightCycleManager" type="Node" parent="."]
+script = ExtResource("5_d3r5t")
+DayDuration = 300.0
+StartTime = 8.0
+
+[node name="EnvironmentalHazards" type="Node2D" parent="."]
+
+[node name="RadiationHazard" type="Node2D" parent="EnvironmentalHazards"]
+position = Vector2(320, 160)
+script = ExtResource("6_f4r5t")
+HazardId = "radiation_1"
+HazardName = "Radiation Zone"
+HazardDescription = "A zone of high radiation that interferes with radio signals."
+Type = 2
+Intensity = 0.7
+Range = 4.0
+SignalInterference = 0.8
+HazardColor = Color(0.0, 1.0, 0.0, 0.5)
+PulsateEffect = true
+
+[node name="ElectricalHazard" type="Node2D" parent="EnvironmentalHazards"]
+position = Vector2(640, 320)
+script = ExtResource("6_f4r5t")
+HazardId = "electrical_1"
+HazardName = "Power Lines"
+HazardDescription = "High voltage power lines that create electrical interference."
+Type = 3
+Intensity = 0.5
+Range = 3.0
+MovementPenalty = 0.7
+SignalInterference = 0.6
+HazardColor = Color(1.0, 1.0, 0.0, 0.5)
+PulsateEffect = true
+PulsateSpeed = 2.0
+
+[node name="WeatherHazard" type="Node2D" parent="EnvironmentalHazards"]
+position = Vector2(160, 480)
+script = ExtResource("6_f4r5t")
+HazardId = "weather_1"
+HazardName = "Storm"
+HazardDescription = "A severe storm that makes movement difficult."
+Type = 0
+Intensity = 0.6
+Range = 5.0
+MovementPenalty = 0.5
+SignalInterference = 0.4
+HazardColor = Color(0.5, 0.5, 1.0, 0.5)
+PulsateEffect = true
+PulsateSpeed = 0.5
+
+[node name="SignalSources" type="Node2D" parent="."]
+
+[node name="SignalSource1" type="Node2D" parent="SignalSources"]
+position = Vector2(800, 160)
+
+[node name="SignalSource2" type="Node2D" parent="SignalSources"]
+position = Vector2(480, 480)
+
+[node name="SignalSource3" type="Node2D" parent="SignalSources"]
+position = Vector2(160, 320)
+
+[node name="FieldExplorationManager" type="Node" parent="."]
+script = ExtResource("7_g5r6t")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="TimeDisplay" type="Label" parent="UI"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 128.0
+offset_bottom = 48.0
+theme_override_font_sizes/font_size = 16
+text = "Time: 08:00"
+
+[node name="SignalStrengthDisplay" type="Label" parent="UI"]
+offset_left = 16.0
+offset_top = 48.0
+offset_right = 192.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 16
+text = "Signal: 0%"
+
+[node name="InterferenceDisplay" type="Label" parent="UI"]
+offset_left = 16.0
+offset_top = 80.0
+offset_right = 192.0
+offset_bottom = 112.0
+theme_override_font_sizes/font_size = 16
+text = "Interference: 0%"
+
+[node name="HazardInfoPanel" type="Panel" parent="UI"]
+visible = false
+offset_left = 16.0
+offset_top = 544.0
+offset_right = 416.0
+offset_bottom = 624.0
+
+[node name="HazardNameLabel" type="Label" parent="UI/HazardInfoPanel"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 8.0
+offset_right = 384.0
+offset_bottom = 32.0
+theme_override_font_sizes/font_size = 16
+text = "Hazard Name"
+
+[node name="HazardDescriptionLabel" type="Label" parent="UI/HazardInfoPanel"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 32.0
+offset_right = 384.0
+offset_bottom = 72.0
+theme_override_font_sizes/font_size = 12
+text = "Hazard description goes here."
+autowrap = true
+
+[node name="Instructions" type="Label" parent="UI"]
+offset_left = 640.0
+offset_top = 16.0
+offset_right = 944.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 12
+text = "Arrow keys: Move
+Space: Interact
+T: Advance time by 1 hour
+D: Toggle day/night cycle"
+</node>
