@@ -13,8 +13,7 @@ This directory contains documentation for the Signal Lost game project, a C# God
 ### UI System
 
 - **pixel-based-approach.md**: Overview of the pixel-based UI approach.
-- **pixel-ui-system.md**: Documentation for the pixel-based UI system.
-- **pixel-ui-development.md**: Guidelines for extending the pixel-based UI system.
+- **pixel-ui-guide.md**: Comprehensive guide for the pixel-based UI system, including components, implementation, and development guidelines.
 - **pixel-message-display.md**: Documentation for the pixel-based message display system.
 
 ### Game Systems
@@ -38,6 +37,9 @@ This directory contains documentation for the Signal Lost game project, a C# God
 - **logging.md**: Documentation for the logging system.
 - **README-pixel-ui.md**: Quick start guide for the pixel-based UI system.
 - **ai-screenshot-tool.md**: Documentation for the AI agent screenshot tool.
+- **codebase_documentation.md**: Overview of the codebase architecture and components.
+- **manual_test_procedures.md**: Procedures for manual testing of the game.
+- **end-to-end-testing-plan.md**: Plan for implementing end-to-end tests.
 
 ## Godot Project
 
@@ -51,10 +53,11 @@ The Godot project is located in the `godot_project` directory at the root of the
 - ✅ Game progression mechanics implementation
 - ✅ Field exploration system implementation
 - ✅ Gameplay implementation and content
+- ✅ Save/load system implementation
 - ⬜ Inventory system enhancements
 - ⬜ End-to-end testing improvements
-- ⬜ Save/load system
 - ⬜ Visual polish and optimization
+- ⬜ Audio system refinements
 
 ## Documentation Guidelines
 

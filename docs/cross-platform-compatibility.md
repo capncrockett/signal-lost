@@ -2,7 +2,7 @@
 
 ## Overview
 
-Signal Lost is designed to work on both Windows and macOS platforms. This document outlines the key considerations and best practices for maintaining cross-platform compatibility.
+Signal Lost is designed to work on both Windows and macOS platforms. This document outlines the key considerations and best practices for maintaining cross-platform compatibility. With the recent radio interface implementation, cross-platform testing has become even more critical.
 
 ## Platform-Specific Considerations
 
@@ -198,12 +198,40 @@ private string GetScreenshotDirectory()
 
 ```
 
+## Radio Interface Cross-Platform Considerations
+
+### Audio System
+
+The radio interface's audio system has platform-specific considerations:
+
+- **Audio Initialization**: Audio initialization may differ between platforms
+- **Audio Latency**: Mac may have different audio latency compared to Windows
+- **Resource Cleanup**: Ensure proper cleanup of audio resources on both platforms
+
+### Run Scripts
+
+We've created platform-specific run scripts for testing the radio interface:
+
+- **Windows**: Use `.bat` files for running different radio scenes
+- **macOS**: Use `.sh` files for running different radio scenes
+
+```bash
+# Example macOS run script for radio demo
+#!/bin/bash
+cd godot_project
+/Applications/Godot_mono.app/Contents/MacOS/Godot --path . --scene Scenes/Radio/RadioSignalsDemo.tscn
+```
+
+## Memory Management
+
+Memory management is critical for cross-platform compatibility:
+
+- **Dispose Pattern**: Implement IDisposable for classes that manage unmanaged resources
+- **Resource Cleanup**: Ensure resources are properly cleaned up on both platforms
+- **Memory Leaks**: Test for memory leaks on both platforms
+
 ## Conclusion
 
 By following these guidelines, you can ensure that Signal Lost works consistently across both Windows and macOS platforms. Regular testing on both platforms is essential to catch and fix any platform-specific issues early in development.
 
-The test runner has been updated to work on both platforms, and platform-specific code has been implemented for file system access and screenshots. Continue to test on both platforms regularly to ensure compatibility.
-
-```
-
-```
+With the radio interface implementation, cross-platform testing has become even more important. Use the provided run scripts to test different radio scenes on both platforms, and pay special attention to audio system behavior and memory management.
